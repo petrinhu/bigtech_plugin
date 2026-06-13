@@ -30,5 +30,5 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), e
 - **13 documentos de governança.** Manuais de organização, pipeline de release, liderança, ferramentas, contrato de qualidade, testes, agile, checklist de deploy, auditorias e princípios de arquitetura, higienizados para distribuição pública.
 - **Marketplace `petrinhu`.** Distribuição via `/plugin marketplace add` e `/plugin install bigtech`, sob a licença Apache-2.0.
 
-[0.1.1]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/v0.1.1
-[0.1.0]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/v0.1.0
+[0.1.1]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.1
+[0.1.0]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.0
