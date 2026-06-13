@@ -86,6 +86,7 @@ Sem colisão, siga a instalação normalmente.
 
 ## Compatibilidade
 
+- **Feito para o Claude Code (Anthropic).** Sem garantia de funcionamento em outros assistentes ou CLIs de código (por exemplo, Grok, Gemini CLI, GitHub Copilot CLI, OpenAI Codex, Cursor ou Aider). Hooks, skills e o protocolo de subagents dependem do Claude Code; portar exige adaptação e não é suportado oficialmente.
 - **Incompatível com o plugin `caveman`.** O `caveman` comprime a comunicação e conflita com o reforço de modo do `bigtech`. Se o `caveman` estiver ativo, **desative-o** antes de usar o `bigtech`. O hook `bigtech_session_init` avisa no `SessionStart` quando detecta os dois ativos ao mesmo tempo.
 - **Dependências sugeridas:** `playwright` e `superpowers`. Não são obrigatórias, mas habilitam a experiência completa (automação de navegador e fluxos avançados). Instale-as para o uso pleno; o `bigtech_session_init` sugere a instalação quando estão ausentes.
 

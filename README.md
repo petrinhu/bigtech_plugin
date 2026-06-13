@@ -2,7 +2,16 @@
 
 > Estruture qualquer projeto como uma empresa de produto digital: uma constelação de 50 agents (12 C-level + 38 operacionais), 3 skills de orquestração e hooks de governança e TDD. Dimensionável do solo founder à bigtech.
 
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE)
+[![Claude Code Plugin](https://img.shields.io/badge/Claude_Code-plugin-D97757?style=for-the-badge&logo=anthropic&logoColor=white)](https://code.claude.com/docs/en/plugins)
+[![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-4C8EDA?style=for-the-badge)](./LICENSE)
+
+[![Release](https://img.shields.io/badge/release-v0.1.2-2EA043?style=for-the-badge)](https://codeberg.org/petrinhu/bigtech_plugin/releases)
+[![CI](https://codeberg.org/petrinhu/bigtech_plugin/actions/workflows/ci.yml/badge.svg)](https://codeberg.org/petrinhu/bigtech_plugin/actions)
+
+[![Agents](https://img.shields.io/badge/agents-50-4F4F4F?style=for-the-badge)](#o-que-é)
+[![Skills](https://img.shields.io/badge/skills-3-4F4F4F?style=for-the-badge)](#o-que-é)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-4F4F4F?style=for-the-badge)](https://codeberg.org/petrinhu/bigtech_plugin/pulls)
 
 ## Bem-vindo, líder supremo
 
@@ -113,6 +122,8 @@ Use para planejar passos, ordenar backlog, ou perguntar "o que falta" e "em que 
 | `bigtech_reinforce.py` | UserPromptSubmit | Reforça o modo bigtech (anti-drift) e roteia ativação por linguagem natural para `/bigtech`. Escopado por marcador, anti-ruído. |
 
 ## Compatibilidade
+
+**Feito para o Claude Code (Anthropic).** O plugin usa recursos próprios do Claude Code: hooks de ciclo de vida, skills, o protocolo de subagents e o formato de plugin/marketplace. Não há garantia de funcionamento em outros assistentes de IA ou CLIs de código (por exemplo, Grok, Gemini CLI, GitHub Copilot CLI, OpenAI Codex, Cursor ou Aider); portar para outras plataformas pode exigir adaptação e não é suportado oficialmente.
 
 **Incompatível com o plugin `caveman`.** O `caveman` comprime a comunicação e conflita com o reforço de modo deste plugin. Desative o `caveman` antes de usar o `bigtech`; o hook de sessão avisa caso detecte os dois ativos ao mesmo tempo.
 
