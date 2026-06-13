@@ -31,11 +31,12 @@ concurrency:
 jobs:
   validate:
     name: validate (preci)
-    # codeberg-medium (global): gates Python puro + binario leve, nada compila.
-    # Revertido de codeberg-small em 2026-06-13: small tem timeout de 5 min, apertado
-    # pros gates (referencia: 3m3s no medium, que da 10 min). Em fila do medium,
-    # alternar pra codeberg-medium-lazy (mais disponivel, janela ate 24h).
-    runs-on: codeberg-medium
+    # codeberg-medium-lazy (global): gates Python puro + binario leve, nada compila.
+    # Trocado para -lazy em 2026-06-13: o standard codeberg-medium ficou >15 min em
+    # waiting sem pegar runner (fila congestionada). O pool lazy (carga flexivel,
+    # infra offsite, janela ate 24h) costuma pegar quando o standard satura. Voltar
+    # pro codeberg-medium quando a fila normalizar.
+    runs-on: codeberg-medium-lazy
     container:
       # act-latest = default Codeberg, compat GitHub Actions + setup-python.
       image: ghcr.io/catthehacker/ubuntu:act-latest
