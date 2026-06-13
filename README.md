@@ -6,7 +6,7 @@
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-4C8EDA?style=for-the-badge)](./LICENSE)
 
-[![Release](https://img.shields.io/badge/release-v0.1.2-2EA043?style=for-the-badge)](https://codeberg.org/petrinhu/bigtech_plugin/releases)
+[![Release](https://img.shields.io/gitea/v/release/petrinhu/bigtech_plugin?gitea_url=https://codeberg.org&style=for-the-badge&color=2EA043&label=release)](https://codeberg.org/petrinhu/bigtech_plugin/releases)
 [![CI](https://codeberg.org/petrinhu/bigtech_plugin/actions/workflows/ci.yml/badge.svg)](https://codeberg.org/petrinhu/bigtech_plugin/actions)
 
 [![Agents](https://img.shields.io/badge/agents-50-4F4F4F?style=for-the-badge)](#o-que-é)

@@ -4,6 +4,16 @@ Todas as mudanças relevantes deste projeto são documentadas neste arquivo.
 
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), e o projeto adota o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.1.5] - 2026-06-13
+
+### Fixed
+
+- **Badge de release no README.** O badge de versão apontava para `v0.1.2` (não fora atualizado nos lançamentos 0.1.3 e 0.1.4). Agora usa o endpoint dinâmico do shields.io para Codeberg (`gitea/v/release`), refletindo automaticamente a última release publicada, sem manutenção manual.
+
+### Changed
+
+- **CI no runner `codeberg-medium-lazy`.** O workflow Forgejo Actions passou a rodar no pool lazy da Codeberg (carga flexível, mais disponível) após o runner `codeberg-medium` standard ficar longos períodos em fila sem pegar o job.
+
 ## [0.1.4] - 2026-06-13
 
 ### Changed
@@ -54,6 +64,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), e
 - **13 documentos de governança.** Manuais de organização, pipeline de release, liderança, ferramentas, contrato de qualidade, testes, agile, checklist de deploy, auditorias e princípios de arquitetura, higienizados para distribuição pública.
 - **Marketplace `petrinhu`.** Distribuição via `/plugin marketplace add` e `/plugin install bigtech`, sob a licença Apache-2.0.
 
+[0.1.5]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.5
 [0.1.4]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.4
 [0.1.3]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.3
 [0.1.2]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.2
