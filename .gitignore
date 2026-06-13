@@ -1,0 +1,13 @@
+# Python (hooks)
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Marcadores de runtime do próprio plugin
+.bigtech-porte
+
+# SO / editor
+.DS_Store
+*.swp
