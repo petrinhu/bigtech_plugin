@@ -1,0 +1,20 @@
+{
+  "name": "bigtech",
+  "version": "0.1.0",
+  "description": "Constelação de agents C-level (CEO, CTO, CPO, CMO, COO, CISO, CDO, CFO, CRO, CLO, CAIO + Chief of Staff) e operacionais, com skills de orquestração (bigtech, proj_software, tab_pendencias) para tocar produto e SDLC como uma bigtech.",
+  "author": {
+    "name": "petrinhu",
+    "url": "https://codeberg.org/petrinhu"
+  },
+  "homepage": "https://codeberg.org/petrinhu/bigtech_plugin",
+  "repository": "https://codeberg.org/petrinhu/bigtech_plugin",
+  "license": "Apache-2.0",
+  "keywords": [
+    "bigtech",
+    "agents",
+    "c-level",
+    "orchestration",
+    "product",
+    "sdlc"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "petrinhu",
+  "owner": {
+    "name": "petrinhu",
+    "url": "https://codeberg.org/petrinhu"
+  },
+  "plugins": [
+    {
+      "name": "bigtech",
+      "source": "./",
+      "description": "Constelação de agents C-level e operacionais com skills de orquestração (bigtech, proj_software, tab_pendencias) para tocar produto e SDLC como uma bigtech.",
+      "category": "workflow",
+      "version": "0.1.0",
+      "license": "Apache-2.0"
+    }
+  ]
+}

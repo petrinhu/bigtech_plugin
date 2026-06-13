@@ -22,7 +22,7 @@
 
 | ID | Onda | Grupo | Descrição Técnica | Prioridade | Pré-requisito | Dificuldade | Status | Estado Auditado |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| F1 | W1 | Fundação | Estrutura de diretórios + `.claude-plugin/plugin.json` (name=bigtech, Apache-2.0) + `marketplace.json` (1 plugin, `source: "./"`). **One-way-door.** | Alta | — | Baixa | ⏳ Pendente | — |
+| F1 | W1 | Fundação | Estrutura de diretórios + `.claude-plugin/plugin.json` (name=bigtech, Apache-2.0) + `marketplace.json` (name=petrinhu, 1 plugin, `source: "./"`). **One-way-door.** | Alta | — | Baixa | ✅ Concluído | — |
 | R1 | W2 | Release | `LICENSE` Apache-2.0 + `NOTICE` (pull-early: desbloqueia AUD-LICENSE). | Alta | F1 | Baixa | ⏳ Pendente | — |
 | D3 | W2 | Docs | Gerar `docs/principles/hardware-resource-limits.md` **generalizado** (sem specs da máquina); ~20 agents dependem. | Média | F1 | Média | ⏳ Pendente | — |
 | D1a | W2 | Docs | Higienizar `TOOLING.md` (40 wikilinks — o doc mais pesado). | Alta | F1 | Alta | ⏳ Pendente | — |
