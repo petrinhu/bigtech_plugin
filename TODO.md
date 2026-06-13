@@ -57,7 +57,7 @@
 | TST-T15 | W7 | Testes | Pré-CI: rodar a suíte local (estática + pytest dos hooks + zero-órfãos) antes do push. | Média | TST-T2, TST-ORFAOS, TST-T14 | Baixa | ✅ Concluído | — |
 | AUD-REPORT | W7 | Auditoria | Relatório final consolidado (score, sumário de achados, remediação) antes do gate. | Alta | AUD-SEC, AUD-PRIV, AUD-LICENSE, AUD-QUALITY | Média | ✅ Concluído | ✓ |
 | R4 | W8 | Release | `git init` + publicar no Codeberg (`codeberg.org/petrinhu/bigtech_plugin`). **Gate de publicação / one-way-door — go/no-go do líder supremo.** | Alta | TST-T14, TST-T15, TST-ORFAOS, AUD-REPORT | Baixa | ✅ Concluído | — |
-| W-WIKI | W8 | Release | Wiki do repo (Codeberg/Forgejo wiki-native) + doc `.md` extensa em registro didático para INICIANTE (explica jargão, passo-a-passo). Deriva de `docs/` (linka, não duplica). Execução via `technical-writer`/`ux-writer`. | Baixa | R4 | Média | ⏳ Pendente | — |
+| W-WIKI | W8 | Release | Wiki do repo (Codeberg/Forgejo wiki-native) + doc `.md` extensa em registro didático para INICIANTE (explica jargão, passo-a-passo). Deriva de `docs/` (linka, não duplica). Execução via `technical-writer`/`ux-writer`. | Baixa | R4 | Média | ✅ Concluído | ✓ |
 
 ## Tabela de scoring WSJF (itens-pai funcionais)
 
