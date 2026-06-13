@@ -43,13 +43,13 @@
 | S3 | W4 | Skills | Higienizar `/tab_pendencias` (zero-wikilink, `references/`). | Média | D1*, D2 | Média | ✅ Concluído | — |
 | S1 | W4 | Skills | Higienizar `/bigtech` (listar só os 50, remover `/proj_jogo`, orquestração repassa path de docs aos subagents). | Alta | A1, A2*, D1* | Alta | ✅ Concluído | — |
 | S2 | W4 | Skills | Higienizar `/proj_software` (refs só aos incluídos, zero-wikilink). | Média | A1, A2*, D1* | Média | ✅ Concluído | — |
-| TST-T2 | W4 | Testes | Análise estática (ruff/mypy nos hooks + markdownlint + validação de schema JSON). | Média | H3, A2* | Baixa | ⏳ Pendente | — |
-| TST-T8 | W4 | Testes | Verificação de secrets (gitleaks/trufflehog) em todo o repo. | Alta | H4, A2*, D1* | Baixa | ⏳ Pendente | — |
-| TST-ORFAOS | W5 | Testes | **Validação ZERO-ÓRFÃOS** (gate §4.1): wikilinks=0 fora de código, paths locais=0, refs aos 20 excluídos=0, termos pessoais=0, links Markdown órfãos=0. | Alta | D1*, D2, D3, D4, A1, A2*, S1, S2, S3 | Alta | ⏳ Pendente | — |
-| TST-DEPS | W5 | Testes | Scanning de dependências + CVEs (pip-audit / trivy / OSV) dos hooks. | Baixa | H1, H4 | Baixa | ⏳ Pendente | — |
+| TST-T2 | W4 | Testes | Análise estática (ruff/mypy nos hooks + markdownlint + validação de schema JSON). | Média | H3, A2* | Baixa | ✅ Concluído | — |
+| TST-T8 | W4 | Testes | Verificação de secrets (gitleaks/trufflehog) em todo o repo. | Alta | H4, A2*, D1* | Baixa | ✅ Concluído | — |
+| TST-ORFAOS | W5 | Testes | **Validação ZERO-ÓRFÃOS** (gate §4.1): wikilinks=0 fora de código, paths locais=0, refs aos 20 excluídos=0, termos pessoais=0, links Markdown órfãos=0. | Alta | D1*, D2, D3, D4, A1, A2*, S1, S2, S3 | Alta | ✅ Concluído | — |
+| TST-DEPS | W5 | Testes | Scanning de dependências + CVEs (pip-audit / trivy / OSV) dos hooks. | Baixa | H1, H4 | Baixa | ✅ Concluído | — |
 | TST-T14 | W5 | Testes | Smoke test de instalação: marketplace local → `/plugin install` → carregar 50 agents + 3 skills + hooks; agent resolve e lê um manual. | Alta | H4, A1, A2*, S1, S2, S3, R1 | Média | ⏳ Pendente | — |
-| R2 | W5 | Release | `README.md` (instalação via marketplace, ritual de boas-vindas/CEO, compat caveman, deps playwright/superpowers, lista de agents/skills). | Alta | D4, H3, S1 | Média | ⏳ Pendente | — |
-| R3 | W5 | Release | `CHANGELOG.md` v0.1.0. | Baixa | F1 | Baixa | ⏳ Pendente | — |
+| R2 | W5 | Release | `README.md` (instalação via marketplace, ritual de boas-vindas/CEO, compat caveman, deps playwright/superpowers, lista de agents/skills). | Alta | D4, H3, S1 | Média | ✅ Concluído | — |
+| R3 | W5 | Release | `CHANGELOG.md` v0.1.0. | Baixa | F1 | Baixa | ✅ Concluído | — |
 | AUD-SEC | W6 | Auditoria | Segurança dos hooks Python (silent-fail, sem exec inseguro/path traversal, não bloqueia) + secrets. | Alta | H4, TST-T2, TST-T8 | Alta | ⏳ Pendente | — |
 | AUD-PRIV | W6 | Auditoria | Privacidade/despersonalização: zero dados pessoais (nome/títulos/infra/specs de máquina). **Gate de publicação.** | Alta | TST-ORFAOS | Média | ⏳ Pendente | — |
 | AUD-LICENSE | W6 | Auditoria | Licença/atribuição: Apache-2.0 correta + `NOTICE` + compatibilidade da origem dos docs. | Alta | R1, D1* | Baixa | ⏳ Pendente | — |

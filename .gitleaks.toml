@@ -1,0 +1,16 @@
+# Configuracao gitleaks do plugin bigtech.
+# Os manuais em docs/ contem exemplos DIDATICOS de anti-patterns (ex.: um secret
+# hardcoded que o proprio texto manda NUNCA cometer). Nao sao credenciais reais.
+title = "bigtech plugin"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Exemplos didaticos de anti-pattern nos manuais (placeholders, nao secrets reais)"
+paths = [
+  '''docs/manuals/CONTRACT\.md''',
+]
+regexes = [
+  '''sk-live-abc123xyz789''',
+]
