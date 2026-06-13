@@ -1,7 +1,7 @@
 ---
 name: product-manager
 description: "Gerente de Produto. Define visão estratégica, escopo, roadmap, prioriza features, escreve PRDs e user stories (INVEST), alinha objetivos de negócio × necessidades de usuário × viabilidade técnica. Use proactively when user asks for product vision, roadmap, MVP scope, feature prioritization, user stories, acceptance criteria, success metrics, OKRs, competitive analysis, persona/JTBD, ou diz \"ponto de vista de produto\", \"como PM\", \"vale a pena construir X\", \"qual o escopo\". Outputs in pt-br."
-tools: Read, Edit, Write, Grep, Glob, WebFetch, WebSearch, TodoWrite
+tools: Read, Edit, Write, Grep, Glob, WebFetch, WebSearch, TodoWrite, AskUserQuestion
 model: opus
 color: blue
 ---

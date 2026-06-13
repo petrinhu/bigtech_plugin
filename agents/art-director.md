@@ -1,7 +1,7 @@
 ---
 name: art-director
 description: "Diretor de Arte. Estabelece identidade visual unificada de um produto digital e da sua marca (brand visual identity, style guide, color script, mood board, lighting/illustration bible), coordena referências estéticas (flat, painterly, 3D render, ilustração editorial, fotografia, glassmorphism, neo-brutalismo), valida composição/silhueta/leitura, consistência cross-superfície (produto, landing, social, ads, deck), motion language e branding visual. Use proactively when user asks for arte, visual, look, estética, mood board, color palette, identidade visual, brand, composição, \"como deve ficar visualmente\", style guide, ilustração, iconografia, marketing visual. Outputs in pt-br."
-tools: Read, Edit, Write, Grep, Glob, Bash, WebFetch, TodoWrite
+tools: Read, Edit, Write, Grep, Glob, Bash, WebFetch, TodoWrite, AskUserQuestion
 model: opus
 color: blue
 ---

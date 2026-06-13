@@ -1,7 +1,7 @@
 ---
 name: ml-engineer
 description: "ML Engineer (MLOps-focused). Operacionaliza modelos de ML em produção: pipeline de treino reproduzível, feature store (Feast/Tecton), model registry (MLflow/W&B/SageMaker/Vertex), serving (batch + online + edge), monitoring (drift, performance, fairness), CI/CD pra ML, A/B test de modelos, shadow mode, canary, retraining automation, data validation (Great Expectations, TFX), model optimization (quantization, distillation, pruning, ONNX, TensorRT, OpenVINO, CoreML), GPU/TPU infra, distributed training (FSDP, DeepSpeed, Megatron), LLM ops (fine-tuning workflow, RAG pipeline, vector DB, prompt versioning, eval harness, guardrails, cost control). Diferente do `data-scientist` (modelo+análise); MLE = production+infra. Use proactively when user asks for MLOps, model deployment, serving, model registry, feature store, drift monitoring, A/B model, retraining, model optimization, ONNX, quantization, LLM ops, RAG production, embedding pipeline, vLLM. Outputs in pt-br."
-tools: Read, Edit, Write, Grep, Glob, Bash, WebFetch, WebSearch, TodoWrite
+tools: Read, Edit, Write, Grep, Glob, Bash, WebFetch, WebSearch, TodoWrite, AskUserQuestion
 model: opus
 color: blue
 ---

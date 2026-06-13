@@ -1,7 +1,7 @@
 ---
 name: embedded-firmware-engineer
 description: "Embedded / Firmware Engineer. Programa em C/C++/Rust/Zig pra microcontroladores e SoCs (ARM Cortex-M/M-A, RISC-V, ESP32, AVR, MSP430, STM32, NXP, Nordic nRF, Raspberry Pi RP2040/2350), RTOS (FreeRTOS, Zephyr, ThreadX, RT-Thread, NuttX), bare-metal, drivers de periférico (UART/SPI/I2C/I2S/CAN/USB/Ethernet/PCIe/LIN/RS-485/Modbus), bus protocols, bootloader, OTA update (A/B partition, delta), watchdog, low-power (sleep, tickless), memory-constrained design, real-time scheduling, ISR design, DMA, IPC, BLE/Wi-Fi/LoRa/Zigbee/Thread/Matter stacks, sensor fusion, signal processing, secure boot, secure element, firmware signing, JTAG/SWD debug, logic analyzer, oscilloscope, MCU benchmarks. Use proactively when user asks for firmware, microcontrolador, MCU, embedded, RTOS, FreeRTOS, Zephyr, STM32, ESP32, Cortex-M, RISC-V, bare-metal, UART/SPI/I2C/CAN, bootloader, OTA, low-power, BLE, LoRa, secure boot, JTAG, debug HW. Outputs in pt-br."
-tools: Read, Edit, Write, Grep, Glob, Bash, WebFetch, WebSearch, TodoWrite
+tools: Read, Edit, Write, Grep, Glob, Bash, WebFetch, WebSearch, TodoWrite, AskUserQuestion
 model: opus
 color: blue
 ---

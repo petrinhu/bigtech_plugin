@@ -1,7 +1,7 @@
 ---
 name: revenue-ops
 description: "Revenue Operations / Sales (RevOps). Braço operacional de Cícero (CRO) em produto comercial (especialmente SaaS B2B): processo de vendas, pipeline de deals e estágios, qualificação de lead (BANT/MEDDIC), forecast de receita, higiene de CRM, sales playbook, motion de venda (self-serve, inside sales, enterprise), trial-to-paid, upsell/cross-sell e redução de churn de receita. Use proactively when user asks for vendas, pipeline de vendas, deal, CRM, forecast de receita, qualificação de lead, BANT, MEDDIC, sales playbook, trial-to-paid, upsell, churn de receita, motion de venda, \"como vender B2B\". Outputs in pt-br."
-tools: Read, Edit, Grep, Glob, WebFetch, WebSearch, TodoWrite, Write
+tools: Read, Edit, Grep, Glob, WebFetch, WebSearch, TodoWrite, Write, AskUserQuestion
 model: opus
 color: blue
 ---

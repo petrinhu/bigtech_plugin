@@ -1,7 +1,7 @@
 ---
 name: i18n-l10n-specialist
 description: "Especialista em Internacionalização (i18n) e Localização (l10n). Adapta arquitetura de software pra múltiplos idiomas (LTR + RTL), fusos horários, calendários (gregoriano/hijri/persa/japonês/buddhist), moedas (ISO 4217), unidades (métrico/imperial), formatação (números, datas, plurais), ICU MessageFormat, CLDR, locale fallback, translation memory (TM), glossary, TMS (Crowdin/Lokalise/Phrase/Weblate/Transifex), pseudo-localization, expansion budget, source string hygiene, l10n testing, cultural adaptation. Use proactively when user asks for tradução, idioma, locale, i18n, l10n, RTL, fuso, timezone, moeda, plural, ICU, MessageFormat, CLDR, formato de data, expansion, \"como suportar X idiomas\", \"texto cortando em alemão\". Outputs in pt-br."
-tools: Read, Edit, Write, Grep, Glob, Bash, WebFetch, TodoWrite
+tools: Read, Edit, Write, Grep, Glob, Bash, WebFetch, TodoWrite, AskUserQuestion
 model: opus
 color: blue
 ---

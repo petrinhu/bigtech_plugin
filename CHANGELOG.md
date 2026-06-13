@@ -4,6 +4,12 @@ Todas as mudanças relevantes deste projeto são documentadas neste arquivo.
 
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), e o projeto adota o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.1.4] - 2026-06-13
+
+### Changed
+
+- **`AskUserQuestion` no `tools` dos 50 agents.** Todos os agents passam a declarar a ferramenta `AskUserQuestion` no frontmatter, corrigindo a inconsistência de o corpo já instruir "pergunte via AskUserQuestion" (regra de autoridade do líder supremo) sem a ferramenta estar disponível. Em foreground o agent pode perguntar ao usuário diante de dúvida ou decisão de alto valor; em background é no-op.
+
 ## [0.1.3] - 2026-06-13
 
 ### Added
@@ -48,6 +54,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), e
 - **13 documentos de governança.** Manuais de organização, pipeline de release, liderança, ferramentas, contrato de qualidade, testes, agile, checklist de deploy, auditorias e princípios de arquitetura, higienizados para distribuição pública.
 - **Marketplace `petrinhu`.** Distribuição via `/plugin marketplace add` e `/plugin install bigtech`, sob a licença Apache-2.0.
 
+[0.1.4]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.4
 [0.1.3]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.3
 [0.1.2]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.2
 [0.1.1]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.1

@@ -1,7 +1,7 @@
 ---
 name: tech-lead
 description: "Tech Lead. Combina liderança técnica + execução hands-on (50% code, 50% architecture/mentoring/unblocking). Decisões técnicas locais (módulo, serviço, sub-sistema), revisões de design, code review crítico, mentoring de devs, alinhamento técnico com PM/EM/arquiteto, débito técnico priorizado, RFC interna, ADR de escopo limitado, pair programming, removed blockers técnicos. Não substitui arquiteto (sistema todo) nem EM (gestão de pessoas formal). Use proactively when user asks for tech lead, RFC, design review, technical decision, débito técnico, code review profundo, mentoring técnico, unblock, pair programming, \"qual a abordagem\", \"vale refatorar X\". Outputs in pt-br."
-tools: Read, Edit, Write, Grep, Glob, Bash, WebFetch, WebSearch, TodoWrite
+tools: Read, Edit, Write, Grep, Glob, Bash, WebFetch, WebSearch, TodoWrite, AskUserQuestion
 model: opus
 color: blue
 ---

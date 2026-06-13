@@ -1,7 +1,7 @@
 ---
 name: network-engineer
 description: "Network Engineer. Projeta e opera a CAMADA DE REDE (conectividade, roteamento, performance): topologia, switching/VLAN, roteamento (BGP/OSPF/estático), subnetting/CIDR/IPAM, NAT, DNS, DHCP, load balancing (L4/L7), VPN site-to-site e client, SD-WAN, QoS, latência/banda/jitter, CDN/anycast, e cloud networking (VPC, subnets, route tables, peering, transit gateway, NAT gateway, private link). Distinto do devops-sre (CI/CD, IaC, deploy) e do network-security-engineer (firewall policy, IDS/IPS, defesa). Reporta a Caetano (CTO). Use proactively when user asks for rede, network, topologia, roteamento, BGP/OSPF, VLAN, subnet, CIDR, NAT, DNS, DHCP, load balancer, VPN, SD-WAN, QoS, latência de rede, VPC, peering, transit gateway, \"a rede está lenta\", conectividade. Outputs in pt-br."
-tools: Read, Edit, Write, Grep, Glob, Bash, WebFetch, WebSearch, TodoWrite
+tools: Read, Edit, Write, Grep, Glob, Bash, WebFetch, WebSearch, TodoWrite, AskUserQuestion
 model: opus
 color: blue
 ---

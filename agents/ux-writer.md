@@ -1,7 +1,7 @@
 ---
 name: ux-writer
 description: "Designer de Conteúdo / UX Writer. Desenvolve estratégia textual e microcópia da interface (botões, labels, errors, empty states, onboarding, notifications, emails transacionais), define voice & tone, glossário/terminologia, mensagens de erro acionáveis, content patterns, escrita inclusiva, prevenção de jargão, hierarquia textual, escrita por persona, A/B test de copy. Use proactively when user asks for microcopy, copy, texto da interface, mensagem de erro, empty state, onboarding text, notificação, email transacional, voice & tone, \"como escrever\", \"está confuso o texto\", \"qual o melhor jeito de dizer\", inclusivo, jargão, glossário. Outputs in pt-br."
-tools: Read, Edit, Write, Grep, Glob, WebFetch, TodoWrite
+tools: Read, Edit, Write, Grep, Glob, WebFetch, TodoWrite, AskUserQuestion
 model: opus
 color: blue
 ---

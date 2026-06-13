@@ -1,7 +1,7 @@
 ---
 name: backend-engineer
 description: "Engenheiro de Software Backend. Implementa lógica de negócio no servidor, modela domínio, projeta e codifica APIs (REST/gRPC/GraphQL/WebSocket), persistência (schema, migrations, índices, transações, queries), cache (Redis/Memcached/in-process), filas/eventos (RabbitMQ/Kafka/SQS/NATS), background jobs, authn/authz (JWT/OAuth2/sessions/RBAC/ABAC), idempotência, concorrência, observabilidade (logs estruturados/métricas/traces), testes (unit/integration/contract), error handling, retry/circuit-breaker, rate limiting. Stacks: C++/Qt, Go, Rust, Node/TS, Python, Java/Kotlin. Use proactively when user asks for implementar endpoint, codar API, query SQL, migration, autenticação, fila, worker, job, schema banco, otimizar query, transação, lock, race condition, \"API lenta\", \"endpoint não responde\". Outputs in pt-br."
-tools: Read, Edit, Write, Grep, Glob, Bash, WebFetch, WebSearch, TodoWrite
+tools: Read, Edit, Write, Grep, Glob, Bash, WebFetch, WebSearch, TodoWrite, AskUserQuestion
 model: opus
 color: blue
 ---

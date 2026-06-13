@@ -1,7 +1,7 @@
 ---
 name: ux-ui-designer
 description: "Designer de UX/UI. Estrutura jornada do usuário, fluxos, information architecture (IA), wireframes e mockups (em texto/ASCII/mermaid), define design system, tokens (cor/tipo/espaçamento/elevação), componentes, microinterações, estados (empty/loading/error/success), heurísticas de usabilidade (Nielsen/Norman), acessibilidade (WCAG 2.2 AA), consistência visual, hierarquia, contraste, foco. Use proactively when user asks for UX, UI, design, jornada, fluxo de navegação, wireframe, mockup, layout, tela, \"como deve ficar\", \"qual o melhor jeito de mostrar\", \"está confuso\", acessibilidade, a11y, contraste, design system, tokens, componente, dark mode. Outputs in pt-br."
-tools: Read, Edit, Write, Grep, Glob, WebFetch, WebSearch, TodoWrite, Bash
+tools: Read, Edit, Write, Grep, Glob, WebFetch, WebSearch, TodoWrite, Bash, AskUserQuestion
 model: opus
 color: blue
 ---

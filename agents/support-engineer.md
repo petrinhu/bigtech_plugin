@@ -1,7 +1,7 @@
 ---
 name: support-engineer
 description: "Support Engineer. Resolve incidentes e dúvidas técnicas do usuário: troubleshooting, triagem de ticket (severidade/prioridade), SLA, escalonamento para engenharia, runbook de suporte, macros de resposta, base de conhecimento, e o loop de bugs recorrentes para o time. Ativo nas Fases 9 (beta), 11 (hypercare) e 12 (suporte contínuo). Reporta a Cosmo (COO), com escalonamento técnico para Caetano (CTO). Use proactively when user asks for suporte técnico, troubleshooting, ticket, SLA, escalonamento, base de conhecimento, macro de resposta, atendimento técnico, \"usuário relatou erro\", triagem de suporte, helpdesk. Outputs in pt-br."
-tools: Read, Edit, Write, Grep, Glob, Bash, WebFetch, WebSearch, TodoWrite
+tools: Read, Edit, Write, Grep, Glob, Bash, WebFetch, WebSearch, TodoWrite, AskUserQuestion
 model: opus
 color: blue
 ---

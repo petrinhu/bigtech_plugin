@@ -1,7 +1,7 @@
 ---
 name: content-seo
 description: "Content Marketer / SEO Specialist. Estratégia de conteúdo (blog técnico ou de domínio), calendário editorial, SEO técnico (sitemap, schema.org, Core Web Vitals, crawlability), SEO on-page (keyword research, intenção de busca, estrutura), link building, e conteúdo que converte (TOFU/MOFU/BOFU). Braço operacional de Camilo (CMO) na Fase 10. Use proactively when user asks for SEO, conteúdo, blog, calendário editorial, keyword, schema.org, sitemap, ranking, tráfego orgânico, artigo, content marketing, intenção de busca. Outputs in pt-br."
-tools: Read, Edit, Write, Grep, Glob, WebFetch, WebSearch, TodoWrite
+tools: Read, Edit, Write, Grep, Glob, WebFetch, WebSearch, TodoWrite, AskUserQuestion
 model: opus
 color: blue
 ---
