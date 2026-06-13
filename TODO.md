@@ -24,15 +24,15 @@
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | F1 | W1 | Fundação | Estrutura de diretórios + `.claude-plugin/plugin.json` (name=bigtech, Apache-2.0) + `marketplace.json` (name=petrinhu, 1 plugin, `source: "./"`). **One-way-door.** | Alta | — | Baixa | ✅ Concluído | — |
 | R1 | W2 | Release | `LICENSE` Apache-2.0 + `NOTICE` (pull-early: desbloqueia AUD-LICENSE). | Alta | F1 | Baixa | ✅ Concluído | — |
-| D3 | W2 | Docs | Gerar `docs/principles/hardware-resource-limits.md` **generalizado** (sem specs da máquina); ~20 agents dependem. | Média | F1 | Média | ⏳ Pendente | — |
+| D3 | W2 | Docs | Gerar `docs/principles/hardware-resource-limits.md` **generalizado** (sem specs da máquina); ~20 agents dependem. | Média | F1 | Média | ✅ Concluído | — |
 | D1a | W2 | Docs | Higienizar `TOOLING.md` (40 wikilinks — o doc mais pesado). **Piloto: gerou `docs/superpowers/higienizacao-template.md`.** | Alta | F1 | Alta | ✅ Concluído | — |
-| D1b | W2 | Docs | Higienizar `ORG` + `pipeline_release_1.0` + `lideranca_pipeline_release` (core da constelação). | Alta | F1 | Alta | ⏳ Pendente | — |
-| D1c | W2 | Docs | Higienizar manuais: `DEPLOY_CHECKLIST`, `CONTRACT`, `TESTES`, `AGILE`, `AUDITORIAS`. | Média | F1 | Média | ⏳ Pendente | — |
-| D2 | W2 | Docs | Higienizar 3 docs de princípios (`arquitetura-principios`, `agile-methodology`, `anti-patterns`). | Média | F1 | Média | ⏳ Pendente | — |
+| D1b | W2 | Docs | Higienizar `ORG` + `pipeline_release_1.0` + `lideranca_pipeline_release` (core da constelação). | Alta | F1 | Alta | ✅ Concluído | — |
+| D1c | W2 | Docs | Higienizar manuais: `DEPLOY_CHECKLIST`, `CONTRACT`, `TESTES`, `AGILE`, `AUDITORIAS`. | Média | F1 | Média | ✅ Concluído | — |
+| D2 | W2 | Docs | Higienizar 3 docs de princípios (`arquitetura-principios`, `agile-methodology`, `anti-patterns`). | Média | F1 | Média | ✅ Concluído | — |
 | H1 | W2 | Hooks | Portar hooks TDD (`tdd_guard`+`tdd_common`+`tdd_runner`+`tests/`); paths → `${CLAUDE_PLUGIN_ROOT}`. **51 testes passando.** | Média | F1 | Alta | ✅ Concluído | — |
 | H2 | W2 | Hooks | Portar `bigtech_porte_reminder` + `bigtech_reinforce` (paths/marcador `.bigtech-porte`). | Média | F1 | Média | ✅ Concluído | — |
 | H3 | W2 | Hooks | Criar `bigtech_session_init.py` (SessionStart: docs-bootstrap + aviso caveman via settings.json + sugestão deps). **Caminho crítico (§4.3).** | Alta | F1, D3 | Alta | ✅ Concluído | — |
-| D4 | W3 | Docs | Reescrever ORG §0 — transferência do título de líder supremo/CEO ao usuário que instala. | Média | D1b | Média | ⏳ Pendente | — |
+| D4 | W3 | Docs | Reescrever ORG §0 — transferência do título de líder supremo/CEO ao usuário que instala. *(feito junto do D1b)* | Média | D1b | Média | ✅ Concluído | — |
 | H4 | W3 | Hooks | `hooks/hooks.json` — registro central de todos os hooks (eventos + `${CLAUDE_PLUGIN_ROOT}`). *(antecipado para W2)* | Média | H1, H2, H3 | Baixa | ✅ Concluído | — |
 | A1 | W3 | Agents | Higienizar 12 agents C-level (zero-wikilink→links relativos, instrução imperativa de leitura, refs só aos 50, despersonalizar). | Alta | D1*, D2, D3 | Média | ⏳ Pendente | — |
 | A2a | W3 | Agents | Higienizar 14 agents de Engenharia (architect, tech-lead, back/front/mobile/embedded/hardware, devops, perf, network, net-sec, security, qa, release). | Alta | D1*, D2, D3 | Alta | ⏳ Pendente | — |
