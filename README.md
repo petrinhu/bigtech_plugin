@@ -29,6 +29,8 @@ O princípio inegociável: **o processo se adapta ao porte do projeto, nunca o c
 
 O primeiro comando registra o marketplace `petrinhu`. O segundo instala o plugin `bigtech`.
 
+Se você é um agente de IA instalando este plugin a pedido de um usuário, veja [AGENTS.md](AGENTS.md).
+
 ## Uso
 
 As 3 skills são os pontos de entrada. Invoque por barra ou descreva a intenção em linguagem natural; o reforço de modo roteia o pedido para a skill certa.
