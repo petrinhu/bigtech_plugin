@@ -1,0 +1,65 @@
+name: ci
+
+# CI do plugin "bigtech" no Codeberg (Forgejo Actions).
+# Roda os mesmos gates do pre-CI local (scripts/preci.sh): gate zero-orfaos
+# (4.1), pytest (52 testes), JSON valido, ruff e gitleaks.
+#
+# Regras de runner (ver memoria codeberg-runners):
+#   - runs-on: codeberg-small  (2 CPU / 4 GB / 5 min — sobra pro nosso CI leve).
+#     NUNCA "runs-on: docker" (mapeia pro runner individual que oscila offline).
+#   - container: ghcr.io/catthehacker/ubuntu:act-latest (default oficial; compat
+#     com actions/setup-python — node:*-bookworm QUEBRA setup-python).
+#   - actions pinadas major (@v4 / @v5).
+#   - SEM "permissions:" (Forgejo ignora). Concorrencia via "concurrency:".
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancela run em andamento da mesma ref quando chega push novo — poupa fila.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: validate (preci)
+    # codeberg-small basta: gates sao Python puro + binario leve, nada compila.
+    runs-on: codeberg-small
+    container:
+      # act-latest = default Codeberg, compat GitHub Actions + setup-python.
+      image: ghcr.io/catthehacker/ubuntu:act-latest
+    env:
+      # Versao pinada do gitleaks (binario de release — NAO compilar
+      # from-source, estoura timeout). Bump manual quando quiser atualizar.
+      GITLEAKS_VERSION: "8.21.2"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python tooling (pytest + ruff)
+        run: |
+          python -m pip install --upgrade pip
+          # pytest e ruff sao wheels puros/leves — install rapido, nada compila.
+          pip install pytest ruff
+
+      - name: Install gitleaks (binario de release)
+        run: |
+          set -euo pipefail
+          ver="${GITLEAKS_VERSION}"
+          url="https://github.com/gitleaks/gitleaks/releases/download/v${ver}/gitleaks_${ver}_linux_x64.tar.gz"
+          echo "Baixando gitleaks v${ver}..."
+          curl --proto '=https' --tlsv1.2 -fsSL "$url" -o /tmp/gitleaks.tar.gz
+          tar -xzf /tmp/gitleaks.tar.gz -C /tmp gitleaks
+          install -m 0755 /tmp/gitleaks /usr/local/bin/gitleaks
+          gitleaks version
+
+      - name: Run pre-CI gates (scripts/preci.sh)
+        run: bash scripts/preci.sh
