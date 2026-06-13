@@ -40,9 +40,9 @@
 | A2c | W3 | Agents | Higienizar 7 agents de Produto/UX/Design (PM, BA, ux-researcher, ux-ui, ux-writer, a11y, art-director). | Média | D1*, D2, D3 | Média | ✅ Concluído | — |
 | A2d | W3 | Agents | Higienizar 8 agents de Gestão+Marketing (eng-manager, scrum-master, content-seo, pr-comms, growth, community, customer-success, revenue-ops). | Média | D1*, D2, D3 | Média | ✅ Concluído | — |
 | A2e | W3 | Agents | Higienizar 5 agents de Suporte/Docs/Legal/i18n (support, technical-writer, compliance-legal, internal-auditor, i18n-l10n). | Média | D1*, D2, D3 | Média | ✅ Concluído | — |
-| S3 | W4 | Skills | Higienizar `/tab_pendencias` (zero-wikilink, `references/`). | Média | D1*, D2 | Média | ⏳ Pendente | — |
-| S1 | W4 | Skills | Higienizar `/bigtech` (listar só os 50, remover `/proj_jogo`, orquestração repassa path de docs aos subagents). | Alta | A1, A2*, D1* | Alta | ⏳ Pendente | — |
-| S2 | W4 | Skills | Higienizar `/proj_software` (refs só aos incluídos, zero-wikilink). | Média | A1, A2*, D1* | Média | ⏳ Pendente | — |
+| S3 | W4 | Skills | Higienizar `/tab_pendencias` (zero-wikilink, `references/`). | Média | D1*, D2 | Média | ✅ Concluído | — |
+| S1 | W4 | Skills | Higienizar `/bigtech` (listar só os 50, remover `/proj_jogo`, orquestração repassa path de docs aos subagents). | Alta | A1, A2*, D1* | Alta | ✅ Concluído | — |
+| S2 | W4 | Skills | Higienizar `/proj_software` (refs só aos incluídos, zero-wikilink). | Média | A1, A2*, D1* | Média | ✅ Concluído | — |
 | TST-T2 | W4 | Testes | Análise estática (ruff/mypy nos hooks + markdownlint + validação de schema JSON). | Média | H3, A2* | Baixa | ⏳ Pendente | — |
 | TST-T8 | W4 | Testes | Verificação de secrets (gitleaks/trufflehog) em todo o repo. | Alta | H4, A2*, D1* | Baixa | ⏳ Pendente | — |
 | TST-ORFAOS | W5 | Testes | **Validação ZERO-ÓRFÃOS** (gate §4.1): wikilinks=0 fora de código, paths locais=0, refs aos 20 excluídos=0, termos pessoais=0, links Markdown órfãos=0. | Alta | D1*, D2, D3, D4, A1, A2*, S1, S2, S3 | Alta | ⏳ Pendente | — |
