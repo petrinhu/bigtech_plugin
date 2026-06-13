@@ -1,0 +1,24 @@
+bigtech plugin
+Copyright 2026 petrinhu
+
+This product is licensed under the Apache License, Version 2.0 (the
+"License"); you may not use this product except in compliance with the
+License. You may obtain a copy of the License in the accompanying LICENSE
+file or at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+
+---
+
+Attribution
+
+The documentation, agent definitions, and governance manuals bundled with
+this plugin are derived from material authored by petrinhu. They were
+adapted and generalized for public distribution: personal identity,
+local environment paths, and private infrastructure references were removed.
+The concept of the "supreme leader / CEO" is intentionally transferred to
+whoever installs and operates the plugin.
