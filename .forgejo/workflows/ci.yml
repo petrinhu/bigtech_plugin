@@ -5,8 +5,11 @@ name: ci
 # (4.1), pytest (52 testes), JSON valido, ruff e gitleaks.
 #
 # Regras de runner (ver memoria codeberg-runners):
-#   - runs-on: codeberg-small  (2 CPU / 4 GB / 5 min — sobra pro nosso CI leve).
-#     NUNCA "runs-on: docker" (mapeia pro runner individual que oscila offline).
+#   - runs-on: codeberg-medium (4 CPU / 8 GB / 10 min — runner GLOBAL da Codeberg,
+#     mais estavel). NUNCA "runs-on: docker": mapeia pro runner individual "claudio",
+#     que fica offline (confirmado 2026-06: offline ha dias). Se o medium estiver
+#     fora na hora, trocar pra codeberg-small (mesma sintaxe). Reconfirmar em
+#     codeberg.org/<repo>/settings ou na lista global antes do lancamento.
 #   - container: ghcr.io/catthehacker/ubuntu:act-latest (default oficial; compat
 #     com actions/setup-python — node:*-bookworm QUEBRA setup-python).
 #   - actions pinadas major (@v4 / @v5).
@@ -26,8 +29,8 @@ concurrency:
 jobs:
   validate:
     name: validate (preci)
-    # codeberg-small basta: gates sao Python puro + binario leve, nada compila.
-    runs-on: codeberg-small
+    # codeberg-medium (global): gates Python puro + binario leve, nada compila.
+    runs-on: codeberg-medium
     container:
       # act-latest = default Codeberg, compat GitHub Actions + setup-python.
       image: ghcr.io/catthehacker/ubuntu:act-latest

@@ -38,7 +38,7 @@ else
 fi
 
 GATE_NUM=0
-TOTAL_GATES=5
+TOTAL_GATES=6
 
 # Cabecalho de um gate (numerado).
 gate() {
@@ -155,6 +155,16 @@ if command -v gitleaks >/dev/null 2>&1; then
   fi
 else
   skip "gitleaks ausente localmente — rodara no CI (binario de release)."
+fi
+
+# =================================================================================
+# Gate 6 — Smoke offline (frontmatter parseavel + hooks executam)
+# =================================================================================
+gate "Smoke offline: smoke_offline.py"
+if ${PY} scripts/smoke_offline.py; then
+  pass "smoke offline: plugin carregavel; hooks executam e se comportam."
+else
+  fail "smoke offline reprovou — veja acima."
 fi
 
 # =================================================================================
