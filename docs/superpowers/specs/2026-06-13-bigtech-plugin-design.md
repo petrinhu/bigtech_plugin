@@ -1,7 +1,7 @@
 # Design — Plugin Claude Code `bigtech`
 
 - **Data:** 2026-06-13
-- **Autor:** Petrus (petrinhu)
+- **Autor:** petrinhu
 - **Status:** aprovado para planejamento (aguarda review final do spec)
 - **Repo de destino:** `https://codeberg.org/petrinhu/bigtech_plugin.git`
 - **Licença:** Apache-2.0
@@ -22,7 +22,7 @@ de engenharia/produto/negócio, **sem** as vertentes de jogo e de perícia) como
 4. **Docs canônicos** que sustentam os agents/skills, empacotados e higienizados.
 
 **Princípio inegociável:** o produto é **distribuível e público**. Não pode conter
-referências locais (`~/.claude`, `/home/petrus`), wikilinks `[[X]]` do vault, nem
+referências locais (config local do Claude Code, paths absolutos da máquina), wikilinks `[[X]]` do vault, nem
 **identidade/infra pessoal** (nome do autor como soberano, stack imposta, servidores).
 
 ---
@@ -81,7 +81,7 @@ referências locais (`~/.claude`, `/home/petrus`), wikilinks `[[X]]` do vault, n
 
 Todos os hooks: resolver paths via `${CLAUDE_PLUGIN_ROOT}` no `hooks/hooks.json` (único lugar onde a variável expande), nunca `~/.claude/hooks`. Registro central em `hooks/hooks.json`.
 
-### 2.5 Docs empacotados — 12 docs (mapa origem → destino)
+### 2.5 Docs empacotados — 13 docs (mapa origem → destino)
 
 Higienizados **sem empobrecer o conteúdo técnico** (ver §4).
 
@@ -159,18 +159,18 @@ Cada `[[X]]` é *eliminado* de uma de duas formas, e **nunca** vira um ponteiro 
 Detalhamento por categoria de alvo no **Apêndice A** (mapa de rastreabilidade).
 
 1. **Wikilinks** — eliminar 100% conforme a regra-mãe acima (link relativo ou reescrita).
-2. **Paths locais** `~/.claude`, `/home/petrus` → removidos ou `${CLAUDE_PLUGIN_ROOT}` (só em `hooks.json`).
+2. **Paths locais** (config local do Claude Code, paths absolutos da máquina) → removidos ou `${CLAUDE_PLUGIN_ROOT}` (só em `hooks.json`).
 3. **Refs cruzadas a agents/skills excluídos** (jogo, perícia, `/proj_jogo`, `/pericia-medica`,
    `dr-*`, `engineering-coach`, `product-marketing-manager`) → removidas/reescritas.
    `cosimo-chief-of-staff` e skill `bigtech` listam só os 50 incluídos; `caetano-cto` não
    aponta para `/proj_jogo`; `art-director` perde as refs aos colegas de jogo.
 4. **Validação final (critério de aceitação):** fora de blocos de código,
-   `grep -rn '\[\['` = **0**; `grep -rn '/home/petrus\|~/\.claude'` = **0**; **nenhum** link
+   `grep -rn '\[\['` = **0**; `grep -rn '/home/<usuário>\|~/\.claude'` = **0**; **nenhum** link
    Markdown relativo apontando para arquivo inexistente (checagem ativa de órfãos); zero
    menções aos 20 excluídos e aos termos pessoais da §4.2.
 
 ### 4.2 Despersonalização (decisão: generalizar mantendo o conceito)
-1. **Identidade pessoal** (`petrus`, `Kaiser`, `Presidente`, `Rei`, `Soberano`, e-mail,
+1. **Identidade pessoal** (`<nome-do-autor>`, apelidos de soberania como rei/presidente/soberano, `<email-pessoal>`,
    nome próprio do autor como soberano) → generalizar para **"o usuário/operador (você)"**.
 2. **Transferência de título ao novo dono (feature de produto):** o conceito de
    autoridade suprema NÃO some — passa para quem instala. Reescrever **ORG §0** como:
@@ -181,7 +181,7 @@ Detalhamento por categoria de alvo no **Apêndice A** (mapa de rastreabilidade).
    supremo da própria bigtech.
 3. **Stack imposta** (`C++/Qt`, `Breeze` como default obrigatório) → "stack do projeto
    (configurável)"; manter exemplos como exemplos, não como lei pessoal.
-4. **Infra pessoal** (`Hostinger`, instâncias `Forgejo`/`Codeberg` pessoais, MCPs/tokens) →
+4. **Infra pessoal** (`<infra-pessoal>`: provedor de hosting, instâncias de git pessoais, MCPs/tokens) →
    genérica ("seu provedor de git/hosting") ou removida.
 5. **`anti-patterns.md`** recebe revisão item a item (tem proibições atreladas ao fluxo
    pessoal); manter as universais (ex.: `--force`, `--no-verify`), generalizar o resto.
@@ -298,10 +298,10 @@ determinística sobre os 50 agents + 3 skills + 13 docs.
 | 7 | Genéricos contextuais | `CLAUDE`(9), `TODO`(5) | → "o CLAUDE.md / TODO.md do projeto" (texto) |
 | 8 | Link já quebrado | `SEGURANCA`(1) | remover (não existe nem no original) |
 | 9 | Agents/skills excluídos | `proj_jogo`, `pericia-medica`, `engineering-coach`, `product-marketing-manager`, `dr-*`, 10 de jogo (`art-director` cita vários), `narrative-writer`, `revisor-textual`, `linux-diag` | reescrever listas da constelação p/ os 50; remover delegações |
-| 10 | Paths locais (8 arquivos) | `~/.claude/*`, `/home/petrus/*`, `no_mdash.py`, `templates/*` | remover / `${CLAUDE_PLUGIN_ROOT}` (só em hooks.json) |
+| 10 | Paths locais (8 arquivos) | `~/.claude/*`, `/home/<usuário>/*`, `no_mdash.py`, `templates/*` | remover / `${CLAUDE_PLUGIN_ROOT}` (só em hooks.json) |
 | 11 | Ref interna válida | `tab_pendencias` (skill incluída) | manter como menção textual à skill |
 
 **Validação automatizável (qa-engineer), fora de blocos de código:** `grep -rn '\[\['` = 0
-· `grep -rn '/home/petrus\|~/\.claude'` = 0 · checagem ativa de links Markdown órfãos = 0 ·
+· `grep -rn '/home/<usuário>\|~/\.claude'` = 0 · checagem ativa de links Markdown órfãos = 0 ·
 menções aos 20 excluídos = 0 · termos pessoais (§4.2) = 0.
 ```

@@ -127,6 +127,10 @@ Os manuais de governança acompanham o plugin em `docs/` e são injetados no con
 - `docs/manuals/`: contrato de qualidade, testes, agile, checklist de deploy e auditorias.
 - `docs/principles/`: princípios de arquitetura, metodologia agile, anti-patterns e limites de hardware.
 
+## Segurança
+
+Os hooks executam código na sua máquina e o `tdd_runner` pode rodar o comando de teste declarado pelo projeto que você abrir (paridade de confiança com `make test`/`npm test`). Antes de usar com repositórios de terceiros, leia [SECURITY.md](./SECURITY.md): modelo de confiança, opt-in e como desativar.
+
 ## Licença
 
 Distribuído sob a licença [Apache-2.0](./LICENSE).

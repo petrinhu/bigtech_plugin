@@ -151,13 +151,13 @@ Rode `grep -n '—' agents/<agent>.md` (esperado: 0) antes de entregar.
 
 Remover o que prende à **identidade** do autor; transferir o **conceito** de autoridade ao usuário que instala.
 
-1. **Identidade pessoal** → generalizar para **"você, o usuário/operador"**. Termos a eliminar: nome próprio do autor, `Kaiser`, `Presidente`, `Rei`, `Soberano`, "líder supremo" como pessoa específica, e-mail, qualquer apelido de soberania.
+1. **Identidade pessoal** → generalizar para **"você, o usuário/operador"**. Termos a eliminar: `<nome-do-autor>` e qualquer apelido de soberania (ex.: títulos como rei/presidente/soberano atrelados nominalmente ao autor), "líder supremo" como pessoa específica, `<email-pessoal>`.
 2. **Transferência de título (feature de produto, não remoção):** o conceito de autoridade suprema **passa para quem instala**. Padrão de reescrita:
    > "Você, que opera este plugin, é o **líder supremo** desta organização — o **CEO da sua bigtech**. A constelação C-level propõe e executa; a palavra final é sua. Diante de dúvida ou de mais de uma opção, os agents perguntam via AskUserQuestion (opção recomendada primeiro)."
 
    Onde aplicar com mais força: **ORG §0** e o **README** (ritual de boas-vindas). Nos demais arquivos, basta trocar "petrus/o líder supremo" por "você, o usuário".
 3. **Stack imposta** (`C++/Qt`, `Breeze` como default obrigatório) → "stack do projeto (configurável)". Mantenha exemplos **como exemplos**, nunca como lei pessoal. (No TOOLING, "build C++/Qt" foi preservado por ser exemplo legítimo de uso da ferramenta `cmake`, não imposição de stack.)
-4. **Infra pessoal** → genérica ou removida: `Hostinger`, instâncias `Forgejo`/`Codeberg` pessoais, MCPs/tokens específicos, contas → "seu provedor de git/hosting", "seu servidor MCP".
+4. **Infra pessoal** → genérica ou removida: `<infra-pessoal>` (provedor de hosting, instâncias de git pessoais, MCPs/tokens específicos, contas) → "seu provedor de git/hosting", "seu servidor MCP".
 5. **Specs de máquina** → remover: modelo de CPU/GPU, quantidade de RAM/VRAM (ex.: "VRAM 4GB" → "a VRAM disponível"), distro como fato pessoal ("Fedora 44", "auditado no sistema em <data>").
 6. **`anti-patterns.md`** recebe revisão item a item: manter as proibições **universais** (`--force`, `--no-verify`, amend de commit publicado), generalizar/remover as atreladas ao fluxo pessoal.
 
@@ -166,16 +166,17 @@ Remover o que prende à **identidade** do autor; transferir o **conceito** de au
 Use como filtro `grep -niE`. Qualquer ocorrência fora de exemplo neutro deve ser tratada:
 
 ```
-petrus | petrinhu | kaiser | presidente | \brei\b | soberano | líder supremo
-hostinger | /home/petrus | ~/\.claude | yahoo | <e-mail do autor>
-forgejo | codeberg\.org/petrinhu | <instância de git pessoal>
-fedora 44 | auditado no sistema | instalado no sistema | VRAM 4GB | <specs de máquina>
+<nome-do-autor> | presidente | \brei\b | soberano | líder supremo
+<infra-pessoal> | /home/<usuário> | ~/\.claude | <email-pessoal>
+<instância-de-git-pessoal> | <conta-de-git-pessoal>
+<distro+versão> | auditado no sistema | instalado no sistema | <specs-de-máquina>
 ```
 
-> Cuidado com falsos positivos: `dnf` (gerenciador Fedora/RHEL) **não** é dado pessoal — é
-> distro Linux comum; preserve-o como exemplo e acrescente a nota de portabilidade (Regra 4).
-> "Codeberg" só é proibido quando aponta para a **conta pessoal**; citar a plataforma de forma
-> genérica é permitido.
+> Substitua cada placeholder pelos valores reais do seu ambiente ao montar o filtro. Cuidado
+> com falsos positivos: o gerenciador de pacotes da distro (`dnf`, `apt`, `pacman`…) **não** é
+> dado pessoal — preserve-o como exemplo e acrescente a nota de portabilidade (Regra 4). A
+> plataforma de git só é proibida quando aponta para a **conta pessoal**; citar a plataforma
+> de forma genérica é permitido.
 
 ---
 
@@ -209,7 +210,7 @@ O produto reflete **só os 50 agents incluídos**. Remova menções, seções, l
 
 ## Regra 4 — Paths locais e portabilidade
 
-1. `~/.claude`, `/home/petrus` e qualquer caminho absoluto do autor → **remover** ou generalizar. Em **hooks** (não neste escopo de docs), paths resolvem via `${CLAUDE_PLUGIN_ROOT}` — **e somente** no `hooks/hooks.json`.
+1. `~/.claude`, `/home/<usuário>` e qualquer caminho absoluto da máquina do autor → **remover** ou generalizar. Em **hooks** (não neste escopo de docs), paths resolvem via `${CLAUDE_PLUGIN_ROOT}` — **e somente** no `hooks/hooks.json`.
 2. Caminhos de runtime nos docs/agents → instrução de localização via contexto de sessão (docs-bootstrap) ou Glob `**/bigtech/docs/**/<NOME>.md` (spec §4.3).
 3. **Comandos de instalação por distro:** `dnf` (Fedora/RHEL) é mantido como exemplo concreto **com nota de portabilidade** no topo do doc:
    > "Os comandos usam `dnf` (Fedora/RHEL) como exemplo; em outras distribuições adapte ao seu gerenciador de pacotes (`apt`, `pacman`, `zypper`, `brew`, `nix`)."
@@ -274,8 +275,8 @@ F=<ARQUIVO>
 # 1. Zero wikilinks (fora de blocos de código com atributos C++). Esperado: 0.
 grep -n '\[\[' "$F"
 
-# 2. Zero termos pessoais. Esperado: 0.
-grep -niE 'petrus|petrinhu|kaiser|hostinger|/home/petrus|~/\.claude' "$F"
+# 2. Zero termos pessoais (troque os placeholders pelos valores reais do seu ambiente). Esperado: 0.
+grep -niE '<nome-do-autor>|<infra-pessoal>|/home/<usuário>|~/\.claude' "$F"
 
 # 3. Zero agents/skills excluídos. Esperado: 0.
 grep -niE 'linux-diag|narrative-writer|revisor-textual|learning-designer|engineering-coach|product-marketing-manager|proj_jogo|pericia-medica|dr-advogado|dr-medico|3d-artist|audio-designer|economy-designer|engine-graphics|game-animator|gameplay_engineer|game-producer|lead-game-designer|level-designer|narrative-designer' "$F"
@@ -283,8 +284,8 @@ grep -niE 'linux-diag|narrative-writer|revisor-textual|learning-designer|enginee
 # 4. Links relativos: confira cada alvo contra o mapa de destino (§2.5), NÃO contra o filesystem.
 grep -noE '\]\([^)]+\.md\)' "$F" | sort -u
 
-# 5. Resíduos de infra/specs (revisar manualmente; "dnf" + nota de portabilidade é OK).
-grep -niE 'forgejo|codeberg\.org/petrinhu|VRAM [0-9]|auditado no sistema|instalado no sistema' "$F"
+# 5. Resíduos de infra/specs (revisar manualmente; gerenciador de pacotes da distro + nota de portabilidade é OK).
+grep -niE '<instância-de-git-pessoal>|<conta-de-git-pessoal>|VRAM [0-9]|auditado no sistema|instalado no sistema' "$F"
 ```
 
 > `exit=1` (nenhum match) é o resultado esperado de 1, 2 e 3. Em (4), todo alvo deve constar

@@ -50,10 +50,10 @@
 | TST-T14 | W5 | Testes | Smoke test de instalação: marketplace local → `/plugin install` → carregar 50 agents + 3 skills + hooks; agent resolve e lê um manual. | Alta | H4, A1, A2*, S1, S2, S3, R1 | Média | ⏳ Pendente | — |
 | R2 | W5 | Release | `README.md` (instalação via marketplace, ritual de boas-vindas/CEO, compat caveman, deps playwright/superpowers, lista de agents/skills). | Alta | D4, H3, S1 | Média | ✅ Concluído | — |
 | R3 | W5 | Release | `CHANGELOG.md` v0.1.0. | Baixa | F1 | Baixa | ✅ Concluído | — |
-| AUD-SEC | W6 | Auditoria | Segurança dos hooks Python (silent-fail, sem exec inseguro/path traversal, não bloqueia) + secrets. | Alta | H4, TST-T2, TST-T8 | Alta | ⏳ Pendente | — |
-| AUD-PRIV | W6 | Auditoria | Privacidade/despersonalização: zero dados pessoais (nome/títulos/infra/specs de máquina). **Gate de publicação.** | Alta | TST-ORFAOS | Média | ⏳ Pendente | — |
-| AUD-LICENSE | W6 | Auditoria | Licença/atribuição: Apache-2.0 correta + `NOTICE` + compatibilidade da origem dos docs. | Alta | R1, D1* | Baixa | ⏳ Pendente | — |
-| AUD-QUALITY | W6 | Auditoria | Qualidade/consistência de docs/agents/skills (sem god-doc, refs coerentes, terminologia única CEO). | Média | D1*, A1, A2*, S1 | Média | ⏳ Pendente | — |
+| AUD-SEC | W6 | Auditoria | Segurança dos hooks Python (silent-fail, sem exec inseguro/path traversal, não bloqueia) + secrets. | Alta | H4, TST-T2, TST-T8 | Alta | ✅ Concluído | ✓ |
+| AUD-PRIV | W6 | Auditoria | Privacidade/despersonalização: zero dados pessoais (nome/títulos/infra/specs de máquina). **Gate de publicação.** | Alta | TST-ORFAOS | Média | ✅ Concluído | ✓ |
+| AUD-LICENSE | W6 | Auditoria | Licença/atribuição: Apache-2.0 correta + `NOTICE` + compatibilidade da origem dos docs. | Alta | R1, D1* | Baixa | ✅ Concluído | ✓ |
+| AUD-QUALITY | W6 | Auditoria | Qualidade/consistência de docs/agents/skills (sem god-doc, refs coerentes, terminologia única CEO). | Média | D1*, A1, A2*, S1 | Média | ✅ Concluído | ✓ |
 | TST-T15 | W7 | Testes | Pré-CI: rodar a suíte local (estática + pytest dos hooks + zero-órfãos) antes do push. | Média | TST-T2, TST-ORFAOS, TST-T14 | Baixa | ⏳ Pendente | — |
 | AUD-REPORT | W7 | Auditoria | Relatório final consolidado (score, sumário de achados, remediação) antes do gate. | Alta | AUD-SEC, AUD-PRIV, AUD-LICENSE, AUD-QUALITY | Média | ⏳ Pendente | — |
 | R4 | W8 | Release | `git init` + publicar no Codeberg (`codeberg.org/petrinhu/bigtech_plugin`). **Gate de publicação / one-way-door — go/no-go do líder supremo.** | Alta | TST-T14, TST-T15, TST-ORFAOS, AUD-REPORT | Baixa | ⏳ Pendente | — |
@@ -88,7 +88,7 @@
 > D1 e A2 têm WSJF baixo só por serem grandes — por isso foram **fatiados** e entram cedo
 > (W2/W3), pois são pré-requisito de quase tudo. O fatiamento encurta o caminho crítico.
 
-## Decisões one-way-door (go/no-go do líder supremo, petrus)
+## Decisões one-way-door (go/no-go do líder supremo)
 
 1. **`F1`** — congelar nome (`bigtech`), layout e `source` do marketplace antes de abrir a W2 (contrato público; mudar depois quebra quem já instalou).
 2. **`R4`** — go/no-go da publicação no Codeberg (irreversível; usuários passam a executar os hooks Python na máquina deles).

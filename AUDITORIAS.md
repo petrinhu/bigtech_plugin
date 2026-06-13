@@ -14,7 +14,7 @@ Os hooks Python executam na máquina de quem instala (SessionStart / PreToolUse 
 ## AUD-PRIV — Privacidade / Despersonalização **(gate de publicação)**
 Confirma que **nenhum dado pessoal** sobrevive ao empacotamento:
 - Sem nome do autor como soberano, e-mail, títulos pessoais; conceito de "líder supremo/CEO" transferido ao usuário (ORG §0 / §4.2 do spec).
-- Sem infra pessoal (Hostinger, instâncias Forgejo/Codeberg pessoais, MCPs/tokens).
+- Sem infra pessoal (seu provedor de hosting, instâncias de git pessoais, MCPs/tokens).
 - Sem specs da máquina (no `hardware-resource-limits.md` generalizado).
 - Confirma o resultado do `TST-ORFAOS` na dimensão semântica (o que o grep não pega).
 

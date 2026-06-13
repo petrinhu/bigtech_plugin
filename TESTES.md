@@ -20,7 +20,7 @@ Garante que nenhuma credencial, token ou caminho/identidade pessoal foi commitad
 ## TST-ORFAOS — Validação ZERO-ÓRFÃOS (específico do projeto)
 Critério de aceitação da §4.1 do spec. Fora de blocos de código:
 - `grep -rn '\[\['` = **0** (nenhum wikilink Obsidian; atributos C++ `[[nodiscard]]` em código são exceção);
-- `grep -rn '/home/petrus\|~/\.claude'` = **0** (sem paths locais);
+- `grep -rn '/home/<usuário>\|~/\.claude'` = **0** (sem paths locais absolutos da máquina do autor);
 - **0** menções aos 20 agents/skills excluídos (jogo, perícia, `engineering-coach`, `product-marketing-manager`, `proj_jogo`, `pericia-medica`);
 - **0** termos pessoais (nome do autor como soberano, infra pessoal, specs de máquina);
 - **0** links Markdown relativos apontando para arquivo inexistente (checagem ativa de órfãos).

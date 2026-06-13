@@ -16,7 +16,7 @@ a coluna Onda marca passos paralelizáveis). Caminho crítico: `F1 → H3 → A2
 
 ## Princípios inegociáveis deste projeto
 
-1. **Produto público:** zero referências locais (`~/.claude`, `/home/petrus`), zero wikilinks `[[ ]]`
+1. **Produto público:** zero referências locais (config local do Claude Code, paths absolutos da máquina), zero wikilinks `[[ ]]`
    (exceto atributos C++ em código), zero identidade/infra pessoal. Ver §4 do spec + `TST-ORFAOS`.
 2. **Execução por agents especialistas** (technical-writer, devops-sre, software-architect, qa-engineer,
    compliance-legal), orquestrados por C-level; nunca higienização inline.

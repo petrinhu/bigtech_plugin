@@ -71,7 +71,7 @@ def test_run_suite_no_command_is_not_ran():
 
 
 # ---------------------------------------------------------------------------
-# Task 10: Integracao real — ciclo red -> green
+# Task 10: Integracao real - ciclo red -> green
 # ---------------------------------------------------------------------------
 import json
 import os
@@ -115,6 +115,7 @@ def test_full_cycle_red_then_green(tmp_path):
         "from soma import soma\n\ndef test_soma():\n    assert soma(2, 3) == 5\n")
 
     payload_test = {"tool_name": "Write",
+                    "cwd": str(tmp_path),
                     "tool_input": {"file_path": str(tmp_path / "tests" / "test_soma.py")}}
     proc = _run_hook("tdd_runner.py", payload_test, str(tmp_path))
     assert proc.returncode == 0   # runner nunca quebra o fluxo
@@ -130,8 +131,45 @@ def test_full_cycle_red_then_green(tmp_path):
     # Implementa soma -> GREEN
     (tmp_path / "soma.py").write_text("def soma(a, b):\n    return a + b\n")
     payload_prod = {"tool_name": "Write",
+                    "cwd": str(tmp_path),
                     "tool_input": {"file_path": str(tmp_path / "soma.py")}}
     _run_hook("tdd_runner.py", payload_prod, str(tmp_path))
 
     st = json.load(open(found))
     assert st["ran"] is True and st["has_red"] is False  # GREEN confirmado
+
+
+def test_file_outside_session_cwd_does_not_run_suite(tmp_path):
+    """IMP-2: arquivo de um projeto VIZINHO (fora do cwd da sessao) nao dispara
+    o test_command desta sessao, mesmo que o vizinho traga .claude/tdd-guard.json.
+    Sem estado gravado para o projeto vizinho."""
+    session = tmp_path / "sessao"
+    neighbor = tmp_path / "vizinho"
+    (session / ".claude").mkdir(parents=True)
+    (session / ".claude" / "tdd-guard.json").write_text(
+        json.dumps({"preset": "python-pytest"}))
+
+    # Projeto vizinho com config propria e um test_command que, se rodasse,
+    # gravaria estado (e o sentinela provaria a execucao indevida).
+    (neighbor / ".claude").mkdir(parents=True)
+    sentinel = neighbor / "RAN"
+    (neighbor / ".claude" / "tdd-guard.json").write_text(json.dumps({
+        "preset": "python-pytest",
+        "test_command": f"touch {sentinel}",
+    }))
+    neighbor_file = neighbor / "mod.py"
+    neighbor_file.write_text("x = 1\n")
+
+    # A sessao esta em `session`, mas o arquivo editado e do `vizinho`.
+    payload = {"tool_name": "Write",
+               "cwd": str(session),
+               "tool_input": {"file_path": str(neighbor_file)}}
+    proc = _run_hook("tdd_runner.py", payload, str(tmp_path))
+    assert proc.returncode == 0          # silent-fail preservado
+
+    # A suite do vizinho NAO rodou: nenhum sentinela, nenhum estado.
+    assert not sentinel.exists(), "test_command do projeto vizinho foi executado"
+    import hashlib
+    h = hashlib.sha256(os.path.realpath(str(neighbor)).encode()).hexdigest()[:16]
+    state = tmp_path / ".claude" / "state" / "tdd-guard" / h / "last-run.json"
+    assert not state.exists(), "estado gravado para projeto fora do cwd da sessao"

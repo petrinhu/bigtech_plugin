@@ -48,6 +48,16 @@ def run_suite(cfg: dict, project_root: str, runner=subprocess.run) -> dict:
     }
 
 
+def _under(path: str, base: str) -> bool:
+    """True se `path` (real) estiver dentro de `base` (real). Mesma guarda
+    de containment do tdd_guard.py (rel nao comeca com '..')."""
+    try:
+        rel = os.path.relpath(os.path.realpath(path), os.path.realpath(base))
+    except ValueError:
+        return False          # drives distintos no Windows, p.ex.
+    return rel == "." or not rel.startswith("..")
+
+
 def main() -> int:
     try:
         data = json.load(sys.stdin)
@@ -59,6 +69,15 @@ def main() -> int:
         fp = c.extract_file_path(data)
         if not fp:
             return 0
+        # Ancora a execucao no cwd da SESSAO (mesmo payload que os demais hooks
+        # usam). So roda a suite se o arquivo editado estiver sob esse cwd; um
+        # arquivo de projeto vizinho (com seu proprio .claude/tdd-guard.json)
+        # nao dispara o test_command desta sessao. Sem cwd no payload, mantem
+        # o comportamento anterior (nao usa os.getcwd() como cerca, pois seria
+        # o cwd do runner do hook, nao o da sessao).
+        session_cwd = (data.get("cwd") or "").strip()
+        if session_cwd and not _under(fp, session_cwd):
+            return 0          # arquivo fora do cwd da sessao; nao roda a suite
         start = os.path.dirname(os.path.realpath(fp)) or os.getcwd()
         root, cfg = c.load_config(start)
         if cfg is None:
