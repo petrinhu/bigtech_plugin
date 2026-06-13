@@ -34,12 +34,12 @@
 | H3 | W2 | Hooks | Criar `bigtech_session_init.py` (SessionStart: docs-bootstrap + aviso caveman via settings.json + sugestão deps). **Caminho crítico (§4.3).** | Alta | F1, D3 | Alta | ✅ Concluído | — |
 | D4 | W3 | Docs | Reescrever ORG §0 — transferência do título de líder supremo/CEO ao usuário que instala. *(feito junto do D1b)* | Média | D1b | Média | ✅ Concluído | — |
 | H4 | W3 | Hooks | `hooks/hooks.json` — registro central de todos os hooks (eventos + `${CLAUDE_PLUGIN_ROOT}`). *(antecipado para W2)* | Média | H1, H2, H3 | Baixa | ✅ Concluído | — |
-| A1 | W3 | Agents | Higienizar 12 agents C-level (zero-wikilink→links relativos, instrução imperativa de leitura, refs só aos 50, despersonalizar). | Alta | D1*, D2, D3 | Média | ⏳ Pendente | — |
-| A2a | W3 | Agents | Higienizar 14 agents de Engenharia (architect, tech-lead, back/front/mobile/embedded/hardware, devops, perf, network, net-sec, security, qa, release). | Alta | D1*, D2, D3 | Alta | ⏳ Pendente | — |
-| A2b | W3 | Agents | Higienizar 4 agents de Dados/IA (data-engineer, data-scientist, ml-engineer, applied-ai-engineer). | Média | D1*, D2, D3 | Baixa | ⏳ Pendente | — |
-| A2c | W3 | Agents | Higienizar 7 agents de Produto/UX/Design (PM, BA, ux-researcher, ux-ui, ux-writer, a11y, art-director). | Média | D1*, D2, D3 | Média | ⏳ Pendente | — |
-| A2d | W3 | Agents | Higienizar 8 agents de Gestão+Marketing (eng-manager, scrum-master, content-seo, pr-comms, growth, community, customer-success, revenue-ops). | Média | D1*, D2, D3 | Média | ⏳ Pendente | — |
-| A2e | W3 | Agents | Higienizar 5 agents de Suporte/Docs/Legal/i18n (support, technical-writer, compliance-legal, internal-auditor, i18n-l10n). | Média | D1*, D2, D3 | Média | ⏳ Pendente | — |
+| A1 | W3 | Agents | Higienizar 12 agents C-level (zero-wikilink→links relativos, instrução imperativa de leitura, refs só aos 50, despersonalizar). | Alta | D1*, D2, D3 | Média | ✅ Concluído | — |
+| A2a | W3 | Agents | Higienizar 14 agents de Engenharia (architect, tech-lead, back/front/mobile/embedded/hardware, devops, perf, network, net-sec, security, qa, release). | Alta | D1*, D2, D3 | Alta | ✅ Concluído | — |
+| A2b | W3 | Agents | Higienizar 4 agents de Dados/IA (data-engineer, data-scientist, ml-engineer, applied-ai-engineer). | Média | D1*, D2, D3 | Baixa | ✅ Concluído | — |
+| A2c | W3 | Agents | Higienizar 7 agents de Produto/UX/Design (PM, BA, ux-researcher, ux-ui, ux-writer, a11y, art-director). | Média | D1*, D2, D3 | Média | ✅ Concluído | — |
+| A2d | W3 | Agents | Higienizar 8 agents de Gestão+Marketing (eng-manager, scrum-master, content-seo, pr-comms, growth, community, customer-success, revenue-ops). | Média | D1*, D2, D3 | Média | ✅ Concluído | — |
+| A2e | W3 | Agents | Higienizar 5 agents de Suporte/Docs/Legal/i18n (support, technical-writer, compliance-legal, internal-auditor, i18n-l10n). | Média | D1*, D2, D3 | Média | ✅ Concluído | — |
 | S3 | W4 | Skills | Higienizar `/tab_pendencias` (zero-wikilink, `references/`). | Média | D1*, D2 | Média | ⏳ Pendente | — |
 | S1 | W4 | Skills | Higienizar `/bigtech` (listar só os 50, remover `/proj_jogo`, orquestração repassa path de docs aos subagents). | Alta | A1, A2*, D1* | Alta | ⏳ Pendente | — |
 | S2 | W4 | Skills | Higienizar `/proj_software` (refs só aos incluídos, zero-wikilink). | Média | A1, A2*, D1* | Média | ⏳ Pendente | — |

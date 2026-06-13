@@ -5,7 +5,7 @@
 - **Owner:** technical-writer.
 - **Last-reviewed:** 2026-06-13.
 - **Fonte de verdade do escopo:** `specs/2026-06-13-bigtech-plugin-design.md` (§4 + Apêndice A). Em conflito, a spec vence.
-- **Status:** validado na tarefa-piloto (`docs/TOOLING.md`, item D1a).
+- **Status:** validado nas tarefas-piloto de doc (`docs/TOOLING.md`, item D1a) e de agent (`agents/celso-ceo.md`, item A1 — fixou o padrão da §4.3, seção "Instrução imperativa de leitura para AGENTS").
 
 > Este é o **contrato** que padroniza a higienização. Aplique as 6 regras na ordem,
 > rode o bloco de validação no fim e só então marque o item como "Pendente verificação".
@@ -81,6 +81,69 @@ Coluna "Ação": **REL** = link relativo (alvo empacotado); **TEXTO** = reescrev
 > da §2.5 da spec (a tabela §1.2 acima), **não** contra o filesystem atual — os 13 docs são
 > criados em paralelo (W2/W3) e podem ainda não existir quando você higieniza o seu. O gate
 > final de órfãos (`TST-ORFAOS`, W5) roda quando todos estiverem no lugar.
+
+---
+
+## Instrução imperativa de leitura para AGENTS (§4.3)
+
+> **Aplica-se apenas aos 50 agents** (`agents/*.md`). Nos docs e skills a referência passiva
+> vira link relativo simples (Regra 1); nos **agents** ela vira uma **ordem de LER** o manual
+> antes de decidir, com o caminho resolvido em runtime. Validado na tarefa-piloto
+> (`agents/celso-ceo.md`, item A1).
+
+**Problema que esta regra resolve (spec §4.3).** A referência original do agent é passiva
+(`"Manuais: [[CONTRACT]], [[TESTES]]…"`) e depende do resolvedor de wikilinks do vault, que
+**não viaja com o plugin**. Pior: `${CLAUDE_PLUGIN_ROOT}` só expande no `hooks.json` (não no
+corpo do agent), e **subagents não herdam o `additionalContext`** injetado na thread principal.
+A correção tem duas partes obrigatórias: (1) trocar a citação passiva por uma **ordem de
+leitura** com caminho resolvido em runtime; (2) instruir o agent a **repassar o caminho absoluto
+no prompt** quando ele despachar um subagent.
+
+### Bloco-modelo (copie e adapte ao texto do agent)
+
+Substitua a antiga seção de "Referências canônicas" por uma seção própria (sugestão de título:
+**"Leitura obrigatória antes de decidir"**), com este esqueleto. Liste **apenas os manuais que o
+agent original citava** (não acrescente manuais que não eram dele).
+
+```markdown
+## Leitura obrigatória antes de decidir
+
+**Antes de [a ação central do agent: arbitrar / aprovar arquitetura / fechar o sprint / …], leia os manuais que acompanham o plugin.** O caminho absoluto de `docs/` é injetado no contexto da sessão pelo docs-bootstrap (hook `SessionStart`); se ele não estiver no contexto, localize os arquivos via Glob `**/bigtech/docs/**/<NOME>.md`. Leia o manual relevante ao tipo de decisão **antes** de fechá-la, nunca depois:
+
+- **Pipeline de release**: [`pipeline_release_1.0`](../docs/pipeline_release_1.0.md).
+- **Liderança C-level**: [`lideranca_pipeline_release`](../docs/lideranca_pipeline_release.md).
+- **Governança e RACI**: [`ORG`](../docs/ORG.md).
+- **Manuais de execução**, em `docs/manuals/`: [`CONTRACT`](../docs/manuals/CONTRACT.md) (código), [`TESTES`](../docs/manuals/TESTES.md) (qualidade), [`AGILE`](../docs/manuals/AGILE.md) (cadência), [`DEPLOY_CHECKLIST`](../docs/manuals/DEPLOY_CHECKLIST.md) (deploy/rollback), [`AUDITORIAS`](../docs/manuals/AUDITORIAS.md) (checklists de gate).
+
+> **Ao despachar um subagent, inclua o caminho absoluto de `docs/` no prompt da task.** Subagents não herdam o contexto da sessão (o docs-bootstrap só alcança a thread principal e as skills); sem o caminho no prompt, o subagent não consegue abrir o manual.
+```
+
+### Como adaptar (4 ajustes obrigatórios)
+
+1. **A ação central muda por agent.** No CEO é "arbitrar trade-off ou bater go/no-go"; num
+   `software-architect` é "aprovar a arquitetura"; num `scrum-master` é "fechar o sprint".
+   Use o verbo do mandato do próprio agent.
+2. **Liste só os manuais do agent.** Reaproveite exatamente os `[[X]]` que o original citava
+   (na seção "Referências canônicas" e ao longo do corpo). Não infle a lista.
+3. **Profundidade do link = `../docs/`** (todo agent vive em `agents/`; ver §1.1). Atributo C++
+   em código é exceção e fica intocado.
+4. **A nota do subagent é obrigatória** sempre que o agent tiver a tool `Agent` (orquestradores
+   e C-levels). Em agent puramente executor, sem `Agent` na lista de tools, a nota pode ser
+   omitida, mas mantê-la não faz mal e padroniza.
+
+### Refs imperativas no corpo (além da seção dedicada)
+
+Quando um anti-padrão ou passo do corpo citava um manual de forma passiva ("ver
+[[DEPLOY_CHECKLIST]]"), troque por uma **ordem curta com o link relativo**, ex.:
+`leia [DEPLOY_CHECKLIST](../docs/manuals/DEPLOY_CHECKLIST.md) antes do go`. O link relativo é
+complemento da ordem, nunca a única referência.
+
+### Cuidado de estilo (anti-pattern do projeto)
+
+Ao reescrever o bloco de **Autoridade** (transferência de título, Regra 2) e a seção de leitura,
+**não use em-dash (`—`)**. Prefira parênteses, dois-pontos ou reestruture a frase. O em-dash é
+proibido pelo projeto; o gate de validação não o pega, então é responsabilidade do writer.
+Rode `grep -n '—' agents/<agent>.md` (esperado: 0) antes de entregar.
 
 ---
 
