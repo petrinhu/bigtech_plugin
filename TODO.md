@@ -47,7 +47,7 @@
 | TST-T8 | W4 | Testes | Verificação de secrets (gitleaks/trufflehog) em todo o repo. | Alta | H4, A2*, D1* | Baixa | ✅ Concluído | — |
 | TST-ORFAOS | W5 | Testes | **Validação ZERO-ÓRFÃOS** (gate §4.1): wikilinks=0 fora de código, paths locais=0, refs aos 20 excluídos=0, termos pessoais=0, links Markdown órfãos=0. | Alta | D1*, D2, D3, D4, A1, A2*, S1, S2, S3 | Alta | ✅ Concluído | — |
 | TST-DEPS | W5 | Testes | Scanning de dependências + CVEs (pip-audit / trivy / OSV) dos hooks. | Baixa | H1, H4 | Baixa | ✅ Concluído | — |
-| TST-T14 | W5 | Testes | Smoke test de instalação: marketplace local → `/plugin install` → carregar 50 agents + 3 skills + hooks; agent resolve e lê um manual. | Alta | H4, A1, A2*, S1, S2, S3, R1 | Média | ⏳ Pendente | — |
+| TST-T14 | W5 | Testes | Smoke test de instalação: marketplace local → `/plugin install` → carregar 50 agents + 3 skills + hooks; agent resolve e lê um manual. | Alta | H4, A1, A2*, S1, S2, S3, R1 | Média | 🔍 Pendente verificação | — |
 | R2 | W5 | Release | `README.md` (instalação via marketplace, ritual de boas-vindas/CEO, compat caveman, deps playwright/superpowers, lista de agents/skills). | Alta | D4, H3, S1 | Média | ✅ Concluído | — |
 | R3 | W5 | Release | `CHANGELOG.md` v0.1.0. | Baixa | F1 | Baixa | ✅ Concluído | — |
 | AUD-SEC | W6 | Auditoria | Segurança dos hooks Python (silent-fail, sem exec inseguro/path traversal, não bloqueia) + secrets. | Alta | H4, TST-T2, TST-T8 | Alta | ✅ Concluído | ✓ |
@@ -56,7 +56,7 @@
 | AUD-QUALITY | W6 | Auditoria | Qualidade/consistência de docs/agents/skills (sem god-doc, refs coerentes, terminologia única CEO). | Média | D1*, A1, A2*, S1 | Média | ✅ Concluído | ✓ |
 | TST-T15 | W7 | Testes | Pré-CI: rodar a suíte local (estática + pytest dos hooks + zero-órfãos) antes do push. | Média | TST-T2, TST-ORFAOS, TST-T14 | Baixa | ✅ Concluído | — |
 | AUD-REPORT | W7 | Auditoria | Relatório final consolidado (score, sumário de achados, remediação) antes do gate. | Alta | AUD-SEC, AUD-PRIV, AUD-LICENSE, AUD-QUALITY | Média | ✅ Concluído | ✓ |
-| R4 | W8 | Release | `git init` + publicar no Codeberg (`codeberg.org/petrinhu/bigtech_plugin`). **Gate de publicação / one-way-door — go/no-go do líder supremo.** | Alta | TST-T14, TST-T15, TST-ORFAOS, AUD-REPORT | Baixa | ⏳ Pendente | — |
+| R4 | W8 | Release | `git init` + publicar no Codeberg (`codeberg.org/petrinhu/bigtech_plugin`). **Gate de publicação / one-way-door — go/no-go do líder supremo.** | Alta | TST-T14, TST-T15, TST-ORFAOS, AUD-REPORT | Baixa | ✅ Concluído | — |
 | W-WIKI | W8 | Release | Wiki do repo (Codeberg/Forgejo wiki-native) + doc `.md` extensa em registro didático para INICIANTE (explica jargão, passo-a-passo). Deriva de `docs/` (linka, não duplica). Execução via `technical-writer`/`ux-writer`. | Baixa | R4 | Média | ⏳ Pendente | — |
 
 ## Tabela de scoring WSJF (itens-pai funcionais)
