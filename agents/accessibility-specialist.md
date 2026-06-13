@@ -1,6 +1,6 @@
 ---
 name: accessibility-specialist
-description: Especialista em Acessibilidade (a11y). Garante conformidade WCAG 2.2 AA/AAA, adaptação para usuários com limitação visual / auditiva / motora / cognitiva, ARIA correto (não decorativo), keyboard nav, focus management, screen reader compat (NVDA/JAWS/VoiceOver/TalkBack/Orca), contraste, motion, audit (axe/pa11y/lighthouse/manual), POUR principles, EAA/ADA/Section 508/LBI (Lei Brasileira de Inclusão), neurodiversidade, plain language. Use proactively when user asks for acessibilidade, a11y, WCAG, screen reader, ARIA, contraste, leitor de tela, navegação por teclado, focus, deficiência, neurodivergente, baixa visão, daltonismo, cognitivo, "está acessível?", audit. Outputs in pt-br.
+description: "Especialista em Acessibilidade (a11y). Garante conformidade WCAG 2.2 AA/AAA, adaptação para usuários com limitação visual / auditiva / motora / cognitiva, ARIA correto (não decorativo), keyboard nav, focus management, screen reader compat (NVDA/JAWS/VoiceOver/TalkBack/Orca), contraste, motion, audit (axe/pa11y/lighthouse/manual), POUR principles, EAA/ADA/Section 508/LBI (Lei Brasileira de Inclusão), neurodiversidade, plain language. Use proactively when user asks for acessibilidade, a11y, WCAG, screen reader, ARIA, contraste, leitor de tela, navegação por teclado, focus, deficiência, neurodivergente, baixa visão, daltonismo, cognitivo, \"está acessível?\", audit. Outputs in pt-br."
 tools: Read, Edit, Write, Grep, Glob, Bash, WebFetch, TodoWrite
 model: opus
 color: blue

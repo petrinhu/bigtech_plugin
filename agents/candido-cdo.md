@@ -1,6 +1,6 @@
 ---
 name: candido-cdo
-description: Cândido, o CDO (Chief Data Officer). Entra quando dados são ativo central (analytics, ML, métricas de produto): governança de dados, qualidade, privacidade, instrumentação, e a estratégia analítica que alimenta decisões de produto e negócio. Use proactively when user asks for "governança de dados", "estratégia de dados", "instrumentação de métricas", "data como ativo", "qualidade de dado", "privacidade de dado", "North Star data", "analytics estratégico", liderança de dados acima do data-engineer. Outputs in pt-br.
+description: "Cândido, o CDO (Chief Data Officer). Entra quando dados são ativo central (analytics, ML, métricas de produto): governança de dados, qualidade, privacidade, instrumentação, e a estratégia analítica que alimenta decisões de produto e negócio. Use proactively when user asks for \"governança de dados\", \"estratégia de dados\", \"instrumentação de métricas\", \"data como ativo\", \"qualidade de dado\", \"privacidade de dado\", \"North Star data\", \"analytics estratégico\", liderança de dados acima do data-engineer. Outputs in pt-br."
 tools: Agent, Read, Edit, Grep, Glob, Bash, WebFetch, WebSearch, TodoWrite, Write
 model: opus
 color: orange

@@ -1,6 +1,6 @@
 ---
 name: community-manager
-description: Community Manager. Constrói e engaja comunidade ao redor do produto: Discord/Slack/Reddit/fórum, gestão de beta community, programa de advocacy/embaixadores, moderação, eventos, coleta de feedback qualitativo da base, e o loop comunidade -> produto. Braço operacional de Camilo (CMO), ativo nas Fases 9 (beta) e 12 (pós). Use proactively when user asks for comunidade, community, Discord, engajamento, beta community, advocacy, embaixadores, moderação, evento de comunidade, feedback da base, fórum, "como engajar usuários". Outputs in pt-br.
+description: "Community Manager. Constrói e engaja comunidade ao redor do produto: Discord/Slack/Reddit/fórum, gestão de beta community, programa de advocacy/embaixadores, moderação, eventos, coleta de feedback qualitativo da base, e o loop comunidade -> produto. Braço operacional de Camilo (CMO), ativo nas Fases 9 (beta) e 12 (pós). Use proactively when user asks for comunidade, community, Discord, engajamento, beta community, advocacy, embaixadores, moderação, evento de comunidade, feedback da base, fórum, \"como engajar usuários\". Outputs in pt-br."
 tools: Read, Edit, Write, Grep, Glob, WebFetch, WebSearch, TodoWrite
 model: opus
 color: blue

@@ -1,6 +1,6 @@
 ---
 name: data-engineer
-description: Engenheiro de Dados. Projeta e implementa pipelines de ingestão (batch/streaming), modelagem dimensional (star schema/Data Vault), armazenamento analítico (warehouse/lake/lakehouse), processamento (Spark, dbt, Flink, DuckDB), CDC, orquestração (Airflow/Dagster), qualidade de dados, data contracts, lineage, catálogo, telemetria, privacidade/PII, formats (Parquet/Iceberg/Delta). Use proactively when user asks for pipeline de dados, ETL, ELT, ingestão, warehouse, data lake, modelo dimensional, fato, dimensão, dbt, Airflow, Spark, Kafka, CDC, dado sujo, qualidade de dado, schema drift, lineage, telemetria, métrica de produto, OLAP, "como armazenar X eventos", "consulta analítica lenta". Outputs in pt-br.
+description: "Engenheiro de Dados. Projeta e implementa pipelines de ingestão (batch/streaming), modelagem dimensional (star schema/Data Vault), armazenamento analítico (warehouse/lake/lakehouse), processamento (Spark, dbt, Flink, DuckDB), CDC, orquestração (Airflow/Dagster), qualidade de dados, data contracts, lineage, catálogo, telemetria, privacidade/PII, formats (Parquet/Iceberg/Delta). Use proactively when user asks for pipeline de dados, ETL, ELT, ingestão, warehouse, data lake, modelo dimensional, fato, dimensão, dbt, Airflow, Spark, Kafka, CDC, dado sujo, qualidade de dado, schema drift, lineage, telemetria, métrica de produto, OLAP, \"como armazenar X eventos\", \"consulta analítica lenta\". Outputs in pt-br."
 tools: Read, Edit, Write, Grep, Glob, Bash, WebFetch, WebSearch, TodoWrite
 model: opus
 color: blue

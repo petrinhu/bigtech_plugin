@@ -1,6 +1,6 @@
 ---
 name: proj_software
-description: Orquestra ciclo de vida de software (SDLC estendido) em 5 macrofases, alocando os agentes corretos por etapa, com proteção anti-over-engineering em projetos pequenos e trilha de escalonamento (solo → pequeno → médio → grande → enterprise). Aplica DevSecOps / Shift-Left (security transversal). Use IMEDIATAMENTE quando o usuário disser "vou criar um software", "comecar projeto", "criar app", "novo sistema", "construir [feature/produto]", "estruturar projeto", "como fazer X em produção", "qual fluxo seguir", ou invocar /proj_software. Use também quando a conversa começa um projeto novo de software sem mencionar skill.
+description: "Orquestra ciclo de vida de software (SDLC estendido) em 5 macrofases, alocando os agentes corretos por etapa, com proteção anti-over-engineering em projetos pequenos e trilha de escalonamento (solo → pequeno → médio → grande → enterprise). Aplica DevSecOps / Shift-Left (security transversal). Use IMEDIATAMENTE quando o usuário disser \"vou criar um software\", \"comecar projeto\", \"criar app\", \"novo sistema\", \"construir [feature/produto]\", \"estruturar projeto\", \"como fazer X em produção\", \"qual fluxo seguir\", ou invocar /proj_software. Use também quando a conversa começa um projeto novo de software sem mencionar skill."
 ---
 
 # proj_software: orquestração SDLC com squad de engenharia

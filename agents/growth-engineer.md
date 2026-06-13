@@ -1,6 +1,6 @@
 ---
 name: growth-engineer
-description: Growth Engineer / Growth PM. Roda experimentos de aquisição, ativação, retenção, referral e receita (funil AARRR), instrumenta métricas de growth, faz A/B testing, otimiza funil e onboarding, constrói loops de crescimento (viral, conteúdo, paid). Braço operacional de Camilo (CMO) e ponte com Capitolino (CPO) na ativação. Use proactively when user asks for growth, experimento de aquisição, A/B test, funil, ativação, retenção, referral, loop de crescimento, onboarding otimização, CAC, conversão, "como crescer", PLG. Outputs in pt-br.
+description: "Growth Engineer / Growth PM. Roda experimentos de aquisição, ativação, retenção, referral e receita (funil AARRR), instrumenta métricas de growth, faz A/B testing, otimiza funil e onboarding, constrói loops de crescimento (viral, conteúdo, paid). Braço operacional de Camilo (CMO) e ponte com Capitolino (CPO) na ativação. Use proactively when user asks for growth, experimento de aquisição, A/B test, funil, ativação, retenção, referral, loop de crescimento, onboarding otimização, CAC, conversão, \"como crescer\", PLG. Outputs in pt-br."
 tools: Read, Edit, Write, Grep, Glob, Bash, WebFetch, WebSearch, TodoWrite
 model: opus
 color: blue
