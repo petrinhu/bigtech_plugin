@@ -118,7 +118,15 @@ Use para planejar passos, ordenar backlog, ou perguntar "o que falta" e "em que 
 
 **Dependências sugeridas:** `playwright` e `superpowers`. Não são obrigatórias, mas habilitam a experiência completa (automação de navegador e fluxos avançados). Instale-as para tirar o máximo do plugin; o hook de sessão sugere a instalação quando estão ausentes.
 
+## Modelo de orquestração
+
+Por padrão, os agents usam o modelo **`opus`** (sempre o Opus mais recente: o campo `model` não fixa versão), e a **orquestração** (o Chief of Staff e os C-level montando e coordenando a constelação) roda em **effort máximo**, para o raciocínio mais profundo nas decisões que cruzam o time. Esse é o default recomendado.
+
+Você pode mudar manualmente: edite o campo `model` no cabeçalho de qualquer agent em `agents/<slug>.md` (valores aceitos: `opus`, `sonnet`, `haiku`) e ajuste o nível de esforço da sua sessão com `/effort`.
+
 ## Documentação
+
+**Wiki (didática, para iniciantes):** a [Wiki do projeto](https://codeberg.org/petrinhu/bigtech_plugin/wiki) tem uma página por agente, hook e skill, além de glossário, guia de instalação e de uso passo a passo.
 
 Os manuais de governança acompanham o plugin em `docs/` e são injetados no contexto da sessão:
 

@@ -11,7 +11,7 @@
       "source": "./",
       "description": "Constelação de agents C-level e operacionais com skills de orquestração (bigtech, proj_software, tab_pendencias) para tocar produto e SDLC como uma bigtech.",
       "category": "workflow",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "license": "Apache-2.0"
     }
   ]
