@@ -89,7 +89,7 @@ def test_excluded_file_permitted(tmp_path, monkeypatch):
 
 def test_file_outside_root_is_inert(tmp_path, monkeypatch):
     """Arquivo fora da raiz do projeto (relpath começa com '..') retorna 0 sem bloquear."""
-    root = _project(tmp_path)
+    _project(tmp_path)
     monkeypatch.setenv("HOME", str(tmp_path))
     # fora.py está no diretório pai de tmp_path, fora da raiz do projeto
     outside_fp = str(tmp_path.parent / "fora.py")

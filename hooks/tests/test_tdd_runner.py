@@ -1,4 +1,8 @@
+import json
+import os
 import subprocess
+import sys
+
 import tdd_runner as r
 
 
@@ -73,10 +77,6 @@ def test_run_suite_no_command_is_not_ran():
 # ---------------------------------------------------------------------------
 # Task 10: Integracao real - ciclo red -> green
 # ---------------------------------------------------------------------------
-import json
-import os
-import sys
-
 HOOKS_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 

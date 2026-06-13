@@ -11,3 +11,6 @@ __pycache__/
 # SO / editor
 .DS_Store
 *.swp
+
+# Conteudo da wiki (vai para o repo .wiki separado, nao para o repo principal)
+wiki/

@@ -174,7 +174,8 @@ def test_glob_match_bare_double_star_matches_all():
 # --- BUG I1: load_config silencia config malformada ---
 
 def test_load_config_malformed_warns(tmp_path, capsys):
-    d = tmp_path / ".claude"; d.mkdir()
+    d = tmp_path / ".claude"
+    d.mkdir()
     (d / "tdd-guard.json").write_text("{ nao eh json")
     root, cfg = c.load_config(str(tmp_path))
     assert root is None and cfg is None
@@ -182,7 +183,8 @@ def test_load_config_malformed_warns(tmp_path, capsys):
 
 
 def test_load_config_bad_preset_warns(tmp_path, capsys):
-    d = tmp_path / ".claude"; d.mkdir()
+    d = tmp_path / ".claude"
+    d.mkdir()
     (d / "tdd-guard.json").write_text(json.dumps({"preset": "python_pytest"}))  # typo
     root, cfg = c.load_config(str(tmp_path))
     assert root is None and cfg is None
