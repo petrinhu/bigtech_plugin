@@ -1,6 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "petrinhu",
+  "description": "Marketplace de petrinhu: distribui o plugin bigtech, que monta uma constelação de agents C-level e operacionais com skills de orquestração para tocar produto e ciclo de vida de software como uma bigtech.",
   "owner": {
     "name": "petrinhu",
     "url": "https://codeberg.org/petrinhu"
@@ -11,7 +12,7 @@
       "source": "./",
       "description": "Constelação de agents C-level e operacionais com skills de orquestração (bigtech, proj_software, tab_pendencias) para tocar produto e SDLC como uma bigtech.",
       "category": "workflow",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "license": "Apache-2.0"
     }
   ]

@@ -4,6 +4,17 @@ Todas as mudanças relevantes deste projeto são documentadas neste arquivo.
 
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), e o projeto adota o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.1.2] - 2026-06-13
+
+### Fixed
+
+- **Conformidade 100% com `claude plugin validate --strict` e `claude plugin tag`.** Resolvidos os dois únicos avisos restantes do empacotamento.
+- **`description` do marketplace.** Adicionado o campo `description` no nível raiz do `marketplace.json` (o aviso "No marketplace description provided" reprovava o `--strict`).
+
+### Changed
+
+- **`CLAUDE.md` da raiz renomeado para `DEVELOPMENT.md`.** Um `CLAUDE.md` na raiz de um plugin não é carregado como contexto e poluía o pacote distribuído (aviso do `claude plugin tag`); o conteúdo é doc de desenvolvimento/contribuição e segue versionado com nome honesto. As menções a "CLAUDE.md" nos manuais e skills são ao conceito genérico (o CLAUDE.md do projeto onde o plugin roda) e permanecem inalteradas.
+
 ## [0.1.1] - 2026-06-13
 
 ### Changed
@@ -30,5 +41,6 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), e
 - **13 documentos de governança.** Manuais de organização, pipeline de release, liderança, ferramentas, contrato de qualidade, testes, agile, checklist de deploy, auditorias e princípios de arquitetura, higienizados para distribuição pública.
 - **Marketplace `petrinhu`.** Distribuição via `/plugin marketplace add` e `/plugin install bigtech`, sob a licença Apache-2.0.
 
+[0.1.2]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.2
 [0.1.1]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.1
 [0.1.0]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.0

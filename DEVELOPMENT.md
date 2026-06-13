@@ -1,4 +1,7 @@
-# CLAUDE.md — Projeto plugin `bigtech`
+# Desenvolvimento — Projeto plugin `bigtech`
+
+> Doc de contexto para quem **desenvolve/contribui** com este repositório (não é carregado como
+> contexto de plugin nem distribuído como instrução de uso). Para usar o plugin, veja o `README.md`.
 
 Construção de um **plugin Claude Code distribuível** que empacota a organização "bigtech"
 (constelação de agents C-level + operacionais, sem jogo nem perícia) com skills de orquestração,
