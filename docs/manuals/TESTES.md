@@ -9,9 +9,32 @@ Manual de governança que acompanha o plugin. Manuais irmãos: [CONTRACT](CONTRA
 > As seções T1-T12 e A1-A10 cobrem C/C++/Qt. As seções T13-T15 e A11-A13 cobrem os demais stacks.
 > Adapte os caminhos e nomes de módulos conforme o projeto alvo.
 
-> **Portabilidade dos comandos:** os comandos de instalação abaixo usam `dnf` (Fedora/RHEL) e
-> `apt` (Debian/Ubuntu) como exemplos concretos. Em outras distribuições, adapte ao seu
-> gerenciador de pacotes (`pacman`, `zypper`, `brew`, `nix`); o nome do pacote costuma ser o mesmo.
+> **Portabilidade dos comandos (agnóstico de SO):** os comandos de instalação abaixo usam `dnf`
+> (Fedora/RHEL) e `apt` (Debian/Ubuntu) como exemplos concretos, mas o plugin é agnóstico de
+> sistema operacional e cobre Windows nativo, WSL, macOS e Linux.
+> - **Linux:** adapte ao gerenciador da distribuição: `apt` (Debian/Ubuntu), `dnf` (Fedora/RHEL),
+>   `pacman` (Arch), `zypper` (openSUSE). O nome do pacote costuma ser o mesmo.
+> - **macOS:** use `brew` (Homebrew).
+> - **Windows:** use `winget` (nativo), `choco` (Chocolatey) ou `scoop`.
+> - **Detecção de ferramenta conforme o SO:** `command -v <ferramenta>` no Unix, WSL ou Git-Bash;
+>   `Get-Command <ferramenta>` ou `where <ferramenta>` no Windows (PowerShell ou cmd).
+> - **Prefira gerenciadores cross-platform quando a ferramenta os oferece:** `pip`/`uv` (Python),
+>   `cargo` (Rust), `npm`/`pnpm` (Node) funcionam igual em Windows, macOS e Linux: um só comando
+>   serve para todos os SO.
+> - **No Windows, rodar o Claude Code via WSL** torna válidos todos os comandos Unix deste manual
+>   (incluindo `command -v` e os gerenciadores `apt`/`dnf`), evitando a tradução para PowerShell.
+
+> **Política - ferramenta ausente (agnóstica de SO).** Ao executar um item de teste (`TST-*`)
+> cuja ferramenta requerida não está instalada, o agente NÃO falha em silêncio, NÃO pula o item
+> sem avisar e NÃO instala nada sem consentimento. Em vez disso: (1) detecta a ausência de forma
+> adequada ao SO (`command -v <ferramenta>` no Unix/WSL; `Get-Command <ferramenta>` ou
+> `where <ferramenta>` no Windows); (2) OFERECE instalar, via AskUserQuestion, mostrando o comando
+> de instalação adequado ao SO e ao gerenciador disponível (`apt`/`dnf`/`brew`/`winget`/`choco`/`scoop`),
+> preferindo gerenciadores cross-platform (`pip`/`uv`, `cargo`, `npm`) quando a ferramenta os
+> suporta, a partir de T15.0 ou da coluna de ferramentas do tipo; (3) com a confirmação do usuário,
+> instala e então roda o item; (4) sem confirmação, NÃO roda: registra o item como pendente na
+> tabela, com nota visível do que faltou e o comando de instalação, para retomar depois. Nunca
+> silencioso. Pré-requisitos básicos do ambiente (ex.: Python/pytest) seguem o T15.0.
 
 ---
 
@@ -98,6 +121,14 @@ Este manual é um excerto operacional: documenta os procedimentos de teste e aud
 ### T15.0  Instalar ferramentas necessárias
 
 Cada stack exige um conjunto de ferramentas para os testes T15.X. Instale antes do primeiro uso; depois apenas atualizar quando precisar.
+
+> **No Windows (nota consolidada).** Os gerenciadores cross-platform abaixo já cobrem Windows: `uv`/`pip` (Python), `cargo` (Rust) e `npm`/`pnpm` (Node) instalam igual em Windows, macOS e Linux. Equivalentes nativos quando precisar:
+> - **Python:** instalador Windows do `uv` (PowerShell: `powershell -c "irm https://astral.sh/uv/install.ps1 | iex"`) ou `pip`.
+> - **Rust:** `rustup-init.exe` (do site da rustup) ou `winget install Rustlang.Rustup`.
+> - **Node:** `winget install OpenJS.NodeJS` ou nvm-windows.
+> - **Ferramentas de sistema** (cmake, clang, cppcheck): `winget`, `choco` ou msys2.
+>
+> Alternativa: rodar o Claude Code via WSL torna válidos os blocos `apt`/`dnf` deste T15.0 sem tradução.
 
 **Python (uv):**
 ```bash

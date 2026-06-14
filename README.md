@@ -141,6 +141,8 @@ When invoked, every agent runs a pre-flight check on the backlog table (`TODO.md
 
 ### Compatibility
 
+**Platform.** Works on Linux, macOS, and Windows (native or WSL). The hooks are pure Python, so they run cross-platform. When the `tab_pendencias` skill plans tests or audits that need external tools, each tool is offered for installation with your confirmation, using the command that fits your OS (apt/dnf/brew/winget/choco/scoop) and preferring cross-platform managers (pip/uv, cargo, npm). Nothing is installed silently.
+
 **Built for Claude Code (Anthropic).** The plugin uses Claude Code's own features: life-cycle hooks, skills, the subagent protocol, and the plugin/marketplace format. There is no guarantee it works on other AI assistants or code CLIs (for example, Grok, Gemini CLI, GitHub Copilot CLI, OpenAI Codex, Cursor, or Aider); porting to other platforms may require adaptation and is not officially supported.
 
 **Incompatible with the `caveman` plugin.** `caveman` compresses communication and conflicts with this plugin's mode reinforcement. Disable `caveman` before using `bigtech`; the session hook warns you if it detects both active at the same time.
@@ -300,6 +302,8 @@ Ao serem acionados, todos os agents fazem um pre-flight da tabela de pendências
 | `bigtech_reinforce.py` | UserPromptSubmit | Reforça o modo bigtech (anti-drift) e roteia ativação por linguagem natural para `/bigtech`. Escopado por marcador, anti-ruído. |
 
 ### Compatibilidade
+
+**Plataforma.** Funciona em Linux, macOS e Windows (nativo ou WSL). Os hooks são Python puro, então rodam de forma cross-platform. Quando a skill `tab_pendencias` planeja testes ou auditorias que precisam de ferramentas externas, cada ferramenta é oferecida para instalação com a sua confirmação, no comando adequado ao seu SO (apt/dnf/brew/winget/choco/scoop) e preferindo gerenciadores cross-platform (pip/uv, cargo, npm). Nada é instalado em silêncio.
 
 **Feito para o Claude Code (Anthropic).** O plugin usa recursos próprios do Claude Code: hooks de ciclo de vida, skills, o protocolo de subagents e o formato de plugin/marketplace. Não há garantia de funcionamento em outros assistentes de IA ou CLIs de código (por exemplo, Grok, Gemini CLI, GitHub Copilot CLI, OpenAI Codex, Cursor ou Aider); portar para outras plataformas pode exigir adaptação e não é suportado oficialmente.
 

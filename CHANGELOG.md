@@ -4,6 +4,16 @@ Todas as mudanças relevantes deste projeto são documentadas neste arquivo.
 
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), e o projeto adota o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.1.9] - 2026-06-14
+
+### Added
+
+- **Política "ferramenta ausente" canonizada.** Os manuais `TESTES.md` e `AUDITORIAS.md`, o catálogo da skill `tab_pendencias` (e os templates que ela gera) e a `SKILL.md` passam a declarar a regra: ao executar um teste (TST-*) ou auditoria (AUD-*) cuja ferramenta requerida não está instalada, o agente oferece instalá-la com a confirmação do usuário (via AskUserQuestion), nunca em silêncio e nunca pulando o item sem avisar.
+
+### Changed
+
+- **Portabilidade agnóstica de sistema operacional (Linux, macOS, Windows nativo ou WSL).** Os manuais e o `docs/TOOLING.md` passam a tratar detecção e instalação adequadas ao SO (apt/dnf/brew/winget/choco/scoop), preferindo gerenciadores cross-platform (pip/uv, cargo, npm/pnpm). O `README.md` e a wiki (Instalação, Uso) ganham nota de Plataforma e da política, em inglês e português.
+
 ## [0.1.8] - 2026-06-14
 
 ### Changed
@@ -95,6 +105,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), e
 - **13 documentos de governança.** Manuais de organização, pipeline de release, liderança, ferramentas, contrato de qualidade, testes, agile, checklist de deploy, auditorias e princípios de arquitetura, higienizados para distribuição pública.
 - **Marketplace `petrinhu`.** Distribuição via `/plugin marketplace add` e `/plugin install bigtech`, sob a licença Apache-2.0.
 
+[0.1.9]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.9
 [0.1.8]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.8
 [0.1.7]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.7
 [0.1.6]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.6

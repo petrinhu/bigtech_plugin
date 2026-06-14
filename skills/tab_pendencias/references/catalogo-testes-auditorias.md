@@ -6,6 +6,19 @@
 > ./AUDITORIAS.md próprios, eles têm precedência; este catálogo é a base/fallback e
 > a fonte dos manuais que a skill cria quando faltam.
 
+> **Política - ferramenta ausente (agnóstica de SO; vale para todo `TST-*` e `AUD-*` deste
+> catálogo).** Ao executar um item cuja ferramenta requerida não está instalada, o agente NÃO
+> falha em silêncio, NÃO pula o item sem avisar e NÃO instala nada sem consentimento. Em vez
+> disso: (1) detecta a ausência de forma adequada ao SO (`command -v <ferramenta>` no Unix/WSL;
+> `Get-Command <ferramenta>` ou `where <ferramenta>` no Windows); (2) OFERECE instalar, via
+> AskUserQuestion, mostrando o comando de instalação adequado ao SO e ao gerenciador disponível
+> (`apt`/`dnf`/`brew`/`winget`/`choco`/`scoop`), preferindo gerenciadores cross-platform
+> (`pip`/`uv`, `cargo`, `npm`) quando a ferramenta os suporta, a partir da coluna Ferramentas da
+> linha ou de T15.0 para pré-CI; (3) com a confirmação do usuário, instala e então roda o item;
+> (4) sem confirmação, NÃO roda: registra o item como pendente na tabela, com nota visível do que
+> faltou e o comando de instalação, para retomar depois. Nunca silencioso. Pré-requisitos básicos
+> do ambiente (ex.: Python/pytest) seguem o T15.0.
+
 ## Detecção de stack
 
 > Sinais marcados "(conteúdo)" são detectados lendo deps/imports dos arquivos (Grep/Read), não apenas por nome de arquivo na raiz.
@@ -87,6 +100,12 @@ um manual existente.
 
 > Tipos de teste aplicáveis a este projeto (stack: {STACK}). T1 unitário fica sob o
 > hook de TDD, não listado aqui. Cada tipo vira um item TST-* na tabela de pendências.
+> Política - ferramenta ausente (agnóstica de SO): ao rodar um TST-* cuja ferramenta falta, NÃO
+> falhar em silêncio nem instalar sozinho: detectar conforme o SO (`command -v` no Unix/WSL;
+> `Get-Command` ou `where` no Windows), OFERECER instalar via AskUserQuestion com o comando
+> adequado ao SO e ao gerenciador disponível (apt/dnf/brew/winget/choco/scoop), preferindo
+> gerenciadores cross-platform (pip/uv, cargo, npm) quando a ferramenta os suporta e, sem
+> confirmação, deixar o item pendente com nota.
 
 <<linhas de TST-* aplicáveis, no formato: "## TST-T<n> <Tipo>\n<objetivo>\n**Ferramentas:** ...">>
 ```
@@ -98,6 +117,12 @@ um manual existente.
 
 > Auditorias aplicáveis a este projeto (stack: {STACK}). Cada uma vira um item AUD-*
 > na tabela de pendências, nas ondas finais (downstream de código+teste).
+> Política - ferramenta ausente (agnóstica de SO): ao rodar um AUD-* cuja ferramenta falta, NÃO
+> falhar em silêncio nem instalar sozinho: detectar conforme o SO (`command -v` no Unix/WSL;
+> `Get-Command` ou `where` no Windows), OFERECER instalar via AskUserQuestion com o comando
+> adequado ao SO e ao gerenciador disponível (apt/dnf/brew/winget/choco/scoop), preferindo
+> gerenciadores cross-platform (pip/uv, cargo, npm) quando a ferramenta os suporta e, sem
+> confirmação, deixar o item pendente com nota.
 
 <<linhas de AUD-* aplicáveis, no formato: "## AUD-<ID> <Tema>\n<objetivo>\n**Ferramentas:** ...">>
 ```

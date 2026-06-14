@@ -131,6 +131,14 @@ Executa no INÍCIO de TODO comando (--create, --reorder, --show, --main), antes 
 exibir/escrever a tabela. Garante que os testes não-unitários e auditorias aplicáveis
 estejam planejados. Catálogo e regras: `references/catalogo-testes-auditorias.md`.
 
+> **Execução dos itens segue a política de ferramenta ausente** (agnóstica de SO; auto-instalar
+> com confirmação, nunca silencioso): ao rodar um `TST-*`/`AUD-*` cuja ferramenta falta, detectar
+> conforme o SO (`command -v` no Unix/WSL; `Get-Command` ou `where` no Windows), OFERECER instalar
+> via AskUserQuestion com o comando adequado ao SO e ao gerenciador disponível
+> (apt/dnf/brew/winget/choco/scoop), preferindo gerenciadores cross-platform (pip/uv, cargo, npm)
+> quando a ferramenta os suporta e, sem confirmação, deixar o item pendente com nota - jamais pular
+> em silêncio. Detalhe no catálogo e nos manuais [TESTES](../../docs/manuals/TESTES.md) / [AUDITORIAS](../../docs/manuals/AUDITORIAS.md).
+
 ### Passos
 
 1. **Detectar stack + características**: Glob na raiz para sinais de arquivo; Grep/Read de deps e imports para sinais de conteúdo (rede/API, protocolo, framework). Ver o reference.

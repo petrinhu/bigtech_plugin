@@ -12,7 +12,7 @@ Manual de governança que acompanha o plugin. Manuais relacionados: [CONTRACT](m
 
 Regra: o agent usa a ferramenta canônica do seu domínio SEMPRE que aplicável (não reinventa em shell cru). Se ela faltar (⬇), instala com o comando aqui antes de usar. Respeite os limites de hardware da máquina ([limites de hardware](principles/hardware-resource-limits.md)) e a prioridade de ferramentas MCP: quando houver um servidor MCP que cubra a tarefa, prefira-o ao shell cru.
 
-> **Portabilidade dos comandos:** os comandos de instalação abaixo usam `dnf` (Fedora/RHEL) como exemplo concreto. Em outras distribuições, adapte ao seu gerenciador de pacotes (`apt`, `pacman`, `zypper`, `brew`, `nix`); o nome do pacote costuma ser o mesmo.
+> **Portabilidade dos comandos (agnóstico de SO):** os comandos de instalação abaixo usam `dnf` (Fedora/RHEL) como exemplo concreto. Adapte ao gerenciador do seu sistema: Linux (`apt`, `pacman`, `zypper`, `nix`), macOS (`brew`), Windows (`winget`, `choco` ou `scoop`); o nome do pacote costuma ser o mesmo. Prefira gerenciadores cross-platform quando a ferramenta os oferece (`pip`/`uv`, `cargo`, `npm`/`pnpm`, que funcionam igual em Windows, macOS e Linux). No Windows, rodar o Claude Code via WSL valida os comandos Unix.
 
 ---
 

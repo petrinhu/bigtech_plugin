@@ -9,6 +9,8 @@ Manual de governança que acompanha o plugin. Manuais irmãos: [CONTRACT](CONTRA
 
 > **Como usar este manual.** Este é o catálogo de referência dos temas de auditoria por stack. O conjunto de auditorias aplicável a um projeto concreto é materializado no `AUDITORIAS.md` da raiz daquele projeto, gerado e podado pela skill `/tab_pendencias` conforme o stack detectado (cada tema vira um item `AUD-*` na tabela de pendências). Consulte aqui o escopo de cada tema; rode lá a auditoria do seu projeto.
 
+> **Política - ferramenta ausente (agnóstica de SO).** Ao executar um item de auditoria (`AUD-*`) cuja ferramenta requerida não está instalada, o agente NÃO falha em silêncio, NÃO pula o item sem avisar e NÃO instala nada sem consentimento. Em vez disso: (1) detecta a ausência de forma adequada ao SO (`command -v <ferramenta>` no Unix/WSL; `Get-Command <ferramenta>` ou `where <ferramenta>` no Windows); (2) OFERECE instalar, via AskUserQuestion, mostrando o comando de instalação adequado ao SO e ao gerenciador disponível (`apt`/`dnf`/`brew`/`winget`/`choco`/`scoop`), preferindo gerenciadores cross-platform (`pip`/`uv`, `cargo`, `npm`) quando a ferramenta os suporta, a partir da coluna Ferramentas do tema; (3) com a confirmação do usuário, instala e então roda o item; (4) sem confirmação, NÃO roda: registra o item como pendente na tabela, com nota visível do que faltou e o comando de instalação, para retomar depois. Nunca silencioso. Pré-requisitos básicos do ambiente seguem o T15.0 do [TESTES](TESTES.md).
+
 ---
 
 ## Catálogo de temas por stack
