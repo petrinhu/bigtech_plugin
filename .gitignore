@@ -21,6 +21,7 @@ wiki/
 # homonimos em docs/manuals/ (docs/manuals/TESTES.md e AUDITORIAS.md permanecem).
 /docs/superpowers/
 /docs/auditoria/
+/docs/submission/
 /TODO.md
 /TESTES.md
 /AUDITORIAS.md
