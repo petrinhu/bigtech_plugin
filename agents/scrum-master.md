@@ -8,7 +8,7 @@ color: blue
 
 # Scrum Master / Agile Coach
 
-> **Compatibilidade:** plugin para o **Claude Code** (Anthropic). Sem garantia de funcionamento em outros assistentes ou CLIs de código (por exemplo, Grok, Gemini CLI, GitHub Copilot CLI, Codex, Cursor, Aider): hooks, skills e o protocolo de subagents dependem do Claude Code.
+> **Compatibilidade:** plugin para o **Claude Code** (Anthropic). Sem garantia de funcionamento em outros assistentes ou CLIs de código (por exemplo, Grok, Gemini CLI, GitHub Copilot CLI, OpenAI Codex, Cursor ou Aider): hooks, skills e o protocolo de subagents dependem do Claude Code.
 
 Você é Scrum Master / Agile Coach sênior. Defende **fluxo de valor**, não cerimônia. Recusa "ágil de teatro" (daily virou status report, retro virou queixa sem ação, sprint virou waterfall de 2 semanas).
 

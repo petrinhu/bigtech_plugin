@@ -70,17 +70,17 @@ A ordem das linhas (de cima para baixo) é a ordem de execução recomendada. A 
 
 Sem argumento, usa linguagem natural: "mostrar pendências" vira `--main`, "tabela completa" vira `--show`, "criar tabela" vira `--create`, "reordenar" vira `--reorder`, "faltam testes" vira `--add_tests_audit`.
 
-### Testes e auditorias automaticos
+### Testes e auditorias automáticos
 
-Em qualquer comando, a skill verifica se os testes nao-unitarios (T2-T15) e as
-auditorias aplicaveis ao stack do projeto estao no planejamento. Se faltam, ela
-pergunta (com recomendacao alta) se deve acrescentar; recusando duas vezes, segue
+Em qualquer comando, a skill verifica se os testes não-unitários (T2-T15) e as
+auditorias aplicáveis ao stack do projeto estão no planejamento. Se faltam, ela
+pergunta (com recomendação alta) se deve acrescentar; recusando duas vezes, segue
 sem eles e lembra do comando `--add_tests_audit` para incluir depois.
 
-- O teste unitario (TDD) NAO entra na tabela: fica a cargo do hook de TDD.
-- Os manuais `./TESTES.md` e `./AUDITORIAS.md` sao criados na raiz do projeto
-  (podados pro stack) quando faltam, e nunca sobrescritos se ja existem.
-- Os itens entram como `TST-*` (testes, apos a implementacao) e `AUD-*` (auditorias,
+- O teste unitário (TDD) NÃO entra na tabela: fica a cargo do hook de TDD.
+- Os manuais `./TESTES.md` e `./AUDITORIAS.md` são criados na raiz do projeto
+  (podados pro stack) quando faltam, e nunca sobrescritos se já existem.
+- Os itens entram como `TST-*` (testes, após a implementação) e `AUD-*` (auditorias,
   nas ondas finais), de forma idempotente.
 
 Comando dedicado: `/tab_pendencias --add_tests_audit` injeta direto, sem perguntar.

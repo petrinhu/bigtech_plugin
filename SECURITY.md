@@ -18,7 +18,7 @@ antes de rodar a suíte de testes deles.
 
 ## Os hooks rodam na sua máquina
 
-Quando o plugin está instalado, o Claude Code registra cinco hooks (ver
+Quando o plugin está instalado, o Claude Code registra seis hooks (ver
 `hooks/hooks.json`). Todos executam localmente, com o seu usuário, sob os
 seguintes eventos:
 
@@ -26,6 +26,7 @@ seguintes eventos:
 |---|---|---|
 | `bigtech_session_init.py` | SessionStart | Injeta o caminho dos manuais no contexto; avisa sobre conflito e dependências ausentes. |
 | `bigtech_porte_reminder.py` | SessionStart | Reavalia o porte do projeto; só age em projeto de código ainda não classificado. |
+| `tab_pendencias_reminder.py` | SessionStart | Lembra de gerar o `TODO.md` via `/tab_pendencias` quando há `.bigtech-porte` sem a tabela; só lembra, nunca bloqueia. |
 | `bigtech_reinforce.py` | UserPromptSubmit | Reforça o modo de operação e roteia pedidos em linguagem natural. |
 | `tdd_guard.py` | PreToolUse (`Write`/`Edit`/`MultiEdit`) | Gate opt-in de TDD; pode bloquear a escrita de código de produção. |
 | `tdd_runner.py` | PostToolUse (`Write`/`Edit`/`MultiEdit`) | Roda a suíte de testes do projeto após a edição e grava o resultado. |

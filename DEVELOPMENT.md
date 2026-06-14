@@ -1,4 +1,4 @@
-# Desenvolvimento — Projeto plugin `bigtech`
+# Desenvolvimento - Projeto plugin `bigtech`
 
 > Doc de contexto para quem **desenvolve/contribui** com este repositório (não é carregado como
 > contexto de plugin nem distribuído como instrução de uso). Para usar o plugin, veja o `README.md`.
@@ -27,4 +27,4 @@ até nome do autor e wikilinks de exemplo), ficam restritos à cópia de trabalh
    (exceto atributos C++ em código), zero identidade/infra pessoal. Ver §4 do spec + `TST-ORFAOS`.
 2. **Execução por agents especialistas** (technical-writer, devops-sre, software-architect, qa-engineer,
    compliance-legal), orquestrados por C-level; nunca higienização inline.
-3. **`R4` (publicar) e `F1` (contrato público) são one-way-doors** — go/no-go do líder supremo.
+3. **`R4` (publicar) e `F1` (contrato público) são one-way-doors**: go/no-go do líder supremo.

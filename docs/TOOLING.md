@@ -1,4 +1,4 @@
-# TOOLING.md — Ferramentas FOSS Automatizáveis dos Agents
+# TOOLING.md - Ferramentas FOSS Automatizáveis dos Agents
 
 > Catálogo das melhores ferramentas livres (FOSS) Linux, automatizáveis via CLI/headless, mapeadas aos agents que devem usá-las SEMPRE que a tarefa pedir.
 
@@ -6,9 +6,9 @@ Manual de governança que acompanha o plugin. Manuais relacionados: [CONTRACT](m
 
 ## Legenda de status
 
-- ✓ **comum** — costuma já estar no toolchain de uma estação de desenvolvimento.
-- ⬇ **instalar sob demanda** — instale com o comando da coluna quando a tarefa pedir.
-- ↺ **preferir** — alternativa moderna recomendada no lugar da ferramenta legada.
+- ✓ **comum**: costuma já estar no toolchain de uma estação de desenvolvimento.
+- ⬇ **instalar sob demanda**: instale com o comando da coluna quando a tarefa pedir.
+- ↺ **preferir**: alternativa moderna recomendada no lugar da ferramenta legada.
 
 Regra: o agent usa a ferramenta canônica do seu domínio SEMPRE que aplicável (não reinventa em shell cru). Se ela faltar (⬇), instala com o comando aqui antes de usar. Respeite os limites de hardware da máquina ([limites de hardware](principles/hardware-resource-limits.md)) e a prioridade de ferramentas MCP: quando houver um servidor MCP que cubra a tarefa, prefira-o ao shell cru.
 
@@ -218,7 +218,7 @@ Regra: o agent usa a ferramenta canônica do seu domínio SEMPRE que aplicável 
 
 - **Preferir (↺) ao legado:** `rg` sobre grep, `fd` sobre find, `delta` sobre diff, `nft` sobre iptables, `uv`/`pipx` sobre pip global, `biome` sobre eslint+prettier, `ruff` sobre flake8+black, `tokei` sobre cloc, `tofu` sobre terraform.
 - **Tier 1 (instalar primeiro, mais usado):** ruff, shellcheck, shfmt, yamllint, vale, semgrep, trivy, syft, pandoc, mermaid-cli, duckdb, yq, miller, hyperfine, delta, pa11y, lighthouse, restic, parallel, entr, tokei.
-- **Sob demanda (⬇):** as demais — instale com o comando da linha de cada ferramenta quando a tarefa exigir.
+- **Sob demanda (⬇):** as demais: instale com o comando da linha de cada ferramenta quando a tarefa exigir.
 
 ---
 

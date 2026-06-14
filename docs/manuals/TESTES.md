@@ -17,35 +17,23 @@ Manual de governança que acompanha o plugin. Manuais irmãos: [CONTRACT](CONTRA
 
 ## Índice
 
-1. [Pré-requisitos e Instalação](#1-pré-requisitos-e-instalação)
-2. [T1  -  Testes Unitários](#t1--testes-unitários)
-3. [T2  -  Análise Estática](#t2--análise-estática)
-4. [T3  -  Fuzzing de Inputs](#t3--fuzzing-de-inputs)
-5. [T4  -  Análise Dinâmica de Memória](#t4--análise-dinâmica-de-memória)
-6. [T5  -  Scanning de Dependências](#t5--scanning-de-dependências)
-7. [T6  -  Teste de APIs](#t6--teste-de-apis)
-8. [T7  -  Scanning de Binário](#t7--scanning-de-binário)
-9. [T8  -  Verificação de Secrets](#t8--verificação-de-secrets)
-10. [T9  -  Teste de Rede](#t9--teste-de-rede)
-11. [T10  -  SQL Injection](#t10--sql-injection)
-12. [T11  -  Fuzzing de Protocolos de Rede](#t11--fuzzing-de-protocolos-de-rede)
-13. [T12  -  Busca de CVEs nas Dependências](#t12--busca-de-cves-nas-dependências)
-14. [A1  -  Descoberta e Modelagem](#a1--descoberta-e-modelagem)
-15. [A2  -  Auditoria de Arquitetura e Camadas](#a2--auditoria-de-arquitetura-e-camadas)
-16. [A3  -  UI/UX e Acessibilidade](#a3--uiux-e-acessibilidade)
-17. [A4  -  QA Geral C++](#a4--qa-geral-c)
-18. [A5  -  Análise Estática e Dinâmica C/C++](#a5--análise-estática-e-dinâmica-cc)
-19. [A6  -  Cobertura de Testes](#a6--cobertura-de-testes)
-20. [A7  -  Dependências e Acoplamento](#a7--dependências-e-acoplamento)
-21. [A8  -  Consistência .h vs .cpp](#a8--consistência-h-vs-cpp)
-22. [A9  -  Análise Arquitetural Geral](#a9--análise-arquitetural-geral)
-23. [A10  -  Relatório Final de Auditoria](#a10--relatório-final-de-auditoria)
-24. [Classificação de Problemas](#classificação-de-problemas)
-25. [Formato de Patch](#formato-de-patch)
+Este manual é um excerto operacional: documenta os procedimentos de teste e auditoria abaixo. A suíte completa de tipos (T1-T15) e o catálogo de auditorias por stack vivem no `TESTES.md` e no `AUDITORIAS.md` da raiz do seu projeto, gerados pela skill `/tab_pendencias` conforme o stack detectado.
+
+1. [T1 - Testes Unitários](#t1---testes-unitários)
+2. [T2 - Análise Estática](#t2---análise-estática)
+3. [T4 - Análise Dinâmica de Memória](#t4---análise-dinâmica-de-memória)
+4. [T8 - Verificação de Secrets](#t8---verificação-de-secrets)
+5. [T10 - SQL Injection](#t10---sql-injection)
+6. [T12 - Busca de CVEs nas Dependências](#t12---busca-de-cves-nas-dependências)
+7. [T14 - Integração (Sandbox)](#t14---integração-sandbox)
+8. [T15 - Pré-CI: Espelhar CI Localmente](#t15---pré-ci-espelhar-ci-localmente) (instalação de ferramentas em T15.0)
+9. [A2 - Auditoria de Arquitetura e Camadas](#a2---auditoria-de-arquitetura-e-camadas)
+10. [A3 - UI/UX e Acessibilidade](#a3---uiux-e-acessibilidade)
+11. [A10 - Relatório Final de Auditoria](#a10---relatório-final-de-auditoria)
 
 ---
 
-## T1  -  Testes Unitários
+## T1 - Testes Unitários
 
 **Objetivo:** verificar que cada módulo se comporta conforme especificado de forma isolada.
 
@@ -55,7 +43,7 @@ Manual de governança que acompanha o plugin. Manuais irmãos: [CONTRACT](CONTRA
 
 ---
 
-## T2  -  Análise Estática
+## T2 - Análise Estática
 
 **Objetivo:** detectar bugs, má práticas e problemas de segurança sem executar o código.
 
@@ -63,7 +51,7 @@ Manual de governança que acompanha o plugin. Manuais irmãos: [CONTRACT](CONTRA
 
 ---
 
-## T4  -  Análise Dinâmica de Memória
+## T4 - Análise Dinâmica de Memória
 
 **Objetivo:** detectar vazamentos de memória, acessos inválidos e comportamento indefinido em runtime.
 
@@ -71,7 +59,7 @@ Manual de governança que acompanha o plugin. Manuais irmãos: [CONTRACT](CONTRA
 
 ---
 
-## T8  -  Verificação de Secrets
+## T8 - Verificação de Secrets
 
 **Objetivo:** garantir que nenhuma credencial, token ou chave privada foi commitada no repositório.
 
@@ -79,7 +67,7 @@ Manual de governança que acompanha o plugin. Manuais irmãos: [CONTRACT](CONTRA
 
 ---
 
-## T10  -  SQL Injection
+## T10 - SQL Injection
 
 **Objetivo:** verificar que as queries SQLite são seguras contra injeção de SQL.
 
@@ -87,7 +75,7 @@ Manual de governança que acompanha o plugin. Manuais irmãos: [CONTRACT](CONTRA
 
 ---
 
-## T12  -  Busca de CVEs nas Dependências
+## T12 - Busca de CVEs nas Dependências
 
 **Objetivo:** identificar vulnerabilidades conhecidas (CVE) nas bibliotecas usadas pelo projeto.
 
@@ -95,13 +83,13 @@ Manual de governança que acompanha o plugin. Manuais irmãos: [CONTRACT](CONTRA
 
 ---
 
-## T14  -  Integração (Sandbox)
+## T14 - Integração (Sandbox)
 
 **Objetivo:** Validação fim-a-fim contra fontes de verdade (Dumps binários).
 
 ---
 
-## T15  -  Pré-CI · Espelhar CI Localmente
+## T15 - Pré-CI: Espelhar CI Localmente
 
 **Objetivo:** rodar a MESMA suíte que o CI roda, antes de push/tag, evitando ciclo "push, esperar 8 min, falhar, corrigir". Funciona em qualquer stack porque os comandos do CI são exatamente os mesmos comandos locais.
 
@@ -298,7 +286,7 @@ Container-level só é 100 % idêntico se a imagem do CI for pública e fixada p
 
 ---
 
-## A2  -  Auditoria de Arquitetura e Camadas
+## A2 - Auditoria de Arquitetura e Camadas
 
 **Objetivo:** validar que nenhuma camada viola as regras de dependência da arquitetura.
 
@@ -306,13 +294,13 @@ Container-level só é 100 % idêntico se a imagem do CI for pública e fixada p
 
 ---
 
-## A3  -  UI/UX e Acessibilidade
+## A3 - UI/UX e Acessibilidade
 
 **Objetivo:** verificar qualidade visual, contraste, navegação por teclado e conformidade com boas práticas.
 
 ---
 
-## A10  -  Relatório Final de Auditoria
+## A10 - Relatório Final de Auditoria
 
 **Objetivo:** consolidar todos os resultados em um único documento com score, problemas e patches.
 

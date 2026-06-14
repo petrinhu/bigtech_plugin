@@ -17,6 +17,7 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -108,8 +109,10 @@ for rel in sorted(set(refs)):
         fail(f"hook script ausente: {rel}")
 print(f"  scripts referenciados: {len(set(refs))}")
 
-# 5. Executa os hooks de governanca com ambiente simulado
-print("[5] Execucao dos hooks (env simulado)")
+# 5. Executa os 6 hooks com ambiente simulado (4 de governanca + 2 de TDD):
+#    session_init, reinforce, porte_reminder, tab_pendencias_reminder,
+#    tdd_guard, tdd_runner.
+print("[5] Execucao dos hooks (env simulado, 6 hooks)")
 env = {**os.environ, "CLAUDE_PLUGIN_ROOT": str(ROOT)}
 
 
@@ -156,6 +159,28 @@ if rc not in (0,):
     fail(f"tdd_guard exit {rc} sem config (deveria liberar com 0)")
 else:
     print("  tdd_guard: fail-open sem config OK")
+
+# 5e. tab_pendencias_reminder: projeto classificado (.bigtech-porte) sem TODO.md
+#     deve disparar o lembrete de /tab_pendencias (exit 0 + cita a skill).
+#     Usa um diretorio temporario isolado para nao depender do estado de /tmp.
+with tempfile.TemporaryDirectory(prefix="bigtech-smoke-") as tmp:
+    (Path(tmp) / ".bigtech-porte").write_text("porte=early\n", encoding="utf-8")
+    # NAO criamos TODO.md de proposito: e a condicao que arma o gatilho.
+    rc, out = run_hook("tab_pendencias_reminder.py", {"cwd": tmp})
+    if rc != 0:
+        fail(f"tab_pendencias_reminder exit {rc} (deveria ser 0)")
+    elif "/tab_pendencias" not in out:
+        fail("tab_pendencias_reminder: nao citou /tab_pendencias com porte sem TODO.md")
+    else:
+        print("  tab_pendencias_reminder: lembrete /tab_pendencias OK")
+
+# 5f. tdd_runner: payload minimo, projeto sem .claude/tdd-guard.json -> nao roda
+#     a suite e nunca quebra o fluxo (exit 0).
+rc, _ = run_hook("tdd_runner.py", {"tool_name": "Write", "tool_input": {"file_path": "/tmp/x.py"}, "cwd": "/tmp"})
+if rc != 0:
+    fail(f"tdd_runner exit {rc} sem config (deveria ser 0/inerte)")
+else:
+    print("  tdd_runner: inerte sem config (exit 0) OK")
 
 print()
 if fails:

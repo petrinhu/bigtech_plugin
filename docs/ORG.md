@@ -1,4 +1,4 @@
-# ORG.md — Organização tipo Bigtech no Claude
+# ORG.md - Organização tipo Bigtech no Claude
 
 > Manual de governança da constelação de agents C-level e do roteamento de pipeline. Junta o aprendizado acumulado (agents, skills, hooks, manuais) com o [pipeline de release](pipeline_release_1.0.md) e a [teoria de liderança C-level](lideranca_pipeline_release.md). Estrutura seu workspace como uma empresa de produto digital, dimensionável do solo founder à bigtech.
 
@@ -8,7 +8,7 @@ Manuais que acompanham o plugin: [CONTRACT](manuals/CONTRACT.md), [TESTES](manua
 
 ## 0. Autoridade Suprema (acima de toda a constelação)
 
-**Você, que opera este plugin, é o líder supremo desta organização — o CEO da sua bigtech.** A constelação C-level (Celso/CEO inclusive) propõe e executa, mas **a palavra final é sua**.
+**Você, que opera este plugin, é o líder supremo desta organização: o CEO da sua bigtech.** A constelação C-level (Celso/CEO inclusive) propõe e executa, mas **a palavra final é sua**.
 
 Decisões de altíssimo valor (arquitetura macro, escopo, stack, go/no-go, deploy irreversível, gasto, qualquer escolha difícil de reverter) são SEMPRE suas. Você lidera os times quando há dúvida ou mais de uma opção.
 
@@ -20,7 +20,7 @@ Regra operacional: diante de dúvida ou de mais de uma opção viável, os agent
 
 O pipeline de release (12 fases) cruza três domínios: o quê construir, como construir, como vender. Cada domínio tem um C-level. Para operar isso no Claude, cada C-level vira um **agent orquestrador leve**: ele decide e devolve um mapa de delegação; os **agents operacionais** (já existentes) executam. Um **Chief of Staff** (Cósimo) classifica o porte do projeto e ativa só o necessário, prevenindo over-engineering.
 
-Princípio anti-OE: **o processo se adapta ao porte, nunca o contrário.** Quem decide o porte e a variante de pipeline é o Cósimo (Chief of Staff). Ver secao 5.
+Princípio anti-OE: **o processo se adapta ao porte, nunca o contrário.** Quem decide o porte e a variante de pipeline é o Cósimo (Chief of Staff). Ver seção 5.
 
 ---
 
@@ -79,6 +79,14 @@ graph TD
     CLO -.delega.-> compliance-legal
 ```
 
+**Alternativa textual do organograma** (equivalente ao diagrama acima, para leitores de tela e quem não renderiza Mermaid):
+
+- **Celso (CEO)** no topo, com **Cósimo (Chief of Staff)** ao lado como par de roteamento.
+- O CEO supervisiona diretamente: **Capitolino (CPO)**, **Caetano (CTO)**, **Camilo (CMO)** e **Cosmo (COO)**; e ainda **Confúcio (CFO)** e **Cláudio (CLO)**.
+- **Caetano (CTO)** supervisiona **Narciso (CISO)**, **Cândido (CDO)** e **Caio (CAIO)**.
+- **Camilo (CMO)** supervisiona **Cícero (CRO)**.
+- Delegação para agents operacionais: o CPO delega a product-manager, ux-ui-designer, ux-writer e accessibility-specialist; o CTO delega a software-architect, tech-lead, frontend/backend/mobile-engineer, devops-sre, qa-engineer, data-engineer e ml-engineer; o COO delega a scrum-master, engineering-manager e release-manager; o CISO delega a security-engineer e compliance-legal; o CDO delega a data-engineer, data-scientist e ml-engineer; o CAIO delega a applied-ai-engineer e ml-engineer; o CLO delega a compliance-legal.
+
 ---
 
 ## 4. RACI fase x C-level
@@ -107,7 +115,7 @@ Cândido (CDO), Caio (CAIO), Confúcio (CFO) e Cícero (CRO) entram conforme o p
 
 ## 5. Variantes de pipeline por porte (anti over-engineering)
 
-Quem decide e re-avalia: **Cósimo (Chief of Staff)**. Critérios na [teoria de liderança C-level](lideranca_pipeline_release.md) secao 5 e no próprio agent.
+Quem decide e re-avalia: **Cósimo (Chief of Staff)**. Critérios na [teoria de liderança C-level](lideranca_pipeline_release.md) seção 5 e no próprio agent.
 
 | Variante | Porte | C-levels ativos | Cerimônia | Fases |
 |---|---|---|---|---|
@@ -126,7 +134,7 @@ Status: ✅ Concluído · 🔄 Em andamento · 🟡 Parcial · ⏳ Pendente · �
 
 | ID | Grupo | Descrição Técnica | Prioridade | Pré-requisito | Dificuldade | Status | Estado Auditado |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| ORG-01 | AGENTS-C | Criar os 11 agents C-level + Chief of Staff (celso-ceo, capitolino-cpo, caetano-cto, camilo-cmo, cosmo-coo, narciso-ciso, candido-cdo, confucio-cfo, cicero-cro, claudio-clo, cosimo-chief-of-staff) | Alta | — | Média | ✅ Concluído | — |
+| ORG-01 | AGENTS-C | Criar os 11 agents C-level + Chief of Staff (celso-ceo, capitolino-cpo, caetano-cto, camilo-cmo, cosmo-coo, narciso-ciso, candido-cdo, caio-caio, confucio-cfo, cicero-cro, claudio-clo, cosimo-chief-of-staff) | Alta | — | Média | ✅ Concluído | — |
 | ORG-02 | AGENTS-OP | Criar agents operacionais de MARKETING (lacuna total da Fase 10): `growth-engineer`, `content-seo`, `pr-comms`, `community-manager`. Camilo (CMO) delega a eles | Alta | ORG-01 | Alta | ✅ Concluído | ✓ |
 | ORG-03 | AGENTS-OP | Criar agent de RECEITA/vendas (`revenue-ops`) para Cícero (CRO) delegar em contexto B2B | Média | ORG-01 | Média | ✅ Concluído | ✓ |
 | ORG-04 | AGENTS-OP | Criar agent `customer-success` + `support-engineer` (Fases 9 e 12, antes sem cobertura) | Média | — | Média | ✅ Concluído | ✓ |
@@ -142,7 +150,7 @@ Status: ✅ Concluído · 🔄 Em andamento · 🟡 Parcial · ⏳ Pendente · �
 | ORG-14 | PROCESSO | Registrar a decisão de arquitetura em documentação persistente do projeto | Alta | ORG-01 | Baixa | ✅ Concluído | ✓ |
 | ORG-15 | PROCESSO | Gatilho para classificar porte ao iniciar projeto: hook SessionStart `bigtech_porte_reminder.py` (lembra de rodar `/bigtech` em projeto de código sem marcador `.bigtech-porte`; silencia após classificar) | Baixa | ORG-13 | Média | ✅ Concluído | ✓ |
 | ORG-16 | AGENTS-OP | Criar agent `internal-auditor` (dono do DOSSIÊ DE AUDITORIA completo, "o livro" do projeto). Orquestra os especialistas por capítulo do manual [AUDITORIAS](manuals/AUDITORIAS.md), consolida o livro, rastreia remediação, entrega ao auditor externo. Reporta a Cláudio (CLO) + Narciso (CISO) + Caetano (CTO). Antes só parcialmente coberto por technical-writer (monta doc, sem mandato de auditoria) | Média | ORG-01 | Média | ✅ Concluído | ✓ |
-| ORG-17 | PROCESSO | Definir e aplicar a política de ferramentas dos agents (secao 8): Read sempre; Grep/Glob sempre; Write/Edit para quem produz ou mantém artefato; Bash para quem executa; read-only documentado como exceção | Alta | ORG-01 | Baixa | ✅ Concluído | ✓ |
+| ORG-17 | PROCESSO | Definir e aplicar a política de ferramentas dos agents (seção 8): Read sempre; Grep/Glob sempre; Write/Edit para quem produz ou mantém artefato; Bash para quem executa; read-only documentado como exceção | Alta | ORG-01 | Baixa | ✅ Concluído | ✓ |
 | ORG-18 | AGENTS-OP | Criar agent `network-engineer` (camada de rede: topologia, roteamento BGP/OSPF, VLAN, subnet/IPAM, NAT, DNS/DHCP, load balancing, VPN, SD-WAN, cloud networking VPC/peering). Sob Caetano (CTO), colabora com devops-sre. Distinto de network-security-engineer | Média | ORG-01 | Média | ✅ Concluído | ✓ |
 | ORG-19 | AGENTS-OP | Criar agent `network-security-engineer` (defesa de rede: firewall policy, segmentação/microssegmentação, zero-trust/ZTNA, IDS/IPS, WAF, DDoS, NAC, mTLS, east-west, IR de rede). Sob Narciso (CISO), compartilha com security-engineer (AppSec). Distinto de network-engineer | Média | ORG-01 | Média | ✅ Concluído | ✓ |
 | ORG-20 | TOOLING | Criar o manual [TOOLING](TOOLING.md) (catálogo de ferramentas FOSS automatizáveis tool->agent->status->instalar, kit canônico por agent) e linkar a seção "Ferramentas (usar SEMPRE)" nos agents operacionais-chave | Média | ORG-01 | Média | ✅ Concluído | ✓ |
@@ -153,7 +161,7 @@ Status: ✅ Concluído · 🔄 Em andamento · 🟡 Parcial · ⏳ Pendente · �
 
 **Já existe (cobre o pipeline):** product-manager, software-architect, tech-lead, frontend/backend/mobile-engineer, devops-sre, qa-engineer, security-engineer, data-engineer, data-scientist, ml-engineer, ux-ui-designer, ux-writer, accessibility-specialist, compliance-legal, technical-writer, engineering-manager, scrum-master. Skills: `/proj_software`, `/tab_pendencias`. Hooks de guard-rail (TDD) e governança. Manuais: os canônicos que acompanham o plugin.
 
-**Criado agora:** a constelação C-level (secao 2).
+**Criado agora:** a constelação C-level (seção 2).
 
 **Tabela zerada.** Tudo concluído: constelação C-level (12, incluindo Caio/CAIO), agents operacionais do pipeline inteiro (incluindo ux-researcher, business-analyst, performance-engineer, internal-auditor, applied-ai-engineer), skill `/bigtech` e hook de classificação de porte (SessionStart). A organização está completa, operacional, disparável por comando e com gatilho de onboarding. Única decisão em aberto não-bloqueante: ORG-08 (CHRO mapeado a engineering-manager, sem agent C dedicado por ora).
 

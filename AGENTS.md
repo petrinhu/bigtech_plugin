@@ -1,14 +1,132 @@
 # AGENTS.md
 
+**[English](#english)** (below) · **[Português](#português)** (abaixo)
+
+---
+
+## English
+
+> Installation manual aimed at an AI agent (Claude). If you are a human, start with the [README.md](README.md).
+
+### You are an AI agent
+
+You are an AI agent (Claude). If the user pointed you at this repository and asked something like "install the bigtech plugin from codeberg.org/petrinhu/bigtech_plugin", this file is your script. Follow the steps below in order, **stop before installing** if the conflict check (the "Name conflicts" section) finds a collision, and report to the user what you did.
+
+General rule: prefer the main path (remote marketplace). Use the local-clone alternative only if the user asked for it, if the environment has no network, or if the remote registry fails.
+
+### What this plugin is
+
+`bigtech` is a plugin for Claude Code that packages a product-and-engineering organization:
+
+- **50 agents.** 12 C-level (CEO, CPO, CTO, CMO, COO, CISO, CDO, CAIO, CFO, CRO, CLO, and Chief of Staff) and 38 operational agents that do the work.
+- **3 orchestration skills.** `/bigtech` assembles the constellation and classifies the project size, `/proj_software` runs the software development life cycle (SDLC), `/tab_pendencias` plans the backlog by value and dependency.
+- **Governance and TDD hooks.** Bootstrap of the manuals into the session, size reassessment, operating-mode reinforcement, TDD guard-rail (red, green, refactor), and a test runner.
+
+Package identity (confirmed in `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`):
+
+| Field | Value |
+|---|---|
+| Marketplace | `petrinhu` |
+| Plugin | `bigtech` |
+| Version | `0.1.7` |
+| License | `Apache-2.0` |
+| Repository | `https://codeberg.org/petrinhu/bigtech_plugin` |
+| Author | `petrinhu` |
+
+### Installation in Claude Code (main path)
+
+Run these slash commands in Claude Code, in order:
+
+```
+/plugin marketplace add codeberg.org/petrinhu/bigtech_plugin
+/plugin install bigtech@petrinhu
+```
+
+The first command registers the `petrinhu` marketplace. The second installs the `bigtech` plugin from that marketplace. The `bigtech@petrinhu` form disambiguates the source; if the environment has only this marketplace, `/plugin install bigtech` also resolves.
+
+After installing, **ask the user to restart the session** (or restart it once you have authorization). The `bigtech_session_init` hook runs on the `SessionStart` event: it is what loads the docs-bootstrap and injects the path of the manuals in `docs/` into the context. Without restarting, the manuals do not enter the context and the mode reinforcement is not active.
+
+### Alternative: local clone
+
+Use this when the user asked to install from a local copy, when there is no network, or when the remote registry failed.
+
+```bash
+git clone https://codeberg.org/petrinhu/bigtech_plugin
+```
+
+Then, in Claude Code, register the marketplace from the cloned path and install:
+
+```
+/plugin marketplace add <local-clone-path>
+/plugin install bigtech
+```
+
+Replace `<local-clone-path>` with the absolute path of the directory where you cloned the repository (the one that contains `.claude-plugin/marketplace.json`).
+
+### Post-installation verification
+
+Confirm the three signals. If any of them fails, report it to the user before moving on.
+
+1. **The 50 agents show up.** List the available agents and check for the C-level ones (`celso-ceo`, `capitolino-cpo`, `caetano-cto`, `camilo-cmo`, `cosmo-coo`, `narciso-ciso`, `candido-cdo`, `caio-caio`, `confucio-cfo`, `cicero-cro`, `claudio-clo`, `cosimo-chief-of-staff`) and a sample of the operational ones (`software-architect`, `backend-engineer`, `qa-engineer`, `technical-writer`).
+2. **The 3 skills exist.** `/bigtech`, `/proj_software`, and `/tab_pendencias` must be listed and invokable.
+3. **The hooks run.** When starting a new session, `bigtech_session_init` should inject the path of the manuals into the context. On a code project not yet classified, `bigtech_porte_reminder` reassesses the size. Use `/plugin` to confirm that the plugin is active and that the hooks are registered.
+
+### ⚠️ Name conflicts (check BEFORE installing)
+
+This is the most important point for you, agent. **Check it before running `/plugin install`.**
+
+If the user's environment already has **global** agents, skills, or hooks (defined in `~/.claude/`, outside the plugin) with the **same names** as the ones this plugin ships, installing the plugin causes duplication and conflict. Examples of a likely collision: homonymous agents such as `celso-ceo`; homonymous skills such as `/bigtech` and `/tab_pendencias`; and, most seriously, **homonymous TDD hooks would run twice** (the global version plus the plugin's), which can block or run the test suite twice over.
+
+Run this check before installing:
+
+1. Inspect `~/.claude/agents/` for files with the same names as the agents in the "What this plugin is" section.
+2. Inspect `~/.claude/skills/` (or `~/.claude/commands/`) for `/bigtech`, `/proj_software`, `/tab_pendencias`.
+3. Inspect `~/.claude/hooks/` for homonymous TDD or governance hooks (`tdd_guard`, `tdd_runner`, `bigtech_*`).
+
+If there is a collision, **do not install over it.** Present to the user, as a question, the two safe ways out (recommend the first):
+
+- **Isolated profile (recommended).** Install the plugin in a clean environment, pointing Claude Code at another configuration directory with `CLAUDE_CONFIG_DIR` (for example, export `CLAUDE_CONFIG_DIR=/path/to/clean-profile` before starting the session). That way the plugin does not contend for names with the global config.
+- **Remove the homonymous globals.** With explicit authorization from the user, remove or rename the global agents, skills, and hooks that collide before installing the plugin. Treat this as a destructive change: confirm each item.
+
+With no collision, proceed with the installation normally.
+
+### Compatibility
+
+- **Built for Claude Code (Anthropic).** No guarantee it works on other assistants or code CLIs (for example, Grok, Gemini CLI, GitHub Copilot CLI, OpenAI Codex, Cursor, or Aider). Hooks, skills, and the subagent protocol depend on Claude Code; porting requires adaptation and is not officially supported.
+- **Incompatible with the `caveman` plugin.** `caveman` compresses communication and conflicts with `bigtech`'s mode reinforcement. If `caveman` is active, **disable it** before using `bigtech`. The `bigtech_session_init` hook warns on `SessionStart` when it detects both active at the same time.
+- **Suggested dependencies:** `playwright` and `superpowers`. They are not required, but they enable the full experience (browser automation and advanced flows). Install them for full use; `bigtech_session_init` suggests installing them when they are absent.
+
+### Security
+
+This plugin's hooks **run code on the user's machine**, as that user. Before installing, read and consider [SECURITY.md](SECURITY.md). Summary of what you need to know:
+
+- The `tdd_runner` hook runs the test command declared by the **project the user opens** (`fast_command`/`test_command` field in `.claude/tdd-guard.json`). This has the same trust parity as running `make test` or `npm test` in the repository: the command comes from the project's versioned file.
+- TDD (guard and runner) is **opt-in**: it only acts on projects that contain `.claude/tdd-guard.json`. Without that file, both hooks stay inert.
+- When working in an unaudited third-party repository, inspect the `test_command`/`fast_command` in `.claude/tdd-guard.json` before editing files. To turn TDD off for the session, export `TDD_GUARD=off`.
+
+### How to use it after installing
+
+The entry points are the 3 skills. To get started, invoke `/bigtech` pointing at the project: the Chief of Staff classifies the size (avoiding over-engineering) and returns the activation map, that is, which C-levels and operational agents to turn on and in which phases.
+
+```
+/bigtech ./my-project
+```
+
+From there, `/proj_software` runs the software cycle and `/tab_pendencias` plans the backlog. For the detail of each skill, the agents, and the governance manuals, see the [README.md](README.md) and the `docs/` directory.
+
+---
+
+## Português
+
 > Manual de instalação dirigido a um agente de IA (Claude). Se você é humano, comece pelo [README.md](README.md).
 
-## Você é um agente de IA
+### Você é um agente de IA
 
 Você é um agente de IA (Claude). Se o usuário apontou você para este repositório e pediu algo como "instala o plugin bigtech de codeberg.org/petrinhu/bigtech_plugin", este arquivo é o seu roteiro. Siga os passos abaixo na ordem, **pare antes de instalar** se a verificação de conflito (seção "Conflito de nomes") acusar colisão, e relate ao usuário o que você fez.
 
 Regra geral: prefira o caminho principal (marketplace remoto). Use a alternativa de clone local só se o usuário pediu, se o ambiente não tem rede, ou se o registro remoto falhar.
 
-## O que é este plugin
+### O que é este plugin
 
 `bigtech` é um plugin para o Claude Code que empacota uma organização de produto e engenharia:
 
@@ -22,12 +140,12 @@ Identidade do pacote (confirmada em `.claude-plugin/plugin.json` e `.claude-plug
 |---|---|
 | Marketplace | `petrinhu` |
 | Plugin | `bigtech` |
-| Versão | `0.1.0` |
+| Versão | `0.1.7` |
 | Licença | `Apache-2.0` |
 | Repositório | `https://codeberg.org/petrinhu/bigtech_plugin` |
 | Autor | `petrinhu` |
 
-## Instalação no Claude Code (caminho principal)
+### Instalação no Claude Code (caminho principal)
 
 Execute estes comandos de barra no Claude Code, na ordem:
 
@@ -40,7 +158,7 @@ O primeiro comando registra o marketplace `petrinhu`. O segundo instala o plugin
 
 Depois de instalar, **peça ao usuário para reiniciar a sessão** (ou reinicie quando tiver autorização). O hook `bigtech_session_init` roda no evento `SessionStart`: é ele que carrega o docs-bootstrap e injeta no contexto o caminho dos manuais em `docs/`. Sem reiniciar, os manuais não entram em contexto e o reforço de modo não fica ativo.
 
-## Alternativa: clone local
+### Alternativa: clone local
 
 Use quando o usuário pediu instalação a partir de uma cópia local, quando não há rede, ou quando o registro remoto falhou.
 
@@ -57,7 +175,7 @@ Em seguida, no Claude Code, registre o marketplace a partir do caminho clonado e
 
 Substitua `<caminho-local-do-clone>` pelo caminho absoluto do diretório onde você clonou o repositório (o que contém `.claude-plugin/marketplace.json`).
 
-## Verificação pós-instalação
+### Verificação pós-instalação
 
 Confirme os três sinais. Se algum falhar, relate ao usuário antes de seguir.
 
@@ -65,7 +183,7 @@ Confirme os três sinais. Se algum falhar, relate ao usuário antes de seguir.
 2. **As 3 skills existem.** `/bigtech`, `/proj_software` e `/tab_pendencias` devem estar listadas e invocáveis.
 3. **Os hooks rodam.** Ao iniciar uma nova sessão, o `bigtech_session_init` deve injetar o caminho dos manuais no contexto. Em projeto de código ainda não classificado, o `bigtech_porte_reminder` reavalia o porte. Use `/plugin` para confirmar que o plugin está ativo e que os hooks estão registrados.
 
-## ⚠️ Conflito de nomes (verifique ANTES de instalar)
+### ⚠️ Conflito de nomes (verifique ANTES de instalar)
 
 Este é o ponto mais importante para você, agente. **Verifique antes de rodar `/plugin install`.**
 
@@ -84,13 +202,13 @@ Se houver colisão, **não instale por cima.** Apresente ao usuário, via pergun
 
 Sem colisão, siga a instalação normalmente.
 
-## Compatibilidade
+### Compatibilidade
 
 - **Feito para o Claude Code (Anthropic).** Sem garantia de funcionamento em outros assistentes ou CLIs de código (por exemplo, Grok, Gemini CLI, GitHub Copilot CLI, OpenAI Codex, Cursor ou Aider). Hooks, skills e o protocolo de subagents dependem do Claude Code; portar exige adaptação e não é suportado oficialmente.
 - **Incompatível com o plugin `caveman`.** O `caveman` comprime a comunicação e conflita com o reforço de modo do `bigtech`. Se o `caveman` estiver ativo, **desative-o** antes de usar o `bigtech`. O hook `bigtech_session_init` avisa no `SessionStart` quando detecta os dois ativos ao mesmo tempo.
 - **Dependências sugeridas:** `playwright` e `superpowers`. Não são obrigatórias, mas habilitam a experiência completa (automação de navegador e fluxos avançados). Instale-as para o uso pleno; o `bigtech_session_init` sugere a instalação quando estão ausentes.
 
-## Segurança
+### Segurança
 
 Os hooks deste plugin **executam código na máquina do usuário**, com o usuário dele. Antes de instalar, leia e considere [SECURITY.md](SECURITY.md). Resumo do que você precisa saber:
 
@@ -98,7 +216,7 @@ Os hooks deste plugin **executam código na máquina do usuário**, com o usuár
 - O TDD (guard e runner) é **opt-in**: só atua em projetos que contêm `.claude/tdd-guard.json`. Sem esse arquivo, os dois hooks ficam inertes.
 - Ao trabalhar em repositório de terceiros não auditado, inspecione o `test_command`/`fast_command` em `.claude/tdd-guard.json` antes de editar arquivos. Para desligar o TDD na sessão, exporte `TDD_GUARD=off`.
 
-## Como usar depois de instalar
+### Como usar depois de instalar
 
 Os pontos de entrada são as 3 skills. Para começar, invoque `/bigtech` apontando para o projeto: o Chief of Staff classifica o porte (evitando over-engineering) e devolve o mapa de ativação, ou seja, quais C-levels e operacionais ligar e em quais fases.
 

@@ -20,6 +20,7 @@ wiki/
 # exemplo. Patterns ANCORADOS na raiz (barra inicial) para NAO afetar os manuais
 # homonimos em docs/manuals/ (docs/manuals/TESTES.md e AUDITORIAS.md permanecem).
 /docs/superpowers/
+/docs/auditoria/
 /TODO.md
 /TESTES.md
 /AUDITORIAS.md

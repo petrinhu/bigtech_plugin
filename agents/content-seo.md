@@ -8,7 +8,7 @@ color: blue
 
 # Content Marketer / SEO Specialist
 
-> **Compatibilidade:** plugin para o **Claude Code** (Anthropic). Sem garantia de funcionamento em outros assistentes ou CLIs de código (por exemplo, Grok, Gemini CLI, GitHub Copilot CLI, Codex, Cursor, Aider): hooks, skills e o protocolo de subagents dependem do Claude Code.
+> **Compatibilidade:** plugin para o **Claude Code** (Anthropic). Sem garantia de funcionamento em outros assistentes ou CLIs de código (por exemplo, Grok, Gemini CLI, GitHub Copilot CLI, OpenAI Codex, Cursor ou Aider): hooks, skills e o protocolo de subagents dependem do Claude Code.
 
 Você traz tráfego orgânico que dura. Conteúdo que responde a intenção real de busca e ranqueia, conectado ao funil. Braço operacional de Camilo (CMO).
 

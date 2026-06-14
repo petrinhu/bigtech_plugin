@@ -1,26 +1,184 @@
 # bigtech
 
-> Estruture qualquer projeto como uma empresa de produto digital: uma constelação de 50 agents (12 C-level + 38 operacionais), 3 skills de orquestração e hooks de governança e TDD. Dimensionável do solo founder à bigtech.
-
 [![Claude Code Plugin](https://img.shields.io/badge/Claude_Code-plugin-D97757?style=for-the-badge&logo=anthropic&logoColor=white)](https://code.claude.com/docs/en/plugins)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-4C8EDA?style=for-the-badge)](./LICENSE)
 
 [![Release](https://img.shields.io/gitea/v/release/petrinhu/bigtech_plugin?gitea_url=https://codeberg.org&style=for-the-badge&color=2EA043&label=release)](https://codeberg.org/petrinhu/bigtech_plugin/releases)
-[![CI](https://codeberg.org/petrinhu/bigtech_plugin/actions/workflows/ci.yml/badge.svg)](https://codeberg.org/petrinhu/bigtech_plugin/actions)
+[![CI status (Forgejo Actions)](https://codeberg.org/petrinhu/bigtech_plugin/actions/workflows/ci.yml/badge.svg)](https://codeberg.org/petrinhu/bigtech_plugin/actions)
 
-[![Agents](https://img.shields.io/badge/agents-50-4F4F4F?style=for-the-badge)](#o-que-é)
-[![Skills](https://img.shields.io/badge/skills-3-4F4F4F?style=for-the-badge)](#o-que-é)
+[![Agents](https://img.shields.io/badge/agents-50-4F4F4F?style=for-the-badge)](#what-it-is)
+[![Skills](https://img.shields.io/badge/skills-3-4F4F4F?style=for-the-badge)](#what-it-is)
 [![Hooks](https://img.shields.io/badge/hooks-6-4F4F4F?style=for-the-badge)](#hooks)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-4F4F4F?style=for-the-badge)](https://codeberg.org/petrinhu/bigtech_plugin/pulls)
 
-## Bem-vindo, líder supremo
+**[English](#english)** (below) · **[Português](#português)** (abaixo)
+
+---
+
+## English
+
+> Structure any project like a digital-product company: a constellation of 50 agents (12 C-level + 38 operational), 3 orchestration skills, and governance and TDD hooks. Scales from solo founder to bigtech.
+
+### Welcome, supreme leader
+
+You, who install and operate this plugin, are the **supreme leader of this organization: the CEO of your bigtech.** The C-level constellation (Celso/CEO included) proposes and executes, but **the final word is always yours.**
+
+High-stakes decisions (macro architecture, scope, stack, go/no-go, irreversible deploys, spend, any hard-to-reverse choice) are yours. When in doubt, or when more than one viable option exists, the agents do not decide on their own: they ask (the recommended option comes first). The team works for you.
+
+### What it is
+
+`bigtech` packages a complete product-and-engineering organization as a plugin for Claude Code:
+
+- **50 agents.** 12 C-level (strategy, product, engineering, marketing, operations, security, data, AI, finance, revenue, legal, chief of staff) and 38 operational agents that do the work.
+- **3 orchestration skills.** `/bigtech` assembles the constellation, `/proj_software` runs the software development life cycle (SDLC), `/tab_pendencias` plans the backlog by value and dependency.
+- **Governance and TDD hooks.** Test guard-rail (red, green, refactor), project-size reassessment, operating-mode reinforcement, and bootstrap of the manuals into the session.
+
+The non-negotiable principle: **the process adapts to the size of the project, never the other way around.** A 200-line CLI does not summon the whole team. The Chief of Staff classifies the size and turns on only what is needed, preventing over-engineering.
+
+### Installation
+
+```
+/plugin marketplace add codeberg.org/petrinhu/bigtech_plugin
+/plugin install bigtech@petrinhu
+```
+
+The first command registers the `petrinhu` marketplace. The second installs the `bigtech` plugin from it. The `bigtech@petrinhu` form disambiguates the source; if the environment has only this marketplace, `/plugin install bigtech` also resolves.
+
+If you are an AI agent installing this plugin on behalf of a user, see [AGENTS.md](AGENTS.md).
+
+### Usage
+
+The 3 skills are the entry points. Invoke them with a slash or describe your intent in natural language; the mode reinforcement routes the request to the right skill.
+
+#### `/bigtech`: assemble the constellation
+
+Business and leadership layer (product, marketing, sales, legal, finance, release). Invokes the Chief of Staff (Cósimo), who classifies the size, picks the pipeline variant, and returns the activation map: which C-levels and operational agents to turn on, and in which of the 12 phases.
+
+```
+/bigtech ./my-project
+/bigtech "scheduling app for clinics" --porte early --dispatch
+```
+
+Use it when you want to "assemble the team", "organize it like a bigtech", "which pipeline and which agents", "who leads this", or "classify the size".
+
+#### `/proj_software`: SDLC engine
+
+Orchestrates the software development life cycle across 5 macro-phases, allocating the engineering agents by level, with an anti-over-engineering gatekeeper and cross-cutting security (shift-left). This is where `/bigtech` delegates engineering execution.
+
+```
+/proj_software
+/proj_software "payments API with idempotency"
+```
+
+Use it when starting a new software project: "I'm going to build software", "new system", "build a feature", "which flow to follow".
+
+#### `/tab_pendencias`: WSJF planning table
+
+Creates and maintains a backlog table ordered top to bottom in the sequence that minimizes rework, combining topological ordering (dependency) with WSJF (value). The "Wave" column marks steps of equal value that run in parallel.
+
+```
+/tab_pendencias --create
+/tab_pendencias --show
+/tab_pendencias --reorder
+```
+
+Use it to plan steps, order the backlog, or ask "what's left" and "in what order to do it".
+
+### Agents
+
+#### C-level (12)
+
+| Agent | Role | Domain |
+|---|---|---|
+| `celso-ceo` | CEO | Strategy and arbitration |
+| `capitolino-cpo` | CPO | Product and design |
+| `caetano-cto` | CTO | Product engineering |
+| `camilo-cmo` | CMO | Marketing and go-to-market |
+| `cosmo-coo` | COO | Cross-functional execution |
+| `narciso-ciso` | CISO | Security |
+| `candido-cdo` | CDO | Data, analytics, and ML |
+| `caio-caio` | CAIO | AI as a capability |
+| `confucio-cfo` | CFO | Finance and budget |
+| `cicero-cro` | CRO | Revenue and sales |
+| `claudio-clo` | CLO | Legal (general counsel) |
+| `cosimo-chief-of-staff` | Chief of Staff | Pipeline routing, anti-over-engineering |
+
+#### Operational (38)
+
+**Engineering (14):** `software-architect`, `tech-lead`, `backend-engineer`, `frontend-engineer`, `mobile-engineer`, `embedded-firmware-engineer`, `hardware-engineer`, `devops-sre`, `performance-engineer`, `network-engineer`, `network-security-engineer`, `security-engineer`, `qa-engineer`, `release-manager`.
+
+**Data and AI (4):** `data-engineer`, `data-scientist`, `ml-engineer`, `applied-ai-engineer`.
+
+**Product, UX, and Design (7):** `product-manager`, `business-analyst`, `ux-researcher`, `ux-ui-designer`, `ux-writer`, `accessibility-specialist`, `art-director`.
+
+**Management and People (2):** `engineering-manager`, `scrum-master`.
+
+**Marketing, Growth, and Revenue (6):** `content-seo`, `pr-comms`, `growth-engineer`, `community-manager`, `customer-success`, `revenue-ops`.
+
+**Support, Docs, Legal, and i18n (5):** `support-engineer`, `technical-writer`, `compliance-legal`, `internal-auditor`, `i18n-l10n-specialist`.
+
+When invoked, every agent runs a pre-flight check on the backlog table (`TODO.md` at the root): the C-level agents require it as a precondition in the activation map; the operational agents flag it if missing and proceed with the task.
+
+### Hooks
+
+| Hook | Event | Function |
+|---|---|---|
+| `tdd_guard.py` | PreToolUse (Write/Edit) | TDD guard-rail: blocks code outside the red, green, refactor cycle. Opt-in per project. |
+| `tdd_runner.py` | PostToolUse (Write/Edit) | Runs the test suite after the edit and reports the result to the TDD cycle. |
+| `bigtech_session_init.py` | SessionStart | Injects the manuals' path into the context (docs-bootstrap), warns if `caveman` is active, and suggests the missing dependencies. |
+| `bigtech_porte_reminder.py` | SessionStart | Reassesses the project size (scales up or down); only fires on a code project not yet classified. |
+| `tab_pendencias_reminder.py` | SessionStart | Reminds you to generate the backlog table via `/tab_pendencias` when the project has already been classified (`.bigtech-porte` marker) but still has no `TODO.md`. It only reminds, never blocks. |
+| `bigtech_reinforce.py` | UserPromptSubmit | Reinforces bigtech mode (anti-drift) and routes natural-language activation to `/bigtech`. Marker-scoped, noise-resistant. |
+
+### Compatibility
+
+**Built for Claude Code (Anthropic).** The plugin uses Claude Code's own features: life-cycle hooks, skills, the subagent protocol, and the plugin/marketplace format. There is no guarantee it works on other AI assistants or code CLIs (for example, Grok, Gemini CLI, GitHub Copilot CLI, OpenAI Codex, Cursor, or Aider); porting to other platforms may require adaptation and is not officially supported.
+
+**Incompatible with the `caveman` plugin.** `caveman` compresses communication and conflicts with this plugin's mode reinforcement. Disable `caveman` before using `bigtech`; the session hook warns you if it detects both active at the same time.
+
+**Suggested dependencies:** `playwright` and `superpowers`. They are not required, but they enable the full experience (browser automation and advanced flows). Install them to get the most out of the plugin; the session hook suggests installing them when they are absent.
+
+### Orchestration model
+
+By default, the agents use the **`opus`** model (always the latest Opus: the `model` field does not pin a version), and the **orchestration** (the Chief of Staff and the C-level assembling and coordinating the constellation) runs at **maximum effort**, for the deepest reasoning on the decisions that cut across the team. This is the recommended default.
+
+You can change it manually: edit the `model` field in the header of any agent in `agents/<slug>.md` (accepted values: `opus`, `sonnet`, `haiku`) and adjust your session's effort level with `/effort`.
+
+### Documentation
+
+**Wiki (beginner-friendly, didactic):** the [project Wiki](https://codeberg.org/petrinhu/bigtech_plugin/wiki) has one page per agent, hook, and skill, plus a glossary, an installation guide, and a step-by-step usage guide.
+
+The governance manuals ship with the plugin in `docs/` and are injected into the session context:
+
+- `docs/ORG.md`: governance manual for the constellation (RACI, sizes, pipeline routing).
+- `docs/pipeline_release_1.0.md`: 12-phase release pipeline, from idea to 1.0.
+- `docs/lideranca_pipeline_release.md`: C-level leadership theory and the named constellation.
+- `docs/TOOLING.md`: catalog of free/open-source (FOSS) tools per agent.
+- `docs/manuals/`: quality contract, tests, agile, deploy checklist, and audits.
+- `docs/principles/`: architecture principles, agile methodology, anti-patterns, and hardware limits.
+
+### Security
+
+The hooks run code on your machine, and `tdd_runner` may run the test command declared by the project you open (trust parity with `make test`/`npm test`). Before using it with third-party repositories, read [SECURITY.md](./SECURITY.md): trust model, opt-in, and how to disable.
+
+### License
+
+Distributed under the [Apache-2.0](./LICENSE) license.
+
+---
+
+## Português
+
+> Estruture qualquer projeto como uma empresa de produto digital: uma constelação de 50 agents (12 C-level + 38 operacionais), 3 skills de orquestração e hooks de governança e TDD. Dimensionável do solo founder à bigtech.
+
+### Bem-vindo, líder supremo
 
 Você, que instala e opera este plugin, é o **líder supremo desta organização: o CEO da sua bigtech.** A constelação C-level (Celso/CEO inclusive) propõe e executa, mas **a palavra final é sempre sua.**
 
 Decisões de altíssimo valor (arquitetura macro, escopo, stack, go/no-go, deploy irreversível, gasto, qualquer escolha difícil de reverter) são suas. Diante de dúvida ou de mais de uma opção viável, os agents não decidem sozinhos: eles perguntam (a opção recomendada vem primeiro). O time trabalha para você.
 
-## O que é
+### O que é
 
 `bigtech` empacota uma organização completa de produto e engenharia em forma de plugin para o Claude Code:
 
@@ -30,22 +188,22 @@ Decisões de altíssimo valor (arquitetura macro, escopo, stack, go/no-go, deplo
 
 O princípio inegociável: **o processo se adapta ao porte do projeto, nunca o contrário.** Um CLI de 200 linhas não chama o time inteiro. O Chief of Staff classifica o porte e liga só o necessário, prevenindo over-engineering.
 
-## Instalação
+### Instalação
 
 ```
 /plugin marketplace add codeberg.org/petrinhu/bigtech_plugin
-/plugin install bigtech
+/plugin install bigtech@petrinhu
 ```
 
-O primeiro comando registra o marketplace `petrinhu`. O segundo instala o plugin `bigtech`.
+O primeiro comando registra o marketplace `petrinhu`. O segundo instala o plugin `bigtech` a partir dele. A forma `bigtech@petrinhu` desambigua a origem; se o ambiente só tiver esse marketplace, `/plugin install bigtech` também resolve.
 
 Se você é um agente de IA instalando este plugin a pedido de um usuário, veja [AGENTS.md](AGENTS.md).
 
-## Uso
+### Uso
 
 As 3 skills são os pontos de entrada. Invoque por barra ou descreva a intenção em linguagem natural; o reforço de modo roteia o pedido para a skill certa.
 
-### `/bigtech`: montar a constelação
+#### `/bigtech`: montar a constelação
 
 Camada de negócio e liderança (produto, marketing, vendas, jurídico, finanças, release). Invoca o Chief of Staff (Cósimo), que classifica o porte, escolhe a variante de pipeline e devolve o mapa de ativação: quais C-levels e operacionais ligar, em quais das 12 fases.
 
@@ -56,7 +214,7 @@ Camada de negócio e liderança (produto, marketing, vendas, jurídico, finança
 
 Use quando quiser "montar o time", "organizar como bigtech", "qual pipeline e quais agents", "quem lidera isso" ou "classificar o porte".
 
-### `/proj_software`: motor de SDLC
+#### `/proj_software`: motor de SDLC
 
 Orquestra o ciclo de vida de software em 5 macrofases, alocando os agents de engenharia por nível, com gatekeeper anti-over-engineering e segurança transversal (shift-left). É para onde o `/bigtech` delega a execução de engenharia.
 
@@ -67,7 +225,7 @@ Orquestra o ciclo de vida de software em 5 macrofases, alocando os agents de eng
 
 Use quando começar um projeto novo de software: "vou criar um software", "novo sistema", "construir feature", "qual fluxo seguir".
 
-### `/tab_pendencias`: tabela de planejamento WSJF
+#### `/tab_pendencias`: tabela de planejamento WSJF
 
 Cria e mantém uma tabela de pendências ordenada de cima para baixo na sequência que minimiza retrabalho, combinando ordenação topológica (dependência) com WSJF (valor). A coluna "Onda" marca passos de igual valor que rodam em paralelo.
 
@@ -79,9 +237,9 @@ Cria e mantém uma tabela de pendências ordenada de cima para baixo na sequênc
 
 Use para planejar passos, ordenar backlog, ou perguntar "o que falta" e "em que ordem fazer".
 
-## Agents
+### Agents
 
-### C-level (12)
+#### C-level (12)
 
 | Agent | Cargo | Domínio |
 |---|---|---|
@@ -98,7 +256,7 @@ Use para planejar passos, ordenar backlog, ou perguntar "o que falta" e "em que 
 | `claudio-clo` | CLO | Jurídico (general counsel) |
 | `cosimo-chief-of-staff` | Chief of Staff | Roteamento de pipeline, anti-over-engineering |
 
-### Operacionais (38)
+#### Operacionais (38)
 
 **Engenharia (14):** `software-architect`, `tech-lead`, `backend-engineer`, `frontend-engineer`, `mobile-engineer`, `embedded-firmware-engineer`, `hardware-engineer`, `devops-sre`, `performance-engineer`, `network-engineer`, `network-security-engineer`, `security-engineer`, `qa-engineer`, `release-manager`.
 
@@ -114,7 +272,7 @@ Use para planejar passos, ordenar backlog, ou perguntar "o que falta" e "em que 
 
 Ao serem acionados, todos os agents fazem um pre-flight da tabela de pendências (`TODO.md` na raiz): os C-level a exigem como pré-condição no mapa de ativação; os operacionais sinalizam caso falte e seguem com a tarefa.
 
-## Hooks
+### Hooks
 
 | Hook | Evento | Função |
 |---|---|---|
@@ -125,7 +283,7 @@ Ao serem acionados, todos os agents fazem um pre-flight da tabela de pendências
 | `tab_pendencias_reminder.py` | SessionStart | Lembra de gerar a tabela de pendências via `/tab_pendencias` quando o projeto já foi classificado (marcador `.bigtech-porte`) mas ainda não tem `TODO.md`. Só lembra, nunca bloqueia. |
 | `bigtech_reinforce.py` | UserPromptSubmit | Reforça o modo bigtech (anti-drift) e roteia ativação por linguagem natural para `/bigtech`. Escopado por marcador, anti-ruído. |
 
-## Compatibilidade
+### Compatibilidade
 
 **Feito para o Claude Code (Anthropic).** O plugin usa recursos próprios do Claude Code: hooks de ciclo de vida, skills, o protocolo de subagents e o formato de plugin/marketplace. Não há garantia de funcionamento em outros assistentes de IA ou CLIs de código (por exemplo, Grok, Gemini CLI, GitHub Copilot CLI, OpenAI Codex, Cursor ou Aider); portar para outras plataformas pode exigir adaptação e não é suportado oficialmente.
 
@@ -133,13 +291,13 @@ Ao serem acionados, todos os agents fazem um pre-flight da tabela de pendências
 
 **Dependências sugeridas:** `playwright` e `superpowers`. Não são obrigatórias, mas habilitam a experiência completa (automação de navegador e fluxos avançados). Instale-as para tirar o máximo do plugin; o hook de sessão sugere a instalação quando estão ausentes.
 
-## Modelo de orquestração
+### Modelo de orquestração
 
 Por padrão, os agents usam o modelo **`opus`** (sempre o Opus mais recente: o campo `model` não fixa versão), e a **orquestração** (o Chief of Staff e os C-level montando e coordenando a constelação) roda em **effort máximo**, para o raciocínio mais profundo nas decisões que cruzam o time. Esse é o default recomendado.
 
 Você pode mudar manualmente: edite o campo `model` no cabeçalho de qualquer agent em `agents/<slug>.md` (valores aceitos: `opus`, `sonnet`, `haiku`) e ajuste o nível de esforço da sua sessão com `/effort`.
 
-## Documentação
+### Documentação
 
 **Wiki (didática, para iniciantes):** a [Wiki do projeto](https://codeberg.org/petrinhu/bigtech_plugin/wiki) tem uma página por agente, hook e skill, além de glossário, guia de instalação e de uso passo a passo.
 
@@ -152,10 +310,10 @@ Os manuais de governança acompanham o plugin em `docs/` e são injetados no con
 - `docs/manuals/`: contrato de qualidade, testes, agile, checklist de deploy e auditorias.
 - `docs/principles/`: princípios de arquitetura, metodologia agile, anti-patterns e limites de hardware.
 
-## Segurança
+### Segurança
 
 Os hooks executam código na sua máquina e o `tdd_runner` pode rodar o comando de teste declarado pelo projeto que você abrir (paridade de confiança com `make test`/`npm test`). Antes de usar com repositórios de terceiros, leia [SECURITY.md](./SECURITY.md): modelo de confiança, opt-in e como desativar.
 
-## Licença
+### Licença
 
 Distribuído sob a licença [Apache-2.0](./LICENSE).

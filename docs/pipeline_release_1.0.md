@@ -26,11 +26,13 @@ flowchart TD
     F12 -. aprendizado .-> F1
 ```
 
+**Alternativa textual do fluxo** (equivalente ao diagrama acima): o pipeline avança em sequência pelas fases 0. Ideação, 1. Discovery, 2. Definição, 3. Design, 4. Arquitetura e 5. Setup Eng. A partir do Setup, o desenvolvimento se ramifica em três trilhas paralelas (6a. Frontend, 6b. Backend, 6c. Mobile), que convergem para duas fases simultâneas: 7. QA e 8. SecOps. Ambas alimentam a 9. Beta, seguida por 10. GTM, 11. Release 1.0 e 12. Pós. O aprendizado da fase 12 realimenta a 1. Discovery, fechando o ciclo.
+
 Cada fase tem loops internos (uma descoberta volta ao Discovery, um bug volta ao Dev). O pipeline é **iterativo dentro de cada fase, sequencial entre macro-fases**.
 
 ### Mapa fase, C-level e agent
 
-Quem lidera cada fase (detalhe e RACI completo em [ORG](ORG.md) secao 4):
+Quem lidera cada fase (detalhe e RACI completo em [ORG](ORG.md) seção 4):
 
 | Fase | C-level (agent) | Agents operacionais |
 |---|---|---|
@@ -48,7 +50,7 @@ Quem lidera cada fase (detalhe e RACI completo em [ORG](ORG.md) secao 4):
 | 11. Release 1.0 | Celso (CEO) coordena | release-manager, devops-sre, tech-lead, qa-engineer |
 | 12. Pós | Capitolino (CPO) | data-scientist, product-manager, customer-success, support-engineer |
 
-Antes de iniciar, **Cósimo (Chief of Staff)** define o porte e a variante de pipeline (secao final). Em projeto pequeno, fases colapsam e a maioria dos agents fica dormente.
+Antes de iniciar, **Cósimo (Chief of Staff)** define o porte e a variante de pipeline (seção final). Em projeto pequeno, fases colapsam e a maioria dos agents fica dormente.
 
 Quando IA é capability do produto, **Caio (CAIO)** entra (Fases 2, 4, 6-8, 12) e delega `applied-ai-engineer` (feature LLM: prompt, agente, RAG-app, eval-app, guardrail) e `ml-engineer` (infra/MLOps), em paralelo a Cândido (CDO) no lado do dado. Fronteira: CDO governa o dado, CAIO governa o modelo e o uso de IA. Uma integração de modelo pontual NÃO acorda o CAIO (usa só o `applied-ai-engineer`).
 
@@ -273,7 +275,7 @@ LGPD (base legal, finalidade, minimização, ROPA, DPIA), GDPR (usuários UE), H
 Termos de Uso, Política de Privacidade, aviso de cookies, DPA com subprocessadores.
 
 ### 8.5. Resposta a incidentes
-Runbook de incidente, plano de comunicação (interno, usuários, ANPD em ate 2 dias úteis em incidente relevante), tabletop exercises.
+Runbook de incidente, plano de comunicação (interno, usuários, ANPD em até 2 dias úteis em incidente relevante), tabletop exercises.
 
 ### 8.6. Liderança
 Narciso (CISO) lado técnico via `security-engineer`; Cláudio (CLO) lado jurídico via `compliance-legal`. Papéis humanos: Security Engineer, Pentester, DPO, Legal Counsel, Compliance Officer.
@@ -350,7 +352,7 @@ Camilo (CMO), via `growth-engineer`, `content-seo`, `pr-comms`, `community-manag
 - [ ] DR drill nos últimos 90 dias.
 - [ ] LGPD ROPA atualizado.
 
-Ver [DEPLOY_CHECKLIST](manuals/DEPLOY_CHECKLIST.md) para as 7 fases de deploy irreversível.
+Ver [DEPLOY_CHECKLIST](manuals/DEPLOY_CHECKLIST.md) para o checklist de deploy irreversível (fases contíguas, do gate de classificação ao cutover).
 
 ### 11.2. Estratégia de deploy
 Blue-green (dois ambientes, switch instantâneo), canary (1% -> 5% -> 25% -> 100% com observação de métricas), feature flags (release técnico desacoplado do release de produto).
@@ -399,7 +401,7 @@ Capitolino (CPO) no roadmap, via `product-manager`, `data-scientist`, `customer-
 
 ## Variantes de pipeline por porte (anti over-engineering)
 
-Quem decide e re-avalia: **Cósimo (Chief of Staff)** (agent `cosimo-chief-of-staff`). Critérios na [teoria de liderança C-level](lideranca_pipeline_release.md) secao 5. Detalhe em [ORG](ORG.md) secao 5.
+Quem decide e re-avalia: **Cósimo (Chief of Staff)** (agent `cosimo-chief-of-staff`). Critérios na [teoria de liderança C-level](lideranca_pipeline_release.md) seção 5. Detalhe em [ORG](ORG.md) seção 5.
 
 | Variante | Porte | Como o pipeline muda |
 |---|---|---|

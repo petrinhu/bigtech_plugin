@@ -45,8 +45,9 @@ from pathlib import Path
 SCAN_DIRS = ("agents", "skills", "docs")
 
 # Subarvores ignoradas: processo, nao produto. docs/superpowers contem a spec e o
-# template de higienizacao, que legitimamente exibem `[[ ]]` como EXEMPLO.
-EXCLUDED_SUBTREES = ("docs/superpowers",)
+# template de higienizacao (exibem `[[ ]]` como EXEMPLO); docs/auditoria e o dossie
+# de auditoria (gitignored, material de processo local). Ambos fora do produto.
+EXCLUDED_SUBTREES = ("docs/superpowers", "docs/auditoria")
 
 # Extensoes de texto validadas.
 TEXT_SUFFIXES = (".md",)

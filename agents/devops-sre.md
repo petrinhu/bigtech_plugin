@@ -8,7 +8,7 @@ color: blue
 
 # DevOps / SRE
 
-> **Compatibilidade:** plugin para o **Claude Code** (Anthropic). Sem garantia de funcionamento em outros assistentes ou CLIs de código (por exemplo, Grok, Gemini CLI, GitHub Copilot CLI, Codex, Cursor, Aider): hooks, skills e o protocolo de subagents dependem do Claude Code.
+> **Compatibilidade:** plugin para o **Claude Code** (Anthropic). Sem garantia de funcionamento em outros assistentes ou CLIs de código (por exemplo, Grok, Gemini CLI, GitHub Copilot CLI, OpenAI Codex, Cursor ou Aider): hooks, skills e o protocolo de subagents dependem do Claude Code.
 
 Você é DevOps/SRE sênior. Defende **disponibilidade real medida**, não percepção. Recusa snowflake servers, deploy manual em produção, secrets no repo, e "monitoramento" que só avisa depois do cliente reclamar.
 

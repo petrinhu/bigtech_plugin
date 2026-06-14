@@ -46,7 +46,9 @@ graph TD
     CMO --> P3["Fases 10-11"]
 ```
 
-C-levels complementares (Narciso/CISO, Cândido/CDO, Confúcio/CFO, Cícero/CRO, Cláudio/CLO) entram conforme o porte e o tipo de produto. Mapa completo em [ORG](ORG.md) secao 2.
+**Alternativa textual do organograma** (equivalente ao diagrama acima): no topo está **Celso (CEO)**, com **Cósimo (Chief of Staff)** ao lado como par de roteamento. O CEO supervisiona os quatro pilares operacionais: **Capitolino (CPO)**, **Caetano (CTO)**, **Camilo (CMO)** e **Cosmo (COO)**. Cada pilar lidera um bloco de fases: o CPO toca as fases 0 a 3 e a 12; o CTO toca as fases 4 a 9; o CMO toca as fases 10 e 11.
+
+C-levels complementares (Narciso/CISO, Cândido/CDO, Confúcio/CFO, Cícero/CRO, Cláudio/CLO) entram conforme o porte e o tipo de produto. Mapa completo em [ORG](ORG.md) seção 2.
 
 ---
 
@@ -87,7 +89,7 @@ Em estruturas grandes, VPs ficam abaixo dos C-levels (VP de Engenharia sob CTO, 
 
 ## 5. Configurações reais por estágio (porte do projeto)
 
-Quem aplica isso na prática é **Cósimo (Chief of Staff)**, selecionando a variante de pipeline. Ver [ORG](ORG.md) secao 5 e [pipeline_release_1.0](pipeline_release_1.0.md) secao final.
+Quem aplica isso na prática é **Cósimo (Chief of Staff)**, selecionando a variante de pipeline. Ver [ORG](ORG.md) seção 5 e [pipeline_release_1.0](pipeline_release_1.0.md) seção final.
 
 ### 5.1. Solo founder / projeto pessoal (1 pessoa) -> Pipeline-Sprint
 Uma pessoa acumula tudo: CEO + CPO + CTO + CISO + CMO. Comum em fundador técnico-domínio (médico-dev, advogado-dev). O pipeline é o mesmo, executado em série e enxuto. Agents ativos: Celso e Caetano; o resto dormente (salvo criticidade: dado de saúde mantém Narciso e Cláudio).
@@ -107,7 +109,7 @@ Constelação inteira: CEO, COO, CFO, CTO, CPO, CMO, CISO, CDO, CHRO, CLO. Cada 
 
 ## 6. RACI: quem responde por cada fase
 
-R = Responsável, A = Aprovador, C = Consultado, I = Informado. Matriz completa em [ORG](ORG.md) secao 4.
+R = Responsável, A = Aprovador, C = Consultado, I = Informado. Matriz completa em [ORG](ORG.md) seção 4.
 
 | Fase | Responsável principal | Apoio |
 |---|---|---|

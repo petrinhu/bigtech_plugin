@@ -5,16 +5,19 @@
 # e FALHA no primeiro erro (fail-fast). Rode-o antes de abrir PR / push pra pegar
 # problema na maquina, sem gastar fila de runner.
 #
-# Gates (em ordem):
+# Gates (em ordem), sao 8 no total:
 #   1. Gate ZERO-ORFAOS (spec 4.1)   -> python3 scripts/validate_plugin.py
-#   2. Testes dos hooks (52 testes)  -> python3 -m pytest hooks/tests -q
+#   2. Testes dos hooks (suite dos hooks) -> python3 -m pytest hooks/tests -q
 #   3. JSON valido (3 manifestos)    -> python3 -m json.tool em cada um
-#   4. Lint Python (se ruff existir) -> ruff check hooks/ scripts/   [degrada gracioso]
-#   5. Secret scan (se gitleaks)     -> gitleaks detect ... -c .gitleaks.toml [degrada]
+#   4. Paridade de versao            -> plugin.json == marketplace.json (plugins[0].version)
+#   5. Lint Python (se ruff existir) -> ruff check hooks/ scripts/   [degrada gracioso]
+#   6. Secret scan (se gitleaks)     -> gitleaks detect ... -c .gitleaks.toml [degrada]
+#   7. Smoke offline                 -> python3 scripts/smoke_offline.py (frontmatter + hooks)
+#   8. claude plugin validate (x2)   -> --strict no diretorio e no plugin.json [degrada gracioso]
 #
-# Ferramentas opcionais (ruff, gitleaks): se AUSENTES localmente, o gate avisa que
-# "rodara no CI" e segue (nao falha) — paridade total e garantida no CI, que as
-# instala. Os gates 1-3 sao obrigatorios e usam so a stdlib do Python.
+# Ferramentas opcionais (ruff, gitleaks, claude): se AUSENTES localmente, o gate
+# avisa que "rodara no CI" e segue (nao falha); paridade total e garantida no CI,
+# que as instala. Os gates 1-4 e 7 sao obrigatorios e usam so a stdlib do Python.
 #
 # Uso:
 #   bash scripts/preci.sh        # da raiz do repo ou de qualquer lugar
@@ -38,7 +41,7 @@ else
 fi
 
 GATE_NUM=0
-TOTAL_GATES=6
+TOTAL_GATES=8
 
 # Cabecalho de um gate (numerado).
 gate() {
@@ -78,7 +81,7 @@ else
 fi
 
 # =================================================================================
-# Gate 2 — Testes dos hooks (52 testes)
+# Gate 2 — Testes dos hooks (suite dos hooks)
 # =================================================================================
 gate "Testes dos hooks: pytest hooks/tests"
 if ! ${PY} -c 'import pytest' >/dev/null 2>&1; then
@@ -123,7 +126,56 @@ else
 fi
 
 # =================================================================================
-# Gate 4 — Lint Python (ruff) — opcional, degrada gracioso
+# Gate 4 - Paridade de versao (plugin.json == marketplace.json)
+# =================================================================================
+# A versao do plugin vive em dois lugares (plugin.json::version e
+# marketplace.json::plugins[0].version). Divergencia gera um pacote inconsistente
+# e e facil de esquecer ao bumpar. Este gate FALHA se as duas nao baterem.
+# Python stdlib (json), sem dependencia externa.
+gate "Paridade de versao: plugin.json vs marketplace.json"
+if ${PY} - <<'PYEOF'
+import json
+import sys
+
+PLUGIN = ".claude-plugin/plugin.json"
+MARKET = ".claude-plugin/marketplace.json"
+
+try:
+    with open(PLUGIN, encoding="utf-8") as fh:
+        plugin_ver = json.load(fh).get("version")
+    with open(MARKET, encoding="utf-8") as fh:
+        market = json.load(fh)
+    plugins = market.get("plugins") or []
+    market_ver = plugins[0].get("version") if plugins else None
+except (OSError, ValueError, IndexError, AttributeError) as exc:
+    print(f"  erro ao ler as versoes: {exc}", file=sys.stderr)
+    sys.exit(2)
+
+if not plugin_ver:
+    print(f"  {PLUGIN}: campo 'version' ausente ou vazio.", file=sys.stderr)
+    sys.exit(2)
+if not market_ver:
+    print(f"  {MARKET}: 'plugins[0].version' ausente ou vazio.", file=sys.stderr)
+    sys.exit(2)
+if plugin_ver != market_ver:
+    print(
+        f"  divergencia: plugin.json={plugin_ver!r} != "
+        f"marketplace.json plugins[0].version={market_ver!r}",
+        file=sys.stderr,
+    )
+    sys.exit(1)
+
+print(f"  versao casada: {plugin_ver}")
+sys.exit(0)
+PYEOF
+then
+  pass "versao identica em plugin.json e marketplace.json."
+else
+  fail "versao divergente entre plugin.json e marketplace.json; sincronize antes de seguir."
+fi
+
+# =================================================================================
+# Gate 5 - Lint Python (ruff): opcional, degrada gracioso
 # =================================================================================
 gate "Lint Python: ruff check hooks/ scripts/"
 if command -v ruff >/dev/null 2>&1; then
@@ -137,7 +189,7 @@ else
 fi
 
 # =================================================================================
-# Gate 5 — Secret scan (gitleaks) — opcional, degrada gracioso
+# Gate 6 - Secret scan (gitleaks): opcional, degrada gracioso
 # =================================================================================
 gate "Secret scan: gitleaks detect"
 if command -v gitleaks >/dev/null 2>&1; then
@@ -158,13 +210,50 @@ else
 fi
 
 # =================================================================================
-# Gate 6 — Smoke offline (frontmatter parseavel + hooks executam)
+# Gate 7 - Smoke offline (frontmatter parseavel + hooks executam)
 # =================================================================================
 gate "Smoke offline: smoke_offline.py"
 if ${PY} scripts/smoke_offline.py; then
   pass "smoke offline: plugin carregavel; hooks executam e se comportam."
 else
   fail "smoke offline reprovou — veja acima."
+fi
+
+# =================================================================================
+# Gate 8 - claude plugin validate --strict (x2): opcional, degrada gracioso
+# =================================================================================
+# Validacao oficial da CLI do Claude Code, em DOIS alvos (cobre marketplace +
+# manifesto do plugin):
+#   a) no diretorio (.)            -> resolve o marketplace.json e o(s) plugin(s)
+#   b) em ./.claude-plugin/plugin.json -> valida o manifesto do plugin direto
+# Se a CLI `claude` NAO estiver no runner, o gate faz SKIP avisando (degradacao
+# graciosa, igual ruff/gitleaks); nao falha o pre-CI por ausencia da CLI.
+gate "claude plugin validate --strict (diretorio + plugin.json)"
+if command -v claude >/dev/null 2>&1; then
+  validate_ok=1
+  if claude plugin validate --strict .; then
+    printf '  %s[ok]%s validate --strict no diretorio (marketplace).\n' \
+      "${C_GREEN}" "${C_RESET}"
+  else
+    printf '  %s[FAIL]%s validate --strict reprovou no diretorio.\n' \
+      "${C_RED}" "${C_RESET}" >&2
+    validate_ok=0
+  fi
+  if claude plugin validate --strict ./.claude-plugin/plugin.json; then
+    printf '  %s[ok]%s validate --strict no plugin.json.\n' \
+      "${C_GREEN}" "${C_RESET}"
+  else
+    printf '  %s[FAIL]%s validate --strict reprovou no plugin.json.\n' \
+      "${C_RED}" "${C_RESET}" >&2
+    validate_ok=0
+  fi
+  if [[ "${validate_ok}" -eq 1 ]]; then
+    pass "claude plugin validate --strict limpo nos dois alvos."
+  else
+    fail "claude plugin validate --strict reprovou; veja acima."
+  fi
+else
+  skip "CLI 'claude' ausente no runner; validate --strict roda em quem tiver a CLI."
 fi
 
 # =================================================================================

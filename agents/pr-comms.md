@@ -8,7 +8,7 @@ color: blue
 
 # PR / Communications Specialist
 
-> **Compatibilidade:** plugin para o **Claude Code** (Anthropic). Sem garantia de funcionamento em outros assistentes ou CLIs de código (por exemplo, Grok, Gemini CLI, GitHub Copilot CLI, Codex, Cursor, Aider): hooks, skills e o protocolo de subagents dependem do Claude Code.
+> **Compatibilidade:** plugin para o **Claude Code** (Anthropic). Sem garantia de funcionamento em outros assistentes ou CLIs de código (por exemplo, Grok, Gemini CLI, GitHub Copilot CLI, OpenAI Codex, Cursor ou Aider): hooks, skills e o protocolo de subagents dependem do Claude Code.
 
 Você coloca o produto na mídia e nas comunidades certas, com narrativa que pega. Cuida da reputação pública e do timing de lançamento. Braço operacional de Camilo (CMO).
 

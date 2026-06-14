@@ -1,6 +1,6 @@
 ---
 name: proj_software
-description: "Orquestra ciclo de vida de software (SDLC estendido) em 5 macrofases, alocando os agentes corretos por etapa, com proteção anti-over-engineering em projetos pequenos e trilha de escalonamento (solo → pequeno → médio → grande → enterprise). Aplica DevSecOps / Shift-Left (security transversal). Use IMEDIATAMENTE quando o usuário disser \"vou criar um software\", \"comecar projeto\", \"criar app\", \"novo sistema\", \"construir [feature/produto]\", \"estruturar projeto\", \"como fazer X em produção\", \"qual fluxo seguir\", ou invocar /proj_software. Use também quando a conversa começa um projeto novo de software sem mencionar skill."
+description: "Orquestra ciclo de vida de software (SDLC estendido) em 5 macrofases, alocando os agentes corretos por etapa, com proteção anti-over-engineering em projetos pequenos e trilha de escalonamento (solo → pequeno → médio → grande → enterprise). Aplica DevSecOps / Shift-Left (security transversal). Use IMEDIATAMENTE quando o usuário disser \"vou criar um software\", \"começar projeto\", \"criar app\", \"novo sistema\", \"construir [feature/produto]\", \"estruturar projeto\", \"como fazer X em produção\", \"qual fluxo seguir\", ou invocar /proj_software. Use também quando a conversa começa um projeto novo de software sem mencionar skill."
 ---
 
 # proj_software: orquestração SDLC com squad de engenharia
@@ -50,7 +50,7 @@ Se o usuário não disse: **pergunte 1-3 itens críticos**, não mais. Maioria d
 
 Use o **mínimo viável**. Cada agente adiciona overhead de comunicação e processo.
 
-### Nivel S0: Solo / Script / Prototype (≤ 1 semana, 1 pessoa, sem deploy)
+### Nível S0: Solo / Script / Prototype (≤ 1 semana, 1 pessoa, sem deploy)
 **Agentes:** nenhum subagente necessário. Main thread codifica direto.
 - Sem PRD, sem ADR, sem RFC, sem CI elaborada.
 - Sem `software-architect`: overkill.
@@ -58,7 +58,7 @@ Use o **mínimo viável**. Cada agente adiciona overhead de comunicação e proc
 - **Guardrails:** `superpowers:brainstorming` se requirements ambíguos; `superpowers:test-driven-development` se não-trivial.
 - Doc: README mínimo é suficiente.
 
-### Nivel S1: App pessoal / MVP interno (≤ 1 mês, 1-2 pessoas, deploy simples)
+### Nível S1: App pessoal / MVP interno (≤ 1 mês, 1-2 pessoas, deploy simples)
 **Agentes ativos:** main thread + 2-3 sob demanda.
 - `product-manager` opcional (só se requirements ambíguos)
 - `software-architect` **apenas** quando trade-off real existe (escolha de banco, sync × async)
@@ -69,7 +69,7 @@ Use o **mínimo viável**. Cada agente adiciona overhead de comunicação e proc
 - Sem `devops-sre` separado: main thread cuida do deploy
 - Doc: README + 1-2 ADRs em decisões one-way door
 
-### Nivel S2: Produto pequeno / startup early-stage (1-6 meses, 3-8 devs)
+### Nível S2: Produto pequeno / startup early-stage (1-6 meses, 3-8 devs)
 **Agentes ativos comuns:**
 - `product-manager` (visão/escopo)
 - `software-architect` (decisões one-way door)
@@ -81,7 +81,7 @@ Use o **mínimo viável**. Cada agente adiciona overhead de comunicação e proc
 - `technical-writer` opcional (README + docs API)
 - Doc: PRD curto, ADRs em decisões importantes, README + getting-started
 
-### Nivel S3: Produto médio / scale-up (6m-2 anos, 8-30 devs, múltiplos times)
+### Nível S3: Produto médio / scale-up (6m-2 anos, 8-30 devs, múltiplos times)
 **Adicionar a S2:**
 - `tech-lead` por squad
 - `engineering-manager` por área
@@ -94,7 +94,7 @@ Use o **mínimo viável**. Cada agente adiciona overhead de comunicação e proc
 - `compliance-legal` se regulado
 - `engineering-manager` cuida do growth e da mentoria do time
 
-### Nivel S4: Enterprise / regulado / multi-time (2+ anos, 30+ devs)
+### Nível S4: Enterprise / regulado / multi-time (2+ anos, 30+ devs)
 **Squad completa.** Incluir:
 - `ml-engineer` se ML em produção
 - `engineering-manager` formal por área, com trilha de mentoria/coaching do time
@@ -112,7 +112,7 @@ Use o **mínimo viável**. Cada agente adiciona overhead de comunicação e proc
 **S1:** PRD-em-1-página + 1-2 ADRs.
 **S2+:** pleno.
 
-**Agentes** (escalonado por nivel):
+**Agentes** (escalonado por nível):
 - `product-manager`: visão, escopo, roadmap, MVP
 - `ux-ui-designer`: jornada e interface (se há UI)
 - `ux-writer`: microcópia e voice/tone (S2+)
@@ -200,7 +200,7 @@ Use o **mínimo viável**. Cada agente adiciona overhead de comunicação e proc
 | 4. QA | DAST + fuzzing + pentest controlado + report formal |
 | 5. Operação | WAF, IDS/IPS, secrets vault, IR playbook compartilhado com `devops-sre` |
 
-**Calibre por nivel:** S0 = não precisa; S1 = checklist OWASP top 10; S2 = threat model leve + SAST; S3+ = pleno DevSecOps.
+**Calibre por nível:** S0 = não precisa; S1 = checklist OWASP top 10; S2 = threat model leve + SAST; S3+ = pleno DevSecOps.
 
 ---
 
@@ -243,7 +243,7 @@ Use o **mínimo viável**. Cada agente adiciona overhead de comunicação e proc
 
 Projetos crescem. Reconheça **sinais** e migre **incrementalmente**, não big-bang.
 
-### Sinais que indicam migração de nivel
+### Sinais que indicam migração de nível
 
 **S0 → S1:**
 - Vai usar em produção / outras pessoas vão usar
@@ -286,7 +286,7 @@ Projetos crescem. Reconheça **sinais** e migre **incrementalmente**, não big-b
 
 ---
 
-## 6. Templates rápidos por nivel
+## 6. Templates rápidos por nível
 
 ### S0/S1: PRD-1-página
 ```markdown
@@ -326,7 +326,7 @@ Status: Accepted | Date: YYYY-MM-DD
 
 ## 7. Como usar esta skill
 
-1. **Identifique o nivel** (S0-S4) com 1-3 perguntas se necessário
+1. **Identifique o nível** (S0-S4) com 1-3 perguntas se necessário
 2. **Mapeie quais agentes** invocar conforme matriz
 3. **Execute as fases** com agentes apenas onde adicionam valor
 4. **Aplique shift-left de segurança** proporcional
@@ -338,7 +338,7 @@ Status: Accepted | Date: YYYY-MM-DD
 ## Integração com ecossistema
 
 - Os agentes são acionados conforme a matriz (a constelação C-level completa é montada pela skill `/bigtech`). **Ao despachar um agent, inclua no prompt o caminho absoluto de `docs/`**: subagents não herdam o contexto de sessão.
-- Skill **`/bigtech`**: camada de NEGÓCIO/liderança (C-levels, pipeline de produto de 12 fases, GTM, release). Quando um projeto precisa de produto/marketing/vendas/release além da engenharia, comece por `/bigtech`; ela delega a execução de engenharia (fases 4-9) de volta a esta skill. Os niveis S0-S4 daqui mapeiam aos portes solo/early/scale/bigtech de lá.
+- Skill **`/bigtech`**: camada de NEGÓCIO/liderança (C-levels, pipeline de produto de 12 fases, GTM, release). Quando um projeto precisa de produto/marketing/vendas/release além da engenharia, comece por `/bigtech`; ela delega a execução de engenharia (fases 4-9) de volta a esta skill. Os níveis S0-S4 daqui mapeiam aos portes solo/early/scale/bigtech de lá.
 - Skill **`/tab_pendencias`**: tabela canônica de pendências.
 - O pipeline de CI é configurado pelo `devops-sre` no provedor de CI do projeto.
 - Princípios transversais: 4 camadas, SOLID, TDD e convenções de commit estão em [`arquitetura-principios`](../../docs/principles/arquitetura-principios.md) e [`CONTRACT`](../../docs/manuals/CONTRACT.md).

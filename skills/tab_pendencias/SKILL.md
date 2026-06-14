@@ -1,6 +1,6 @@
 ---
 name: tab_pendencias
-description: 'Cria e gerencia tabela de pendências/planejamento ORDENADA para minimizar retrabalho. No --create (e --reorder) orquestra um time de agents (Cosmo/COO coordena software-architect + tech-lead + product-manager + engineering-manager + scrum-master) para sequenciar por dependência (topological) e valor (WSJF), com coluna "Onda" sinalizando passos de igual valor paralelizáveis. Use sempre que o usuário pedir criar/mostrar/atualizar tabela de pendências, planejar passos, ordenar backlog, "o que falta", "em que ordem fazer", ou invocar /tab_pendencias. Em qualquer comando, garante (com dupla-confirmacao) testes nao-unitarios e auditorias aplicaveis ao stack como itens de fechamento; cria ./TESTES.md e ./AUDITORIAS.md do projeto quando faltam. Argumentos: --create, --reorder, --show, --main, --add_tests_audit.'
+description: 'Cria e gerencia tabela de pendências/planejamento ORDENADA para minimizar retrabalho. No --create (e --reorder) orquestra um time de agents (Cosmo/COO coordena software-architect + tech-lead + product-manager + engineering-manager + scrum-master) para sequenciar por dependência (topological) e valor (WSJF), com coluna "Onda" sinalizando passos de igual valor paralelizáveis. Use sempre que o usuário pedir criar/mostrar/atualizar tabela de pendências, planejar passos, ordenar backlog, "o que falta", "em que ordem fazer", ou invocar /tab_pendencias. Em qualquer comando, garante (com dupla confirmação) testes não-unitários e auditorias aplicáveis ao stack como itens de fechamento; cria ./TESTES.md e ./AUDITORIAS.md do projeto quando faltam. Argumentos: --create, --reorder, --show, --main, --add_tests_audit.'
 argument-hint: '--create | --reorder | --show | --main | --add_tests_audit'
 allowed-tools: [Read, Write, Edit, Glob, Grep, Agent, TodoWrite]
 ---
@@ -66,12 +66,12 @@ Em contexto SAFe (porte scale-up/bigtech, definido pelo Chief of Staff), NÃO ap
 
 `CoD = Valor + Criticidade + Redução de Risco`; `WSJF = CoD / Job Size`. Rank = ordem decrescente de WSJF. Em projeto pequeno (solo/early), o WSJF pode ser qualitativo (sem a tabela completa), respeitando o anti-OE.
 
-### Testes e auditoria: ordem inviolavel (TDD + shift-left)
+### Testes e auditoria: ordem inviolável (TDD + shift-left)
 
-- **Teste unitario (T1) = TDD:** ride COM o item de implementacao (escrito antes/junto do codigo), garantido pelo hook de TDD (tdd_guard/tdd_runner). **NAO vira item** na tabela; nao criar "escrever testes unitarios" como passo solto.
-- **Demais testes (T2-T15) sao downstream:** estatica, integracao, e2e, seguranca (secrets, SQLi, CVE), memoria, pre-CI. Nao existem antes do sistema; entram como itens de fechamento (`TST-*`) numa onda APOS a implementacao. Sao injetados pelo fluxo "Injecao automatica de testes e auditorias".
-- **Auditoria e downstream de codigo+teste:** todo item `AUD-*` tem `Pre-requisito` = os itens de codigo+teste que audita; cai numa Onda POSTERIOR aos testes.
-- **Invariante:** nunca agendar teste/auditoria antes do que ele cobre. Se a ordenacao produzir isso, a dependencia esta errada (corrigir o `Pre-requisito`).
+- **Teste unitário (T1) = TDD:** roda COM o item de implementação (escrito antes/junto do código), garantido pelo hook de TDD (tdd_guard/tdd_runner). **NÃO vira item** na tabela; não criar "escrever testes unitários" como passo solto.
+- **Demais testes (T2-T15) são downstream:** estática, integração, e2e, segurança (secrets, SQLi, CVE), memória, pré-CI. Não existem antes do sistema; entram como itens de fechamento (`TST-*`) numa onda APÓS a implementação. São injetados pelo fluxo "Injeção automática de testes e auditorias".
+- **Auditoria é downstream de código+teste:** todo item `AUD-*` tem `Pré-requisito` = os itens de código+teste que audita; cai numa Onda POSTERIOR aos testes.
+- **Invariante:** nunca agendar teste/auditoria antes do que ele cobre. Se a ordenação produzir isso, a dependência está errada (corrigir o `Pré-requisito`).
 
 ---
 
@@ -79,13 +79,13 @@ Em contexto SAFe (porte scale-up/bigtech, definido pelo Chief of Staff), NÃO ap
 
 ### Gate anti over-engineering (sempre primeiro)
 
-Calibrar pelo porte (ver `cosimo-chief-of-staff` / [ORG](../../docs/ORG.md)):
-- **Tabela pequena/simples** (até ~8 itens, projeto solo/pessoal): **NÃO** spawnar o time. A própria thread aplica o método (topological + WSJF + ondas) e escreve. Anti-OE.
+**Quem decide a abordagem de montagem (em `--create` e `--reorder`) é o Cósimo (Chief of Staff)**: ele classifica a complexidade da tabela (número de itens, dependências cruzadas, criticidade) e determina thread direta (simples) vs orquestrar o time (complexa). Calibrar pela complexidade da tabela (ver `cosimo-chief-of-staff` / [ORG](../../docs/ORG.md)):
+- **Tabela pequena/simples** (até ~8 itens, baixa complexidade e poucas dependências cruzadas): **NÃO** spawnar o time. A própria thread aplica o método (topological + WSJF + ondas) e escreve. Anti-OE por complexidade da tabela, não por porte "solo" (a constelação está sempre disponível).
 - **Tabela grande/complexa** (muitos itens, dependências cruzadas, cross-funcional): orquestrar o time abaixo.
 
 ### Orquestração (tabela grande)
 
-Cosmo (COO) coordena. A skill (thread principal) dispara os agents em paralelo, cada um com a lista bruta de itens, para sua lente:
+Quando o Cósimo determina "via time", o **Cosmo (COO) coordena a montagem**: a skill (thread principal) dispara os agents em paralelo, cada um com a lista bruta de itens, para sua lente:
 
 | Agent | Lente que devolve |
 |---|---|
@@ -102,8 +102,8 @@ Subagent não dispara subagent: quem dispara cada agent é a thread principal (a
 
 1. Coletar os itens (do usuário; se vier de um doc, ler).
 2. Perguntar só o essencial: caminho (sugerir `TODO.md` na raiz) e título do projeto.
-3. Aplicar o gate anti-OE.
-4. Ordenar pelo método (direto ou via time).
+3. Aplicar o gate anti-OE: **o Cósimo decide a abordagem** (thread direta vs time) pela complexidade da tabela.
+4. Montar a tabela: thread direta (simples) OU **time coordenado pelo Cosmo** (complexa), conforme a decisão do Cósimo.
 5. Escrever `TODO.md` com as 9 colunas, linhas em ordem de execução, Onda preenchida.
 
 ### `--reorder`
@@ -112,7 +112,7 @@ Reordena uma tabela existente (mesmo método e gate). Preserva IDs, Status e Est
 
 ### Gatilho de reordenação (proporcional ao tamanho e à repercussão)
 
-Quando uma pendência NOVA entra, decidir entre **só anexar** ou **reordenar tudo**, proporcional ao tamanho da solicitação e ao impacto no projeto inteiro. Em caso dúbio ou grande, quem julga a repercussão é `cosmo-coo` (COO).
+Quando uma pendência NOVA entra, decidir entre **só anexar** ou **reordenar tudo**, proporcional ao tamanho da solicitação e ao impacto no projeto inteiro. **O Cósimo (Chief of Staff) decide a abordagem** (só anexar vs reordenar) pela complexidade/repercussão; quando reordena via time, **o Cosmo (COO) coordena a montagem** (dispara as lentes e consolida). Em caso dúbio sobre a repercussão, o Cosmo (COO) julga.
 
 - **Só anexar** (sem reordenar): item pequeno, escopo local, sem criar dependência sobre itens já ordenados, não mexe em fundação nem one-way-door. Adicionar na Onda adequada (ou ao fim) e seguir.
 - **Reordenar (`--reorder`, orquestra o time):** quando o item novo
@@ -125,32 +125,32 @@ Regra de ouro: o custo de reordenar deve ser menor que o retrabalho que ele evit
 
 ---
 
-## Injecao automatica de testes e auditorias
+## Injeção automática de testes e auditorias
 
-Executa no INICIO de TODO comando (--create, --reorder, --show, --main), antes de
-exibir/escrever a tabela. Garante que os testes nao-unitarios e auditorias aplicaveis
-estejam planejados. Catalogo e regras: `references/catalogo-testes-auditorias.md`.
+Executa no INÍCIO de TODO comando (--create, --reorder, --show, --main), antes de
+exibir/escrever a tabela. Garante que os testes não-unitários e auditorias aplicáveis
+estejam planejados. Catálogo e regras: `references/catalogo-testes-auditorias.md`.
 
 ### Passos
 
-1. **Detectar stack + caracteristicas**: Glob na raiz para sinais de arquivo; Grep/Read de deps e imports para sinais de conteudo (rede/API, protocolo, framework). Ver o reference.
-2. **Calcular itens aplicaveis**: TST-* (T2-T15 podados; T1 SEMPRE fora) + AUD-* (podados).
-3. **Garantir manuais do projeto**: se `./TESTES.md` ou `./AUDITORIAS.md` faltam, marca-los para criacao (do reference, podados). Nunca sobrescrever manual existente.
-4. **Conferir a tabela** `TODO.md`: quais TST-*/AUD- ja existem (por ID).
-5. Se **nada falta** (itens presentes e manuais existem): idempotente, NAO pergunta, NAO escreve. Segue o comando.
-6. Se **falta algo**: rodar o fluxo de confirmacao abaixo.
+1. **Detectar stack + características**: Glob na raiz para sinais de arquivo; Grep/Read de deps e imports para sinais de conteúdo (rede/API, protocolo, framework). Ver o reference.
+2. **Calcular itens aplicáveis**: TST-* (T2-T15 podados; T1 SEMPRE fora) + AUD-* (podados).
+3. **Garantir manuais do projeto**: se `./TESTES.md` ou `./AUDITORIAS.md` faltam, marcá-los para criação (do reference, podados). Nunca sobrescrever manual existente.
+4. **Conferir a tabela** `TODO.md`: quais TST-*/AUD-* já existem (por ID).
+5. Se **nada falta** (itens presentes e manuais existem): idempotente, NÃO pergunta, NÃO escreve. Segue o comando.
+6. Se **falta algo**: rodar o fluxo de confirmação abaixo.
 
-### Fluxo de confirmacao (nunca silencioso)
+### Fluxo de confirmação (nunca silencioso)
 
-PERGUNTA 1 (AskUserQuestion, recomendacao ALTA a favor):
+PERGUNTA 1 (AskUserQuestion, recomendação ALTA a favor):
 > "Faltam testes/auditorias no planejamento deste projeto. Acrescentar agora?"
-> Opcoes: [Acrescentar (fortemente recomendado)] | [Nao acrescentar]
+> Opções: [Acrescentar (fortemente recomendado)] | [Não acrescentar]
 
-- Acrescentar -> aplicar (secao "Aplicar") + avisar o que mudou. Segue o comando.
-- Nao -> PERGUNTA 2 (reforco):
-  > "Testes e auditoria sao Definition of Done: previnem retrabalho, vulnerabilidades
-  >  (secrets, SQLi, CVE) e regressoes. Seguir mesmo assim sem eles?"
-  > Opcoes: [Acrescentar agora (recomendado)] | [Seguir sem testes]
+- Acrescentar -> aplicar (seção "Aplicar") + avisar o que mudou. Segue o comando.
+- Não -> PERGUNTA 2 (reforço):
+  > "Testes e auditoria são Definition of Done: previnem retrabalho, vulnerabilidades
+  >  (secrets, SQLi, CVE) e regressões. Seguir mesmo assim sem eles?"
+  > Opções: [Acrescentar agora (recomendado)] | [Seguir sem testes]
   - Acrescentar -> aplicar + avisar. Segue o comando.
   - Seguir sem -> executa o comando SEM testes; avisar:
     "OK. Pode acrescentar depois com: /tab_pendencias --add_tests_audit"
@@ -159,26 +159,26 @@ PERGUNTA 1 (AskUserQuestion, recomendacao ALTA a favor):
 
 - Criar `./TESTES.md` e/ou `./AUDITORIAS.md` se faltarem (podados pro stack).
 - Injetar na tabela apenas os IDs AUSENTES (idempotente):
-  - **TST-*** -> `Grupo` = `Testes`; `Onda` = uma apos a ultima de implementacao; `Pre-requisito` = itens de implementacao cobertos (na pratica, a ultima onda funcional); `Status` = ⏳; `Estado Auditado` = `—`; `Descricao` referencia `TESTES.md`.
-  - **AUD-*** -> `Grupo` = `Auditoria`; `Onda` = final, apos os testes; `Pre-requisito` = os TST-* + ultima onda de implementacao; `Status` = ⏳; `Estado Auditado` = `—`; `Descricao` referencia `AUDITORIAS.md`.
-- Reaplicar a ordenacao (topological + WSJF + ondas) para encaixar os novos itens respeitando a ordem inviolavel.
+  - **TST-*** -> `Grupo` = `Testes`; `Onda` = uma após a última de implementação; `Pré-requisito` = itens de implementação cobertos (na prática, a última onda funcional); `Status` = ⏳; `Estado Auditado` = `—`; `Descrição` referencia `TESTES.md`.
+  - **AUD-*** -> `Grupo` = `Auditoria`; `Onda` = final, após os testes; `Pré-requisito` = os TST-* + última onda de implementação; `Status` = ⏳; `Estado Auditado` = `—`; `Descrição` referencia `AUDITORIAS.md`.
+- Reaplicar a ordenação (topological + WSJF + ondas) para encaixar os novos itens respeitando a ordem inviolável.
 - Avisar: "criei <arquivos>; injetei N testes + M auditorias nas ondas <...>".
 
 ### --add_tests_audit
 
-Comando dedicado: pula as PERGUNTAS (o usuario ja pediu); roda "Aplicar" direto;
-idempotente; avisa o que fez (ou "nada a fazer" se ja completo).
+Comando dedicado: pula as PERGUNTAS (o usuário já pediu); roda "Aplicar" direto;
+idempotente; avisa o que fez (ou "nada a fazer" se já completo).
 
 ### Hook de TDD ausente
 
-T1 sempre fora. Se o projeto NAO tem `.claude/tdd-guard.json`, avisar uma vez:
-"TDD nao esta sob hook neste projeto; ative o hook ou inclua testes unitarios
-manualmente." (nao bloqueia).
+T1 sempre fora. Se o projeto NÃO tem `.claude/tdd-guard.json`, avisar uma vez:
+"TDD não está sob hook neste projeto; ative o hook ou inclua testes unitários
+manualmente." (não bloqueia).
 
-### Modo nao-interativo
+### Modo não-interativo
 
-Sem humano para responder o AskUserQuestion (ex.: invocacao por workflow/agente):
-NAO injeta (respeita "nao silencioso"); executa o comando e emite aviso proeminente
+Sem humano para responder o AskUserQuestion (ex.: invocação por workflow/agente):
+NÃO injeta (respeita "não silencioso"); executa o comando e emite aviso proeminente
 recomendando `/tab_pendencias --add_tests_audit`.
 
 ---
