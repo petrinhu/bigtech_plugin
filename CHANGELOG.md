@@ -4,6 +4,12 @@ Todas as mudanças relevantes deste projeto são documentadas neste arquivo.
 
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), e o projeto adota o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.1.8] - 2026-06-14
+
+### Changed
+
+- **README.md passa a recomendar o plugin companheiro `superpowers`.** A suíte de skills de engenharia da Anthropic é apresentada como complemento que se integra bem ao bigtech, com instrução de instalá-la antes do bigtech. A recomendação é bilíngue (inglês internacional e pt-br), com link canônico `https://claude.com/plugins/superpowers` e o comando `/plugin install superpowers@claude-plugins-official`.
+
 ## [0.1.7] - 2026-06-14
 
 ### Changed
@@ -89,6 +95,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), e
 - **13 documentos de governança.** Manuais de organização, pipeline de release, liderança, ferramentas, contrato de qualidade, testes, agile, checklist de deploy, auditorias e princípios de arquitetura, higienizados para distribuição pública.
 - **Marketplace `petrinhu`.** Distribuição via `/plugin marketplace add` e `/plugin install bigtech`, sob a licença Apache-2.0.
 
+[0.1.8]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.8
 [0.1.7]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.7
 [0.1.6]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.6
 [0.1.5]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.5

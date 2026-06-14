@@ -38,6 +38,14 @@ The non-negotiable principle: **the process adapts to the size of the project, n
 
 ### Installation
 
+**Recommended companion: `superpowers`.** `bigtech` pairs very well with [`superpowers`](https://claude.com/plugins/superpowers), Anthropic's suite of engineering and process skills (brainstorming, writing-plans, TDD, debugging, and more). Installing it **before** `bigtech` is recommended for the best experience: the agents and skills lean on those flows when they are available.
+
+```
+/plugin install superpowers@claude-plugins-official
+```
+
+Then install `bigtech` itself:
+
 ```
 /plugin marketplace add codeberg.org/petrinhu/bigtech_plugin
 /plugin install bigtech@petrinhu
@@ -189,6 +197,14 @@ Decisões de altíssimo valor (arquitetura macro, escopo, stack, go/no-go, deplo
 O princípio inegociável: **o processo se adapta ao porte do projeto, nunca o contrário.** Um CLI de 200 linhas não chama o time inteiro. O Chief of Staff classifica o porte e liga só o necessário, prevenindo over-engineering.
 
 ### Instalação
+
+**Companion recomendado: `superpowers`.** O `bigtech` integra-se muito bem com o [`superpowers`](https://claude.com/plugins/superpowers), a suíte de skills de engenharia e processo da Anthropic (brainstorming, writing-plans, TDD, debugging e outras). É recomendável instalá-lo **antes** do `bigtech` para a melhor experiência: os agents e as skills se apoiam nesses fluxos quando estão disponíveis.
+
+```
+/plugin install superpowers@claude-plugins-official
+```
+
+Em seguida, instale o `bigtech`:
 
 ```
 /plugin marketplace add codeberg.org/petrinhu/bigtech_plugin
