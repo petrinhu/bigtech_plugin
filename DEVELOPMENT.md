@@ -7,15 +7,19 @@ Construção de um **plugin Claude Code distribuível** que empacota a organiza�
 (constelação de agents C-level + operacionais, sem jogo nem perícia) com skills de orquestração,
 hooks e docs. Destino: `https://codeberg.org/petrinhu/bigtech_plugin.git`. Licença: Apache-2.0.
 
-## Documentos canônicos do projeto
+## Artefatos de construção (locais, não versionados)
 
-- **Spec (fonte de verdade):** `docs/superpowers/specs/2026-06-13-bigtech-plugin-design.md` — escopo, layout, higienização (política zero-wikilinks-sem-órfãos), despersonalização, acesso a docs em runtime, mapa de rastreabilidade (Apêndice A).
-- **Testes:** `TESTES.md`. **Auditorias:** `AUDITORIAS.md`.
+O planejamento e o processo deste projeto vivem em artefatos **locais**, mantidos fora do pacote
+distribuível via `.gitignore` (não vão para o repo público nem são carregados pelo plugin):
 
-## Pendências
+- **Spec de design** (escopo, layout, higienização zero-wikilinks-sem-órfãos, despersonalização,
+  acesso a docs em runtime, mapa de rastreabilidade).
+- **Tabela de pendências** (`TODO.md`, ordenada por execução; a coluna Onda marca passos paralelizáveis).
+- **Manuais de teste/auditoria do próprio projeto** (`TESTES.md`, `AUDITORIAS.md` na raiz) e o relatório
+  de auditoria. Não confundir com os manuais de governança que **acompanham** o plugin em `docs/manuals/`.
 
-A tabela de pendências e planejamento do projeto está em `TODO.md` na raiz (ordenada por execução;
-a coluna Onda marca passos paralelizáveis). Caminho crítico: `F1 → H3 → A2 → S1 → TST-ORFAOS → AUD-PRIV → R4`.
+Eles guiam a construção, mas, por conterem material de processo (e, no caso da spec/template/relatório,
+até nome do autor e wikilinks de exemplo), ficam restritos à cópia de trabalho local.
 
 ## Princípios inegociáveis deste projeto
 

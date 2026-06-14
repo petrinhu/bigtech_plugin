@@ -14,3 +14,12 @@ __pycache__/
 
 # Conteudo da wiki (vai para o repo .wiki separado, nao para o repo principal)
 wiki/
+
+# Artefatos de construcao/processo — NAO distribuir no pacote publico (ficam locais).
+# Contem material de processo e, no caso de docs/superpowers, ate PII/wikilinks de
+# exemplo. Patterns ANCORADOS na raiz (barra inicial) para NAO afetar os manuais
+# homonimos em docs/manuals/ (docs/manuals/TESTES.md e AUDITORIAS.md permanecem).
+/docs/superpowers/
+/TODO.md
+/TESTES.md
+/AUDITORIAS.md

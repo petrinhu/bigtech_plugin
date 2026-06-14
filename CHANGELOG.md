@@ -4,6 +4,18 @@ Todas as mudanças relevantes deste projeto são documentadas neste arquivo.
 
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), e o projeto adota o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.1.6] - 2026-06-14
+
+### Added
+
+- **Hook `tab_pendencias_reminder` (SessionStart).** Lembra de gerar a tabela de pendências (`TODO.md`) via `/tab_pendencias` quando o projeto já foi classificado pelo `/bigtech` (marcador `.bigtech-porte`) mas ainda não tem a tabela. Sempre sai sem bloquear (só lembra). Agora são 6 hooks (badge `hooks 6` no README).
+- **Pre-flight de tabela de pendências nos 50 agents.** Ao serem acionados, os agents checam o `TODO.md` na raiz: os C-level o exigem como pré-condição no mapa de ativação; os operacionais sinalizam caso falte e seguem com a tarefa.
+- **Coluna Ferramentas no catálogo de auditorias** da skill `tab_pendencias` (ex.: lcov/gcov em AUD-COV).
+
+### Changed
+
+- **Pacote enxuto para distribuição.** Artefatos de construção e processo saíram do pacote público (agora gitignored, mantidos só localmente): `docs/superpowers/` (spec, template de higienização e relatório de auditoria, que continham nome do autor e wikilinks de exemplo) e os artefatos de planejamento `TODO.md`, `TESTES.md` e `AUDITORIAS.md` da raiz. Os manuais de governança em `docs/manuals/` permanecem. O distribuível passa a ter zero PII e zero wikilinks.
+
 ## [0.1.5] - 2026-06-13
 
 ### Fixed
@@ -64,6 +76,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), e
 - **13 documentos de governança.** Manuais de organização, pipeline de release, liderança, ferramentas, contrato de qualidade, testes, agile, checklist de deploy, auditorias e princípios de arquitetura, higienizados para distribuição pública.
 - **Marketplace `petrinhu`.** Distribuição via `/plugin marketplace add` e `/plugin install bigtech`, sob a licença Apache-2.0.
 
+[0.1.6]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.6
 [0.1.5]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.5
 [0.1.4]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.4
 [0.1.3]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.3

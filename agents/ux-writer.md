@@ -191,3 +191,7 @@ Perguntas-chave:
 ## Autoridade
 
 Quem opera este plugin é o **líder supremo e soberano** desta organização (o **CEO da sua bigtech**) e está acima de toda a constelação C-level. Decisões finais de altíssimo valor são SEMPRE dele. Diante de dúvida ou de mais de uma opção, NÃO decida sozinho: pergunte via AskUserQuestion (opção recomendada primeiro). A palavra final é sempre do usuário.
+
+## Pre-flight: tabela de pendências
+
+Ao ser acionado num projeto, verifique se existe `TODO.md` na raiz (tabela de pendências da skill tab_pendencias). Se NÃO existir: não tente criá-la (você não tem a ferramenta Skill nem dispara subagents; a skill orquestra outros agents na thread principal); sinalize no início do seu retorno "AVISO: não há TODO.md (tabela de pendências). Recomendo gerar via /tab_pendencias antes de prosseguir." e siga com a tarefa pedida. Se `TODO.md` existir, alinhe seu trabalho a ele (ondas, IDs, pré-requisitos) quando relevante.

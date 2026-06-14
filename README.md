@@ -11,6 +11,7 @@
 
 [![Agents](https://img.shields.io/badge/agents-50-4F4F4F?style=for-the-badge)](#o-que-é)
 [![Skills](https://img.shields.io/badge/skills-3-4F4F4F?style=for-the-badge)](#o-que-é)
+[![Hooks](https://img.shields.io/badge/hooks-6-4F4F4F?style=for-the-badge)](#hooks)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-4F4F4F?style=for-the-badge)](https://codeberg.org/petrinhu/bigtech_plugin/pulls)
 
 ## Bem-vindo, líder supremo
@@ -111,6 +112,8 @@ Use para planejar passos, ordenar backlog, ou perguntar "o que falta" e "em que 
 
 **Suporte, Docs, Legal e i18n (5):** `support-engineer`, `technical-writer`, `compliance-legal`, `internal-auditor`, `i18n-l10n-specialist`.
 
+Ao serem acionados, todos os agents fazem um pre-flight da tabela de pendências (`TODO.md` na raiz): os C-level a exigem como pré-condição no mapa de ativação; os operacionais sinalizam caso falte e seguem com a tarefa.
+
 ## Hooks
 
 | Hook | Evento | Função |
@@ -119,6 +122,7 @@ Use para planejar passos, ordenar backlog, ou perguntar "o que falta" e "em que 
 | `tdd_runner.py` | PostToolUse (Write/Edit) | Roda a suíte de testes após a edição e reporta o resultado ao ciclo TDD. |
 | `bigtech_session_init.py` | SessionStart | Injeta o caminho dos manuais no contexto (docs-bootstrap), avisa se o `caveman` está ativo e sugere as dependências ausentes. |
 | `bigtech_porte_reminder.py` | SessionStart | Reavalia o porte do projeto (escala para cima ou para baixo); só dispara em projeto de código ainda não classificado. |
+| `tab_pendencias_reminder.py` | SessionStart | Lembra de gerar a tabela de pendências via `/tab_pendencias` quando o projeto já foi classificado (marcador `.bigtech-porte`) mas ainda não tem `TODO.md`. Só lembra, nunca bloqueia. |
 | `bigtech_reinforce.py` | UserPromptSubmit | Reforça o modo bigtech (anti-drift) e roteia ativação por linguagem natural para `/bigtech`. Escopado por marcador, anti-ruído. |
 
 ## Compatibilidade
