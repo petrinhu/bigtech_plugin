@@ -4,6 +4,20 @@ Todas as mudanças relevantes deste projeto são documentadas neste arquivo.
 
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), e o projeto adota o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.1.12] - 2026-06-17
+
+### Fixed
+
+- **Fail-open dos três reminders de sessão quando o `stdin` não é um dicionário.** Os hooks `bigtech_porte_reminder.py`, `tab_pendencias_reminder.py` e `bigtech_session_init.py` tratavam um payload de `stdin` não-dict (lista, número ou JSON malformado) como erro e saíam com código 1, gerando ruído de "hook error" no terminal; agora absorvem o caso e seguem o turno sem interromper. Achado da auditoria de corretude dos hooks.
+- **`conftest.py` aninhado classificado como código de produção.** A heurística que distingue arquivo de teste de arquivo de produção marcava um `conftest.py` fora da raiz de testes (em subdiretório aninhado) como produção, fazendo o `tdd_guard` bloquear indevidamente a edição no modo TDD; a classificação passa a reconhecê-lo como suporte de teste.
+- **Falso-bloqueio do `tdd_guard` por erro de I/O.** Uma falha ao ler ou gravar o estado do TDD (arquivo de estado inacessível, permissão negada) podia ser interpretada como ausência de teste vermelho e barrar a escrita de produção; o guard passa a fazer fail-open diante de erro de I/O, permitindo a edição em vez de travar o trabalho.
+- **Falsos positivos do regex de roteamento do `bigtech_reinforce`.** O padrão que detecta ativação por linguagem natural para `/bigtech` casava trechos que apenas continham a substring (por exemplo dentro de outra palavra), roteando pedidos que não eram de ativação; o regex foi ancorado para casar só a intenção real. Achado da mesma auditoria.
+
+### Added
+
+- **Testes para os caminhos de falha antes sem cobertura.** A suíte ganhou casos para o fail-open dos reminders com `stdin` não-dict, a classificação do `conftest.py` aninhado, o fail-open do `tdd_guard` por erro de I/O e os limites do regex de roteamento, fechando as lacunas apontadas pela auditoria de corretude dos hooks.
+- **Aviso de segurança no README (EN+PT) sobre o `tdd_runner`.** A seção de Segurança/Security explicita que o modo TDD é opt-in (só liga com `.claude/tdd-guard.json` presente) e que, quando ligado, o `fast_command`/`test_command` do projeto é executado como comando de shell após cada edição; orienta a tratar esse arquivo como código confiável e a não ativar o modo TDD em repositório de terceiro não-confiável. Linha equivalente espelhada no `SECURITY.md`.
+
 ## [0.1.11] - 2026-06-17
 
 ### Added
@@ -126,6 +140,9 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), e
 - **13 documentos de governança.** Manuais de organização, pipeline de release, liderança, ferramentas, contrato de qualidade, testes, agile, checklist de deploy, auditorias e princípios de arquitetura, higienizados para distribuição pública.
 - **Marketplace `petrinhu`.** Distribuição via `/plugin marketplace add` e `/plugin install bigtech`, sob a licença Apache-2.0.
 
+[0.1.12]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.12
+[0.1.11]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.11
+[0.1.10]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.10
 [0.1.9]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.9
 [0.1.8]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.8
 [0.1.7]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.7

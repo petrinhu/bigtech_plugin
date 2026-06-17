@@ -60,6 +60,10 @@ def main() -> int:
         data = json.load(sys.stdin)
     except Exception:
         data = {}
+    # JSON valido porem nao-dict (null, [], "texto", 12) tambem cai no
+    # fail-open: normaliza para {} antes de qualquer data.get(...).
+    if not isinstance(data, dict):
+        data = {}
 
     cwd = (data.get("cwd") or os.getcwd() or "").strip()
     if not cwd or not os.path.isdir(cwd):

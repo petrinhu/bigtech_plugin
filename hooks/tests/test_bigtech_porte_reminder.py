@@ -135,3 +135,40 @@ def test_subprocess_stdin_invalido_exit_0(tmp_path):
         input="nao eh json", text=True, capture_output=True,
     )
     assert proc.returncode == 0
+
+
+# ---------------------------------------------------------------------------
+# FAIL-OPEN: stdin com JSON VALIDO porem NAO-dict (null, [], "x", 12).
+# Antes do fix, data.get(...) lancava AttributeError -> exit 1 (bloqueava).
+# ---------------------------------------------------------------------------
+import pytest   # noqa: E402
+
+NON_DICT_JSON = ("null", "[]", '"x"', "12", "[1, 2, 3]", "true", "3.14")
+
+
+def _run_main_raw(monkeypatch, raw_text):
+    """Como _run_main, mas injeta o texto bruto de stdin (sem json.dumps)."""
+    monkeypatch.setattr(sys, "stdin", io.StringIO(raw_text))
+    captured = io.StringIO()
+    monkeypatch.setattr(sys, "stdout", captured)
+    rc = p.main()
+    return rc, captured.getvalue()
+
+
+@pytest.mark.parametrize("raw", NON_DICT_JSON)
+def test_main_json_valido_nao_dict_exit_0(tmp_path, monkeypatch, raw):
+    # Sem cwd no payload (nao e dict): cai no os.getcwd(); apontamos para um
+    # diretorio sem marcadores -> silencio, e o essencial: NAO quebra (exit 0).
+    monkeypatch.chdir(tmp_path)
+    rc, out = _run_main_raw(monkeypatch, raw)
+    assert rc == 0
+    assert out == ""
+
+
+@pytest.mark.parametrize("raw", NON_DICT_JSON)
+def test_subprocess_json_valido_nao_dict_exit_0(raw):
+    proc = subprocess.run(
+        [sys.executable, os.path.join(HOOKS_DIR, "bigtech_porte_reminder.py")],
+        input=raw, text=True, capture_output=True,
+    )
+    assert proc.returncode == 0

@@ -49,6 +49,50 @@ def test_trigger_re_nao_casa_prompt_neutro():
 
 
 # ---------------------------------------------------------------------------
+# TRIGGER_RE: termos genericos NAO podem disparar fora de contexto de
+# equipe/projeto (falsos positivos achados na auditoria), mas os verdadeiros
+# positivos (incl. montar/montar/criar o time/empresa/agentes) devem manter.
+# ---------------------------------------------------------------------------
+def test_trigger_re_nao_casa_falsos_positivos_genericos():
+    for prompt in (
+        "gestão de memória",
+        "manage the connection pool",
+        "constellation pattern",
+        "orquestrador de containers",
+        # variacoes proximas que tambem nao sao sobre o time/projeto:
+        "preciso gerenciar a memória do processo",
+        "coordinate the threads no pool",
+        "design a constellation of microservices",
+    ):
+        assert not r.TRIGGER_RE.search(prompt), f"NÃO deveria casar: {prompt!r}"
+
+
+def test_trigger_re_casa_generico_so_com_contexto_de_equipe():
+    # O mesmo verbo generico que NAO casa sozinho deve casar perto do contexto.
+    for prompt in (
+        "gerenciar o projeto inteiro",
+        "preciso coordenar a equipe de agentes",
+        "quem orquestra o time?",
+        "gestão do produto e da empresa",
+    ):
+        assert r.TRIGGER_RE.search(prompt), f"deveria casar: {prompt!r}"
+
+
+def test_trigger_re_corrige_falso_negativo_de_montagem():
+    # Antes so casava 'montar'/'monta'; agora cobre monte/criar + alvo, e
+    # tambem 'montar a empresa' / 'agentes C-level'.
+    for prompt in (
+        "monte o time de produto",
+        "monte a equipe agora",
+        "criar agentes C-level",
+        "montar a empresa",
+        "estruturar o time de engenharia",
+        "organize a equipe por favor",
+    ):
+        assert r.TRIGGER_RE.search(prompt), f"deveria casar: {prompt!r}"
+
+
+# ---------------------------------------------------------------------------
 # read_porte: extrai 'porte=<x>' da primeira linha do marcador; fallback seguro.
 # ---------------------------------------------------------------------------
 def test_read_porte_extrai_valor(tmp_path):
@@ -159,5 +203,42 @@ def test_subprocess_stdin_invalido_exit_0(tmp_path):
     proc = subprocess.run(
         [sys.executable, os.path.join(HOOKS_DIR, "bigtech_reinforce.py")],
         input="nao eh json", text=True, capture_output=True,
+    )
+    assert proc.returncode == 0
+
+
+# ---------------------------------------------------------------------------
+# FAIL-OPEN: stdin com JSON VALIDO porem NAO-dict (null, [], "x", 12).
+# Antes do fix, data.get(...) lancava AttributeError -> exit 1 (bloqueava).
+# ---------------------------------------------------------------------------
+import pytest   # noqa: E402
+
+NON_DICT_JSON = ("null", "[]", '"x"', "12", "[1, 2, 3]", "true", "3.14")
+
+
+def _run_main_raw(monkeypatch, raw_text):
+    """Como _run_main, mas injeta o texto bruto de stdin (sem json.dumps)."""
+    monkeypatch.setattr(sys, "stdin", io.StringIO(raw_text))
+    captured = io.StringIO()
+    monkeypatch.setattr(sys, "stdout", captured)
+    rc = r.main()
+    return rc, captured.getvalue()
+
+
+@pytest.mark.parametrize("raw", NON_DICT_JSON)
+def test_main_json_valido_nao_dict_exit_0(tmp_path, monkeypatch, raw):
+    # Payload nao e dict: cai no os.getcwd() (dir sem marcador) e prompt vazio
+    # -> silencio, e o essencial: NAO quebra (exit 0).
+    monkeypatch.chdir(tmp_path)
+    rc, out = _run_main_raw(monkeypatch, raw)
+    assert rc == 0
+    assert out == ""
+
+
+@pytest.mark.parametrize("raw", NON_DICT_JSON)
+def test_subprocess_json_valido_nao_dict_exit_0(raw):
+    proc = subprocess.run(
+        [sys.executable, os.path.join(HOOKS_DIR, "bigtech_reinforce.py")],
+        input=raw, text=True, capture_output=True,
     )
     assert proc.returncode == 0

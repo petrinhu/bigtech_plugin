@@ -133,3 +133,28 @@ def test_subprocess_stdin_invalido_exit_0(tmp_path):
     # Garante o silent-fail também atravessando o processo real.
     proc = _run_hook("nao eh json")
     assert proc.returncode == 0
+
+
+# ---------------------------------------------------------------------------
+# FAIL-OPEN: stdin com JSON VALIDO porem NAO-dict (null, [], "x", 12).
+# Antes do fix, data.get(...) lancava AttributeError -> exit 1 (bloqueava).
+# ---------------------------------------------------------------------------
+import pytest   # noqa: E402
+
+NON_DICT_JSON = ("null", "[]", '"x"', "12", "[1, 2, 3]", "true", "3.14")
+
+
+@pytest.mark.parametrize("raw", NON_DICT_JSON)
+def test_main_json_valido_nao_dict_exit_0(tmp_path, monkeypatch, raw):
+    # Payload nao e dict: cai no os.getcwd(); apontamos para um dir sem
+    # marcadores -> silencio, e o essencial: NAO quebra (exit 0).
+    monkeypatch.chdir(tmp_path)
+    rc, out = _run_main(monkeypatch, raw)
+    assert rc == 0
+    assert out == ""
+
+
+@pytest.mark.parametrize("raw", NON_DICT_JSON)
+def test_subprocess_json_valido_nao_dict_exit_0(raw):
+    proc = _run_hook(raw)
+    assert proc.returncode == 0

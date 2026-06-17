@@ -34,6 +34,11 @@ WARN_BROKEN = (
     "Permitindo a edicao (fail-open). Verifique .claude/tdd-guard.json "
     "(test_command, timeout_sec) ou o ambiente de teste."
 )
+WARN_STATE_IO = (
+    "TDD guard: falha de I/O ao ler o estado de teste ({err}). "
+    "Permitindo a edicao (fail-open) para nao bloquear producao legitima por "
+    "erro de leitura. Verifique permissoes/espaco em ~/.claude/state."
+)
 
 
 def evaluate(data: dict, env: dict):
@@ -60,7 +65,14 @@ def evaluate(data: dict, env: dict):
     if str(env.get("TDD_PHASE", "")).lower() == "refactor":
         return 0, ""
 
-    state = c.read_state(root)
+    try:
+        state = c.read_state(root)
+    except OSError as e:
+        # Erro de I/O ao ler o estado (HOME read-only, sem permissao, disco
+        # cheio): FAIL-OPEN. Tratar como "sem teste" e bloquear seria punir
+        # producao legitima por um problema de leitura. Distinto de None
+        # (estado ausente), que continua bloqueando como antes.
+        return 0, WARN_STATE_IO.format(err=e)
     if state is None:
         return 2, MSG_NO_STATE.format(rel=rel)
     if not state.get("ran", False):

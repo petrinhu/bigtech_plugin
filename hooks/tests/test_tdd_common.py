@@ -105,6 +105,18 @@ def test_classify_test_beats_production():
     assert c.classify("pkg/test_x.py", cfg) == "test"
 
 
+def test_classify_conftest_nested_is_test_not_production():
+    # BUG: o glob "conftest.py" so casava na raiz, entao um conftest.py
+    # aninhado (pkg/conftest.py) caia em producao e o guard bloquearia.
+    # Com "**/conftest.py", aninhado e raiz ambos sao TESTE.
+    cfg = c.resolve_config({"preset": "python-pytest"})
+    assert c.classify("conftest.py", cfg) == "test"            # raiz
+    assert c.classify("pkg/conftest.py", cfg) == "test"        # aninhado 1 nivel
+    assert c.classify("a/b/c/conftest.py", cfg) == "test"      # aninhado fundo
+    # sanidade: arquivo de producao comum continua producao
+    assert c.classify("pkg/core.py", cfg) == "production"
+
+
 def test_state_roundtrip(tmp_path, monkeypatch):
     monkeypatch.setenv("HOME", str(tmp_path))   # isola o diretorio de estado
     root = "/proj/exemplo"
@@ -126,6 +138,35 @@ def test_read_state_corrupt_returns_none(tmp_path, monkeypatch):
     with open(p, "w") as f:
         f.write("{ nao eh json")
     assert c.read_state("/proj/x") is None
+
+
+# --- BUG: read_state deve DISTINGUIR ausente/corrompido (None) de erro de
+#     I/O (propaga OSError), para o guard poder FAIL-OPEN em vez de bloquear ---
+
+def test_read_state_io_error_propagates(tmp_path, monkeypatch):
+    # open() falhando por I/O (ex.: HOME read-only, sem permissao) NAO pode
+    # virar None silencioso: deve propagar OSError para o chamador decidir.
+    monkeypatch.setenv("HOME", str(tmp_path))
+
+    def boom(*a, **k):
+        raise PermissionError(13, "Permission denied")
+
+    monkeypatch.setattr("builtins.open", boom)
+    import pytest
+    with pytest.raises(OSError):
+        c.read_state("/proj/x")
+
+
+def test_read_state_generic_oserror_propagates(tmp_path, monkeypatch):
+    monkeypatch.setenv("HOME", str(tmp_path))
+
+    def boom(*a, **k):
+        raise OSError(28, "No space left on device")
+
+    monkeypatch.setattr("builtins.open", boom)
+    import pytest
+    with pytest.raises(OSError):
+        c.read_state("/proj/x")
 
 
 def test_extract_file_path():

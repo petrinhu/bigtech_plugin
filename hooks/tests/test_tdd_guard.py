@@ -38,6 +38,17 @@ def test_writing_test_is_always_allowed(tmp_path, monkeypatch):
     assert code == 0
 
 
+def test_nested_conftest_is_test_not_blocked(tmp_path, monkeypatch):
+    """conftest.py aninhado (pkg/conftest.py) e arquivo de TESTE: nunca deve
+    ser bloqueado, mesmo sem estado de teste registrado (preset python-pytest).
+    Antes do fix, so o conftest.py da raiz era reconhecido."""
+    _project(tmp_path)
+    monkeypatch.setenv("HOME", str(tmp_path))
+    (tmp_path / "pkg").mkdir()
+    code, _ = g.evaluate(_write(tmp_path, fp="pkg/conftest.py"), {})
+    assert code == 0          # classificado como teste -> permite
+
+
 def test_production_blocked_when_state_absent(tmp_path, monkeypatch):
     _project(tmp_path)
     monkeypatch.setenv("HOME", str(tmp_path))
@@ -78,6 +89,45 @@ def test_runner_broken_fails_open(tmp_path, monkeypatch):
     code, msg = g.evaluate(_write(tmp_path, fp="src/x.py"), {})
     assert code == 0
     assert msg != ""        # avisa, mas nao bloqueia
+
+
+def test_state_io_error_fails_open(tmp_path, monkeypatch):
+    """read_state lancando OSError (HOME read-only, sem permissao, disco cheio)
+    NAO pode bloquear producao legitima: o guard FAIL-OPEN (exit 0) com aviso.
+    Distinto de estado AUSENTE (None), que continua bloqueando (exit 2)."""
+    _project(tmp_path)
+    monkeypatch.setenv("HOME", str(tmp_path))
+
+    def boom(_root):
+        raise PermissionError(13, "Permission denied")
+
+    monkeypatch.setattr(c, "read_state", boom)
+    code, msg = g.evaluate(_write(tmp_path, fp="src/x.py"), {})
+    assert code == 0          # NAO bloqueia
+    assert msg != ""          # mas avisa em stderr
+
+
+def test_state_io_oserror_fails_open(tmp_path, monkeypatch):
+    _project(tmp_path)
+    monkeypatch.setenv("HOME", str(tmp_path))
+
+    def boom(_root):
+        raise OSError(28, "No space left on device")
+
+    monkeypatch.setattr(c, "read_state", boom)
+    code, _ = g.evaluate(_write(tmp_path, fp="src/x.py"), {})
+    assert code == 0
+
+
+def test_state_absent_still_blocks(tmp_path, monkeypatch):
+    """Contraste explicito: estado AUSENTE (None) continua bloqueando (exit 2).
+    Garante que o fix de I/O nao afrouxou o caminho legitimo de bloqueio."""
+    _project(tmp_path)
+    monkeypatch.setenv("HOME", str(tmp_path))
+    monkeypatch.setattr(c, "read_state", lambda _root: None)
+    code, msg = g.evaluate(_write(tmp_path, fp="src/x.py"), {})
+    assert code == 2
+    assert "teste" in msg.lower()
 
 
 def test_excluded_file_permitted(tmp_path, monkeypatch):

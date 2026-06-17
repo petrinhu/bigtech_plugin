@@ -41,7 +41,7 @@ PRESETS = {
     "python-pytest": {
         "test_command": "pytest -x -q",
         "production_globs": ["**/*.py"],
-        "test_globs": ["tests/**", "**/test_*.py", "**/*_test.py", "conftest.py"],
+        "test_globs": ["tests/**", "**/test_*.py", "**/*_test.py", "**/conftest.py"],
     },
     "php-phpunit": {
         "test_command": "vendor/bin/phpunit",
@@ -153,11 +153,23 @@ def state_path(project_root: str) -> str:
 
 
 def read_state(project_root: str):
+    """Le o estado da ultima execucao de teste.
+
+    Distingue dois casos que NAO podem ser confundidos pelo guard:
+      - estado AUSENTE (arquivo nao existe) ou CORROMPIDO (JSON invalido)
+        -> retorna None (legitimo; ainda nao houve red registrado).
+      - ERRO DE I/O ao ler (PermissionError, disco, FS read-only, etc.)
+        -> propaga OSError, para o chamador poder FAIL-OPEN em vez de tratar
+        como "sem teste" e bloquear edicao de producao legitima.
+    """
     try:
         with open(state_path(project_root)) as f:
             return json.load(f)
-    except Exception:
-        return None
+    except FileNotFoundError:
+        return None                 # estado ausente: legitimo
+    except (ValueError, json.JSONDecodeError):
+        return None                 # estado corrompido: trata como ausente
+    # OSError/PermissionError e demais erros de I/O propagam de proposito.
 
 
 def write_state(project_root: str, state: dict) -> None:

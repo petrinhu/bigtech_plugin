@@ -40,9 +40,12 @@ resolvido em tempo de execução. Nenhum caminho é fixado no código.
 
 Este é o ponto que exige atenção explícita.
 
-O hook `tdd_runner.py` executa o comando definido em `fast_command` ou
-`test_command` dentro do arquivo `.claude/tdd-guard.json` do **projeto que
-você abriu**. Em termos práticos:
+O hook `tdd_runner.py` executa **como comando de shell** o que estiver
+definido em `fast_command` ou `test_command` dentro do arquivo
+`.claude/tdd-guard.json` do **projeto que você abriu**. Por isso, trate esse
+arquivo como código confiável e não ative o modo TDD em repositório de
+terceiro não-confiável sem antes inspecionar esse comando. Em termos
+práticos:
 
 - Se você abre um repositório de terceiros que já traz um
   `.claude/tdd-guard.json` e, durante a sessão, edita um arquivo de produção
