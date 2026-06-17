@@ -94,7 +94,7 @@ With no collision, proceed with the installation normally.
 
 - **Built for Claude Code (Anthropic).** No guarantee it works on other assistants or code CLIs (for example, Grok, Gemini CLI, GitHub Copilot CLI, OpenAI Codex, Cursor, or Aider). Hooks, skills, and the subagent protocol depend on Claude Code; porting requires adaptation and is not officially supported.
 - **Incompatible with the `caveman` plugin.** `caveman` compresses communication and conflicts with `bigtech`'s mode reinforcement. If `caveman` is active, **disable it** before using `bigtech`. The `bigtech_session_init` hook warns on `SessionStart` when it detects both active at the same time.
-- **Suggested dependencies:** `playwright` and `superpowers`. They are not required, but they enable the full experience (browser automation and advanced flows). Install them for full use; `bigtech_session_init` suggests installing them when they are absent.
+- **Suggested dependencies:** `playwright` and `superpowers`. They are not required, but they enable the full experience (browser automation and advanced flows). Install them for full use; `bigtech_session_init` suggests installing them when they are absent. For UI/design work, also install Anthropic's `frontend-design` skill if it is not already installed (it ships in the `example-skills` plugin: `/plugin marketplace add anthropics/skills` then `/plugin install example-skills@anthropic-agent-skills`). The `frontend-engineer` agent embeds its principles directly, so the skill is optional but recommended for richer, non-generic interfaces.
 
 ### Security
 
@@ -206,7 +206,7 @@ Sem colisão, siga a instalação normalmente.
 
 - **Feito para o Claude Code (Anthropic).** Sem garantia de funcionamento em outros assistentes ou CLIs de código (por exemplo, Grok, Gemini CLI, GitHub Copilot CLI, OpenAI Codex, Cursor ou Aider). Hooks, skills e o protocolo de subagents dependem do Claude Code; portar exige adaptação e não é suportado oficialmente.
 - **Incompatível com o plugin `caveman`.** O `caveman` comprime a comunicação e conflita com o reforço de modo do `bigtech`. Se o `caveman` estiver ativo, **desative-o** antes de usar o `bigtech`. O hook `bigtech_session_init` avisa no `SessionStart` quando detecta os dois ativos ao mesmo tempo.
-- **Dependências sugeridas:** `playwright` e `superpowers`. Não são obrigatórias, mas habilitam a experiência completa (automação de navegador e fluxos avançados). Instale-as para o uso pleno; o `bigtech_session_init` sugere a instalação quando estão ausentes.
+- **Dependências sugeridas:** `playwright` e `superpowers`. Não são obrigatórias, mas habilitam a experiência completa (automação de navegador e fluxos avançados). Instale-as para o uso pleno; o `bigtech_session_init` sugere a instalação quando estão ausentes. Para trabalho de UI/design, instale também a skill `frontend-design` da Anthropic, se ainda não estiver instalada (ela vem no plugin `example-skills`: `/plugin marketplace add anthropics/skills` e depois `/plugin install example-skills@anthropic-agent-skills`). O agent `frontend-engineer` já embarca os princípios dela, então a skill é opcional, mas recomendada para interfaces mais ricas e não genéricas.
 
 ### Segurança
 

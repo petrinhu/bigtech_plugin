@@ -4,6 +4,17 @@ Todas as mudanças relevantes deste projeto são documentadas neste arquivo.
 
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), e o projeto adota o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.1.10] - 2026-06-16
+
+### Added
+
+- **Seção "Direção de design distintivo" no agent `frontend-engineer`.** Os princípios da skill `frontend-design` da Anthropic (pensar tom, tipografia, cor, motion, composição e fundos antes de codar; recusar o look genérico de IA) passam a estar embarcados no corpo do agent, porque um subagent não invoca skill nativamente. Aplicam-se sempre que a tarefa cria ou redesenha interface visível, em conjunto com os cuidados de performance, acessibilidade e responsividade (não como troca).
+
+### Changed
+
+- **README (EN+PT) passa a recomendar a skill `frontend-design` da Anthropic para trabalho de UI.** Quando a constelação constrói ou reformula interface (`ux-ui-designer`, `art-director`, `frontend-engineer`, `accessibility-specialist`), a skill ajuda a produzir design visual distintivo em vez de padrões genéricos de template. Recomendação bilíngue (inglês internacional e pt-br), com link canônico para `https://github.com/anthropics/skills` e os comandos `/plugin marketplace add anthropics/skills` + `/plugin install example-skills@anthropic-agent-skills`.
+- **`AGENTS.md` e a wiki (Instalação) passam a recomendar a skill `frontend-design`.** A recomendação "instale se ainda não estiver instalada" entra junto das dependências sugeridas, em inglês e português, com os comandos de instalação a partir do plugin `example-skills` do marketplace `anthropic-agent-skills`. A página de wiki do agent `frontend-engineer` ganha o resumo didático da nova seção.
+
 ## [0.1.9] - 2026-06-14
 
 ### Added

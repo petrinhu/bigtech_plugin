@@ -1,6 +1,6 @@
 {
   "name": "bigtech",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Constelação de agents C-level (CEO, CTO, CPO, CMO, COO, CISO, CDO, CFO, CRO, CLO, CAIO + Chief of Staff) e operacionais, com skills de orquestração (bigtech, proj_software, tab_pendencias) para tocar produto e SDLC como uma bigtech.",
   "author": {
     "name": "petrinhu",

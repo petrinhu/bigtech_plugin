@@ -44,6 +44,13 @@ The non-negotiable principle: **the process adapts to the size of the project, n
 /plugin install superpowers@claude-plugins-official
 ```
 
+**Recommended skill for UI work: `frontend-design`.** When the constellation builds or reshapes interfaces (the `ux-ui-designer`, `art-director`, `frontend-engineer`, and `accessibility-specialist` agents), Anthropic's [`frontend-design`](https://github.com/anthropics/skills/blob/main/skills/frontend-design/SKILL.md) skill helps produce distinctive, intentional visual design instead of templated defaults. It ships in the `example-skills` plugin of the `anthropic-agent-skills` marketplace:
+
+```
+/plugin marketplace add anthropics/skills
+/plugin install example-skills@anthropic-agent-skills
+```
+
 Then install `bigtech` itself:
 
 ```
@@ -204,6 +211,13 @@ O princípio inegociável: **o processo se adapta ao porte do projeto, nunca o c
 
 ```
 /plugin install superpowers@claude-plugins-official
+```
+
+**Skill recomendada para trabalho de UI: `frontend-design`.** Quando a constelação constrói ou reformula interfaces (os agents `ux-ui-designer`, `art-director`, `frontend-engineer` e `accessibility-specialist`), a skill [`frontend-design`](https://github.com/anthropics/skills/blob/main/skills/frontend-design/SKILL.md) da Anthropic ajuda a produzir um design visual distintivo e intencional, em vez de padrões genéricos de template. Ela é distribuída no plugin `example-skills` do marketplace `anthropic-agent-skills`:
+
+```
+/plugin marketplace add anthropics/skills
+/plugin install example-skills@anthropic-agent-skills
 ```
 
 Em seguida, instale o `bigtech`:
