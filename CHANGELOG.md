@@ -4,6 +4,16 @@ Todas as mudanças relevantes deste projeto são documentadas neste arquivo.
 
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), e o projeto adota o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.1.11] - 2026-06-17
+
+### Added
+
+- **Campos `$schema` e `displayName` no `.claude-plugin/plugin.json`.** O `$schema` (`https://json.schemastore.org/claude-code-plugin-manifest.json`) habilita autocomplete e validação do manifesto no editor; o `displayName` (`"Bigtech"`) é o nome legível exibido no seletor `/plugin`. Ambos os campos são opcionais e não afetam o carregamento do plugin.
+
+### Changed
+
+- **Campo `$schema` do `.claude-plugin/marketplace.json` corrigido.** Antes apontava para `https://anthropic.com/claude-code/marketplace.schema.json`, uma URL que não resolvia; agora usa o schema canônico do SchemaStore (`https://json.schemastore.org/claude-code-marketplace.json`). O Claude Code ignora esse campo em runtime; o ganho é autocomplete e validação no editor. Ajuste cosmético e não-breaking, fruto da auditoria de conformidade contra os parâmetros oficiais da Anthropic (o validador `claude plugin validate --strict` já passava).
+
 ## [0.1.10] - 2026-06-16
 
 ### Added
