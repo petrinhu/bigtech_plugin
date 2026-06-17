@@ -4,6 +4,18 @@ Todas as mudanças relevantes deste projeto são documentadas neste arquivo.
 
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), e o projeto adota o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.1.13] - 2026-06-17
+
+### Changed
+
+- **`tab_pendencias_reminder` vira detector de defasagem da tabela.** Antes o hook só lembrava de criar o `TODO.md` (via `/tab_pendencias --create`) num projeto classificado (`.bigtech-porte`) mas sem a tabela. Agora, com a tabela presente, ele mede a defasagem real rodando `git` em modo somente-leitura: conta quantos commits e quantos dias se passaram desde o último toque no `TODO.md` e avisa quando os limiares são ultrapassados. O lembrete histórico de criar a tabela continua igual. O hook nunca reordena a tabela sozinho (reordenar exige o time de agents da skill `/tab_pendencias`); tudo é fail-open (qualquer erro não avisa e nunca bloqueia). O número de hooks não muda (continuam 6; o badge `hooks-6` permanece).
+- **Wiring do hook em `UserPromptSubmit`.** Além do `SessionStart`, o `tab_pendencias_reminder` passa a disparar também em `UserPromptSubmit` para dar, após uma sessão longa com `TODO.md` presente, um nudge único de higiene (revisar e reordenar a tabela).
+
+### Added
+
+- **Config opcional `.tab-staleness.json` na raiz do projeto.** Ajusta os limiares do detector de defasagem (defaults embutidos): `commits` e `dias` para o gatilho de staleness, `modo` (`"e"` exige os dois limiares, `"ou"` basta um), `horas_sessao` para o nudge de sessão longa e `off: true` para desligar os gatilhos de staleness e de sessão (o lembrete de criar a tabela continua ativo).
+- **Testes da nova lógica do hook.** A suíte de testes do `tab_pendencias_reminder` foi reescrita para cobrir os três gatilhos (criar, staleness por `git`, nudge de sessão longa), a leitura da config `.tab-staleness.json` e os caminhos fail-open. A suíte total passou a ter 141 testes (os testes do hook antigo foram substituídos pelos 15 da reforma).
+
 ## [0.1.12] - 2026-06-17
 
 ### Fixed
@@ -140,6 +152,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), e
 - **13 documentos de governança.** Manuais de organização, pipeline de release, liderança, ferramentas, contrato de qualidade, testes, agile, checklist de deploy, auditorias e princípios de arquitetura, higienizados para distribuição pública.
 - **Marketplace `petrinhu`.** Distribuição via `/plugin marketplace add` e `/plugin install bigtech`, sob a licença Apache-2.0.
 
+[0.1.13]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.13
 [0.1.12]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.12
 [0.1.11]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.11
 [0.1.10]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.10

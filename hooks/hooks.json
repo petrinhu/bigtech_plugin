@@ -1,5 +1,5 @@
 {
-  "description": "bigtech plugin hooks — TDD guard/runner (opt-in por projeto) + governanca de modo bigtech (porte, reforco, docs-bootstrap)",
+  "description": "bigtech plugin hooks - TDD guard/runner (opt-in por projeto) + governanca de modo bigtech (porte, reforco, docs-bootstrap)",
   "hooks": {
     "SessionStart": [
       {
@@ -17,7 +17,7 @@
           {
             "type": "command",
             "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/tab_pendencias_reminder.py\"",
-            "timeout": 10
+            "timeout": 15
           }
         ]
       }
@@ -28,6 +28,11 @@
           {
             "type": "command",
             "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/bigtech_reinforce.py\"",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/tab_pendencias_reminder.py\"",
             "timeout": 10
           }
         ]

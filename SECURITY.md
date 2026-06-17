@@ -26,7 +26,7 @@ seguintes eventos:
 |---|---|---|
 | `bigtech_session_init.py` | SessionStart | Injeta o caminho dos manuais no contexto; avisa sobre conflito e dependências ausentes. |
 | `bigtech_porte_reminder.py` | SessionStart | Reavalia o porte do projeto; só age em projeto de código ainda não classificado. |
-| `tab_pendencias_reminder.py` | SessionStart | Lembra de gerar o `TODO.md` via `/tab_pendencias` quando há `.bigtech-porte` sem a tabela; só lembra, nunca bloqueia. |
+| `tab_pendencias_reminder.py` | SessionStart, UserPromptSubmit | Lembra de gerar o `TODO.md` quando há `.bigtech-porte` sem a tabela e, com a tabela presente, mede a defasagem dela rodando `git` em modo somente-leitura; só lembra, nunca bloqueia. |
 | `bigtech_reinforce.py` | UserPromptSubmit | Reforça o modo de operação e roteia pedidos em linguagem natural. |
 | `tdd_guard.py` | PreToolUse (`Write`/`Edit`/`MultiEdit`) | Gate opt-in de TDD; pode bloquear a escrita de código de produção. |
 | `tdd_runner.py` | PostToolUse (`Write`/`Edit`/`MultiEdit`) | Roda a suíte de testes do projeto após a edição e grava o resultado. |
@@ -35,6 +35,18 @@ Nenhum desses hooks faz acesso de rede, telemetria ou envio de dados para
 fora da máquina. O estado do TDD é gravado apenas em
 `$HOME/.claude/state/tdd-guard/<hash>/last-run.json`, sob o seu `HOME`,
 resolvido em tempo de execução. Nenhum caminho é fixado no código.
+
+## O `tab_pendencias_reminder` lê o histórico do `git`
+
+Para medir a defasagem da tabela de pendências, o `tab_pendencias_reminder.py`
+executa o `git` no projeto que você abriu **em modo somente-leitura**: comandos
+de consulta com argumentos fixos (como `git rev-list` e `git log`), sem
+interpolar entrada do projeto e **sem passar por um shell**. Ele só conta
+quantos commits e quantos dias se passaram desde o último toque no `TODO.md`;
+não escreve no repositório, não acessa a rede e não altera nenhum arquivo.
+É benigno e **fail-open**: qualquer erro (sem `git`, fora de um repositório,
+saída inesperada) faz o hook simplesmente não avisar, nunca interromper o
+turno.
 
 ## Paridade de confiança do `tdd_runner`
 

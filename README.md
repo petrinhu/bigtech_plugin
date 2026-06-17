@@ -143,7 +143,7 @@ When invoked, every agent runs a pre-flight check on the backlog table (`TODO.md
 | `tdd_runner.py` | PostToolUse (Write/Edit) | Runs the test suite after the edit and reports the result to the TDD cycle. |
 | `bigtech_session_init.py` | SessionStart | Injects the manuals' path into the context (docs-bootstrap), warns if `caveman` is active, and suggests the missing dependencies. |
 | `bigtech_porte_reminder.py` | SessionStart | Reassesses the project size (scales up or down); only fires on a code project not yet classified. |
-| `tab_pendencias_reminder.py` | SessionStart | Reminds you to generate the backlog table via `/tab_pendencias` when the project has already been classified (`.bigtech-porte` marker) but still has no `TODO.md`. It only reminds, never blocks. |
+| `tab_pendencias_reminder.py` | SessionStart, UserPromptSubmit | Backlog-table staleness detector. Reminds you to generate the `TODO.md` via `/tab_pendencias` when the project is classified (`.bigtech-porte` marker) but has no table; once the table exists, measures its staleness via `git` (commits and days since the last touch to `TODO.md`) and, after a long session, nudges you to review and reorder it. Thresholds are tunable in an optional `.tab-staleness.json` at the project root. It only reminds, never blocks or reorders. |
 | `bigtech_reinforce.py` | UserPromptSubmit | Reinforces bigtech mode (anti-drift) and routes natural-language activation to `/bigtech`. Marker-scoped, noise-resistant. |
 
 ### Compatibility
@@ -314,7 +314,7 @@ Ao serem acionados, todos os agents fazem um pre-flight da tabela de pendências
 | `tdd_runner.py` | PostToolUse (Write/Edit) | Roda a suíte de testes após a edição e reporta o resultado ao ciclo TDD. |
 | `bigtech_session_init.py` | SessionStart | Injeta o caminho dos manuais no contexto (docs-bootstrap), avisa se o `caveman` está ativo e sugere as dependências ausentes. |
 | `bigtech_porte_reminder.py` | SessionStart | Reavalia o porte do projeto (escala para cima ou para baixo); só dispara em projeto de código ainda não classificado. |
-| `tab_pendencias_reminder.py` | SessionStart | Lembra de gerar a tabela de pendências via `/tab_pendencias` quando o projeto já foi classificado (marcador `.bigtech-porte`) mas ainda não tem `TODO.md`. Só lembra, nunca bloqueia. |
+| `tab_pendencias_reminder.py` | SessionStart, UserPromptSubmit | Detector de defasagem da tabela de pendências. Lembra de gerar o `TODO.md` via `/tab_pendencias` quando o projeto já foi classificado (marcador `.bigtech-porte`) mas ainda não tem a tabela; com a tabela presente, mede a defasagem dela via `git` (commits e dias desde o último toque no `TODO.md`) e, após uma sessão longa, dá um nudge para revisar e reordenar. Os limiares são ajustáveis num `.tab-staleness.json` opcional na raiz do projeto. Só lembra, nunca bloqueia nem reordena. |
 | `bigtech_reinforce.py` | UserPromptSubmit | Reforça o modo bigtech (anti-drift) e roteia ativação por linguagem natural para `/bigtech`. Escopado por marcador, anti-ruído. |
 
 ### Compatibilidade
