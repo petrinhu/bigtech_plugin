@@ -138,10 +138,14 @@ def msg_staleness(commits, dias, cfg):
     conj = "e" if modo == "e" else "ou"
     return (
         f"[tab_pendencias] TODO.md possivelmente defasado: {medida} desde o "
-        f"ultimo toque na tabela (limiar: >{lim_c} commits {conj} >{lim_d} "
-        "dias). A tabela reflete o trabalho atual? Considere /tab_pendencias "
-        "--reorder (re-sequencia por dependencia + WSJF + ondas) ou --show. "
-        "So a thread principal inicia a skill; o hook apenas lembra."
+        f"ultimo toque (limiar >{lim_c} commits {conj} >{lim_d} dias). ACAO "
+        "BARATA primeiro: se ha item feito-no-codigo mas nao no Status, so "
+        "atualize a coluna Status no TODO.md (implementacao entregue = "
+        "'Pendente verificacao'; 'Concluido' so apos a onda de teste/auditoria) "
+        "- isso NAO dispara o time de agents. ACAO CARA: reordenar via "
+        "/tab_pendencias --reorder (dependencia + WSJF + ondas) SO se um input "
+        "de priorizacao mudou (nova dependencia, INBOX nao-vazia, item ficou "
+        "urgente). So a thread principal inicia a skill; o hook apenas lembra."
     )
 
 
@@ -261,10 +265,11 @@ def avaliar_userprompt(data, agora, state_dir=None):
         return None
     _marcar_avisado(session_id, state_dir)
     return (
-        f"[tab_pendencias] Sessao em andamento ha ~{horas:.0f}h com TODO.md "
-        "presente. Pausa de higiene: se o trabalho andou, vale revisar/"
-        "reordenar a tabela via /tab_pendencias --reorder (ou --show). Aviso "
-        "unico por sessao."
+        f"[tab_pendencias] Sessao ha ~{horas:.0f}h com TODO.md presente. "
+        "Higiene: marque no Status o que ja ficou pronto (acao barata, nao "
+        "dispara o time de agents); reordene via /tab_pendencias --reorder so "
+        "se a prioridade mudou (nova dependencia, INBOX nao-vazia, urgencia). "
+        "Aviso unico por sessao."
     )
 
 

@@ -46,6 +46,31 @@ A ordem das linhas (de cima para baixo) É a ordem de execução recomendada. A 
 
 ---
 
+## Frescor: manter a tabela viva no sprint
+
+Para a tabela não apodrecer durante o sprint, separe SEMPRE duas operações de naturezas opostas:
+
+- **Sincronizar status** (MECÂNICO, barato, frequente, no commit): ao fechar trabalho, toque a coluna `Status` do item no MESMO PR, com o ID que o projeto JÁ tem (não renumerar). Implementação entregue vira `🔍 Pendente verificação` (NUNCA `✅` direto); `✅ Concluído` só após a onda `TST-*`/`AUD-*` correspondente. **Marcar status nunca dispara o time de agents** e não exige esta skill: é uma edição manual de uma célula, feita no mesmo commit que entrega o item.
+- **Reordenar** (JULGAMENTO, caro, raro): só via `--reorder`, e só quando um input de priorização muda (nova dependência, item ficou urgente, INBOX não-vazia). Nunca por passagem de tempo, loop ou monitor contínuo.
+
+Regra de ouro: **Status no commit; reordenar só quando um input de priorização muda.** Atualizar o `Status` é parte do Definition of Done do item (convenção, não comando): edite a célula à mão no PR que fecha o trabalho. Esta skill cobre o **planejamento** (`--reorder`, julgamento); a sincronização de status é a parte mecânica e fica a cargo da convenção do commit.
+
+### INBOX (captura agora, prioriza depois)
+
+Trabalho novo descoberto no meio do sprint NÃO espera reordenar: vai para a INBOX na hora (1 linha), sem Onda nem WSJF.
+
+- **Local:** seção no FIM do `TODO.md` de projeto:
+  ```markdown
+  ## INBOX (descobertas não priorizadas)
+  - <ID tentativo ou —>: descrição curta do que apareceu
+  ```
+- **Concorrência (worktrees/PRs paralelos):** se vários agents/branches anexam ao mesmo tempo, troque a seção por um arquivo-por-descoberta em `inbox/` (ex: `inbox/2026-06-20-slug.md`) para não gerar conflito de merge. Resolução de conflito da INBOX: **sempre união, NUNCA descartar uma linha** (perder item é o que a INBOX existe para evitar).
+- **Dreno:** `--create` e `--reorder` ESVAZIAM a INBOX (e o `inbox/`), integrando cada item na ordenação (topological + WSJF + ondas) e removendo-o da INBOX. INBOX não-vazia é gatilho natural de `--reorder`.
+
+> **Dois tipos de `TODO.md`:** o de **projeto** (itens editáveis; item↔commit faz sentido; esta seção se aplica) e o **hub agregador** (contagens derivadas de vários projetos; NÃO marcar à mão nem usar INBOX - regenerar por script). A convenção de frescor vale no de projeto.
+
+---
+
 ## Método de ordenação (anti-retrabalho)
 
 Aplicado no `--create` e `--reorder`:
@@ -104,11 +129,11 @@ Subagent não dispara subagent: quem dispara cada agent é a thread principal (a
 2. Perguntar só o essencial: caminho (sugerir `TODO.md` na raiz) e título do projeto.
 3. Aplicar o gate anti-OE: **o Cósimo decide a abordagem** (thread direta vs time) pela complexidade da tabela.
 4. Montar a tabela: thread direta (simples) OU **time coordenado pelo Cosmo** (complexa), conforme a decisão do Cósimo.
-5. Escrever `TODO.md` com as 9 colunas, linhas em ordem de execução, Onda preenchida.
+5. Escrever `TODO.md` com as 9 colunas, linhas em ordem de execução, Onda preenchida. Se houver INBOX / `inbox/`, drená-la (integrar os itens na ordenação e esvaziar).
 
 ### `--reorder`
 
-Reordena uma tabela existente (mesmo método e gate). Preserva IDs, Status e Estado Auditado; só recalcula ordem das linhas e a coluna Onda. Útil quando novas pendências entraram ou dependências mudaram.
+Reordena uma tabela existente (mesmo método e gate). Preserva IDs, Status e Estado Auditado; só recalcula ordem das linhas e a coluna Onda. **Drena a INBOX** (e `inbox/`): integra cada descoberta na ordenação e a remove da INBOX. Útil quando novas pendências entraram ou dependências mudaram.
 
 ### Gatilho de reordenação (proporcional ao tamanho e à repercussão)
 
