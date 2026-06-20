@@ -28,7 +28,7 @@ Package identity (confirmed in `.claude-plugin/plugin.json` and `.claude-plugin/
 |---|---|
 | Marketplace | `petrinhu` |
 | Plugin | `bigtech` |
-| Version | `0.1.15` |
+| Version | `0.1.16` |
 | License | `Apache-2.0` |
 | Repository | `https://codeberg.org/petrinhu/bigtech_plugin` |
 | Author | `petrinhu` |
@@ -140,7 +140,7 @@ Identidade do pacote (confirmada em `.claude-plugin/plugin.json` e `.claude-plug
 |---|---|
 | Marketplace | `petrinhu` |
 | Plugin | `bigtech` |
-| Versão | `0.1.15` |
+| Versão | `0.1.16` |
 | Licença | `Apache-2.0` |
 | Repositório | `https://codeberg.org/petrinhu/bigtech_plugin` |
 | Autor | `petrinhu` |

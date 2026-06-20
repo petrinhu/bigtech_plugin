@@ -4,6 +4,14 @@ Todas as mudanças relevantes deste projeto são documentadas neste arquivo.
 
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), e o projeto adota o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.1.16] - 2026-06-20
+
+Release de currency das ferramentas declaradas no frontmatter dos agents. **Nenhuma contagem muda: a constelação segue em 51 agents e 4 skills** (badges inalterados). Só a linha `tools:` de cada agent foi tocada; `claude plugin validate --strict` continua verde.
+
+### Changed
+
+- **Currency de ferramentas nos 51 agents - alinhamento com a tools-reference oficial do Claude Code.** A ferramenta `TodoWrite` (desabilitada por padrão desde a v2.1.142) foi substituída pelo quarteto `TaskCreate`/`TaskGet`/`TaskList`/`TaskUpdate`, e a `TaskOutput` (depreciada; a doc orienta "Prefer Read") foi removida. Achado da auditoria de conformidade contra a documentação oficial. A alteração é restrita à linha `tools:` do frontmatter de cada agent: nenhuma capacidade some, apenas passa a ser declarada com os nomes vigentes; o corpo dos agents, o roteamento dos C-level e as contagens (51 agents, 4 skills) seguem intactos.
+
 ## [0.1.15] - 2026-06-20
 
 Release de frescor da tabela de pendências. **Não há novo agent nem nova skill: as contagens seguem em 51 agents e 4 skills** (badges inalterados). O frescor entra como **convenção** (status mecânico no commit, reordenar à parte), não como ferramenta: **o toolkit de git hooks de sincronização não foi incluído nesta release**.
@@ -175,6 +183,7 @@ Release de frescor da tabela de pendências. **Não há novo agent nem nova skil
 - **13 documentos de governança.** Manuais de organização, pipeline de release, liderança, ferramentas, contrato de qualidade, testes, agile, checklist de deploy, auditorias e princípios de arquitetura, higienizados para distribuição pública.
 - **Marketplace `petrinhu`.** Distribuição via `/plugin marketplace add` e `/plugin install bigtech`, sob a licença Apache-2.0.
 
+[0.1.16]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.16
 [0.1.15]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.15
 [0.1.14]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.14
 [0.1.13]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.13
