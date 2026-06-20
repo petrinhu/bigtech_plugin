@@ -4,6 +4,21 @@ Todas as mudanças relevantes deste projeto são documentadas neste arquivo.
 
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), e o projeto adota o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.1.15] - 2026-06-20
+
+Release de frescor da tabela de pendências. **Não há novo agent nem nova skill: as contagens seguem em 51 agents e 4 skills** (badges inalterados). O frescor entra como **convenção** (status mecânico no commit, reordenar à parte), não como ferramenta: **o toolkit de git hooks de sincronização não foi incluído nesta release**.
+
+### Added
+
+- **Convenção "Frescor da TODO.md em commits" embarcada nos 12 agents de implementação.** Os agents `backend-engineer`, `frontend-engineer`, `mobile-engineer`, `embedded-firmware-engineer`, `hardware-engineer`, `software-architect`, `tech-lead`, `devops-sre`, `data-engineer`, `ml-engineer`, `applied-ai-engineer` e `qa-engineer` passam a declarar a regra: ao commitar trabalho que fecha ou avança um item da tabela de pendências (`TODO.md`), citar o ID do item (ex.: `V-12`, `F1.4`) na mensagem do commit (corpo ou footer do Conventional Commit) e tocar a coluna `Status` no mesmo commit (implementação entregue vira `🔍 Pendente verificação`, NUNCA `✅` direto; `✅` só após a onda de teste/auditoria). Marcar status é edição manual de uma célula e nunca dispara o time de agents.
+- **Seção "Frescor" e INBOX na skill `tab_pendencias`.** A `SKILL.md` ganhou a seção "Frescor: manter a tabela viva no sprint", que separa as duas operações de naturezas opostas - sincronizar status (mecânico, barato, frequente, no commit) e reordenar (julgamento, caro, raro, só via `--reorder` quando um input de priorização muda) - mais a subseção INBOX (captura imediata de trabalho novo em 1 linha, drenada pelo `--create`/`--reorder`; arquivo-por-descoberta em `inbox/` sob worktrees paralelos; conflito resolvido sempre por união). Reforça que a convenção vale no `TODO.md` de projeto, não no hub agregador.
+- **Documento `docs/tabela-pendencias-frescor.md`.** Novo doc de governança (Diátaxis: explanation + reference) que registra a causa-raiz da defasagem, a distinção status (mecânico) vs prioridade (julgamento), o Definition of Done de status (implementação entregue → `🔍 Pendente verificação`; `✅` só pós-teste/auditoria), a INBOX e uma escada de escalonamento opcional apresentada de forma genérica (aviso de frescor no CI, rotina agendada determinística, fonte-da-verdade em issues do repositório), cada camada condicional a evidência de que o mínimo falhou. README e `AGENTS.md` (EN e PT) passam a citar a convenção de frescor onde documentam a skill `/tab_pendencias`, com link para o novo doc.
+
+### Changed
+
+- **Fiação do `visual-design-director` nas tabelas de delegação de Capitolino/CPO e Caetano/CTO.** O agent de design visual (introduzido na 0.1.14) passa a constar explicitamente nas tabelas de delegação dos dois C-level que o acionam: Capitolino (CPO) para o design da Fase 3 e Caetano (CTO) para o handoff de implementação. Ajuste de consistência entre o catálogo e o roteamento dos C-level; nenhuma contagem muda.
+- **Mensagens do hook `tab_pendencias_reminder` refinadas.** Os avisos passam a distinguir com clareza as duas ações: **atualizar o `Status`** (mecânico, barato, faça você mesmo no commit que fecha o item) versus **reordenar a tabela** (julgamento do time, só com input de priorização novo). O comportamento do hook não muda - continua somente-leitura e fail-open, só lembra, nunca bloqueia nem reordena -, apenas o texto fica alinhado à convenção de frescor.
+
 ## [0.1.14] - 2026-06-20
 
 ### Added
@@ -160,6 +175,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), e
 - **13 documentos de governança.** Manuais de organização, pipeline de release, liderança, ferramentas, contrato de qualidade, testes, agile, checklist de deploy, auditorias e princípios de arquitetura, higienizados para distribuição pública.
 - **Marketplace `petrinhu`.** Distribuição via `/plugin marketplace add` e `/plugin install bigtech`, sob a licença Apache-2.0.
 
+[0.1.15]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.15
 [0.1.14]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.14
 [0.1.13]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.13
 [0.1.12]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.12

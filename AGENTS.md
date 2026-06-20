@@ -112,7 +112,7 @@ The main entry points are the 3 orchestration skills (a 4th skill, `/visual-desi
 /bigtech ./my-project
 ```
 
-From there, `/proj_software` runs the software cycle and `/tab_pendencias` plans the backlog. For the detail of each skill, the agents, and the governance manuals, see the [README.md](README.md) and the `docs/` directory.
+From there, `/proj_software` runs the software cycle and `/tab_pendencias` plans the backlog. To keep that table fresh, follow one convention: when you commit work that closes or advances a `TODO.md` item, cite the item ID in the commit message and touch the `Status` column in the same commit (delivered implementation → `🔍 Pendente verificação`; `✅` only after the test/audit wave); reordering is separate and runs only through `/tab_pendencias --reorder`. Detail in [docs/tabela-pendencias-frescor.md](docs/tabela-pendencias-frescor.md). For the detail of each skill, the agents, and the governance manuals, see the [README.md](README.md) and the `docs/` directory.
 
 ---
 
@@ -224,4 +224,4 @@ Os pontos de entrada principais são as 3 skills de orquestração (uma 4ª skil
 /bigtech ./meu-projeto
 ```
 
-A partir daí, `/proj_software` toca o ciclo de software e `/tab_pendencias` planeja o backlog. Para o detalhe de cada skill, dos agents e dos manuais de governança, consulte o [README.md](README.md) e o diretório `docs/`.
+A partir daí, `/proj_software` toca o ciclo de software e `/tab_pendencias` planeja o backlog. Para manter essa tabela fresca, siga uma convenção: ao commitar trabalho que fecha ou avança um item do `TODO.md`, cite o ID do item na mensagem do commit e toque a coluna `Status` no mesmo commit (implementação entregue → `🔍 Pendente verificação`; `✅` só após a onda de teste/auditoria); reordenar é à parte e só roda pelo `/tab_pendencias --reorder`. Detalhe em [docs/tabela-pendencias-frescor.md](docs/tabela-pendencias-frescor.md). Para o detalhe de cada skill, dos agents e dos manuais de governança, consulte o [README.md](README.md) e o diretório `docs/`.
