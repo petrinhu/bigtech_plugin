@@ -4,6 +4,14 @@ Todas as mudanças relevantes deste projeto são documentadas neste arquivo.
 
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), e o projeto adota o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.1.14] - 2026-06-20
+
+### Added
+
+- **Novo agent `visual-design-director` (Diretor de Design Visual).** Operacional (cor azul), na família Produto/UX e Design. Conduz design visual de **alta fidelidade renderizado**: pesquisa tendências do domínio, faz brainstorm dirigido (uma pergunta por vez, opções A/B/C), escreve mockups HTML/CSS com conteúdo real do produto e os **abre no navegador do usuário**, itera por seção via screenshot (paleta, navegação, componentes, tabelas, gráficos, estados, tela a tela) e entrega spec versionada em `docs/` (tokens light+dark com hex, decisões e por tela) mais o handoff. Reporta a Capitolino/CPO (design, Fase 3) e a Caetano/CTO (handoff). Distinto do `ux-ui-designer` (jornada, IA, wireframe, design-system textual) e do `art-director` (identidade visual, mood board, style guide); aqui é pixel renderizado e validado no browser. Complementa ux-writer, ux-researcher e accessibility-specialist; delega a implementação ao `frontend-engineer`. Acionável pela skill `/bigtech` quando o porte do projeto pede design dedicado.
+- **Nova skill `/visual-design-director`.** Atalho que delega ao subagent homônimo para design visual de alta fidelidade renderizado.
+- **A constelação passa a ter 51 agents e 4 skills.** Os operacionais sobem de 38 para 39 (a família Produto/UX e Design vai de 7 para 8) e as skills de 3 para 4. Os badges do README (`agents-51`, `skills-4`), o catálogo de agents (README), o `AGENTS.md` (EN e PT) e a constelação no `docs/ORG.md` foram atualizados. As 3 skills de orquestração (`/bigtech`, `/proj_software`, `/tab_pendencias`) seguem como pontos de entrada principais; `/visual-design-director` é a 4ª skill, no formato de atalho de agent.
+
 ## [0.1.13] - 2026-06-17
 
 ### Changed
@@ -152,6 +160,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), e
 - **13 documentos de governança.** Manuais de organização, pipeline de release, liderança, ferramentas, contrato de qualidade, testes, agile, checklist de deploy, auditorias e princípios de arquitetura, higienizados para distribuição pública.
 - **Marketplace `petrinhu`.** Distribuição via `/plugin marketplace add` e `/plugin install bigtech`, sob a licença Apache-2.0.
 
+[0.1.14]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.14
 [0.1.13]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.13
 [0.1.12]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.12
 [0.1.11]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.11

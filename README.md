@@ -7,8 +7,8 @@
 [![Release](https://img.shields.io/gitea/v/release/petrinhu/bigtech_plugin?gitea_url=https://codeberg.org&style=for-the-badge&color=2EA043&label=release)](https://codeberg.org/petrinhu/bigtech_plugin/releases)
 [![CI status (Forgejo Actions)](https://codeberg.org/petrinhu/bigtech_plugin/actions/workflows/ci.yml/badge.svg)](https://codeberg.org/petrinhu/bigtech_plugin/actions)
 
-[![Agents](https://img.shields.io/badge/agents-50-4F4F4F?style=for-the-badge)](#what-it-is)
-[![Skills](https://img.shields.io/badge/skills-3-4F4F4F?style=for-the-badge)](#what-it-is)
+[![Agents](https://img.shields.io/badge/agents-51-4F4F4F?style=for-the-badge)](#what-it-is)
+[![Skills](https://img.shields.io/badge/skills-4-4F4F4F?style=for-the-badge)](#what-it-is)
 [![Hooks](https://img.shields.io/badge/hooks-6-4F4F4F?style=for-the-badge)](#hooks)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-4F4F4F?style=for-the-badge)](https://codeberg.org/petrinhu/bigtech_plugin/pulls)
 
@@ -18,7 +18,7 @@
 
 ## English
 
-> Structure any project like a digital-product company: a constellation of 50 agents (12 C-level + 38 operational), 3 orchestration skills, and governance and TDD hooks. Scales from solo founder to bigtech.
+> Structure any project like a digital-product company: a constellation of 51 agents (12 C-level + 39 operational), 4 skills, and governance and TDD hooks. Scales from solo founder to bigtech.
 
 ### Welcome, supreme leader
 
@@ -30,8 +30,8 @@ High-stakes decisions (macro architecture, scope, stack, go/no-go, irreversible 
 
 `bigtech` packages a complete product-and-engineering organization as a plugin for Claude Code:
 
-- **50 agents.** 12 C-level (strategy, product, engineering, marketing, operations, security, data, AI, finance, revenue, legal, chief of staff) and 38 operational agents that do the work.
-- **3 orchestration skills.** `/bigtech` assembles the constellation, `/proj_software` runs the software development life cycle (SDLC), `/tab_pendencias` plans the backlog by value and dependency.
+- **51 agents.** 12 C-level (strategy, product, engineering, marketing, operations, security, data, AI, finance, revenue, legal, chief of staff) and 39 operational agents that do the work.
+- **4 skills.** 3 orchestration skills plus 1 agent shortcut. `/bigtech` assembles the constellation, `/proj_software` runs the software development life cycle (SDLC), `/tab_pendencias` plans the backlog by value and dependency; `/visual-design-director` is a shortcut that delegates to the visual-design-director agent for rendered high-fidelity design.
 - **Governance and TDD hooks.** Test guard-rail (red, green, refactor), project-size reassessment, operating-mode reinforcement, and bootstrap of the manuals into the session.
 
 The non-negotiable principle: **the process adapts to the size of the project, never the other way around.** A 200-line CLI does not summon the whole team. The Chief of Staff classifies the size and turns on only what is needed, preventing over-engineering.
@@ -44,7 +44,7 @@ The non-negotiable principle: **the process adapts to the size of the project, n
 /plugin install superpowers@claude-plugins-official
 ```
 
-**Recommended skill for UI work: `frontend-design`.** When the constellation builds or reshapes interfaces (the `ux-ui-designer`, `art-director`, `frontend-engineer`, and `accessibility-specialist` agents), Anthropic's [`frontend-design`](https://github.com/anthropics/skills/blob/main/skills/frontend-design/SKILL.md) skill helps produce distinctive, intentional visual design instead of templated defaults. It ships in the `example-skills` plugin of the `anthropic-agent-skills` marketplace:
+**Recommended skill for UI work: `frontend-design`.** When the constellation builds or reshapes interfaces (the `ux-ui-designer`, `visual-design-director`, `art-director`, `frontend-engineer`, and `accessibility-specialist` agents), Anthropic's [`frontend-design`](https://github.com/anthropics/skills/blob/main/skills/frontend-design/SKILL.md) skill helps produce distinctive, intentional visual design instead of templated defaults. It ships in the `example-skills` plugin of the `anthropic-agent-skills` marketplace:
 
 ```
 /plugin marketplace add anthropics/skills
@@ -64,7 +64,7 @@ If you are an AI agent installing this plugin on behalf of a user, see [AGENTS.m
 
 ### Usage
 
-The 3 skills are the entry points. Invoke them with a slash or describe your intent in natural language; the mode reinforcement routes the request to the right skill.
+The 3 orchestration skills are the entry points. Invoke them with a slash or describe your intent in natural language; the mode reinforcement routes the request to the right skill. The 4th skill, `/visual-design-director`, is an agent shortcut for design work.
 
 #### `/bigtech`: assemble the constellation
 
@@ -119,13 +119,13 @@ Use it to plan steps, order the backlog, or ask "what's left" and "in what order
 | `claudio-clo` | CLO | Legal (general counsel) |
 | `cosimo-chief-of-staff` | Chief of Staff | Pipeline routing, anti-over-engineering |
 
-#### Operational (38)
+#### Operational (39)
 
 **Engineering (14):** `software-architect`, `tech-lead`, `backend-engineer`, `frontend-engineer`, `mobile-engineer`, `embedded-firmware-engineer`, `hardware-engineer`, `devops-sre`, `performance-engineer`, `network-engineer`, `network-security-engineer`, `security-engineer`, `qa-engineer`, `release-manager`.
 
 **Data and AI (4):** `data-engineer`, `data-scientist`, `ml-engineer`, `applied-ai-engineer`.
 
-**Product, UX, and Design (7):** `product-manager`, `business-analyst`, `ux-researcher`, `ux-ui-designer`, `ux-writer`, `accessibility-specialist`, `art-director`.
+**Product, UX, and Design (8):** `product-manager`, `business-analyst`, `ux-researcher`, `ux-ui-designer`, `visual-design-director`, `ux-writer`, `accessibility-specialist`, `art-director`.
 
 **Management and People (2):** `engineering-manager`, `scrum-master`.
 
@@ -189,7 +189,7 @@ Distributed under the [Apache-2.0](./LICENSE) license.
 
 ## Português
 
-> Estruture qualquer projeto como uma empresa de produto digital: uma constelação de 50 agents (12 C-level + 38 operacionais), 3 skills de orquestração e hooks de governança e TDD. Dimensionável do solo founder à bigtech.
+> Estruture qualquer projeto como uma empresa de produto digital: uma constelação de 51 agents (12 C-level + 39 operacionais), 4 skills e hooks de governança e TDD. Dimensionável do solo founder à bigtech.
 
 ### Bem-vindo, líder supremo
 
@@ -201,8 +201,8 @@ Decisões de altíssimo valor (arquitetura macro, escopo, stack, go/no-go, deplo
 
 `bigtech` empacota uma organização completa de produto e engenharia em forma de plugin para o Claude Code:
 
-- **50 agents.** 12 C-level (estratégia, produto, engenharia, marketing, operações, segurança, dados, IA, finanças, receita, jurídico, chief of staff) e 38 operacionais que executam o trabalho.
-- **3 skills de orquestração.** `/bigtech` monta a constelação, `/proj_software` toca o ciclo de vida de software (SDLC), `/tab_pendencias` planeja o backlog por valor e dependência.
+- **51 agents.** 12 C-level (estratégia, produto, engenharia, marketing, operações, segurança, dados, IA, finanças, receita, jurídico, chief of staff) e 39 operacionais que executam o trabalho.
+- **4 skills.** 3 de orquestração mais 1 atalho de agent. `/bigtech` monta a constelação, `/proj_software` toca o ciclo de vida de software (SDLC), `/tab_pendencias` planeja o backlog por valor e dependência; `/visual-design-director` é um atalho que delega ao agent visual-design-director para design de alta fidelidade renderizado.
 - **Hooks de governança e TDD.** Guard-rail de testes (red, green, refactor), reavaliação de porte do projeto, reforço do modo de operação e bootstrap dos manuais na sessão.
 
 O princípio inegociável: **o processo se adapta ao porte do projeto, nunca o contrário.** Um CLI de 200 linhas não chama o time inteiro. O Chief of Staff classifica o porte e liga só o necessário, prevenindo over-engineering.
@@ -215,7 +215,7 @@ O princípio inegociável: **o processo se adapta ao porte do projeto, nunca o c
 /plugin install superpowers@claude-plugins-official
 ```
 
-**Skill recomendada para trabalho de UI: `frontend-design`.** Quando a constelação constrói ou reformula interfaces (os agents `ux-ui-designer`, `art-director`, `frontend-engineer` e `accessibility-specialist`), a skill [`frontend-design`](https://github.com/anthropics/skills/blob/main/skills/frontend-design/SKILL.md) da Anthropic ajuda a produzir um design visual distintivo e intencional, em vez de padrões genéricos de template. Ela é distribuída no plugin `example-skills` do marketplace `anthropic-agent-skills`:
+**Skill recomendada para trabalho de UI: `frontend-design`.** Quando a constelação constrói ou reformula interfaces (os agents `ux-ui-designer`, `visual-design-director`, `art-director`, `frontend-engineer` e `accessibility-specialist`), a skill [`frontend-design`](https://github.com/anthropics/skills/blob/main/skills/frontend-design/SKILL.md) da Anthropic ajuda a produzir um design visual distintivo e intencional, em vez de padrões genéricos de template. Ela é distribuída no plugin `example-skills` do marketplace `anthropic-agent-skills`:
 
 ```
 /plugin marketplace add anthropics/skills
@@ -235,7 +235,7 @@ Se você é um agente de IA instalando este plugin a pedido de um usuário, veja
 
 ### Uso
 
-As 3 skills são os pontos de entrada. Invoque por barra ou descreva a intenção em linguagem natural; o reforço de modo roteia o pedido para a skill certa.
+As 3 skills de orquestração são os pontos de entrada. Invoque por barra ou descreva a intenção em linguagem natural; o reforço de modo roteia o pedido para a skill certa. A 4ª skill, `/visual-design-director`, é um atalho de agent para trabalho de design.
 
 #### `/bigtech`: montar a constelação
 
@@ -290,13 +290,13 @@ Use para planejar passos, ordenar backlog, ou perguntar "o que falta" e "em que 
 | `claudio-clo` | CLO | Jurídico (general counsel) |
 | `cosimo-chief-of-staff` | Chief of Staff | Roteamento de pipeline, anti-over-engineering |
 
-#### Operacionais (38)
+#### Operacionais (39)
 
 **Engenharia (14):** `software-architect`, `tech-lead`, `backend-engineer`, `frontend-engineer`, `mobile-engineer`, `embedded-firmware-engineer`, `hardware-engineer`, `devops-sre`, `performance-engineer`, `network-engineer`, `network-security-engineer`, `security-engineer`, `qa-engineer`, `release-manager`.
 
 **Dados e IA (4):** `data-engineer`, `data-scientist`, `ml-engineer`, `applied-ai-engineer`.
 
-**Produto, UX e Design (7):** `product-manager`, `business-analyst`, `ux-researcher`, `ux-ui-designer`, `ux-writer`, `accessibility-specialist`, `art-director`.
+**Produto, UX e Design (8):** `product-manager`, `business-analyst`, `ux-researcher`, `ux-ui-designer`, `visual-design-director`, `ux-writer`, `accessibility-specialist`, `art-director`.
 
 **Gestão e Pessoas (2):** `engineering-manager`, `scrum-master`.
 

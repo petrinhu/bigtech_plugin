@@ -31,7 +31,7 @@ Naming: o nome embute a sigla do cargo, na ordem. Invocação como agent pelo sl
 | Agent | Cargo | Sigla no nome | Domínio | Fases | Delega para (operacionais) |
 |---|---|---|---|---|---|
 | **Celso** | CEO | **C**els**O** | Estratégia, arbitragem | 0, 11 (coord.) | os outros C-levels |
-| **Capitolino** | CPO | **C**a**P**itolin**O** | Produto, design | 0-3, 12 | product-manager, ux-researcher, business-analyst, ux-ui-designer, ux-writer, accessibility-specialist, art-director |
+| **Capitolino** | CPO | **C**a**P**itolin**O** | Produto, design | 0-3, 12 | product-manager, ux-researcher, business-analyst, ux-ui-designer, visual-design-director, ux-writer, accessibility-specialist, art-director |
 | **Caetano** | CTO | **C**ae**T**an**O** | Engenharia do produto | 4-9 | software-architect, tech-lead, frontend/backend/mobile-engineer, devops-sre, network-engineer, qa-engineer, performance-engineer, data-engineer, ml-engineer |
 | **Camilo** | CMO | **C**a**M**il**O** | Marketing, GTM | 10, parte 11 | growth-engineer, content-seo, pr-comms, community-manager |
 | **Cosmo** | COO | **C**Osm**O** | Execução cross-func | 6-11 | scrum-master, engineering-manager, customer-success, support-engineer, release-manager |
@@ -70,7 +70,7 @@ graph TD
     CMO --> CRO
     CEO --> CFO & CLO
 
-    CPO -.delega.-> product-manager & ux-ui-designer & ux-writer & accessibility-specialist
+    CPO -.delega.-> product-manager & ux-ui-designer & visual-design-director & ux-writer & accessibility-specialist
     CTO -.delega.-> software-architect & tech-lead & frontend-engineer & backend-engineer & mobile-engineer & devops-sre & qa-engineer & data-engineer & ml-engineer
     COO -.delega.-> scrum-master & engineering-manager & release-manager
     CISO -.delega.-> security-engineer & compliance-legal
@@ -85,7 +85,7 @@ graph TD
 - O CEO supervisiona diretamente: **Capitolino (CPO)**, **Caetano (CTO)**, **Camilo (CMO)** e **Cosmo (COO)**; e ainda **Confúcio (CFO)** e **Cláudio (CLO)**.
 - **Caetano (CTO)** supervisiona **Narciso (CISO)**, **Cândido (CDO)** e **Caio (CAIO)**.
 - **Camilo (CMO)** supervisiona **Cícero (CRO)**.
-- Delegação para agents operacionais: o CPO delega a product-manager, ux-ui-designer, ux-writer e accessibility-specialist; o CTO delega a software-architect, tech-lead, frontend/backend/mobile-engineer, devops-sre, qa-engineer, data-engineer e ml-engineer; o COO delega a scrum-master, engineering-manager e release-manager; o CISO delega a security-engineer e compliance-legal; o CDO delega a data-engineer, data-scientist e ml-engineer; o CAIO delega a applied-ai-engineer e ml-engineer; o CLO delega a compliance-legal.
+- Delegação para agents operacionais: o CPO delega a product-manager, ux-ui-designer, visual-design-director, ux-writer e accessibility-specialist; o CTO delega a software-architect, tech-lead, frontend/backend/mobile-engineer, devops-sre, qa-engineer, data-engineer e ml-engineer; o COO delega a scrum-master, engineering-manager e release-manager; o CISO delega a security-engineer e compliance-legal; o CDO delega a data-engineer, data-scientist e ml-engineer; o CAIO delega a applied-ai-engineer e ml-engineer; o CLO delega a compliance-legal.
 
 ---
 
@@ -159,11 +159,13 @@ Status: ✅ Concluído · 🔄 Em andamento · 🟡 Parcial · ⏳ Pendente · �
 
 ## 7. O que já existe vs o que falta (resumo)
 
-**Já existe (cobre o pipeline):** product-manager, software-architect, tech-lead, frontend/backend/mobile-engineer, devops-sre, qa-engineer, security-engineer, data-engineer, data-scientist, ml-engineer, ux-ui-designer, ux-writer, accessibility-specialist, compliance-legal, technical-writer, engineering-manager, scrum-master. Skills: `/proj_software`, `/tab_pendencias`. Hooks de guard-rail (TDD) e governança. Manuais: os canônicos que acompanham o plugin.
+**Já existe (cobre o pipeline):** product-manager, software-architect, tech-lead, frontend/backend/mobile-engineer, devops-sre, qa-engineer, security-engineer, data-engineer, data-scientist, ml-engineer, ux-ui-designer, visual-design-director, ux-writer, accessibility-specialist, compliance-legal, technical-writer, engineering-manager, scrum-master. Skills: `/proj_software`, `/tab_pendencias`, `/visual-design-director`. Hooks de guard-rail (TDD) e governança. Manuais: os canônicos que acompanham o plugin.
 
 **Criado agora:** a constelação C-level (seção 2).
 
-**Tabela zerada.** Tudo concluído: constelação C-level (12, incluindo Caio/CAIO), agents operacionais do pipeline inteiro (incluindo ux-researcher, business-analyst, performance-engineer, internal-auditor, applied-ai-engineer), skill `/bigtech` e hook de classificação de porte (SessionStart). A organização está completa, operacional, disparável por comando e com gatilho de onboarding. Única decisão em aberto não-bloqueante: ORG-08 (CHRO mapeado a engineering-manager, sem agent C dedicado por ora).
+**Tabela zerada.** Tudo concluído: constelação C-level (12, incluindo Caio/CAIO), agents operacionais do pipeline inteiro (incluindo ux-researcher, business-analyst, performance-engineer, internal-auditor, applied-ai-engineer e visual-design-director), skill `/bigtech` e hook de classificação de porte (SessionStart). A organização está completa, operacional, disparável por comando e com gatilho de onboarding. Única decisão em aberto não-bloqueante: ORG-08 (CHRO mapeado a engineering-manager, sem agent C dedicado por ora).
+
+**Adição recente - `visual-design-director` (Produto/UX/Design).** Diretor de Design Visual: conduz design visual de **alta fidelidade renderizado** (mockups HTML/CSS abertos no navegador, iterados por seção via screenshot até virar spec versionada de tokens light+dark + handoff). Produz na **Fase 3 (Design)** sob Capitolino/CPO e alinha o handoff com Caetano/CTO. Distinto do `ux-ui-designer` (jornada, IA, wireframe, design-system textual) e do `art-director` (identidade visual, mood board, style guide); aqui é pixel renderizado e validado no browser. Acompanha a skill-atalho `/visual-design-director` que delega ao subagent. Complementa ux-writer, ux-researcher e accessibility-specialist; delega implementação ao frontend-engineer.
 
 ---
 
