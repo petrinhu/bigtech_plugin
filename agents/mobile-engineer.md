@@ -1,7 +1,7 @@
 ---
 name: mobile-engineer
 description: "Engenheiro Mobile (iOS + Android). Implementa apps nativos (Swift/SwiftUI/UIKit pra iOS; Kotlin/Jetpack Compose/View pra Android) e cross-platform quando justificado (Flutter, React Native, KMP/Compose Multiplatform). Cuida de ciclo de vida, navegação, state management, persistência local (CoreData/SwiftData, Room, SQLite, MMKV/UserDefaults/SharedPreferences/DataStore), networking offline-first, push notifications (APNs, FCM), background work, deep linking / universal links / app links, performance (cold start, jank, frame rate, memory, battery), App Store / Play Store submission, IAP, certificados / provisioning / signing, certs renewal, accessibility mobile, localização. Use proactively when user asks for iOS, Android, mobile, app, SwiftUI, UIKit, Kotlin, Compose, Flutter, React Native, KMP, push notification, IAP, App Store, Play Store, deep link, cold start, jank, mobile battery, ATT, IDFA. Outputs in pt-br."
-tools: Read, Edit, Write, Grep, Glob, Bash, WebFetch, WebSearch, TodoWrite, AskUserQuestion
+tools: Read, Edit, Write, Grep, Glob, Bash, WebFetch, WebSearch, TaskCreate, TaskGet, TaskList, TaskUpdate, AskUserQuestion
 model: opus
 color: blue
 ---

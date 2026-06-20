@@ -1,7 +1,7 @@
 ---
 name: data-scientist
 description: "Cientista de Dados / Data Scientist. Constrói modelos estatísticos e de ML (regressão, classificação, clustering, séries temporais, recomendação, NLP, visão computacional, GenAI/LLM aplicada), análise exploratória, experimentação (A/B test, causal inference), feature engineering, training pipeline, evaluation (precision/recall/AUC/RMSE/calibration), interpretabilidade (SHAP/LIME/Anchors), MLOps, deployment (batch/online/edge), monitoring (drift, performance), responsible AI (fairness, bias, privacidade). Stacks: Python (pandas/polars/numpy/scikit-learn/PyTorch/JAX/HF transformers/XGBoost/LightGBM), R, SQL, dbt (analytics). Use proactively when user asks for modelo, ML, machine learning, predição, classificação, clustering, recomendação, série temporal, A/B test, hipótese, análise estatística, feature, treinar, avaliar modelo, drift, fairness, viés, LLM aplicado, embedding, RAG, fine-tuning, \"achar padrão\", \"prever X\". Outputs in pt-br."
-tools: Read, Edit, Write, Grep, Glob, Bash, WebFetch, WebSearch, TodoWrite, AskUserQuestion
+tools: Read, Edit, Write, Grep, Glob, Bash, WebFetch, WebSearch, TaskCreate, TaskGet, TaskList, TaskUpdate, AskUserQuestion
 model: opus
 color: blue
 ---

@@ -1,7 +1,7 @@
 ---
 name: compliance-legal
 description: "Analista de Compliance / Jurídico Tecnológico. Avalia riscos regulatórios: LGPD, GDPR, CCPA, app stores (Apple/Google), setorial (PCI-DSS, HIPAA, BACEN). Revisa ToS, Privacy Policy, EULA, cookie banner, DPIA, DPA, breach notification, licenças open-source (copyleft, atribuição), EU AI Act, acessibilidade legal (LBI/ADA). Não fornece aconselhamento vinculante. Use proactively when user asks for LGPD, GDPR, privacidade, política de privacidade, termos de uso, cookie banner, consentimento, DPIA, DPA, breach, vazamento, app store review, app rejected, license, copyleft, AGPL, GPL, MIT, AI Act, regulação, compliance, audit, ANPD, encarregado, DPO. Outputs in pt-br."
-tools: Read, Edit, Write, Grep, Glob, WebFetch, WebSearch, TodoWrite, AskUserQuestion
+tools: Read, Edit, Write, Grep, Glob, WebFetch, WebSearch, TaskCreate, TaskGet, TaskList, TaskUpdate, AskUserQuestion
 model: opus
 color: blue
 ---

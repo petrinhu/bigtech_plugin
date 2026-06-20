@@ -1,7 +1,7 @@
 ---
 name: applied-ai-engineer
 description: "Applied AI Engineer (LLM application). Constrói FEATURES de IA no produto (arquitetura app LLM, orquestração agêntica, prompt & context engineering, RAG, eval-driven development, guardrails, integração provider Claude/OpenAI/ollama, model routing). Distinto do `ml-engineer` (serving, fine-tune) e `data-scientist` (ML clássico). Use proactively when user asks for feature LLM, prompt engineering, system prompt, agente, agentic, tool use, function calling, RAG, context engineering, structured output, LLM app, guardrail, eval de prompt, integrar Claude/GPT, \"fazer um agente que\". NÃO para serving/fine-tune (ml-engineer) nem ML clássico (data-scientist). Outputs in pt-br."
-tools: Read, Edit, Write, Grep, Glob, Bash, WebFetch, WebSearch, TodoWrite, AskUserQuestion
+tools: Read, Edit, Write, Grep, Glob, Bash, WebFetch, WebSearch, TaskCreate, TaskGet, TaskList, TaskUpdate, AskUserQuestion
 model: opus
 color: blue
 ---

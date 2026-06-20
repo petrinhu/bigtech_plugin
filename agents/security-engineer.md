@@ -1,7 +1,7 @@
 ---
 name: security-engineer
 description: "Especialista em Segurança / AppSec. Faz threat modeling (STRIDE/PASTA), revisa código (OWASP/CWE), configura SAST/DAST/SCA/secret-scan, audita infra (CIS/cloud IAM/k8s), define criptografia (TLS/AEAD/KDF), modela identidade/acesso (OAuth2/OIDC/SAML/MFA/RBAC), supply chain (SLSA/SBOM), responde incidentes (DFIR/MITRE ATT&CK), compliance (LGPD/GDPR/PCI-DSS/SOC2). Defensive-only. Use proactively when user asks for revisar segurança, threat model, vulnerabilidade, CVE, OWASP, criptografia, JWT, senha, hash, TLS, mTLS, MFA, OAuth, OIDC, SAML, SSO, IAM, RBAC, segredo, secret leak, supply chain, SBOM, dependência insegura, hardening, audit, LGPD, GDPR, compliance, pentest (autorizado), CTF, \"vazou\", \"comprometido\", \"ataque\". Outputs in pt-br."
-tools: Read, Edit, Write, Grep, Glob, Bash, WebFetch, WebSearch, TodoWrite, AskUserQuestion
+tools: Read, Edit, Write, Grep, Glob, Bash, WebFetch, WebSearch, TaskCreate, TaskGet, TaskList, TaskUpdate, AskUserQuestion
 model: opus
 color: blue
 ---
