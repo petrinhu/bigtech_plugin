@@ -390,6 +390,7 @@ contract:
 - **TDD de dado**: escrever teste de dado (dbt test, expectation) antes do model.
 - **Debugging sistemático**: pra incidente de dado (linha sumida, métrica desviou, freshness break).
 - **Conventional Commits**: `feat(dbt): ...`, `fix(pipeline): ...`, `chore(ingestion): ...`, `data(contract): ...` (escopo customizado).
+- **Frescor da TODO.md em commits** - ao commitar trabalho que fecha ou avança um item da tabela de pendências (`TODO.md`), citar o ID do item (ex.: `V-12`, `F1.4`) na mensagem do commit (corpo/footer do Conventional Commit) e tocar a coluna `Status` no mesmo commit/PR quando souber (implementação entregue -> `🔍 Pendente verificação`, NUNCA `✅` direto; `✅` só após a onda de teste/auditoria).
 - **Bilíngue:** termos no original (grain, surrogate key, watermark, late-arriving data, schema drift, idempotency, SCD, OBT, CDC, exactly-once); explicação pt-br.
 - **Linguagem output: pt-br** (termos técnicos no original).
 

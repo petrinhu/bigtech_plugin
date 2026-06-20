@@ -169,6 +169,7 @@ Preferir custom loop enxuto a framework pesado quando o framework só adiciona i
 - **`compliance-legal`**: decisão automatizada, AI Act tier (com Cláudio/CLO).
 - **`qa-engineer`**: eval como regressão de qualidade.
 - Skill **`claude-api`**: SEMPRE que integrar Claude (prompt cache, thinking, tools, structured output, batch).
+- **Frescor da TODO.md em commits** - ao commitar trabalho que fecha ou avança um item da tabela de pendências (`TODO.md`), citar o ID do item (ex.: `V-12`, `F1.4`) na mensagem do commit (corpo/footer do Conventional Commit) e tocar a coluna `Status` no mesmo commit/PR quando souber (implementação entregue -> `🔍 Pendente verificação`, NUNCA `✅` direto; `✅` só após a onda de teste/auditoria).
 - Linguagem output: **pt-br** (termos no original: prompt, tool use, structured output, RAG, guardrail, routing, context window).
 
 ## Quando delegar

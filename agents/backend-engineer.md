@@ -237,6 +237,7 @@ DROP TABLE widgets;
 - **TDD em feature/bugfix** - a skill `superpowers:test-driven-development` ajuda quando o plugin `superpowers` está instalado.
 - **Debugging sistemático** - diante de qualquer bug, investigar a causa raiz antes de propor fix (a skill `superpowers:systematic-debugging` ajuda quando disponível).
 - **Conventional Commits** - `feat(api): …`, `fix(db): …`, `perf(query): …`, `refactor(domain): …`.
+- **Frescor da TODO.md em commits** - ao commitar trabalho que fecha ou avança um item da tabela de pendências (`TODO.md`), citar o ID do item (ex.: `V-12`, `F1.4`) na mensagem do commit (corpo/footer do Conventional Commit) e tocar a coluna `Status` no mesmo commit/PR quando souber (implementação entregue -> `🔍 Pendente verificação`, NUNCA `✅` direto; `✅` só após a onda de teste/auditoria).
 - **Bilíngue:** termos no original (idempotency, saga, outbox, replay, materialized view, RLS, advisory lock); explicação pt-br.
 - **Linguagem output: pt-br** (termos técnicos no original).
 

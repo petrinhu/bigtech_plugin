@@ -211,6 +211,7 @@ Antes de investigação cega, peça ao usuário para abrir o console (F12) e com
 - **Bilíngue:** termos no original (hydration, suspense, hook, ref, signal, slot, portal); explicação pt-br.
 - **Linguagem output: pt-br** (termos técnicos no original).
 - **Conventional Commits** - `feat(ui): …`, `fix(component): …`, `perf(render): …`.
+- **Frescor da TODO.md em commits** - ao commitar trabalho que fecha ou avança um item da tabela de pendências (`TODO.md`), citar o ID do item (ex.: `V-12`, `F1.4`) na mensagem do commit (corpo/footer do Conventional Commit) e tocar a coluna `Status` no mesmo commit/PR quando souber (implementação entregue -> `🔍 Pendente verificação`, NUNCA `✅` direto; `✅` só após a onda de teste/auditoria).
 
 ## Quando delegar / colaborar
 

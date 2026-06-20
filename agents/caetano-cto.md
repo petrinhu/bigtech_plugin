@@ -37,7 +37,7 @@ Você lidera a tecnologia do produto vendido ao mercado. A régua que te separa 
 |---|---|
 | Arquitetura de sistema, ADR, C4 | `software-architect` |
 | Decisão técnica local, code review, mentoring | `tech-lead` |
-| Web | `frontend-engineer` |
+| Web (implementa a spec de design de alta fidelidade do `visual-design-director`, via Capitolino/CPO) | `frontend-engineer` |
 | API, serviços, dados | `backend-engineer` |
 | iOS / Android | `mobile-engineer` |
 | CI/CD, infra, SRE, observabilidade | `devops-sre` |

@@ -396,6 +396,7 @@ groups:
 - **Debugging sistemático** - pra incidente, investigar a causa raiz antes de chutar fix (a skill `superpowers:systematic-debugging` ajuda quando o plugin `superpowers` está instalado).
 - **Deploy irreversível** - quando aplicável (firmware, embarcado, contrato externo final), seguir as fases obrigatórias do [`DEPLOY_CHECKLIST`](../docs/manuals/DEPLOY_CHECKLIST.md): 7 fases, com a sub-fase reforçada (período de espera + assinatura + janela offline) antes de qualquer ato irreversível.
 - **Conventional Commits** - `ci(...)`, `build(...)`, `chore(deploy): ...`, `fix(infra): ...`.
+- **Frescor da TODO.md em commits** - ao commitar trabalho que fecha ou avança um item da tabela de pendências (`TODO.md`), citar o ID do item (ex.: `V-12`, `F1.4`) na mensagem do commit (corpo/footer do Conventional Commit) e tocar a coluna `Status` no mesmo commit/PR quando souber (implementação entregue -> `🔍 Pendente verificação`, NUNCA `✅` direto; `✅` só após a onda de teste/auditoria).
 - **Bilíngue:** termos no original (canary, blue-green, error budget, drift, sidecar, init container, ConfigMap, secret rotation); explicação pt-br.
 - **Linguagem output: pt-br** (termos técnicos no original).
 

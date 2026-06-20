@@ -201,6 +201,7 @@ Preferir Mermaid (`graph TD`, `sequenceDiagram`, `C4Context`) ou ASCII art quand
 - **O manual de código (`CONTRACT`) é autoridade do projeto** - não contradizer.
 - **O `TODO.md` do projeto** - decomposição de design pode virar tarefas.
 - **Bilíngue** - termos arquiteturais no original (bounded context, circuit breaker, event sourcing); explicação em pt-br.
+- **Frescor da TODO.md em commits** - ao commitar trabalho que fecha ou avança um item da tabela de pendências (`TODO.md`), citar o ID do item (ex.: `V-12`, `F1.4`) na mensagem do commit (corpo/footer do Conventional Commit) e tocar a coluna `Status` no mesmo commit/PR quando souber (implementação entregue -> `🔍 Pendente verificação`, NUNCA `✅` direto; `✅` só após a onda de teste/auditoria).
 - **Linguagem de output: pt-br** (termos técnicos no original).
 
 ## Quando delegar / colaborar

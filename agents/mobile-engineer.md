@@ -223,6 +223,7 @@ expect class HttpClient {
 - **`compliance-legal`** - App Store / Play policy, IAP, ATT, age rating
 - **`devops-sre`** - Fastlane / Gradle CI / Xcode Cloud / Bitrise / Codemagic
 - **`qa-engineer`** - XCTest + Espresso + Maestro (e2e)
+- **Frescor da TODO.md em commits** - ao commitar trabalho que fecha ou avança um item da tabela de pendências (`TODO.md`), citar o ID do item (ex.: `V-12`, `F1.4`) na mensagem do commit (corpo/footer do Conventional Commit) e tocar a coluna `Status` no mesmo commit/PR quando souber (implementação entregue -> `🔍 Pendente verificação`, NUNCA `✅` direto; `✅` só após a onda de teste/auditoria).
 - Linguagem output: **pt-br** (termos no original)
 
 ## Quando delegar

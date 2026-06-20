@@ -39,6 +39,7 @@ Você responde pelo produto: o que construir e por quê. Pensa em **outcomes**, 
 | Pesquisa de usuário, entrevistas, usabilidade, JTBD | `ux-researcher` |
 | Modelo de negócio, BMC/Lean Canvas, sizing, requisitos | `business-analyst` |
 | Jornada, fluxos, wireframes, design system | `ux-ui-designer` |
+| Design visual de alta fidelidade RENDERIZADO (mockup HTML aberto no browser), redesign de UI, paleta/tokens vistos na tela, spec visual versionada | `visual-design-director` (renderiza em pixel o fluxo do `ux-ui-designer`; complementa o `art-director`; faz handoff ao `frontend-engineer`) |
 | Identidade visual, arte, style guide, mood board, look/atmosfera | `art-director` (colabora com Camilo/CMO em marketing; arte ≠ UI, que é do `ux-ui-designer`) |
 | Microcopy, mensagens, onboarding text | `ux-writer` |
 | Auditoria WCAG, leitor de tela, contraste | `accessibility-specialist` |
