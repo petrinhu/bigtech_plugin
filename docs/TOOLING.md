@@ -10,9 +10,9 @@ Manual de governança que acompanha o plugin. Manuais relacionados: [CONTRACT](m
 - ⬇ **instalar sob demanda**: instale com o comando da coluna quando a tarefa pedir.
 - ↺ **preferir**: alternativa moderna recomendada no lugar da ferramenta legada.
 
-Regra: o agent usa a ferramenta canônica do seu domínio SEMPRE que aplicável (não reinventa em shell cru). Se ela faltar (⬇), instala com o comando aqui antes de usar. Respeite os limites de hardware da máquina ([limites de hardware](principles/hardware-resource-limits.md)) e a prioridade de ferramentas MCP: quando houver um servidor MCP que cubra a tarefa, prefira-o ao shell cru.
+Regra: o agent usa a ferramenta canônica do seu domínio SEMPRE que aplicável (não reinventa em shell cru). Se ela faltar (⬇), siga o protocolo da [política de ferramenta ausente](principles/missing-tool-policy.md): este manual é o **catálogo do comando** de instalação de cada ferramenta; a política decide **quando o agent instala sozinho** (ferramenta de userland: `pip`/`uv`, `cargo`, `npm`, binário no `$HOME`) **e quando OFERECE antes** (instalação que exige `sudo`/gerenciador do sistema). A falta de uma ferramenta nunca é motivo para não executar a tarefa. Respeite os limites de hardware da máquina ([limites de hardware](principles/hardware-resource-limits.md)) e a prioridade de ferramentas MCP: quando houver um servidor MCP que cubra a tarefa, prefira-o ao shell cru.
 
-> **Portabilidade dos comandos (agnóstico de SO):** os comandos de instalação abaixo usam `dnf` (Fedora/RHEL) como exemplo concreto. Adapte ao gerenciador do seu sistema: Linux (`apt`, `pacman`, `zypper`, `nix`), macOS (`brew`), Windows (`winget`, `choco` ou `scoop`); o nome do pacote costuma ser o mesmo. Prefira gerenciadores cross-platform quando a ferramenta os oferece (`pip`/`uv`, `cargo`, `npm`/`pnpm`, que funcionam igual em Windows, macOS e Linux). No Windows, rodar o Claude Code via WSL valida os comandos Unix.
+> **Portabilidade dos comandos (agnóstico de SO):** os comandos de instalação abaixo usam `dnf` (Fedora/RHEL) como exemplo concreto. Adapte ao gerenciador do seu sistema: Linux (`apt` em Debian/Ubuntu, `dnf` em Fedora/RHEL, `pacman` em Arch, `zypper` em openSUSE, ou `nix`), macOS (`brew`), Windows (`winget`, `scoop` ou `choco`); o nome do pacote costuma ser o mesmo. Prefira gerenciadores cross-platform quando a ferramenta os oferece (`pip`/`uv`, `cargo`, `npm`/`pnpm`, que funcionam igual em Windows, macOS e Linux). No Windows, rodar o Claude Code via WSL valida os comandos Unix. Quando um pacote é Linux-only de verdade (kernel/ELF), a linha traz a marca **(Linux; no mac/win use \<equivalente\> ou WSL/container)**. O **protocolo** de quando instalar sozinho versus oferecer antes está na [política de ferramenta ausente](principles/missing-tool-policy.md).
 
 ---
 
@@ -63,11 +63,11 @@ Regra: o agent usa a ferramenta canônica do seu domínio SEMPRE que aplicável 
 | k6 | ⬇ | teste de carga HTTP scriptável | performance, qa | binário em dl.k6.io |
 | locust | ⬇ | teste de carga em Python | performance | `pipx install locust` |
 | hyperfine | ⬇ | benchmark de CLI reproduzível | performance, qa | `sudo dnf install hyperfine` |
-| perf | ✓ | profiling CPU (kernel) | performance | `sudo dnf install perf` |
-| valgrind | ✓ | memcheck/callgrind | performance, backend | `sudo dnf install valgrind` |
-| heaptrack | ✓ | profiling de heap | performance | `sudo dnf install heaptrack` |
+| perf | ✓ | profiling CPU (kernel) - **(Linux; no mac use Instruments/`sample`, no win use WPR/ETW ou WSL)** | performance | `sudo dnf install perf` |
+| valgrind | ✓ | memcheck/callgrind - **(Linux/macOS; no win use Dr. Memory ou WSL)** | performance, backend | `sudo dnf install valgrind` |
+| heaptrack | ✓ | profiling de heap - **(Linux; no mac/win use o profiler nativo ou WSL/container)** | performance | `sudo dnf install heaptrack` |
 | py-spy | ⬇ | profiling Python sampling | performance, data | `pipx install py-spy` |
-| strace / ltrace | ✓/⬇ | trace de syscalls/libcalls | performance | `sudo dnf install strace ltrace` |
+| strace / ltrace | ✓/⬇ | trace de syscalls/libcalls - **(Linux; no mac use `dtruss`/Instruments, no win use WSL ou Process Monitor)** | performance | `sudo dnf install strace ltrace` |
 
 ---
 
@@ -89,9 +89,9 @@ Regra: o agent usa a ferramenta canônica do seu domínio SEMPRE que aplicável 
 | openssl | ✓ | cripto, inspeção de cert/TLS | security, network-security | (base) |
 | cosign | ⬇ | assinar/verificar artefato | security, devops | `go install github.com/sigstore/cosign/v2/cmd/cosign@latest` |
 | age + sops | ⬇ | cripto de segredo / secrets em git | security, devops | `sudo dnf install age` ; sops binário |
-| lynis | ✓ | auditoria de hardening do host | internal-auditor, network-security | `sudo dnf install lynis` |
-| chkrootkit | ✓ | detecção de rootkit | network-security | `sudo dnf install chkrootkit` |
-| OpenSCAP (`oscap`) | ⬇ | compliance/benchmark CIS | internal-auditor, security | `sudo dnf install openscap-scanner scap-security-guide` |
+| lynis | ✓ | auditoria de hardening do host - **(Linux/macOS; no win use WSL ou ferramenta de baseline nativa)** | internal-auditor, network-security | `sudo dnf install lynis` |
+| chkrootkit | ✓ | detecção de rootkit - **(Linux; no mac/win use o antimalware da plataforma ou WSL/container)** | network-security | `sudo dnf install chkrootkit` |
+| OpenSCAP (`oscap`) | ⬇ | compliance/benchmark CIS - **(Linux; no mac/win use o SCAP nativo da plataforma ou WSL/container)** | internal-auditor, security | `sudo dnf install openscap-scanner scap-security-guide` |
 
 ---
 
@@ -103,7 +103,7 @@ Regra: o agent usa a ferramenta canônica do seu domínio SEMPRE que aplicável 
 | mtr | ⬇ | traceroute contínuo | `sudo dnf install mtr` |
 | iperf3 | ⬇ | medir banda entre hosts | `sudo dnf install iperf3` |
 | tcpdump / tshark | ✓ | captura de pacote | `sudo dnf install tcpdump wireshark-cli` |
-| nftables (`nft`) | ✓ | firewall (preferir sobre iptables) | (base) |
+| nftables (`nft`) | ✓ | firewall (preferir sobre iptables) - **(Linux; no mac use `pf`/`pfctl`, no win use `netsh advfirewall`/`New-NetFirewallRule`)** | (base) |
 | wireguard-tools (`wg`) | ⬇ | VPN moderna | `sudo dnf install wireguard-tools` |
 | ss | ✓ | sockets/conexões | (base) |
 | ipcalc | ✓ | cálculo de subnet | `sudo dnf install ipcalc` |
@@ -199,7 +199,7 @@ Regra: o agent usa a ferramenta canônica do seu domínio SEMPRE que aplicável 
 | mobile-engineer | toolchain nativo, lighthouse (web views), adb |
 | devops-sre | podman, tofu, ansible, just, restic, caddy, hadolint, yamllint, age/sops, trivy |
 | network-engineer | dig, mtr, iperf3, tcpdump/tshark, wg, nmap, ss, ipcalc, whois |
-| network-security-engineer | nft, nmap, suricata, fail2ban, tcpdump/tshark, openssl, lynis, nuclei |
+| network-security-engineer | nft, nmap, suricata, fail2ban, tcpdump/tshark, openssl, lynis, nuclei (nft/fail2ban/lynis são Linux; em mac/win use o equivalente nativo ou WSL/container) |
 | qa-engineer | pytest, ctest, playwright, hyperfine, k6 |
 | performance-engineer | k6, locust, hyperfine, perf, valgrind, heaptrack, py-spy, strace |
 | security-engineer | semgrep, gitleaks, trufflehog, trivy, grype, syft, bandit, osv-scanner, nuclei, zaproxy, cosign, openssl |

@@ -612,7 +612,12 @@ const QString apiKey = gerenciadorChaves.recuperar("service_api_key");
 # MUST: read current state of files to be modified
 # MUST: understand existing patterns before introducing new ones
 # MUST: check if a build passes before starting
-cmake --build build -j$(nproc) 2>&1 | grep -E "error:|warning:"
+# -j without a number lets CMake pick the core count (portable across OS).
+# Or pass it explicitly per OS:
+#   Linux:   -j$(nproc)
+#   macOS:   -j$(sysctl -n hw.logicalcpu)
+#   Windows: -j%NUMBER_OF_PROCESSORS%
+cmake --build build -j 2>&1 | grep -E "error:|warning:"
 ```
 
 ### 10.2 Conventional Commits (MANDATORY)

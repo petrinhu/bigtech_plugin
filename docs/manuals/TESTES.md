@@ -24,17 +24,13 @@ Manual de governança que acompanha o plugin. Manuais irmãos: [CONTRACT](CONTRA
 > - **No Windows, rodar o Claude Code via WSL** torna válidos todos os comandos Unix deste manual
 >   (incluindo `command -v` e os gerenciadores `apt`/`dnf`), evitando a tradução para PowerShell.
 
-> **Política - ferramenta ausente (agnóstica de SO).** Ao executar um item de teste (`TST-*`)
-> cuja ferramenta requerida não está instalada, o agente NÃO falha em silêncio, NÃO pula o item
-> sem avisar e NÃO instala nada sem consentimento. Em vez disso: (1) detecta a ausência de forma
-> adequada ao SO (`command -v <ferramenta>` no Unix/WSL; `Get-Command <ferramenta>` ou
-> `where <ferramenta>` no Windows); (2) OFERECE instalar, via AskUserQuestion, mostrando o comando
-> de instalação adequado ao SO e ao gerenciador disponível (`apt`/`dnf`/`brew`/`winget`/`choco`/`scoop`),
-> preferindo gerenciadores cross-platform (`pip`/`uv`, `cargo`, `npm`) quando a ferramenta os
-> suporta, a partir de T15.0 ou da coluna de ferramentas do tipo; (3) com a confirmação do usuário,
-> instala e então roda o item; (4) sem confirmação, NÃO roda: registra o item como pendente na
-> tabela, com nota visível do que faltou e o comando de instalação, para retomar depois. Nunca
-> silencioso. Pré-requisitos básicos do ambiente (ex.: Python/pytest) seguem o T15.0.
+> **Política - ferramenta ausente.** Ao executar um item de teste (`TST-*` / `T*`) cuja ferramenta
+> requerida não está instalada, siga a [política de ferramenta ausente](../principles/missing-tool-policy.md)
+> (fonte única do protocolo, agnóstica de SO): detecte conforme o SO; instale sozinho se a ferramenta
+> for de userland (`pip`/`uv`, `cargo`, `npm`, binário no `$HOME`) ou OFEREÇA antes via AskUserQuestion
+> se a instalação exigir `sudo`/gerenciador do sistema; nunca falhe por falta de ferramenta nem fique
+> silencioso. O comando de instalação de cada ferramenta está no [TOOLING](../TOOLING.md); os
+> pré-requisitos básicos do ambiente (ex.: Python/pytest) seguem o T15.0.
 
 ---
 

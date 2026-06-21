@@ -52,6 +52,17 @@ nvidia-smi --query-gpu=name,memory.total,memory.used --format=csv
 swapon --show
 ```
 
+> **Equivalentes por SO.** Os comandos acima são Linux. Em outras plataformas:
+>
+> | Medida | Linux | macOS | Windows (PowerShell) |
+> |---|---|---|---|
+> | Cores lógicos | `nproc` | `sysctl -n hw.logicalcpu` | `$env:NUMBER_OF_PROCESSORS` |
+> | Memória | `free -h` | `vm_stat` (páginas de 4 KB) e `sysctl -n hw.memsize` (total) | `Get-CimInstance Win32_OperatingSystem \| Select FreePhysicalMemory,TotalVisibleMemorySize` |
+> | Swap | `swapon --show` | `sysctl vm.swapusage` | `Get-CimInstance Win32_PageFileUsage` |
+> | GPU NVIDIA | `nvidia-smi ...` | `nvidia-smi` se houver driver; senão GPU integrada (Activity Monitor) | `nvidia-smi ...` (no `PATH` do driver) |
+>
+> A lógica dos caps (§2) é a mesma em qualquer plataforma; só muda o comando que lê o número.
+
 Anote três números:
 
 - **Cores totais** (saída de `nproc`).
@@ -70,8 +81,8 @@ hardware**, não fixos.
 
 ### CPU: deixe folga para o desktop e o IO
 
-- **Threads de workload = ~80% dos cores**, deixando pelo menos **2–3 cores livres**.
-- Fórmula: `cores * 0.8`, com piso de "total − 2".
+- **Threads de workload = ~80% dos cores**, deixando pelo menos **2-3 cores livres**.
+- Fórmula: `cores * 0.8`, com piso de "total - 2".
 
 ```bash
 # Threads recomendadas para workloads paralelos (80% dos cores)
@@ -91,16 +102,16 @@ echo "Usar no máximo $THREADS threads"
 
 - **Mantenha um colchão livre** (sugestão: ~30% da RAM total, ou no mínimo alguns GB) para o
   desktop, navegador e cache de IO.
-- **Cap soft do workload = RAM total − colchão.** Exemplo: numa máquina de 32 GB com colchão de
+- **Cap soft do workload = RAM total - colchão.** Exemplo: numa máquina de 32 GB com colchão de
   ~10 GB, o teto do workload fica em ~20 GB.
 - **Não conte com swap** para caber o workload (ver §3).
 
 ### GPU / VRAM: conte só o que sobra
 
-- **VRAM útil = VRAM total − VRAM já ocupada** por outros processos (servidores de modelo,
+- **VRAM útil = VRAM total - VRAM já ocupada** por outros processos (servidores de modelo,
   compositor gráfico, etc.).
 - Dimensione *batch size*, *contexto* e precisão do modelo para caber na VRAM útil, não na
-  total. Em GPUs pequenas (p.ex. 4–6 GB), prefira **uma carga de GPU por vez** (ver §5) e
+  total. Em GPUs pequenas (p.ex. 4-6 GB), prefira **uma carga de GPU por vez** (ver §5) e
   reduza *batch* antes de assumir que vai caber.
 
 ---
@@ -151,6 +162,10 @@ export CUDA_VISIBLE_DEVICES=0                             # fixa a GPU usada (aj
   bloqueia o `mmap` de modelos grandes (que mapeiam arquivos sem alocar tudo de fato) e quebra
   o carregamento. Para limitar memória física, prefira *cgroups* (`systemd-run --user -p
   MemoryMax=...`) a um `ulimit -v` baixo.
+  > **Por SO:** `systemd-run` é Linux (systemd). No macOS não há systemd nem cgroups: limite pela
+  > configuração do app (batch/contexto) ou rode em container com `--memory`. No Windows, use um
+  > Job Object (limite de memória do processo) ou um container com `--memory`; o WSL2 aceita um teto
+  > global de RAM via `.wslconfig` (`memory=`).
 
 ---
 
@@ -171,6 +186,11 @@ flock -x /tmp/<workload>.lock <comando pesado>
 - **`nice -n 5`** (ou maior) em qualquer comando intensivo de CPU.
 - **`flock`** quando o workload satura um recurso compartilhado (VRAM, RAM): garante **uma
   execução por vez** e evita que duas chamadas se atropelem.
+
+> **Equivalentes por SO.** `nice` e `flock` são Unix (Linux/macOS). No macOS, `nice` existe;
+> `flock` não vem por padrão (instale via `brew install flock`, ou serialize com um lockfile
+> próprio). No Windows: prioridade com `Start-Process -Priority BelowNormal` (PowerShell), e
+> exclusão mútua com um mutex nomeado ou um lockfile; via WSL, `nice` e `flock` funcionam normalmente.
 
 ---
 
@@ -200,12 +220,18 @@ exec flock -x /tmp/minha-tool.lock nice -n 5 minha-tool "$@"
 > Comandos one-shot: exporte as env vars inline na mesma linha, ou reaproveite um wrapper que
 > já exista. Comandos recorrentes: padronize no wrapper.
 
+> **Por SO.** O wrapper acima é Bash (Linux/macOS; substitua `nproc` por `sysctl -n hw.logicalcpu`
+> no macOS, onde `flock` precisa de `brew install flock`). No Windows nativo, escreva o equivalente
+> em PowerShell: as mesmas env vars com `$env:OMP_NUM_THREADS = ...`, prioridade via
+> `Start-Process -Priority BelowNormal` e exclusão mútua por mutex/lockfile. Via WSL, o wrapper Bash
+> roda sem mudança.
+
 ---
 
 ## 8. Exemplo aplicado: RAG / embeddings em GPU pequena
 
 Cenário comum em que os caps importam: um pipeline de RAG com modelos de embedding e reranking
-rodando localmente em uma GPU de **VRAM modesta** (4–6 GB), compartilhada com um servidor de
+rodando localmente em uma GPU de **VRAM modesta** (4-6 GB), compartilhada com um servidor de
 modelos.
 
 - **Serialize as queries:** processe **uma por vez** com `flock`. Disparar várias em paralelo
@@ -252,7 +278,7 @@ Padrões de incidente reais que estes caps evitam (use-os como sinal de alerta):
 
 - [ ] Caps derivados do hardware real (`nproc`, `free -h`, `nvidia-smi`), não chutados.
 - [ ] `OMP/MKL/OPENBLAS/NUMEXPR_NUM_THREADS` exportadas; `TOKENIZERS_PARALLELISM=false`.
-- [ ] Pelo menos 2–3 cores e um colchão de RAM deixados livres.
+- [ ] Pelo menos 2-3 cores e um colchão de RAM deixados livres.
 - [ ] Workload não depende de swap para caber.
 - [ ] Env de GPU exportada; fallback CPU no OOM; **sem** `ulimit -v` rígido.
 - [ ] `nice` em comando pesado; `flock` quando satura GPU/RAM (1 instância por vez).
