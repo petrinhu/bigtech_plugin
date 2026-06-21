@@ -55,7 +55,13 @@ def evaluate(data: dict, env: dict):
     if cfg is None:
         return 0, ""          # projeto sem opt-in: inerte
 
-    rel = os.path.relpath(os.path.realpath(fp), root)
+    try:
+        rel = os.path.relpath(os.path.realpath(fp), root)
+    except ValueError:
+        # Drives distintos no Windows (C:\ vs D:\) fazem relpath lancar
+        # ValueError. FAIL-OPEN, simetrico ao tdd_runner._under(): permitir e
+        # melhor que bloquear producao legitima por um caso de path do SO.
+        return 0, ""
     if rel.startswith(".."):
         return 0, ""
     kind = c.classify(rel, cfg)

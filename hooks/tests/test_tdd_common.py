@@ -245,3 +245,45 @@ def test_parse_totals_phpunit_zero_failures_omits_failed():
 def test_extract_file_path_non_dict_tool_input():
     assert c.extract_file_path({"tool_input": [1, 2]}) == ""
     assert c.extract_file_path({"tool_input": None}) == ""
+
+
+# --- OS-2: separador de path Windows ('\') deve casar globs POSIX ('/') ---
+# No Windows os.path.relpath devolve 'src\app.py'; os globs sao 'src/*.py'.
+# Sem normalizar, nada casaria e classify() retornaria sempre 'ignored',
+# deixando guard/runner inertes. Estes testes simulam o rel path do Windows.
+
+def test_glob_match_normalizes_backslash_separator():
+    # caminho estilo Windows casa o mesmo glob POSIX
+    assert c.glob_match("src\\app.py", "src/*.py")
+    assert c.glob_match("a\\b\\test_x.py", "**/test_*.py")
+    assert c.glob_match("tests\\sub\\x.py", "tests/**")
+    # e nao gera falso positivo: '\' aninhado nao casa glob de unico segmento
+    assert not c.glob_match("src\\sub\\app.py", "src/*.py")
+
+
+def test_glob_match_backslash_matches_same_as_slash():
+    # paridade: o mesmo caminho com '\' e com '/' classifica igual
+    for sep_path in ("a/b/c.py", "a\\b\\c.py"):
+        assert c.glob_match(sep_path, "a/**/c.py")
+        assert not c.glob_match(sep_path, "x/**/c.py")
+
+
+def test_classify_with_windows_separator():
+    # classify deve funcionar mesmo recebendo rel path com '\' (Windows):
+    # sem o fix, todos cairiam em 'ignored' e o TDD ficaria inerte.
+    cfg = c.resolve_config({
+        "preset": "python-pytest",
+        "exclude_globs": ["prototypes/**"],
+    })
+    assert c.classify("tests\\test_foo.py", cfg) == "test"
+    assert c.classify("src\\foo.py", cfg) == "production"
+    assert c.classify("prototypes\\foo.py", cfg) == "excluded"
+    assert c.classify("a\\b\\c\\conftest.py", cfg) == "test"
+
+
+def test_classify_linux_separator_still_correct():
+    # sanidade: no Linux/mac (sep '/') a normalizacao e no-op e nada quebra.
+    cfg = c.resolve_config({"preset": "python-pytest"})
+    assert c.classify("tests/test_foo.py", cfg) == "test"
+    assert c.classify("src/foo.py", cfg) == "production"
+    assert c.classify("README.md", cfg) == "ignored"

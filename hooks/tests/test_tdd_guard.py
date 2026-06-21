@@ -148,6 +148,26 @@ def test_file_outside_root_is_inert(tmp_path, monkeypatch):
     assert code == 0
 
 
+def test_relpath_valueerror_fails_open(tmp_path, monkeypatch):
+    """OS-5: no Windows, fp e root em drives distintos (C:\\ vs D:\\) fazem
+    os.path.relpath lancar ValueError. O guard deve FAIL-OPEN (exit 0),
+    simetrico ao tdd_runner._under(), e nao subir o erro nem bloquear."""
+    _project(tmp_path)
+    monkeypatch.setenv("HOME", str(tmp_path))
+
+    real_relpath = os.path.relpath
+
+    def boom(path, start=None):
+        # so explode na chamada do guard (fp x root); deixa as demais passar.
+        raise ValueError("path is on mount 'C:', start on mount 'D:'")
+
+    monkeypatch.setattr(os.path, "relpath", boom)
+    code, msg = g.evaluate(_write(tmp_path, fp="src/x.py"), {})
+    assert code == 0          # NAO bloqueia
+    # restaura para nao afetar outros testes (monkeypatch ja desfaz, mas garante)
+    monkeypatch.setattr(os.path, "relpath", real_relpath)
+
+
 # ---------------------------------------------------------------------------
 # Task 8: contrato end-to-end via subprocess
 # ---------------------------------------------------------------------------

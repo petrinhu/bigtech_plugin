@@ -32,7 +32,10 @@ def run_suite(cfg: dict, project_root: str, runner=subprocess.run) -> dict:
         return {"ran": False, "reason": str(e), "ts": int(time.time())}
     except subprocess.TimeoutExpired:
         return {"ran": False, "reason": "timeout", "ts": int(time.time())}
-    if proc.returncode in (126, 127):
+    # 126/127 sao POSIX (nao executavel / nao encontrado). 9009 e o equivalente
+    # do cmd.exe no Windows para "comando nao encontrado". Tratar como nao-rodou
+    # evita registrar um falso has_red quando o test_command nem existe.
+    if proc.returncode in (126, 127, 9009):
         return {"ran": False,
                 "reason": f"comando nao executavel (exit {proc.returncode})",
                 "ts": int(time.time())}

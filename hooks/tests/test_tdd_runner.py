@@ -69,6 +69,16 @@ def test_run_suite_not_executable_is_not_ran():
     assert st["ran"] is False
 
 
+def test_run_suite_windows_command_not_found_is_not_ran():
+    # OS-5: cmd.exe usa exit 9009 para "comando nao encontrado". Deve ser
+    # tratado como nao-rodou (igual 126/127 no POSIX), nao como has_red.
+    def fake(cmd, **kw):
+        return _FakeProc(9009, "", "'pytest' is not recognized")
+    st = r.run_suite({"test_command": "pytest", "timeout_sec": 30}, "/proj", fake)
+    assert st["ran"] is False
+    assert "has_red" not in st          # nao registra falso vermelho
+
+
 def test_run_suite_no_command_is_not_ran():
     st = r.run_suite({"timeout_sec": 30}, "/proj", lambda *a, **k: _FakeProc(0))
     assert st["ran"] is False

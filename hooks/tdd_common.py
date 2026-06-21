@@ -33,7 +33,19 @@ def _glob_to_regex(pattern: str) -> str:
     return "^" + "".join(out) + "$"
 
 
+def _normpath(rel_path: str) -> str:
+    """Normaliza o separador para '/' antes do match de glob.
+
+    Cross-OS: no Windows, os.path.relpath devolve caminhos com '\\'. Os globs
+    (presets e config) sao sempre POSIX ('/'). Sem normalizar, nenhum glob
+    casaria no Windows e classify() retornaria sempre 'ignored' -> guard/runner
+    ficariam inertes. No Linux/mac o separador ja e '/', entao isto e no-op.
+    """
+    return rel_path.replace("\\", "/")
+
+
 def glob_match(rel_path: str, pattern: str) -> bool:
+    rel_path = _normpath(rel_path)
     return re.match(_glob_to_regex(pattern), rel_path.strip("/")) is not None
 
 
@@ -44,6 +56,11 @@ PRESETS = {
         "test_globs": ["tests/**", "**/test_*.py", "**/*_test.py", "**/conftest.py"],
     },
     "php-phpunit": {
+        # O test_command roda no shell do SO (shell=True). No Windows (cmd.exe)
+        # a barra POSIX "vendor/bin/phpunit" pode nao resolver; o usuario ajusta
+        # o caminho na sua config (.claude/tdd-guard.json), ex.:
+        # "vendor\\bin\\phpunit" ou "php vendor/bin/phpunit". Nao normalizamos
+        # aqui de proposito: o comando e responsabilidade do usuario/SO.
         "test_command": "vendor/bin/phpunit",
         "production_globs": ["**/*.php"],
         "test_globs": ["tests/**", "**/*Test.php"],
@@ -116,7 +133,7 @@ def load_config(start_dir: str):
         return None, None
     config_path = os.path.join(root, ".claude", "tdd-guard.json")
     try:
-        with open(config_path) as f:
+        with open(config_path, encoding="utf-8") as f:
             raw = json.load(f)
     except json.JSONDecodeError as e:
         print(f"tdd-guard: JSON invalido em {config_path}: {e}", file=sys.stderr)
@@ -134,6 +151,10 @@ def load_config(start_dir: str):
 
 
 def classify(rel_path: str, cfg: dict) -> str:
+    # rel_path chega de os.path.relpath, que no Windows usa '\' (os.sep).
+    # Normaliza para '/' aqui tambem (alem de glob_match) para que a
+    # classificacao independa do separador do SO. No-op no Linux/mac.
+    rel_path = rel_path.replace(os.sep, "/").replace("\\", "/")
     for g in cfg.get("exclude_globs", []):
         if glob_match(rel_path, g):
             return "excluded"
@@ -163,7 +184,7 @@ def read_state(project_root: str):
         como "sem teste" e bloquear edicao de producao legitima.
     """
     try:
-        with open(state_path(project_root)) as f:
+        with open(state_path(project_root), encoding="utf-8") as f:
             return json.load(f)
     except FileNotFoundError:
         return None                 # estado ausente: legitimo
@@ -176,7 +197,7 @@ def write_state(project_root: str, state: dict) -> None:
     p = state_path(project_root)
     os.makedirs(os.path.dirname(p), exist_ok=True)
     tmp = p + ".tmp"
-    with open(tmp, "w") as f:
+    with open(tmp, "w", encoding="utf-8") as f:
         json.dump(state, f)
     os.replace(tmp, p)   # escrita atomica
 
