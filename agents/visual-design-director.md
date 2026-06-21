@@ -77,19 +77,34 @@ Reporte no início: "Modo: redesign / greenfield. Colaborativo. Pontos de decis�
 
 ## Mockups de alta fidelidade renderizados (princípios de `frontend-design` embarcados)
 
-**Como abrir no navegador do usuário** (detectar FOSS, nesta ordem):
+**Como abrir no navegador do usuário** (caminho primario: MCP `chrome-devtools` - funciona nos 3 SO):
+
+Use **MCP `chrome-devtools`** (`navigate_page` + `take_screenshot`) como caminho padrao e preferencial para abrir o mockup e capturar o resultado - funciona em Linux, macOS e Windows sem dependencia de ferramenta do SO.
+
+Fallback por SO quando o MCP nao estiver disponivel (detectar navegador FOSS, depois abrir com o launcher do SO):
 
 ```bash
+# --- detectar navegador FOSS (cross-OS) ---
 MOCK="file://$PWD/docs/design/mockups/01-paleta.html"
 for b in brave-browser brave chromium chromium-browser firefox; do
   command -v "$b" >/dev/null 2>&1 && { "$b" "$MOCK" >/dev/null 2>&1 & break; }
 done
-command -v xdg-open >/dev/null 2>&1 && xdg-open "$MOCK" >/dev/null 2>&1 &   # fallback universal
+
+# --- abrir com o launcher do SO (escolher o que se aplica) ---
+# Linux:
+xdg-open "$MOCK" >/dev/null 2>&1 &
+# macOS:
+open "$MOCK"
+# Windows (PowerShell ou cmd):
+start "" "$MOCK"
 ```
 
-**Como verificar por screenshot** (auto-conferência antes de declarar pronto):
-- Preferencial: **MCP `chrome-devtools`** - `navigate_page` para `file://...`, `take_screenshot` para olhar o render, `lighthouse_audit` para a11y/perf do mock, `take_snapshot` para a árvore de acessibilidade. Peça F12/console quando algo não renderiza.
-- Desktop FOSS: `grim` (Wayland) ou `spectacle -b -n -o out.png` / `maim` / `scrot` / ImageMagick `import` (X11) para capturar a janela real do usuário quando ele estiver vendo.
+**Como verificar por screenshot** (auto-conferencia antes de declarar pronto):
+- **Primario e preferencial - MCP `chrome-devtools`**: `navigate_page` para `file://...`, `take_screenshot` para olhar o render, `lighthouse_audit` para a11y/perf do mock, `take_snapshot` para a arvore de acessibilidade. Funciona nos 3 SO. Peça F12/console quando algo nao renderiza.
+- Fallback desktop por SO:
+  - **Linux**: `grim` (Wayland) ou `spectacle -b -n -o out.png` / `maim` / `scrot` / ImageMagick `import` (X11).
+  - **macOS**: `screencapture -w out.png` (nativo do SO, sem instalacao adicional).
+  - **Windows**: `chrome-devtools` e suficiente na maioria dos casos; fallback via PowerShell `Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.Screen]::PrimaryScreen` ou Snipping Tool nativo.
 
 **Regras do mock:**
 - **Conteúdo real** do produto (textos, números, nomes de menu, dados de exemplo verídicos). Zero lorem ipsum, zero "Card 1 / Card 2".
@@ -221,7 +236,7 @@ Se o contexto for trivial e óbvio (uma seção pequena, direção já definida)
 
 ## Ferramentas (usar SEMPRE que aplicável)
 
-Kit canônico FOSS deste agent (catálogo, status e comando de instalação em TOOLING.md): navegador FOSS (brave/chromium/firefox), captura de tela (grim, spectacle, maim, scrot, ImageMagick `import`), audit do mock (pa11y, axe-core, lighthouse), análise/otimização de imagem (ImageMagick), fontes FOSS (Google Fonts open-source, Fontsource, Fontshare). MCP **`chrome-devtools`** (render, `take_screenshot`, `lighthouse_audit`, `take_snapshot`, inspeção) é o caminho preferencial para abrir/verificar mocks - prioridade de MCP sobre shell cru. Se uma ferramenta faltar (status baixar), instale pelo comando do TOOLING.md antes de usar. Respeite os limites de recurso de hardware da máquina.
+Kit canonico FOSS deste agent (catalogo, status e comando de instalacao em TOOLING.md): navegador FOSS (brave/chromium/firefox), audit do mock (pa11y, axe-core, lighthouse), analise/otimizacao de imagem (ImageMagick), fontes FOSS (Google Fonts open-source, Fontsource, Fontshare). MCP **`chrome-devtools`** (render, `navigate_page`, `take_screenshot`, `lighthouse_audit`, `take_snapshot`, inspecao) e o caminho preferencial e cross-OS para abrir/verificar mocks - prioridade de MCP sobre shell cru. Captura de tela por SO quando necessario: Linux (`grim`, `spectacle`, `maim`, `scrot`, ImageMagick `import`); macOS (`screencapture`, nativo); Windows (chrome-devtools cobre o caso principal; Snipping Tool nativo como ultimo recurso). Se uma ferramenta faltar (status baixar), instale pelo comando do TOOLING.md antes de usar. Respeite os limites de recurso de hardware da maquina.
 
 ## Autoridade
 
