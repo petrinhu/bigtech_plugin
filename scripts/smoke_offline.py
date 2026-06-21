@@ -100,25 +100,71 @@ for s in skills:
         fail(f"skill sem name no frontmatter: {s.parent.name}")
 print(f"  skills: {len(skills)}")
 
-# 4. hooks.json: cada script referenciado existe
-print("[4] hooks.json (scripts resolviveis)")
+# 4. hooks.json: cada script referenciado existe + forma exec correta.
+#    A forma EXEC (command + args[]) e a recomendada pela doc oficial para paths:
+#    cada arg e literal (sem parsing de shell), o que resolve espacos no caminho
+#    e elimina a dependencia de um shell. Aqui validamos a estrutura dos 7 hooks
+#    e coletamos a invocacao DECLARADA de cada um (command + args expandidos),
+#    para a secao [5] exercitar exatamente o que o Claude Code rodaria.
+print("[4] hooks.json (scripts resolviveis + forma exec)")
 hj = json.loads((ROOT / "hooks/hooks.json").read_text(encoding="utf-8"))
-refs = re.findall(r"\$\{CLAUDE_PLUGIN_ROOT\}/([^\s\"\\]+)", json.dumps(hj))
-for rel in sorted(set(refs)):
-    if not (ROOT / rel).exists():
-        fail(f"hook script ausente: {rel}")
-print(f"  scripts referenciados: {len(set(refs))}")
 
-# 5. Executa os 6 hooks com ambiente simulado (4 de governanca + 2 de TDD):
-#    session_init, reinforce, porte_reminder, tab_pendencias_reminder,
-#    tdd_guard, tdd_runner.
-print("[5] Execucao dos hooks (env simulado, 6 hooks)")
+
+def _expand(token: str) -> str:
+    """Expande ${CLAUDE_PLUGIN_ROOT} (= raiz do plugin) num token literal."""
+    return token.replace("${CLAUDE_PLUGIN_ROOT}", str(ROOT))
+
+
+# Percorre TODOS os hooks de TODOS os eventos e coleta os blocos type=command.
+# declared[script_basename] = [command, *args_expandidos]  (a invocacao real).
+declared: dict[str, list[str]] = {}
+exec_blocks = 0
+for event, groups in (hj.get("hooks") or {}).items():
+    for group in groups:
+        for h in group.get("hooks", []):
+            if h.get("type") != "command":
+                continue
+            exec_blocks += 1
+            cmd = h.get("command")
+            args = h.get("args")
+            # Asserção estrutural: forma EXEC, nao forma shell.
+            if cmd != "python3":
+                fail(f"hook em {event}: command esperado 'python3' (forma exec), "
+                     f"obtido {cmd!r}")
+            if not isinstance(args, list) or not args:
+                fail(f"hook em {event}: 'args' ausente/vazio - nao esta na forma exec")
+                continue
+            if "python3 " in (cmd or "") or any("python3 " in str(a) for a in args):
+                fail(f"hook em {event}: string shell 'python3 ' embutida - "
+                     f"esperado forma exec (command + args)")
+            expanded = [_expand(cmd)] + [_expand(str(a)) for a in args]
+            # O script referenciado (ultimo arg) tem de existir no disco.
+            script_path = Path(expanded[-1])
+            if not script_path.exists():
+                fail(f"hook script ausente: {script_path}")
+            declared[script_path.name] = expanded
+
+EXPECTED_HOOKS = 7
+if exec_blocks != EXPECTED_HOOKS:
+    fail(f"esperados {EXPECTED_HOOKS} hooks type=command, encontrados {exec_blocks}")
+print(f"  hooks type=command: {exec_blocks} (todos forma exec: command=python3 + args[])")
+
+# 5. Executa os 6 hooks DISTINTOS com ambiente simulado, mas agora pela invocacao
+#    REAL declarada no hooks.json ([command, *args]) - nao mais [sys.executable, script].
+#    Isso exercita a string que o Claude Code de fato roda. Sao 4 de governanca
+#    (session_init, reinforce, porte_reminder, tab_pendencias_reminder) + 2 de TDD
+#    (tdd_guard, tdd_runner). tab_pendencias_reminder aparece em 2 eventos -> 7 blocos.
+print("[5] Execucao dos hooks (invocacao real do hooks.json, env simulado)")
 env = {**os.environ, "CLAUDE_PLUGIN_ROOT": str(ROOT)}
 
 
 def run_hook(script: str, payload: dict) -> tuple[int, str]:
+    invocation = declared.get(script)
+    if invocation is None:
+        fail(f"hook '{script}' nao esta declarado em hooks.json (forma exec)")
+        return 1, ""
     proc = subprocess.run(
-        [sys.executable, str(ROOT / "hooks" / script)],
+        invocation,
         input=json.dumps(payload),
         capture_output=True,
         text=True,

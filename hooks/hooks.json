@@ -6,17 +6,20 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/bigtech_session_init.py\"",
+            "command": "python3",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/bigtech_session_init.py"],
             "timeout": 10
           },
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/bigtech_porte_reminder.py\"",
+            "command": "python3",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/bigtech_porte_reminder.py"],
             "timeout": 10
           },
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/tab_pendencias_reminder.py\"",
+            "command": "python3",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/tab_pendencias_reminder.py"],
             "timeout": 15
           }
         ]
@@ -27,12 +30,14 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/bigtech_reinforce.py\"",
+            "command": "python3",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/bigtech_reinforce.py"],
             "timeout": 10
           },
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/tab_pendencias_reminder.py\"",
+            "command": "python3",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/tab_pendencias_reminder.py"],
             "timeout": 10
           }
         ]
@@ -43,7 +48,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/tdd_guard.py\"",
+            "command": "python3",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/tdd_guard.py"],
             "timeout": 15
           }
         ],
@@ -55,7 +61,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/tdd_runner.py\"",
+            "command": "python3",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/tdd_runner.py"],
             "timeout": 180
           }
         ],
