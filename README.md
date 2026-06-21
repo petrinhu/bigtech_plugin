@@ -60,6 +60,16 @@ Then install `bigtech` itself:
 
 The first command registers the `petrinhu` marketplace. The second installs the `bigtech` plugin from it. The `bigtech@petrinhu` form disambiguates the source; if the environment has only this marketplace, `/plugin install bigtech` also resolves.
 
+#### Prerequisites per OS
+
+The only hard prerequisite is **`python3` resolvable on your PATH** (the plugin's hooks are spawned as `python3`). Check it with `python3 --version`:
+
+- **Linux:** almost always already present. If missing: `sudo apt install python3` (or `dnf`/`pacman`/`zypper`).
+- **macOS:** install via `xcode-select --install` or `brew install python`.
+- **Windows (native):** the **Microsoft Store** Python registers the `python3` alias automatically (recommended). The python.org installer gives `python`/`py` but not `python3`; if `python3 --version` fails, the plugin ships a `bin/python3.cmd` shim you can place on your PATH, or just use **WSL**.
+
+The companion dependencies (`superpowers`, `playwright`, `frontend-design`) are installed through Claude Code itself, the same on every OS. The agents' runtime tools are handled automatically (each one is offered or installed per your OS when a task needs it; nothing runs silently). Step-by-step per OS, including verification, in the [Installation wiki page](https://codeberg.org/petrinhu/bigtech_plugin/wiki/Installation).
+
 If you are an AI agent installing this plugin on behalf of a user, see [AGENTS.md](AGENTS.md).
 
 ### Usage
@@ -150,7 +160,7 @@ When invoked, every agent runs a pre-flight check on the backlog table (`TODO.md
 
 ### Compatibility
 
-**Platform.** Works on Linux, macOS, and Windows (native or WSL). The hooks are pure Python, so they run cross-platform. When the `tab_pendencias` skill plans tests or audits that need external tools, each tool is offered for installation with your confirmation, using the command that fits your OS (apt/dnf/brew/winget/choco/scoop) and preferring cross-platform managers (pip/uv, cargo, npm). Nothing is installed silently.
+**Platform.** Works on Linux, macOS, and Windows (native or WSL). The hooks are pure Python and run cross-platform; the one prerequisite is `python3` resolvable on the PATH (see [Prerequisites per OS](#prerequisites-per-os), notably the Windows note). When the `tab_pendencias` skill plans tests or audits that need external tools, each tool is offered for installation with your confirmation, using the command that fits your OS (apt/dnf/brew/winget/choco/scoop) and preferring cross-platform managers (pip/uv, cargo, npm). Nothing is installed silently.
 
 **Built for Claude Code (Anthropic).** The plugin uses Claude Code's own features: life-cycle hooks, skills, the subagent protocol, and the plugin/marketplace format. There is no guarantee it works on other AI assistants or code CLIs (for example, Grok, Gemini CLI, GitHub Copilot CLI, OpenAI Codex, Cursor, or Aider); porting to other platforms may require adaptation and is not officially supported.
 
@@ -232,6 +242,16 @@ Em seguida, instale o `bigtech`:
 ```
 
 O primeiro comando registra o marketplace `petrinhu`. O segundo instala o plugin `bigtech` a partir dele. A forma `bigtech@petrinhu` desambigua a origem; se o ambiente só tiver esse marketplace, `/plugin install bigtech` também resolve.
+
+#### Pré-requisitos por SO
+
+O único pré-requisito rígido é **`python3` resolvível no seu PATH** (os hooks do plugin são chamados como `python3`). Confira com `python3 --version`:
+
+- **Linux:** quase sempre já presente. Se faltar: `sudo apt install python3` (ou `dnf`/`pacman`/`zypper`).
+- **macOS:** instale via `xcode-select --install` ou `brew install python`.
+- **Windows (nativo):** o Python da **Microsoft Store** registra o alias `python3` automaticamente (recomendado). O instalador do python.org dá `python`/`py`, mas não o `python3`; se `python3 --version` falhar, o plugin traz um shim `bin/python3.cmd` que você pode colocar no PATH, ou então use **WSL**.
+
+As dependências companion (`superpowers`, `playwright`, `frontend-design`) são instaladas pelo próprio Claude Code, iguais em todo SO. As ferramentas de runtime dos agents são tratadas automaticamente (cada uma é oferecida ou instalada conforme o seu SO quando uma tarefa precisa; nada roda em silêncio). Passo a passo por SO, com verificação, na [página de Instalação da wiki](https://codeberg.org/petrinhu/bigtech_plugin/wiki/Instalacao).
 
 Se você é um agente de IA instalando este plugin a pedido de um usuário, veja [AGENTS.md](AGENTS.md).
 
@@ -323,7 +343,7 @@ Ao serem acionados, todos os agents fazem um pre-flight da tabela de pendências
 
 ### Compatibilidade
 
-**Plataforma.** Funciona em Linux, macOS e Windows (nativo ou WSL). Os hooks são Python puro, então rodam de forma cross-platform. Quando a skill `tab_pendencias` planeja testes ou auditorias que precisam de ferramentas externas, cada ferramenta é oferecida para instalação com a sua confirmação, no comando adequado ao seu SO (apt/dnf/brew/winget/choco/scoop) e preferindo gerenciadores cross-platform (pip/uv, cargo, npm). Nada é instalado em silêncio.
+**Plataforma.** Funciona em Linux, macOS e Windows (nativo ou WSL). Os hooks são Python puro e rodam de forma cross-platform; o único pré-requisito é `python3` resolvível no PATH (veja [Pré-requisitos por SO](#pré-requisitos-por-so), em especial a nota de Windows). Quando a skill `tab_pendencias` planeja testes ou auditorias que precisam de ferramentas externas, cada ferramenta é oferecida para instalação com a sua confirmação, no comando adequado ao seu SO (apt/dnf/brew/winget/choco/scoop) e preferindo gerenciadores cross-platform (pip/uv, cargo, npm). Nada é instalado em silêncio.
 
 **Feito para o Claude Code (Anthropic).** O plugin usa recursos próprios do Claude Code: hooks de ciclo de vida, skills, o protocolo de subagents e o formato de plugin/marketplace. Não há garantia de funcionamento em outros assistentes de IA ou CLIs de código (por exemplo, Grok, Gemini CLI, GitHub Copilot CLI, OpenAI Codex, Cursor ou Aider); portar para outras plataformas pode exigir adaptação e não é suportado oficialmente.
 

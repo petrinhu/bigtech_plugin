@@ -46,6 +46,20 @@ The first command registers the `petrinhu` marketplace. The second installs the 
 
 After installing, **ask the user to restart the session** (or restart it once you have authorization). The `bigtech_session_init` hook runs on the `SessionStart` event: it is what loads the docs-bootstrap and injects the path of the manuals in `docs/` into the context. Without restarting, the manuals do not enter the context and the mode reinforcement is not active.
 
+### Dependencies and installation per OS
+
+What you need to know to make the plugin work on the user's operating system. Two layers: a hard prerequisite (`python3`) and a runtime convention you already follow.
+
+**Hard prerequisite: `python3` resolvable on the PATH.** The plugin's 6 hooks are declared in `hooks/hooks.json` with `"command": "python3"`, so Claude Code spawns the interpreter by that exact name. If `python3` does not resolve, the hooks fail silently and the plugin is inert (no docs-bootstrap, no mode reinforcement). Verify with `python3 --version`, then per OS:
+
+- **Linux:** `python3` is almost always present. If missing, offer to install it via the system manager (`sudo apt install python3` / `dnf` / `pacman` / `zypper`); this is a Case B action under the missing-tool-policy (system privilege), so ask first.
+- **macOS:** ships via the Xcode Command Line Tools (`xcode-select --install`) or Homebrew (`brew install python`). Confirm `python3 --version` resolves.
+- **Windows (native):** the hooks call `python3`. (a) **Microsoft Store Python** (recommended) registers the `python3` and `python` aliases automatically. (b) The **python.org installer** provides `python` and the `py` launcher but does **not** guarantee `python3`; the fix is to put the plugin's `bin/python3.cmd` shim (it forwards to `py -3` or `python`) on a PATH directory such as `%LOCALAPPDATA%\Microsoft\WindowsApps`, or create an alias. (c) **WSL** is the simplest alternative: inside WSL the Linux instructions apply verbatim. Always verify `python3 --version`.
+
+**Companion dependencies (Claude Code installs them, cross-OS).** `superpowers`, `playwright` (MCP), and the `frontend-design` skill are installed through Claude Code itself (slash commands), not through the OS package manager. They are the same on every platform. See the README for the commands.
+
+**Agent runtime tools follow the missing-tool-policy automatically.** When an agent needs an external FOSS tool (linter, scanner, diagram, profiler) that is not installed, it detects the OS, then either auto-installs userland tools without privilege (`pip`/`uv`, `cargo`, `npm`, `$HOME` binary) or offers privileged installs via AskUserQuestion - it never refuses a task for a missing tool. Manager map: `apt`/`dnf`/`pacman`/`zypper` (Linux), `brew` (macOS), `winget`/`scoop`/`choco` (Windows), and cross-platform (`pip`/`uv`, `cargo`, `npm`). Full doctrine in [docs/principles/missing-tool-policy.md](docs/principles/missing-tool-policy.md); per-tool install commands in [docs/TOOLING.md](docs/TOOLING.md).
+
 ### Alternative: local clone
 
 Use this when the user asked to install from a local copy, when there is no network, or when the remote registry failed.
@@ -157,6 +171,20 @@ Execute estes comandos de barra no Claude Code, na ordem:
 O primeiro comando registra o marketplace `petrinhu`. O segundo instala o plugin `bigtech` a partir desse marketplace. A forma `bigtech@petrinhu` desambigua a origem; se o ambiente só tiver esse marketplace, `/plugin install bigtech` também resolve.
 
 Depois de instalar, **peça ao usuário para reiniciar a sessão** (ou reinicie quando tiver autorização). O hook `bigtech_session_init` roda no evento `SessionStart`: é ele que carrega o docs-bootstrap e injeta no contexto o caminho dos manuais em `docs/`. Sem reiniciar, os manuais não entram em contexto e o reforço de modo não fica ativo.
+
+### Dependências e instalação por SO
+
+O que você precisa saber para o plugin funcionar no sistema operacional do usuário. Duas camadas: um pré-requisito rígido (`python3`) e uma convenção de runtime que você já segue.
+
+**Pré-requisito rígido: `python3` resolvível no PATH.** Os 6 hooks do plugin estão declarados em `hooks/hooks.json` com `"command": "python3"`, então o Claude Code chama o interpretador por esse nome exato. Se `python3` não resolve, os hooks falham em silêncio e o plugin fica inerte (sem docs-bootstrap, sem reforço de modo). Verifique com `python3 --version` e, por SO:
+
+- **Linux:** o `python3` quase sempre já está presente. Se faltar, ofereça instalar pelo gerenciador do sistema (`sudo apt install python3` / `dnf` / `pacman` / `zypper`); pela missing-tool-policy isso é ação Caso B (privilégio de sistema), então pergunte antes.
+- **macOS:** vem via Xcode Command Line Tools (`xcode-select --install`) ou Homebrew (`brew install python`). Confirme que `python3 --version` resolve.
+- **Windows (nativo):** os hooks chamam `python3`. (a) **Python da Microsoft Store** (recomendado) registra os aliases `python3` e `python` automaticamente. (b) O **instalador do python.org** dá `python` e o launcher `py`, mas **não** garante `python3`; a solução é colocar o shim `bin/python3.cmd` do plugin (ele encaminha para `py -3` ou `python`) num diretório do PATH, como `%LOCALAPPDATA%\Microsoft\WindowsApps`, ou criar um alias. (c) **WSL** é a alternativa mais simples: dentro do WSL valem as instruções de Linux na íntegra. Sempre verifique `python3 --version`.
+
+**Dependências companion (o Claude Code instala, cross-OS).** `superpowers`, `playwright` (MCP) e a skill `frontend-design` são instaladas pelo próprio Claude Code (comandos de barra), não pelo gerenciador de pacotes do SO. São iguais em toda plataforma. Veja os comandos no README.
+
+**As ferramentas de runtime dos agents seguem a missing-tool-policy automaticamente.** Quando um agent precisa de uma ferramenta FOSS externa (linter, scanner, diagrama, profiler) que não está instalada, ele detecta o SO e então ou autoinstala ferramentas de userland sem privilégio (`pip`/`uv`, `cargo`, `npm`, binário no `$HOME`) ou oferece instalações com privilégio via AskUserQuestion - nunca recusa a tarefa por falta de ferramenta. Mapa de gerenciador: `apt`/`dnf`/`pacman`/`zypper` (Linux), `brew` (macOS), `winget`/`scoop`/`choco` (Windows) e cross-platform (`pip`/`uv`, `cargo`, `npm`). Doutrina completa em [docs/principles/missing-tool-policy.md](docs/principles/missing-tool-policy.md); comandos de instalação por ferramenta em [docs/TOOLING.md](docs/TOOLING.md).
 
 ### Alternativa: clone local
 

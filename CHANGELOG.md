@@ -4,6 +4,21 @@ Todas as mudanças relevantes deste projeto são documentadas neste arquivo.
 
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), e o projeto adota o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [0.2.0] - 2026-06-21
+
+Release de agnosticismo de sistema operacional (Linux, macOS e Windows nativo) e da política de ferramenta ausente como doutrina transversal. **As contagens não mudam: a constelação segue em 51 agents e 4 skills** (badges inalterados). Novo arquivo no pacote: `bin/python3.cmd` (shim de referência para Windows).
+
+### Added
+
+- **Shim `bin/python3.cmd` para Windows nativo.** Arquivo de referência que encaminha o comando `python3` para `py -3` (e, em falha, para `python`), cobrindo o caso do instalador do python.org, que provê `python`/`py` mas não garante o nome `python3` exigido pelos hooks. O usuário coloca o shim num diretório do PATH (ex.: `%LOCALAPPDATA%\Microsoft\WindowsApps`); o Python da Microsoft Store já registra o alias `python3` e dispensa o shim.
+- **Doutrina "política de ferramenta ausente" (`docs/principles/missing-tool-policy.md`) propagada como regra transversal dos agents.** Híbrido por risco: o agent detecta o SO e autoinstala ferramentas FOSS de userland sem privilégio (`pip`/`uv`, `cargo`, `npm`/`pnpm`, binário no `$HOME`) ou oferece via AskUserQuestion as que exigem `sudo`/gerenciador do sistema, e **nunca recusa uma tarefa por falta de ferramenta** (a única não-execução é a recusa explícita do usuário, que pausa só aquele passo). O arquivo é autolistado no `SessionStart` pelo glob `principles/*.md`, então a doutrina entra em contexto no início de toda sessão. Fonte única do protocolo; o `docs/TOOLING.md` permanece como catálogo do comando de cada ferramenta.
+- **Guia de instalação e dependências por SO, para usuários e para o LLM.** O `README.md` (EN+PT) ganha a nota "Pré-requisitos por SO" na seção de instalação; o `AGENTS.md` (EN+PT) ganha a seção "Dependências e instalação por OS" dirigida ao agente instalador; e a página `Instalacao` da wiki (EN+PT) ganha o "Passo 0: pré-requisitos por sistema operacional", em registro didático para iniciante. Os três cobrem o pré-requisito-chave: **`python3` resolvível no PATH**, com o caminho por SO - Linux (quase sempre presente; senão `apt`/`dnf`/`pacman`/`zypper`), macOS (`xcode-select --install` ou `brew install python`) e Windows nativo (Microsoft Store que registra o alias `python3`; instalador python.org mais o shim `bin/python3.cmd` no PATH; ou WSL), sempre com verificação por `python3 --version`. Documentam também que as dependências companion (`superpowers`, `playwright`, `frontend-design`) são instaladas pelo próprio Claude Code (cross-OS) e que as ferramentas de runtime dos agents são tratadas automaticamente pela missing-tool-policy.
+
+### Changed
+
+- **Hooks declarados na forma exec com `command: "python3"`.** O `hooks/hooks.json` invoca os 6 hooks chamando o interpretador pelo nome `python3` (decisão de portabilidade), o que torna **`python3` resolvível no PATH** o único pré-requisito de sistema do plugin. As notas de Plataforma do `README.md` e da wiki (EN+PT) passam a explicitar esse pré-requisito e a apontar para o guia por SO, em especial a nota de Windows, em vez de afirmar que nenhuma configuração de SO é necessária.
+- **Notas de portabilidade agnóstica de SO reforçadas nos docs.** O `docs/TOOLING.md` mantém a nota de portabilidade dos comandos (adaptar `apt`/`dnf`/`pacman`/`zypper`/`brew`/`winget`/`scoop`/`choco`, preferir cross-platform `pip`/`uv`, `cargo`, `npm`/`pnpm`) e as marcas "Linux-only" nas ferramentas mono-OS (perf, valgrind, heaptrack, strace/ltrace) com o equivalente de mac/Windows ou WSL. As páginas user-facing passam a deixar claro que a constelação roda em Linux, macOS e Windows nativo, com TDD e design visual incluídos.
+
 ## [0.1.16] - 2026-06-20
 
 Release de currency das ferramentas declaradas no frontmatter dos agents. **Nenhuma contagem muda: a constelação segue em 51 agents e 4 skills** (badges inalterados). Só a linha `tools:` de cada agent foi tocada; `claude plugin validate --strict` continua verde.
@@ -183,6 +198,7 @@ Release de frescor da tabela de pendências. **Não há novo agent nem nova skil
 - **13 documentos de governança.** Manuais de organização, pipeline de release, liderança, ferramentas, contrato de qualidade, testes, agile, checklist de deploy, auditorias e princípios de arquitetura, higienizados para distribuição pública.
 - **Marketplace `petrinhu`.** Distribuição via `/plugin marketplace add` e `/plugin install bigtech`, sob a licença Apache-2.0.
 
+[0.2.0]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.2.0
 [0.1.16]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.16
 [0.1.15]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.15
 [0.1.14]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.14
