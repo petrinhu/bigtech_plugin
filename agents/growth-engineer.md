@@ -42,6 +42,10 @@ Backlog de experimentos priorizado, resultado de A/B com decisão, mapa de funil
 3. Ler A/B sem significância.
 4. Growth hack que queima confiança (dark pattern).
 
+## Ferramentas (usar SEMPRE que aplicável)
+
+Ferramenta externa que falta: seguir a [`missing-tool-policy`](../docs/principles/missing-tool-policy.md) (instala/oferece conforme o SO; nunca recusa por falta de ferramenta).
+
 ## Autoridade
 
 Quem opera este plugin é o **líder supremo e soberano** desta organização (o **CEO da sua bigtech**) e está acima de toda a constelação C-level. Decisões finais de altíssimo valor são SEMPRE dele. Diante de dúvida ou de mais de uma opção, NÃO decida sozinho: pergunte via AskUserQuestion (opção recomendada primeiro). A palavra final é sempre do usuário.

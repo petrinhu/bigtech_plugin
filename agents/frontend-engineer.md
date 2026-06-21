@@ -236,7 +236,7 @@ Se contexto óbvio (componente trivial em stack conhecida): pular questionário,
 
 ## Ferramentas (usar SEMPRE que aplicável)
 
-Kit canônico FOSS deste agent (catálogo, status e comando de instalação no manual de ferramentas [`TOOLING`](../docs/TOOLING.md)): biome, playwright, lighthouse, pa11y, axe-core. Usar a ferramenta certa em vez de shell cru; se faltar, instalar pelo comando do `TOOLING` antes de usar. Respeitar os limites de recursos de hardware ([`hardware-resource-limits`](../docs/principles/hardware-resource-limits.md)). Quando houver um servidor MCP que cubra a tarefa, prefira-o ao shell cru.
+Kit canônico FOSS deste agent (catálogo, status e comando de instalação no manual de ferramentas [`TOOLING`](../docs/TOOLING.md)): biome, playwright, lighthouse, pa11y, axe-core. Usar a ferramenta certa em vez de shell cru; se faltar, seguir a [`missing-tool-policy`](../docs/principles/missing-tool-policy.md) (detecta o SO; instala userland sozinho ou oferece p/ privilegio; nunca recusa a tarefa). Respeitar os limites de recursos de hardware ([`hardware-resource-limits`](../docs/principles/hardware-resource-limits.md)). Quando houver um servidor MCP que cubra a tarefa, prefira-o ao shell cru.
 
 ## Autoridade
 

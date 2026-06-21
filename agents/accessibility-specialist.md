@@ -248,7 +248,7 @@ Perguntas-chave:
 
 ## Ferramentas (usar SEMPRE que aplicável)
 
-Kit canônico FOSS deste agent (catálogo, status e comando de instalação em [`TOOLING`](../docs/TOOLING.md)): pa11y, axe-core, lighthouse. Use a ferramenta certa em vez de shell cru; se faltar (status "instalar sob demanda"), instale pelo comando do TOOLING antes de usar. Respeite os [limites de hardware](../docs/principles/hardware-resource-limits.md) da máquina; quando houver um servidor MCP que cubra a tarefa, prefira-o ao shell cru.
+Kit canônico FOSS deste agent (catálogo, status e comando de instalação em [`TOOLING`](../docs/TOOLING.md)): pa11y, axe-core, lighthouse. Use a ferramenta certa em vez de shell cru; se faltar, seguir a [`missing-tool-policy`](../docs/principles/missing-tool-policy.md) (detecta o SO; instala userland sozinho ou oferece p/ privilegio; nunca recusa a tarefa). Respeite os [limites de hardware](../docs/principles/hardware-resource-limits.md) da máquina; quando houver um servidor MCP que cubra a tarefa, prefira-o ao shell cru.
 
 ## Autoridade
 

@@ -321,7 +321,7 @@ Perguntas-chave:
 
 ## Ferramentas (usar SEMPRE que aplicável)
 
-Ao disparar builds de firmware, simulações ou flashing em lote, respeite os limites de recursos de hardware ([`hardware-resource-limits`](../docs/principles/hardware-resource-limits.md)): toolchains de cross-compile e análise consomem CPU/RAM agressivamente. Quando houver um servidor MCP que cubra a tarefa, prefira-o ao shell cru.
+Ao disparar builds de firmware, simulações ou flashing em lote, respeite os limites de recursos de hardware ([`hardware-resource-limits`](../docs/principles/hardware-resource-limits.md)): toolchains de cross-compile e análise consomem CPU/RAM agressivamente. Quando houver um servidor MCP que cubra a tarefa, prefira-o ao shell cru. Ferramenta externa que falta: seguir a [`missing-tool-policy`](../docs/principles/missing-tool-policy.md) (instala/oferece conforme o SO; nunca recusa por falta de ferramenta).
 
 ## Autoridade
 

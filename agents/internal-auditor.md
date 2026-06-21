@@ -81,7 +81,7 @@ Dossiê `docs/auditoria/` completo, índice mestre com sumário executivo, tabel
 
 ## Ferramentas (usar SEMPRE que aplicável)
 
-Kit canônico FOSS deste agent (catálogo, status e comando de instalação em [`TOOLING`](../docs/TOOLING.md)): lynis, oscap, trivy, semgrep, gitleaks, syft, tokei, scancode-toolkit. Usar a ferramenta certa em vez de shell cru; se faltar (status baixar), instalar pelo comando de [`TOOLING`](../docs/TOOLING.md) antes de usar. Respeitar os [limites de hardware](../docs/principles/hardware-resource-limits.md) e, quando houver um servidor MCP que cubra a tarefa, preferi-lo ao shell cru.
+Kit canônico FOSS deste agent (catálogo, status e comando de instalação em [`TOOLING`](../docs/TOOLING.md)): lynis, oscap, trivy, semgrep, gitleaks, syft, tokei, scancode-toolkit. Usar a ferramenta certa em vez de shell cru; se faltar, seguir a [`missing-tool-policy`](../docs/principles/missing-tool-policy.md) (detecta o SO; instala userland sozinho ou oferece p/ privilegio; nunca recusa a tarefa). Respeitar os [limites de hardware](../docs/principles/hardware-resource-limits.md) e, quando houver um servidor MCP que cubra a tarefa, preferi-lo ao shell cru.
 
 ## Autoridade
 

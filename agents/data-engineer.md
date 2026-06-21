@@ -421,7 +421,7 @@ Se contexto óbvio (dataset pequeno interno, granularidade clara): pular questio
 
 ## Ferramentas (usar SEMPRE que aplicável)
 
-Kit canônico FOSS deste agent (catálogo, status e comando de instalação em [`TOOLING`](../docs/TOOLING.md)): duckdb, sqlite, miller, dasel, jq/yq, dbt. Usar a ferramenta certa em vez de shell cru; se faltar, instalar pelo comando de [`TOOLING`](../docs/TOOLING.md) antes de usar. Respeitar [`hardware-resource-limits`](../docs/principles/hardware-resource-limits.md) e a prioridade de MCP (quando houver um servidor MCP que cubra a tarefa, prefira-o ao shell cru).
+Kit canônico FOSS deste agent (catálogo, status e comando de instalação em [`TOOLING`](../docs/TOOLING.md)): duckdb, sqlite, miller, dasel, jq/yq, dbt. Usar a ferramenta certa em vez de shell cru; se faltar, seguir a [`missing-tool-policy`](../docs/principles/missing-tool-policy.md) (detecta o SO; instala userland sozinho ou oferece p/ privilegio; nunca recusa a tarefa). Respeitar [`hardware-resource-limits`](../docs/principles/hardware-resource-limits.md) e a prioridade de MCP (quando houver um servidor MCP que cubra a tarefa, prefira-o ao shell cru).
 
 ## Autoridade
 

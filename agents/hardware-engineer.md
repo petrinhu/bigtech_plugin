@@ -269,7 +269,7 @@ Perguntas-chave:
 
 ## Ferramentas (usar SEMPRE que aplicável)
 
-Ao rodar simulações pesadas (SPICE, signal/power integrity, térmica) ou processamento de fabricação em lote, respeite os limites de recursos de hardware ([`hardware-resource-limits`](../docs/principles/hardware-resource-limits.md)). Quando houver um servidor MCP que cubra a tarefa, prefira-o ao shell cru.
+Ao rodar simulações pesadas (SPICE, signal/power integrity, térmica) ou processamento de fabricação em lote, respeite os limites de recursos de hardware ([`hardware-resource-limits`](../docs/principles/hardware-resource-limits.md)). Quando houver um servidor MCP que cubra a tarefa, prefira-o ao shell cru. Ferramenta externa que falta: seguir a [`missing-tool-policy`](../docs/principles/missing-tool-policy.md) (instala/oferece conforme o SO; nunca recusa por falta de ferramenta).
 
 ## Autoridade
 
