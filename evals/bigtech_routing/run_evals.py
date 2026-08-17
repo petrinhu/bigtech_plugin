@@ -304,7 +304,11 @@ def run(path: Path = CASES_PATH) -> int:
         return "  ".join(cell.ljust(widths[i]) for i, cell in enumerate(row))
 
     print(f"bigtech routing evals  -  {path}")
-    print(f"policy: profiles={list(VALID_PROFILES)} floor=early solo→early headcount_weight=0")
+    # ASCII-safe: Windows CI default (cp1252) cannot encode U+2192.
+    print(
+        f"policy: profiles={list(VALID_PROFILES)} "
+        f"floor=early solo->early headcount_weight=0"
+    )
     print()
     print(fmt(headers))
     print(fmt(tuple("-" * w for w in widths)))
@@ -317,7 +321,17 @@ def run(path: Path = CASES_PATH) -> int:
     return 0 if failed == 0 else 1
 
 
+def _ensure_utf8_stdio() -> None:
+    """Windows runners often use cp1252; reconfigure when the host allows."""
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
+
+
 def main(argv: list[str] | None = None) -> int:
+    _ensure_utf8_stdio()
     argv = list(sys.argv[1:] if argv is None else argv)
     path = CASES_PATH
     if argv:
