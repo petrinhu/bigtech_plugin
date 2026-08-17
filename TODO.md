@@ -8,7 +8,8 @@
 > foi consolidada por Cosmo/COO a partir de 4 lentes.
 >
 > **Estado atual:** Release 1.0 fechado (ondas W1-W8 + W-WIKI ✅). Campanha ativa **2026-08-16** =
-> IDs **`BT-*`** no topo (ondas **W1..W5**) + fechamento **`TST-BT-1` (W6) → `AUD-BT-1` (W7)** + plano
+> IDs **`BT-*`** no topo (ondas **W1..W5**); fechamento **`TST-BT-1` (W6) → `AUD-BT-1` (W7)** fica no
+> **fim da tabela** (não executar agora; só após BT-*) + plano
 > `PLANO-MELHORIA-BIGTECH-CLAUDE-CODE-2026-08-16.md`. Legados **N9**, **OS-1..5** e **TOOL-1..4**
 > cancelados 2026-08-16 (legacy/OE). Catálogo genérico T5/T12/AUD-DISC|ARCH|COV|DEPS|LANG: **skip**
 > (cobertos por suite 1.0 ✅ ou anti-OE; ver nota add_tests_audit).
@@ -42,8 +43,6 @@
 | BT-7 | W4 | Qualidade | Drift gate semântico registry/agents/skills (CI/hook; PHASE posterior) <!-- intake:cand-BT-7-2026-08-16 --> | Média | BT-6 | Alta | ⏳ Pendente | — |
 | BT-8 | W4 | Evals | Evals de roteamento da skill /bigtech (constelação + porte) <!-- intake:cand-BT-8-2026-08-16 --> | Média | BT-5 | Alta | ⏳ Pendente | — |
 | BT-9 | W5 | Release | Proteção de main + release gates (go/no-go do líder) (protecao remota GitHub, tag/PR) <!-- intake:cand-BT-9-2026-08-16 --> | Alta | BT-4 | Média | ⏳ Pendente | — |
-| TST-BT-1 | W6 | Testes | Revalidar suite campanha: `preci.sh` + pytest hooks + validate_plugin + smoke + CI multi-OS verde no SHA final (pós BT-5..BT-8; espelha T15/T14 no escopo da campanha). Ver `TESTES.md` § Campanha 2026-08-16. | Alta | BT-5,BT-6,BT-7,BT-8 | Média | ⏳ Pendente | — |
-| AUD-BT-1 | W7 | Auditoria | Auditoria de campanha bigtech 2026-08-16: dual-authority, porte solo/headcount, source-of-truth, CI matrix, zero host legado operacional. Consolida no espírito de AUD-REPORT (sem recriar REPORT). Ver `AUDITORIAS.md` § Campanha 2026-08-16. | Alta | TST-BT-1, BT-1, BT-5, BT-6 | Alta | ⏳ Pendente | — |
 | F1 | W1 | Fundação | Estrutura de diretórios + `.claude-plugin/plugin.json` (name=bigtech, Apache-2.0) + `marketplace.json` (name=petrinhu, 1 plugin, `source: "./"`). **One-way-door.** | Alta | — | Baixa | ✅ Concluído | — |
 | R1 | W2 | Release | `LICENSE` Apache-2.0 + `NOTICE` (pull-early: desbloqueia AUD-LICENSE). | Alta | F1 | Baixa | ✅ Concluído | — |
 | D3 | W2 | Docs | Gerar `docs/principles/hardware-resource-limits.md` **generalizado** (sem specs da máquina); ~20 agents dependem. | Média | F1 | Média | ✅ Concluído | — |
@@ -113,6 +112,8 @@
 | TOOL-2 | W24 | Política-Tools | [CANCELADO 2026-08-16: legacy/OE — fora da campanha BT-*; `docs/principles/missing-tool-policy.md` já existe; aging de verificação legado.] Promover missing-tool-policy cross-cutting. | Alta | TOOL-1 | Média | 💡 Decisão tomada | — |
 | TOOL-3 | W24 | Política-Tools | [CANCELADO 2026-08-16: legacy/OE — fora da campanha BT-*; propagação residual agents = verification aging legado.] Propagar missing-tool-policy aos agents. | Média | TOOL-2 | Média | 💡 Decisão tomada | — |
 | TOOL-4 | W24 | Política-Tools | [CANCELADO 2026-08-16: legacy/OE — fora da campanha BT-*; alinhamento TOOLING/TESTES residual = OE se forçado agora.] Install OS-aware no TOOLING.md. | Baixa | TOOL-2 | Baixa | 💡 Decisão tomada | — |
+| TST-BT-1 | W6 | Testes | Revalidar suite campanha: `preci.sh` + pytest hooks + validate_plugin + smoke + CI multi-OS verde no SHA final (pós BT-5..BT-8; espelha T15/T14 no escopo da campanha). Ver `TESTES.md` § Campanha 2026-08-16. | Alta | BT-5,BT-6,BT-7,BT-8 | Média | ⏳ Pendente | — |
+| AUD-BT-1 | W7 | Auditoria | Auditoria de campanha bigtech 2026-08-16: dual-authority, porte solo/headcount, source-of-truth, CI matrix, zero host legado operacional. Consolida no espírito de AUD-REPORT (sem recriar REPORT). Ver `AUDITORIAS.md` § Campanha 2026-08-16. | Alta | TST-BT-1, BT-1, BT-5, BT-6 | Alta | ⏳ Pendente | — |
 
 ## Tabela de scoring WSJF (itens-pai funcionais)
 
