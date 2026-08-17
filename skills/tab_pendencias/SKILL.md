@@ -89,7 +89,7 @@ Em contexto SAFe (porte scale-up/bigtech, definido pelo Chief of Staff), NÃO ap
 | ID | Item | Valor (1-20) | Criticidade (1-20) | Redução de Risco (1-20) | CoD | Job Size (1-20) | WSJF | Rank |
 ```
 
-`CoD = Valor + Criticidade + Redução de Risco`; `WSJF = CoD / Job Size`. Rank = ordem decrescente de WSJF. Em projeto pequeno (solo/early), o WSJF pode ser qualitativo (sem a tabela completa), respeitando o anti-OE.
+`CoD = Valor + Criticidade + Redução de Risco`; `WSJF = CoD / Job Size`. Rank = ordem decrescente de WSJF. Em projeto early/pequeno, o WSJF pode ser qualitativo (sem a tabela completa), respeitando o anti-OE.
 
 ### Testes e auditoria: ordem inviolável (TDD + shift-left)
 
@@ -105,7 +105,7 @@ Em contexto SAFe (porte scale-up/bigtech, definido pelo Chief of Staff), NÃO ap
 ### Gate anti over-engineering (sempre primeiro)
 
 **Quem decide a abordagem de montagem (em `--create` e `--reorder`) é o Cósimo (Chief of Staff)**: ele classifica a complexidade da tabela (número de itens, dependências cruzadas, criticidade) e determina thread direta (simples) vs orquestrar o time (complexa). Calibrar pela complexidade da tabela (ver `cosimo-chief-of-staff` / [ORG](../../docs/ORG.md)):
-- **Tabela pequena/simples** (até ~8 itens, baixa complexidade e poucas dependências cruzadas): **NÃO** spawnar o time. A própria thread aplica o método (topological + WSJF + ondas) e escreve. Anti-OE por complexidade da tabela, não por porte "solo" (a constelação está sempre disponível).
+- **Tabela pequena/simples** (até ~8 itens, baixa complexidade e poucas dependências cruzadas): **NÃO** spawnar o time. A própria thread aplica o método (topological + WSJF + ondas) e escreve. Anti-OE por complexidade da tabela, não por headcount (a constelação está sempre disponível; piso de porte = early).
 - **Tabela grande/complexa** (muitos itens, dependências cruzadas, cross-funcional): orquestrar o time abaixo.
 
 ### Orquestração (tabela grande)

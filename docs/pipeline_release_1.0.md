@@ -405,12 +405,12 @@ Quem decide e re-avalia: **Cósimo (Chief of Staff)** (agent `cosimo-chief-of-st
 
 | Variante | Porte | Como o pipeline muda |
 |---|---|---|
-| **Pipeline-Sprint** | solo / pessoal (1) | Fases 0-2 viram um one-pager; 3 vira wireframe; 4 vira 3 ADRs; 6-8 contínuos; 9-12 enxutos. Só Celso e Caetano ativos. Sem cerimônia. |
-| **Pipeline-Lean** | early (2-20) | Fases 0-3 leves mas explícitas (PMF importa). Capitolino, Camilo (light) e Narciso (se dado sensível) entram. Kanban/Shape Up. |
-| **Pipeline-Padrão** | scale-up (50-500) | 12 fases completas. Constelação núcleo + Cosmo. Cadência ágil formal. RACI ativo. |
-| **Pipeline-Completo** | bigtech (500+) | Constelação inteira (+ Cândido, Caio se IA é capability, Confúcio, Cícero, Cláudio). Multi-produto, cada um com sub-pipeline. |
+| **Pipeline-Early** | early (minimalista / projeto pequeno) | Fases 0-2 viram um one-pager; 3 vira wireframe; 4 vira 3 ADRs; 6-8 contínuos; 9-12 enxutos. Só Celso e Caetano ativos. Sem cerimônia. |
+| **Pipeline-Lean** | early (early-stage / PMF) | Fases 0-3 leves mas explícitas (PMF importa). Capitolino, Camilo (light) e Narciso (se dado sensível) entram. Kanban/Shape Up. |
+| **Pipeline-Padrão** | scale | 12 fases completas. Constelação núcleo + Cosmo. Cadência ágil formal. RACI ativo. |
+| **Pipeline-Completo** | bigtech | Constelação inteira (+ Cândido, Caio se IA é capability, Confúcio, Cícero, Cláudio). Multi-produto, cada um com sub-pipeline. |
 
-Criticidade sobrepõe headcount: projeto solo que toca prontuário médico, dinheiro ou PII mantém Narciso (CISO) e Cláudio (CLO) ativos mesmo no Pipeline-Sprint.
+Porte = `early | scale | bigtech` (piso early). Headcount/capacity **não** define porte. Criticidade sobrepõe: projeto early que toca prontuário médico, dinheiro ou PII mantém Narciso (CISO) e Cláudio (CLO) ativos mesmo no Pipeline-Early.
 
 ---
 
@@ -462,7 +462,7 @@ Criticidade sobrepõe headcount: projeto solo que toca prontuário médico, dinh
 8. Marketing sobre produto frágil (queima reputação).
 9. Produto sólido sem marketing (não se vende sozinho).
 10. Sem ownership claro de incidentes.
-11. **Over-engineering**: aplicar pipeline bigtech a projeto solo (combatido por Cósimo).
+11. **Over-engineering**: aplicar pipeline bigtech a projeto early/pequeno (combatido por Cósimo).
 
 ---
 
@@ -483,7 +483,7 @@ Criticidade sobrepõe headcount: projeto solo que toca prontuário médico, dinh
 | 11. Release 1.0 | evento de 1 dia + 1 semana hypercare |
 | 12. Pós | contínuo |
 
-**Total típico para SaaS pequeno: 6 a 14 meses** da ideia ao 1.0. No Pipeline-Sprint (solo), pode cair para semanas.
+**Total típico para SaaS pequeno: 6 a 14 meses** da ideia ao 1.0. No Pipeline-Early (early minimalista), pode cair para semanas.
 
 ---
 

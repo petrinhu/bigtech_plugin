@@ -26,6 +26,8 @@ import sys
 
 MARKER = ".bigtech-porte"
 MAX_MARKER_BYTES = 4096
+# Valores canônicos de porte arquitetural. `solo` é alias deprecado → early.
+DEPRECATED_PORTE_ALIASES = {"solo": "early"}
 
 # Manifestos/marcadores que caracterizam projeto de codigo (basenames exatos).
 CODE_MARKERS = (
@@ -55,6 +57,29 @@ def is_code_project(d: str) -> bool:
     return False
 
 
+def normalize_porte(raw: str) -> str:
+    """Normaliza valor de porte. `solo` (deprecado) → early."""
+    p = (raw or "").strip().lower()
+    if not p:
+        return "classificado"
+    if p in DEPRECATED_PORTE_ALIASES:
+        return DEPRECATED_PORTE_ALIASES[p]
+    return p
+
+
+def read_porte(marker_path: str) -> str:
+    """Le 'porte=<x>' do marcador; normaliza alias deprecado solo→early."""
+    try:
+        with open(marker_path, "r", encoding="utf-8", errors="replace") as fh:
+            head = fh.read(MAX_MARKER_BYTES)
+        m = re.search(r"porte\s*=\s*([A-Za-z]+)", head)
+        if m:
+            return normalize_porte(m.group(1))
+    except Exception:
+        pass
+    return "classificado"
+
+
 def main() -> int:
     try:
         data = json.load(sys.stdin)
@@ -75,30 +100,24 @@ def main() -> int:
     # logo no inicio da sessao. O reforco por turno fica no hook
     # bigtech_reinforce.py (UserPromptSubmit).
     if os.path.isfile(marker_path):
-        porte = "classificado"
-        try:
-            with open(marker_path, "r", encoding="utf-8", errors="replace") as fh:
-                head = fh.read(MAX_MARKER_BYTES)
-            m = re.search(r"porte\s*=\s*([A-Za-z]+)", head)
-            if m:
-                porte = m.group(1).lower()
-        except Exception:
-            pass
+        porte = read_porte(marker_path)
         msg = (
             "[bigtech] Projeto classificado (porte=" + porte + "). MODO DE "
-            "OPERACAO ATIVO: operar como a constelacao bigtech — negocio/produto/"
+            "OPERACAO ATIVO: operar como a constelacao bigtech - negocio/produto/"
             "lideranca via C-levels. ORQUESTRADOR = Cosimo (Chief of Staff): "
-            "classifica porte, monta o time e roteia. Para GERENCIAR o projeto ou "
+            "classifica porte (early|scale|bigtech; piso early; headcount nao "
+            "define porte), monta o time e roteia. Para GERENCIAR o projeto ou "
             "os agentes dev: Cosimo (orquestra) + Cosmo (COO, execucao "
             "cross-funcional) + engineering-manager + scrum-master. Engenharia "
-            "via /proj_software. Calibrar headcount pelo porte (anti "
-            "over-engineering; a maioria dos C-levels fica dormente em projeto "
-            "pequeno). Decisoes de alto valor (arquitetura/escopo/stack/go-no-go/"
-            "gasto/irreversivel) -> SEMPRE AskUserQuestion ao usuario, que e o "
-            "lider supremo (CEO) da propria bigtech. Agents devem "
-            "contra-argumentar decisao destrutiva. Nao driftar pro assistente "
-            "generico. Governanca nos manuais do plugin (docs/ORG.md, ...); o "
-            "caminho absoluto e injetado no contexto da sessao (docs-bootstrap)."
+            "via /proj_software. Calibrar a constelacao por complexidade/"
+            "criticidade (anti over-engineering; a maioria dos C-levels fica "
+            "dormente em projeto early/pequeno). Decisoes de alto valor "
+            "(arquitetura/escopo/stack/go-no-go/gasto/irreversivel) -> SEMPRE "
+            "AskUserQuestion ao usuario, que e o lider supremo (CEO) da propria "
+            "bigtech. Agents devem contra-argumentar decisao destrutiva. Nao "
+            "driftar pro assistente generico. Governanca nos manuais do plugin "
+            "(docs/ORG.md, ...); o caminho absoluto e injetado no contexto da "
+            "sessao (docs-bootstrap)."
         )
         out = {
             "hookSpecificOutput": {
@@ -115,11 +134,13 @@ def main() -> int:
     msg = (
         "[bigtech] Projeto de codigo sem porte classificado (sem arquivo "
         ".bigtech-porte). Considere rodar /bigtech: o Cosimo (Chief of Staff) "
-        "classifica o porte (solo/early/scale/bigtech), seleciona a variante "
-        "de pipeline (anti over-engineering) e monta a constelacao de agents. "
-        "Apos classificar, grave o marcador .bigtech-porte na raiz do projeto "
-        "para silenciar este lembrete. Governanca: docs/ORG.md (manuais do "
-        "plugin; caminho absoluto injetado no contexto via docs-bootstrap)."
+        "classifica o porte (early|scale|bigtech; piso early; headcount nao "
+        "define porte), seleciona a variante de pipeline (anti over-engineering) "
+        "e monta a constelacao de agents. Apos classificar, grave o marcador "
+        ".bigtech-porte na raiz (porte=early|scale|bigtech) para silenciar este "
+        "lembrete. Alias deprecado porte=solo e lido como early. Governanca: "
+        "docs/ORG.md (manuais do plugin; caminho absoluto injetado no contexto "
+        "via docs-bootstrap)."
     )
     out = {
         "hookSpecificOutput": {

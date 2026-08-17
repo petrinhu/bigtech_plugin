@@ -1,7 +1,7 @@
 ---
 name: bigtech
 description: "Monta o time de agents C-level (constelação) para um projeto como se fosse uma bigtech. Invoca Cósimo (Chief of Staff), classifica o PORTE do projeto, seleciona a VARIANTE de pipeline (anti over-engineering), e devolve o MAPA DE ATIVAÇÃO (quais C-levels e agents operacionais ligar, em quais das 12 fases). Opcionalmente dispara os C-levels ativos. Camada de NEGÓCIO e LIDERANÇA (produto, marketing, vendas, legal, finanças, release); delega a execução de engenharia ao /proj_software. Use quando o usuário disser \"montar o time\", \"organizar como bigtech\", \"qual pipeline e quais agents\", \"quem lidera isso\", \"classificar o porte\", \"estruturar a empresa do projeto\", ou invocar /bigtech. Para SDLC puro de engenharia sem camada de negócio, usar /proj_software."
-argument-hint: "[caminho ou descrição do projeto] [--porte solo|early|scale|bigtech] [--dispatch]"
+argument-hint: "[caminho ou descrição do projeto] [--porte early|scale|bigtech] [--dispatch]"
 allowed-tools: [Read, Grep, Glob, Bash, Agent, TodoWrite]
 ---
 
@@ -11,9 +11,11 @@ Materializa a organização descrita nos manuais de governança e liderança do 
 
 > **Acesso aos manuais.** O caminho absoluto de `docs/` é injetado no contexto da sessão pelo docs-bootstrap (hook `SessionStart`). Esta skill é carregada de um diretório conhecido, então também pode ler os manuais por caminho relativo (a partir de `skills/bigtech/`): governança em [`ORG`](../../docs/ORG.md), pipeline em [`pipeline_release_1.0`](../../docs/pipeline_release_1.0.md), liderança em [`lideranca_pipeline_release`](../../docs/lideranca_pipeline_release.md). Se o caminho não estiver no contexto, localize via Glob `**/bigtech/docs/**/<NOME>.md`.
 
-> **Regra de ouro (anti-OE):** quem decide o tamanho do time é Cósimo. Projeto solo NÃO recebe 11 C-levels. A maioria fica dormente. Calibrar sempre pelo porte.
+> **Regra de ouro (anti-OE):** quem decide o tamanho do time é Cósimo. Porte arquitetural = `early | scale | bigtech` (piso **early**). Headcount/capacity humana **não** define porte. Em early, a maioria dos C-levels fica dormente. Calibrar por complexidade, criticidade e escala.
 
 Argumentos recebidos: $ARGUMENTS
+
+> **Alias deprecado:** `--porte solo` é aceito e normalizado para `early` (com aviso ao usuário). Não grave `porte=solo` em marcadores novos.
 
 ---
 
@@ -23,7 +25,8 @@ Reúna o contexto. Se faltar, pergunte no máximo 1 a 3 itens críticos.
 
 | Dimensão | Pergunta |
 |---|---|
-| Headcount | Solo (1) / Early (2-20) / Scale (50-500) / Bigtech (500+) |
+| Complexidade / criticidade | Baixa (escopo pequeno, uso próprio) / Média (PMF, primeiros usuários) / Alta (multi-produto, compliance, escala): **isto** orienta o porte, não o número de pessoas |
+| Capacity humana (nota, não porte) | 1 pessoa / time pequeno / time médio / org grande: só capacity; **não** vira valor de `--porte` |
 | Stake | Pessoal / Interno / Cliente externo / Crítico (financeiro, saúde, vida) |
 | Compliance | Nenhuma / LGPD básico / Regulada (PCI, HIPAA, ANVISA, BACEN) |
 | Dado pessoal/PII | Não / Sim (sobe a régua de Narciso e Cláudio) |
@@ -39,8 +42,8 @@ Se há projeto em CWD, leia `CLAUDE.md`, `TODO.md` e `README` do projeto para in
 Dispare o agent `cosimo-chief-of-staff` (tool Agent, subagent_type `cosimo-chief-of-staff`) passando os sinais coletados. Peça que devolva o **mapa de ativação** no formato:
 
 ```
-PORTE: <solo | early | scale | bigtech>
-VARIANTE: <Pipeline-Sprint | Pipeline-Lean | Pipeline-Padrão | Pipeline-Completo>
+PORTE: <early | scale | bigtech>
+VARIANTE: <Pipeline-Early | Pipeline-Lean | Pipeline-Padrão | Pipeline-Completo>
 C-LEVELS ATIVOS: [...]
 C-LEVELS DORMENTES: [...]
 AGENTS OPERACIONAIS: [...]
@@ -52,7 +55,7 @@ JUSTIFICATIVA ANTI-OE: <por que esse nível e não mais>
 
 > **Repasse o caminho absoluto de `docs/` no prompt da task de Cósimo.** Subagents não herdam o contexto da sessão (o docs-bootstrap só alcança a thread principal e as skills); sem o caminho no prompt, Cósimo não consegue abrir os manuais de governança (`ORG`, `pipeline_release_1.0`, `lideranca_pipeline_release`) que sustentam a classificação de porte. Use o caminho injetado no contexto da sessão; se ele não estiver disponível, resolva via Glob `**/bigtech/docs/` e inclua o resultado no prompt.
 
-Se o usuário passou `--porte`, informe a Cósimo como hint, mas deixe ele validar contra os sinais (criticidade sobrepõe headcount).
+Se o usuário passou `--porte`, normalize alias deprecado (`solo` → `early` + aviso) e informe a Cósimo como hint; deixe ele validar contra os sinais (criticidade e complexidade sobrepõem headcount/capacity).
 
 ---
 
@@ -64,10 +67,10 @@ Mapeamento de porte entre as duas camadas (mantenha coerência):
 
 | Porte (Cósimo / bigtech) | Variante de pipeline | Nível SDLC (/proj_software) |
 |---|---|---|
-| solo / pessoal | Pipeline-Sprint | S0 / S1 |
-| early-stage | Pipeline-Lean | S2 |
-| scale-up | Pipeline-Padrão | S3 |
-| bigtech / enterprise | Pipeline-Completo | S4 |
+| early (minimalista / projeto pequeno) | Pipeline-Early | S0 / S1 |
+| early (early-stage / PMF) | Pipeline-Lean | S2 |
+| scale | Pipeline-Padrão | S3 |
+| bigtech | Pipeline-Completo | S4 |
 
 ---
 
@@ -98,11 +101,11 @@ Cada C-level devolve decisões + mapa de delegação aos seus operacionais; a th
 
 ## 4. Gravar o marcador de porte
 
-Após classificar, grave o marcador `.bigtech-porte` na raiz do projeto (uma linha: `porte=<solo|early|scale|bigtech>` + data + variante). Isso silencia o lembrete do hook SessionStart (`bigtech_porte_reminder.py`). Reescreva o marcador quando o porte mudar no re-roteamento.
+Após classificar, grave o marcador `.bigtech-porte` na raiz do projeto (uma linha: `porte=<early|scale|bigtech>` + data + variante). **Nunca** grave `porte=solo` (alias deprecado; se um marcador legado tiver `solo`, os hooks normalizam a leitura para `early`). Isso silencia o lembrete do hook SessionStart (`bigtech_porte_reminder.py`). Reescreva o marcador quando o porte mudar no re-roteamento.
 
 ## 5. Re-roteamento
 
-Registre o porte escolhido e o gatilho de re-avaliação. A cada marco (fim de fase, release, mudança de headcount, novo requisito regulatório), reinvoque `/bigtech` ou Cósimo para checar se o projeto subiu ou desceu de porte, e ajustar a constelação. Documente a transição no changelog/diário do projeto e atualize [`ORG`](../../docs/ORG.md) se a estrutura mudar.
+Registre o porte escolhido e o gatilho de re-avaliação. A cada marco (fim de fase, release, mudança de complexidade/criticidade, capacity humana só como sinal auxiliar, novo requisito regulatório), reinvoque `/bigtech` ou Cósimo para checar se o projeto subiu ou desceu de porte, e ajustar a constelação. Documente a transição no changelog/diário do projeto e atualize [`ORG`](../../docs/ORG.md) se a estrutura mudar.
 
 ---
 

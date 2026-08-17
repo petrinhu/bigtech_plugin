@@ -84,6 +84,18 @@ def test_main_classificado_porte_default_quando_marcador_sem_campo(tmp_path, mon
     assert "porte=classificado" in ctx   # fallback seguro
 
 
+def test_main_classificado_alias_solo_normaliza_para_early(tmp_path, monkeypatch):
+    # BT-5: marcador legado porte=solo exposto como early.
+    (tmp_path / MARKER).write_text("porte=solo\n")
+    rc, out = _run_main(monkeypatch, {"cwd": str(tmp_path)})
+    assert rc == 0
+    ctx = json.loads(out)["hookSpecificOutput"]["additionalContext"]
+    assert "porte=early" in ctx
+    assert "porte=solo" not in ctx
+    assert p.normalize_porte("solo") == "early"
+    assert p.read_porte(str(tmp_path / MARKER)) == "early"
+
+
 # --- main(): projeto de código SEM porte -> lembra /bigtech -----------------
 
 def test_main_lembra_bigtech_em_projeto_de_codigo_sem_porte(tmp_path, monkeypatch):
@@ -93,6 +105,8 @@ def test_main_lembra_bigtech_em_projeto_de_codigo_sem_porte(tmp_path, monkeypatc
     ctx = json.loads(out)["hookSpecificOutput"]["additionalContext"]
     assert "/bigtech" in ctx
     assert ".bigtech-porte" in ctx       # instrui a gravar o marcador
+    assert "early|scale|bigtech" in ctx or "early" in ctx
+    assert "solo/early" not in ctx
 
 
 # --- main(): silêncio em dir que não é projeto de código --------------------

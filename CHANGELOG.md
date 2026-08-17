@@ -4,6 +4,12 @@ Todas as mudanças relevantes deste projeto são documentadas neste arquivo.
 
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), e o projeto adota o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [Unreleased]
+
+### Changed
+
+- **BT-5: porte arquitetural sem solo/headcount (piso early).** Valores canonicos de porte = `early | scale | bigtech`. Headcount/capacity humana e nota auxiliar, nao valor de `--porte` nem de `.bigtech-porte`. Skill `/bigtech`, hooks `bigtech_porte_reminder`/`bigtech_reinforce`, Cosimo, `docs/ORG.md`, `pipeline_release_1.0`, `lideranca_pipeline_release`, mapeamento em `/proj_software` e `/tab_pendencias` alinhados. Alias deprecado: `--porte solo` e marcador legado `porte=solo` normalizam para `early` (hooks expoem `early` sem reescrever o arquivo). Pipeline-Sprint renomeado operacionalmente para Pipeline-Early (early minimalista).
+
 ## [0.2.0] - 2026-06-21
 
 Release de agnosticismo de sistema operacional (Linux, macOS e Windows nativo) e da política de ferramenta ausente como doutrina transversal. **As contagens não mudam: a constelação segue em 51 agents e 4 skills** (badges inalterados). Novo arquivo no pacote: `bin/python3.cmd` (shim de referência para Windows).

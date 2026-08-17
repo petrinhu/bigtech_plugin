@@ -117,6 +117,17 @@ def test_read_porte_fallback_arquivo_inexistente(tmp_path):
     assert r.read_porte(str(tmp_path / "nao-existe")) == "classificado"
 
 
+def test_read_porte_alias_solo_normaliza_para_early(tmp_path):
+    # BT-5: solo é alias deprecado de porte → early (não reescreve o arquivo).
+    mk = tmp_path / MARKER
+    mk.write_text("porte=solo\n")
+    assert r.read_porte(str(mk)) == "early"
+    assert r.normalize_porte("solo") == "early"
+    assert r.normalize_porte("SOLO") == "early"
+    assert r.normalize_porte("early") == "early"
+    assert r.normalize_porte("scale") == "scale"
+
+
 # ---------------------------------------------------------------------------
 # Helper para main() in-process.
 # ---------------------------------------------------------------------------
@@ -140,6 +151,15 @@ def test_main_reforco_quando_classificado(tmp_path, monkeypatch):
     assert hso["hookEventName"] == "UserPromptSubmit"
     assert "porte=scale" in hso["additionalContext"]
     assert "BIGTECH ATIVO" in hso["additionalContext"]
+
+
+def test_main_reforco_normaliza_marcador_solo_legado(tmp_path, monkeypatch):
+    (tmp_path / MARKER).write_text("porte=solo\n")
+    rc, out = _run_main(monkeypatch, {"cwd": str(tmp_path), "prompt": "ajusta o lint"})
+    assert rc == 0
+    ctx = json.loads(out)["hookSpecificOutput"]["additionalContext"]
+    assert "porte=early" in ctx
+    assert "porte=solo" not in ctx
 
 
 # --- MODO 2: roteamento por gatilho em projeto NÃO classificado -------------

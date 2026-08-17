@@ -1,6 +1,6 @@
 # ORG.md - Organização tipo Bigtech no Claude
 
-> Manual de governança da constelação de agents C-level e do roteamento de pipeline. Junta o aprendizado acumulado (agents, skills, hooks, manuais) com o [pipeline de release](pipeline_release_1.0.md) e a [teoria de liderança C-level](lideranca_pipeline_release.md). Estrutura seu workspace como uma empresa de produto digital, dimensionável do solo founder à bigtech.
+> Manual de governança da constelação de agents C-level e do roteamento de pipeline. Junta o aprendizado acumulado (agents, skills, hooks, manuais) com o [pipeline de release](pipeline_release_1.0.md) e a [teoria de liderança C-level](lideranca_pipeline_release.md). Estrutura seu workspace como uma empresa de produto digital, dimensionável do early (projeto pequeno) à bigtech.
 
 Manuais que acompanham o plugin: [CONTRACT](manuals/CONTRACT.md), [TESTES](manuals/TESTES.md), [AGILE](manuals/AGILE.md), [DEPLOY_CHECKLIST](manuals/DEPLOY_CHECKLIST.md), [AUDITORIAS](manuals/AUDITORIAS.md), [TOOLING](TOOLING.md).
 
@@ -119,12 +119,14 @@ Quem decide e re-avalia: **Cósimo (Chief of Staff)**. Critérios na [teoria de 
 
 | Variante | Porte | C-levels ativos | Cerimônia | Fases |
 |---|---|---|---|---|
-| **Pipeline-Sprint** | solo / pessoal (1) | Celso, Caetano | nenhuma | colapsadas |
-| **Pipeline-Lean** | early (2-20) | + Capitolino, Camilo (light), Narciso (se dado sensível) | Kanban / Shape Up | leves |
-| **Pipeline-Padrão** | scale-up (50-500) | + Cosmo; constelação núcleo | Scrum/Kanban formal | 12 completas |
-| **Pipeline-Completo** | bigtech (500+) | + Cândido, Caio (se IA é capability), Confúcio, Cícero, Cláudio | formal multi-time | ramificado por produto |
+| **Pipeline-Early** | early (minimalista / projeto pequeno) | Celso, Caetano | nenhuma | colapsadas |
+| **Pipeline-Lean** | early (early-stage / PMF) | + Capitolino, Camilo (light), Narciso (se dado sensível) | Kanban / Shape Up | leves |
+| **Pipeline-Padrão** | scale | + Cosmo; constelação núcleo | Scrum/Kanban formal | 12 completas |
+| **Pipeline-Completo** | bigtech | + Cândido, Caio (se IA é capability), Confúcio, Cícero, Cláudio | formal multi-time | ramificado por produto |
 
-Regra de criticidade: projeto pequeno mas crítico (saúde, dinheiro, PII) sobe de faixa em segurança (Narciso) e jurídico (Cláudio) mesmo com 1 pessoa. Regra de IA: **IA como capability central** (o produto é IA ou depende dela como diferencial) ativa Caio (CAIO) + `applied-ai-engineer` em qualquer porte, mesmo solo; uma integração de modelo pontual NÃO acorda o CAIO (usa só `applied-ai-engineer`). Cósimo re-avalia a cada marco e registra as transições no changelog/diário do projeto.
+> **Piso = early.** Valores de porte = `early | scale | bigtech`. Headcount/capacity humana **não** define porte (é nota auxiliar). Alias deprecado `solo` → `early`.
+
+Regra de criticidade: projeto early mas crítico (saúde, dinheiro, PII) sobe a régua de segurança (Narciso) e jurídico (Cláudio) mesmo com capacity 1. Regra de IA: **IA como capability central** (o produto é IA ou depende dela como diferencial) ativa Caio (CAIO) + `applied-ai-engineer` em qualquer porte; uma integração de modelo pontual NÃO acorda o CAIO (usa só `applied-ai-engineer`). Cósimo re-avalia a cada marco e registra as transições no changelog/diário do projeto.
 
 ---
 

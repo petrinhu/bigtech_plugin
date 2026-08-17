@@ -1,6 +1,6 @@
 ---
 name: proj_software
-description: "Orquestra ciclo de vida de software (SDLC estendido) em 5 macrofases, alocando os agentes corretos por etapa, com proteção anti-over-engineering em projetos pequenos e trilha de escalonamento (solo → pequeno → médio → grande → enterprise). Aplica DevSecOps / Shift-Left (security transversal). Use IMEDIATAMENTE quando o usuário disser \"vou criar um software\", \"começar projeto\", \"criar app\", \"novo sistema\", \"construir [feature/produto]\", \"estruturar projeto\", \"como fazer X em produção\", \"qual fluxo seguir\", ou invocar /proj_software. Use também quando a conversa começa um projeto novo de software sem mencionar skill."
+description: "Orquestra ciclo de vida de software (SDLC estendido) em 5 macrofases, alocando os agentes corretos por etapa, com proteção anti-over-engineering em projetos pequenos e trilha de escalonamento (S0 protótipo → S1/S2 early → S3 scale → S4 enterprise). Aplica DevSecOps / Shift-Left (security transversal). Use IMEDIATAMENTE quando o usuário disser \"vou criar um software\", \"começar projeto\", \"criar app\", \"novo sistema\", \"construir [feature/produto]\", \"estruturar projeto\", \"como fazer X em produção\", \"qual fluxo seguir\", ou invocar /proj_software. Use também quando a conversa começa um projeto novo de software sem mencionar skill."
 ---
 
 # proj_software: orquestração SDLC com squad de engenharia
@@ -33,7 +33,7 @@ Antes de invocar qualquer agente, identifique:
 
 | Dimensão | Pergunta |
 |---|---|
-| Tamanho | Solo / Pequeno (1-3 devs) / Médio (4-10) / Grande (10-50) / Enterprise (50+) |
+| Capacity / tamanho eng (nota, não porte bigtech) | Protótipo 1 pessoa / Pequeno (1-3) / Médio (4-10) / Grande (10-50) / Enterprise (50+): mapeia a S0-S4; porte arquitetural (`early|scale|bigtech`) vem de `/bigtech` |
 | Stake | Pessoal / Interno / Cliente externo / Crítico (financeiro, saúde, segurança de vida) |
 | Time-to-live | Dias / semanas / meses / anos |
 | Compliance | Nenhuma / leve (LGPD básico) / regulada (PCI, HIPAA, SOX) |
@@ -50,7 +50,7 @@ Se o usuário não disse: **pergunte 1-3 itens críticos**, não mais. Maioria d
 
 Use o **mínimo viável**. Cada agente adiciona overhead de comunicação e processo.
 
-### Nível S0: Solo / Script / Prototype (≤ 1 semana, 1 pessoa, sem deploy)
+### Nível S0: Script / Prototype (≤ 1 semana, capacity 1 pessoa, sem deploy)
 **Agentes:** nenhum subagente necessário. Main thread codifica direto.
 - Sem PRD, sem ADR, sem RFC, sem CI elaborada.
 - Sem `software-architect`: overkill.
@@ -210,7 +210,7 @@ Use o **mínimo viável**. Cada agente adiciona overhead de comunicação e proc
 
 1. **Existe trade-off real ou é decisão óbvia?** Decisão óbvia não precisa agente. Trade-off real chama o specialist.
 2. **O custo de errar excede o custo de chamar o agente?** Threat model num CLI offline pessoal = overkill. Threat model em API pública = obrigatório.
-3. **O artefato gerado vai ser usado?** PRD de 30 páginas pra MVP solo nunca lido. README curto sempre lido. Otimizar pra leitor.
+3. **O artefato gerado vai ser usado?** PRD de 30 páginas pra MVP early/pequeno nunca lido. README curto sempre lido. Otimizar pra leitor.
 4. **Há evidência empírica do problema?** "Vai escalar" sem dado = não-requisito.
 
 ### Smell de over-engineering
@@ -338,7 +338,7 @@ Status: Accepted | Date: YYYY-MM-DD
 ## Integração com ecossistema
 
 - Os agentes são acionados conforme a matriz (a constelação C-level completa é montada pela skill `/bigtech`). **Ao despachar um agent, inclua no prompt o caminho absoluto de `docs/`**: subagents não herdam o contexto de sessão.
-- Skill **`/bigtech`**: camada de NEGÓCIO/liderança (C-levels, pipeline de produto de 12 fases, GTM, release). Quando um projeto precisa de produto/marketing/vendas/release além da engenharia, comece por `/bigtech`; ela delega a execução de engenharia (fases 4-9) de volta a esta skill. Os níveis S0-S4 daqui mapeiam aos portes solo/early/scale/bigtech de lá.
+- Skill **`/bigtech`**: camada de NEGÓCIO/liderança (C-levels, pipeline de produto de 12 fases, GTM, release). Quando um projeto precisa de produto/marketing/vendas/release além da engenharia, comece por `/bigtech`; ela delega a execução de engenharia (fases 4-9) de volta a esta skill. Os níveis S0-S4 daqui mapeiam aos portes arquiteturais `early|scale|bigtech` de lá (S0/S1 ≈ early minimalista; S2 ≈ early Lean; S3 ≈ scale; S4 ≈ bigtech).
 - Skill **`/tab_pendencias`**: tabela canônica de pendências.
 - O pipeline de CI é configurado pelo `devops-sre` no provedor de CI do projeto.
 - Princípios transversais: 4 camadas, SOLID, TDD e convenções de commit estão em [`arquitetura-principios`](../../docs/principles/arquitetura-principios.md) e [`CONTRACT`](../../docs/manuals/CONTRACT.md).

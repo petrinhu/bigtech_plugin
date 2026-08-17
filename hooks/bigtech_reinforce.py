@@ -31,6 +31,9 @@ import sys
 
 MARKER = ".bigtech-porte"
 MAX_MARKER_BYTES = 4096
+# Valores canônicos de porte arquitetural. `solo` é alias deprecado → early.
+VALID_PORTES = frozenset({"early", "scale", "bigtech"})
+DEPRECATED_PORTE_ALIASES = {"solo": "early"}
 
 # Gatilhos de linguagem natural que significam "quero a constelacao C-level".
 # Inclui termos de orquestracao e gerencia (Cosimo = Chief of Staff orquestrador;
@@ -102,15 +105,31 @@ class _Trigger:
 TRIGGER_RE = _Trigger()
 
 
+def normalize_porte(raw: str) -> str:
+    """Normaliza valor de porte. `solo` (deprecado) → early; desconhecido permanece."""
+    p = (raw or "").strip().lower()
+    if not p:
+        return "classificado"
+    if p in DEPRECATED_PORTE_ALIASES:
+        return DEPRECATED_PORTE_ALIASES[p]
+    return p
+
+
 def read_porte(marker_path: str) -> str:
-    """Le a primeira linha do marcador e extrai 'porte=<x>'. Fallback seguro."""
+    """Le a primeira linha do marcador e extrai 'porte=<x>'. Fallback seguro.
+
+    Normaliza alias deprecado `solo` → `early` (piso oficial). Nao reescreve o
+    arquivo; so o valor exposto ao contexto da sessao.
+    """
     try:
         with open(marker_path, "r", encoding="utf-8", errors="replace") as fh:
             head = fh.read(MAX_MARKER_BYTES)
     except Exception:
         return "classificado"
     m = re.search(r"porte\s*=\s*([A-Za-z]+)", head)
-    return m.group(1).lower() if m else "classificado"
+    if not m:
+        return "classificado"
+    return normalize_porte(m.group(1))
 
 
 def emit(msg: str) -> None:
@@ -147,16 +166,18 @@ def main() -> int:
         emit(
             "BIGTECH ATIVO (porte=" + porte + "). Operar como a constelacao: "
             "negocio/produto/lideranca via C-levels. ORQUESTRADOR = Cosimo "
-            "(Chief of Staff): classifica porte, monta o time, roteia (skill "
+            "(Chief of Staff): classifica porte (early|scale|bigtech; piso "
+            "early; headcount nao define porte), monta o time, roteia (skill "
             "/bigtech). Para GERENCIAR projeto ou agentes dev: Cosimo (orquestra) "
             "+ Cosmo (COO, execucao cross-funcional) + engineering-manager "
             "(gestao de pessoas/eng) + scrum-master (cadencia/impedimentos). "
-            "Engenharia via /proj_software. Calibrar headcount pelo porte (anti "
-            "over-engineering). Decisao de alto valor (arquitetura/escopo/stack/"
-            "go-no-go/gasto/irreversivel) -> SEMPRE AskUserQuestion ao usuario, "
-            "que e o lider supremo (CEO) da propria bigtech. Dever de "
-            "contra-argumentar decisao destrutiva (problema -> risco -> "
-            "alternativa -> decisao do usuario). Nao driftar pro assistente generico."
+            "Engenharia via /proj_software. Calibrar a constelacao por "
+            "complexidade/criticidade (anti over-engineering). Decisao de alto "
+            "valor (arquitetura/escopo/stack/go-no-go/gasto/irreversivel) -> "
+            "SEMPRE AskUserQuestion ao usuario, que e o lider supremo (CEO) da "
+            "propria bigtech. Dever de contra-argumentar decisao destrutiva "
+            "(problema -> risco -> alternativa -> decisao do usuario). Nao "
+            "driftar pro assistente generico."
         )
         return 0
 
@@ -167,14 +188,15 @@ def main() -> int:
             "[bigtech] O usuario quer a constelacao C-level / gerenciar projeto "
             "ou agentes dev. ROTEAR para /bigtech, que invoca o AGENTE "
             "ORQUESTRADOR = Cosimo (Chief of Staff): classifica o porte "
-            "(solo/early/scale/bigtech, anti over-engineering), seleciona a "
-            "variante de pipeline e monta o time de C-levels + agents operacionais. "
-            "Para GERENCIAR projeto/agentes dev, os agentes sao: Cosimo (Chief of "
-            "Staff, orquestrador) + Cosmo (COO, execucao cross-funcional) + "
-            "engineering-manager (gestao de eng/pessoas) + scrum-master (cadencia/"
-            "impedimentos) + product-manager. Engenharia pura -> /proj_software. "
-            "NAO responder como assistente generico; usar a skill /bigtech. Apos "
-            "classificar, gravar .bigtech-porte na raiz."
+            "(early|scale|bigtech; piso early; anti over-engineering; headcount "
+            "nao define porte), seleciona a variante de pipeline e monta o time "
+            "de C-levels + agents operacionais. Para GERENCIAR projeto/agentes "
+            "dev, os agentes sao: Cosimo (Chief of Staff, orquestrador) + Cosmo "
+            "(COO, execucao cross-funcional) + engineering-manager (gestao de "
+            "eng/pessoas) + scrum-master (cadencia/impedimentos) + "
+            "product-manager. Engenharia pura -> /proj_software. NAO responder "
+            "como assistente generico; usar a skill /bigtech. Apos classificar, "
+            "gravar .bigtech-porte na raiz (porte=early|scale|bigtech)."
         )
         return 0
 

@@ -91,18 +91,21 @@ Em estruturas grandes, VPs ficam abaixo dos C-levels (VP de Engenharia sob CTO, 
 
 Quem aplica isso na prática é **Cósimo (Chief of Staff)**, selecionando a variante de pipeline. Ver [ORG](ORG.md) seção 5 e [pipeline_release_1.0](pipeline_release_1.0.md) seção final.
 
-### 5.1. Solo founder / projeto pessoal (1 pessoa) -> Pipeline-Sprint
-Uma pessoa acumula tudo: CEO + CPO + CTO + CISO + CMO. Comum em fundador técnico-domínio (médico-dev, advogado-dev). O pipeline é o mesmo, executado em série e enxuto. Agents ativos: Celso e Caetano; o resto dormente (salvo criticidade: dado de saúde mantém Narciso e Cláudio).
+**Porte arquitetural** = só `early | scale | bigtech` (piso early). Headcount/capacity humana é nota auxiliar (como a org se organiza na prática), **não** o valor de porte nem de `--porte`.
 
-### 5.2. Early-stage startup (2 a 20 pessoas) -> Pipeline-Lean
+### 5.1. Early minimalista / projeto pequeno (capacity tipicamente 1) -> Pipeline-Early
+Uma pessoa pode acumular tudo: CEO + CPO + CTO + CISO + CMO. Comum em fundador técnico-domínio. O porte continua **early** (não existe porte "solo"). Pipeline em série e enxuto. Agents ativos: Celso e Caetano; o resto dormente (salvo criticidade: dado de saúde mantém Narciso e Cláudio).
+
+### 5.2. Early-stage / PMF -> Pipeline-Lean
+Capacity tipicamente pequena a média; a complexidade (PMF, primeiros usuários) define a variante Lean.
 - **a) Fundador único técnico**: CEO + CTO na mesma pessoa; primeira contratação sênior costuma ser PM ou Marketing.
-- **b) Dupla fundadora (mais comum)**: CEO toca produto/mercado/negócio, CTO toca engenharia/infra. Funciona até ~50 pessoas.
+- **b) Dupla fundadora (mais comum)**: CEO toca produto/mercado/negócio, CTO toca engenharia/infra.
 - **c) Trio fundador**: CEO + CTO + (CPO ou CMO). Robusto quando os três domínios são igualmente críticos.
 
-### 5.3. Scale-up (50 a 500 pessoas) -> Pipeline-Padrão
+### 5.3. Scale -> Pipeline-Padrão
 CEO + CPO + CTO + CMO consolidados. COO entra quando a operação cross-funcional fica complexa. CISO surge com preocupação regulatória.
 
-### 5.4. Big tech / enterprise (500+ pessoas) -> Pipeline-Completo
+### 5.4. Bigtech -> Pipeline-Completo
 Constelação inteira: CEO, COO, CFO, CTO, CPO, CMO, CISO, CDO, CHRO, CLO. Cada um com VPs e diretores. Pipeline ramificado em múltiplos produtos, cada um com seu PM e Eng Manager.
 
 ---
@@ -138,7 +141,7 @@ R = Responsável, A = Aprovador, C = Consultado, I = Informado. Matriz completa 
 5. **CMO entrando tarde demais**: produto pronto sem narrativa, lançamento morre.
 6. **Founder técnico recusando contratar CMO**: "se o produto é bom, se vende sozinho". Não se vende.
 7. **CISO subordinado demais**: segurança virando checkbox leva a vazamento.
-8. **Over-engineering de liderança**: nomear 10 C-levels para um projeto solo. Cósimo previne.
+8. **Over-engineering de liderança**: nomear 10 C-levels para um projeto early/pequeno. Cósimo previne.
 
 ---
 
@@ -148,7 +151,7 @@ R = Responsável, A = Aprovador, C = Consultado, I = Informado. Matriz completa 
 >
 > 1. **Estrategicamente**: Celso (CEO), que alinha produto, tecnologia e mercado.
 > 2. **Operacionalmente**: o trio Capitolino (CPO), Caetano (CTO), Camilo (CMO), cada um liderando seu bloco de fases.
-> 3. **Em solo founder ou early-stage**: uma pessoa acumula múltiplas cadeiras; o que muda é onde delegar primeiro quando crescer, decidido por Cósimo (Chief of Staff).
+> 3. **Em early (capacity 1 ou time mínimo)**: uma pessoa acumula múltiplas cadeiras; o que muda é onde delegar primeiro quando crescer, decidido por Cósimo (Chief of Staff).
 >
 > **CIO não é a resposta** para produto digital: cuida de TI corporativa interna, não do produto vendido.
 
