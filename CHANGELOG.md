@@ -6,13 +6,28 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), e
 
 ## [Unreleased]
 
+Trabalho **post-0.2.0** em `main` (versão do plugin em `plugin.json` / marketplace permanece **0.2.0** até release semver futura). Campanha dual-host Claude+Grok **2026-08-16 fechada** - tag de marco: [campanha/2026-08-16-fechada](https://github.com/petrinhu/bigtech_plugin/releases/tag/campanha/2026-08-16-fechada). Índice dos relatórios: [docs/campanha/README.md](docs/campanha/README.md).
+
 ### Added
 
-- **BT-8: evals offline de roteamento `/bigtech`.** Suite em `evals/bigtech_routing/` (`cases.json` CASE-A..D + portes, `run_evals.py` stdlib, README). Politica pos-BT-5: perfis `early|scale|bigtech`, piso early, nunca `solo` como perfil, headcount peso 0, criticidade eleva agents (CISO/CLO). Gate no `scripts/preci.sh` e no CI multi-OS (`python3 evals/bigtech_routing/run_evals.py`). Nao substitui eval LLM real; e harness de politica de classificacao.
+- **BT-8: evals offline de roteamento `/bigtech`.** Suite em `evals/bigtech_routing/` (`cases.json` CASE-A..D + portes, `run_evals.py` stdlib, README). Política pós-BT-5: perfis `early|scale|bigtech`, piso early, nunca `solo` como perfil, headcount peso 0, criticidade eleva agents (CISO/CLO). Gate no `scripts/preci.sh` e no CI multi-OS (`python3 evals/bigtech_routing/run_evals.py`). Não substitui eval LLM real; é harness de política de classificação.
+- **BT-7: gate de drift semântico.** Registry/agents/skills alinhados; falha no CI/`preci` se o inventário canônico divergir do pacote.
+- **BT-4: CI multi-OS no GitHub Actions.** Matrix ubuntu/windows + containers debian/fedora/arch + gitleaks; smoke offline e gates de campanha.
+- **BT-1: ADR de fonte da verdade (SoT).** Classificação dual-authority e critério de o que é produto vs overlay pessoal.
+- **BT-2: manuais da casa em `docs/house/`.** Sync dos 10 manuais canônicos do vault para quem consome o plugin sem vault local.
+- **BT-6: inventário dual-authority + plano de cutover.** CSV/MD de inventário e plano de cutover opcional de `~/.claude` (canário; sem cutover automático na campanha).
+- **BT-9: branch protection em `main`.** Gates de CI obrigatórios no remoto GitHub.
+- **Docs de campanha.** Relatórios PHASE 0, verificações BT-0..BT-9, TST-BT-1, AUD-BT-1 em `docs/campanha/` (índice no README da pasta).
 
 ### Changed
 
-- **BT-5: porte arquitetural sem solo/headcount (piso early).** Valores canonicos de porte = `early | scale | bigtech`. Headcount/capacity humana e nota auxiliar, nao valor de `--porte` nem de `.bigtech-porte`. Skill `/bigtech`, hooks `bigtech_porte_reminder`/`bigtech_reinforce`, Cosimo, `docs/ORG.md`, `pipeline_release_1.0`, `lideranca_pipeline_release`, mapeamento em `/proj_software` e `/tab_pendencias` alinhados. Alias deprecado: `--porte solo` e marcador legado `porte=solo` normalizam para `early` (hooks expoem `early` sem reescrever o arquivo). Pipeline-Sprint renomeado operacionalmente para Pipeline-Early (early minimalista).
+- **BT-5: porte arquitetural sem solo/headcount (piso early).** Valores canônicos de porte = `early | scale | bigtech`. Headcount/capacity humana é nota auxiliar, não valor de `--porte` nem de `.bigtech-porte`. Skill `/bigtech`, hooks `bigtech_porte_reminder`/`bigtech_reinforce`, Cosimo, `docs/ORG.md`, `pipeline_release_1.0`, `lideranca_pipeline_release`, mapeamento em `/proj_software` e `/tab_pendencias` alinhados. Alias deprecado: `--porte solo` e marcador legado `porte=solo` normalizam para `early` (hooks expõem `early` sem reescrever o arquivo). Pipeline-Sprint renomeado operacionalmente para Pipeline-Early (early minimalista).
+- **BT-3: host git só GitHub.** `origin` -> `github.com/petrinhu/bigtech_plugin`; remoção de `.forgejo` e purga operacional de Codeberg/Forgejo/Woodpecker em paths de produto e install.
+
+### Verified (campanha)
+
+- **TST-BT-1:** revalidação da suite de campanha - PASS.
+- **AUD-BT-1:** auditoria de campanha W7 - APROVADO 96/100; sem cutover de `~/.claude`.
 
 ## [0.2.0] - 2026-06-21
 

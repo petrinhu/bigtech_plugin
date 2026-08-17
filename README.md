@@ -18,7 +18,7 @@
 
 ## English
 
-> Structure any project like a digital-product company: a constellation of 51 agents (12 C-level + 39 operational), 4 skills, and governance and TDD hooks. Scales from solo founder to bigtech.
+> Structure any project like a digital-product company: a constellation of 51 agents (12 C-level + 39 operational), 4 skills, and governance and TDD hooks. Scales from **early** through **scale** to **bigtech** (deprecated alias: `solo` → `early`).
 
 ### Welcome, supreme leader
 
@@ -35,6 +35,12 @@ High-stakes decisions (macro architecture, scope, stack, go/no-go, irreversible 
 - **Governance and TDD hooks.** Test guard-rail (red, green, refactor), project-size reassessment, operating-mode reinforcement, and bootstrap of the manuals into the session.
 
 The non-negotiable principle: **the process adapts to the size of the project, never the other way around.** A 200-line CLI does not summon the whole team. The Chief of Staff classifies the size and turns on only what is needed, preventing over-engineering.
+
+**Canonical project sizes (porte):** `early` | `scale` | `bigtech`. Headcount is an auxiliary note, not a size value. Legacy `--porte solo` and marker `porte=solo` normalize to `early` (floor is always at least early).
+
+### Campaign 2026-08-16 (closed)
+
+Dual-host Claude+Grok improvement campaign **closed** on GitHub. Product version remains **0.2.0**; work after that tag lives on `main` as post-0.2.0 until the next release. Highlights: GitHub-only host, multi-OS CI matrix, source-of-truth ADR, dual-authority cutover plan (no automatic cutover of `~/.claude`), porte floor `early`, semantic drift gate, offline routing evals, branch protection on `main`, house manuals sync. Release tag: [campanha/2026-08-16-fechada](https://github.com/petrinhu/bigtech_plugin/releases/tag/campanha/2026-08-16-fechada). Index: [docs/campanha/](docs/campanha/README.md).
 
 ### Installation
 
@@ -201,7 +207,7 @@ Distributed under the [Apache-2.0](./LICENSE) license.
 
 ## Português
 
-> Estruture qualquer projeto como uma empresa de produto digital: uma constelação de 51 agents (12 C-level + 39 operacionais), 4 skills e hooks de governança e TDD. Dimensionável do solo founder à bigtech.
+> Estruture qualquer projeto como uma empresa de produto digital: uma constelação de 51 agents (12 C-level + 39 operacionais), 4 skills e hooks de governança e TDD. Dimensionável de **early** passando por **scale** até **bigtech** (alias depreciado: `solo` → `early`).
 
 ### Bem-vindo, líder supremo
 
@@ -218,6 +224,12 @@ Decisões de altíssimo valor (arquitetura macro, escopo, stack, go/no-go, deplo
 - **Hooks de governança e TDD.** Guard-rail de testes (red, green, refactor), reavaliação de porte do projeto, reforço do modo de operação e bootstrap dos manuais na sessão.
 
 O princípio inegociável: **o processo se adapta ao porte do projeto, nunca o contrário.** Um CLI de 200 linhas não chama o time inteiro. O Chief of Staff classifica o porte e liga só o necessário, prevenindo over-engineering.
+
+**Portes canônicos:** `early` | `scale` | `bigtech`. Headcount é nota auxiliar, não valor de porte. Legado `--porte solo` e marcador `porte=solo` normalizam para `early` (piso sempre early).
+
+### Campanha 2026-08-16 (fechada)
+
+Campanha de melhoria dual-host Claude+Grok **fechada** no GitHub. Versão do produto permanece **0.2.0**; o trabalho após essa tag fica em `main` como post-0.2.0 até a próxima release. Destaques: host só GitHub, CI multi-OS, ADR de fonte da verdade, plano dual-authority (sem cutover automático de `~/.claude`), piso de porte `early`, gate de drift semântico, evals offline de roteamento, branch protection em `main`, sync dos manuais da casa. Tag de release: [campanha/2026-08-16-fechada](https://github.com/petrinhu/bigtech_plugin/releases/tag/campanha/2026-08-16-fechada). Índice: [docs/campanha/](docs/campanha/README.md).
 
 ### Instalação
 
