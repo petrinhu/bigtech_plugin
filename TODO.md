@@ -38,7 +38,7 @@
 | BT-1 | W2 | Arquitetura | FABLE-ORG-ARCH: ADR source-of-truth dual-authority vault×plugin (PHASE 1) <!-- intake:cand-BT-1-2026-08-16 --> | Alta | BT-0 | Alta | ✅ Concluído | ✓ |
 | BT-2 | W2 | Docs | docs/house: sync 10 manuais vault + README de navegação (cópia produto) <!-- intake:cand-BT-2-2026-08-16 --> | Alta | BT-0 | Média | ✅ Concluído | ✓ |
 | BT-5 | W3 | Porte | Eliminar solo/headcount como porte (skill /bigtech + hooks + Cosimo alinhados; piso early) <!-- intake:cand-BT-5-2026-08-16 --> | Alta | BT-1 | Média | 🔍 Pendente verificação | — |
-| BT-6 | W3 | Governança | Inventário dual-authority agents: classificar CORE/OVERLAY/STALE/EXCLUSION + plano cutover <!-- intake:cand-BT-6-2026-08-16 --> | Alta | BT-1 | Alta | 🔍 Pendente verificação | — |
+| BT-6 | W3 | Governança | Inventário dual-authority agents: classificar CORE/OVERLAY/STALE/EXCLUSION + plano cutover <!-- intake:cand-BT-6-2026-08-16 --> | Alta | BT-1 | Alta | ✅ Concluído | ✓ |
 | BT-4 | W3 | CI | CI multi-OS GitHub Actions (matrix espelho tab_pendencias: Ubuntu/Windows + containers) <!-- intake:cand-BT-4-2026-08-16 --> | Alta | BT-3 | Alta | ✅ Concluído | ✓ |
 | BT-7 | W4 | Qualidade | Drift gate semântico registry/agents/skills (CI/hook; PHASE posterior) <!-- intake:cand-BT-7-2026-08-16 --> | Média | BT-6 | Alta | 🔍 Pendente verificação | — |
 | BT-8 | W4 | Evals | Evals de roteamento da skill /bigtech (constelação + porte) <!-- intake:cand-BT-8-2026-08-16 --> | Média | BT-5 | Alta | 🔍 Pendente verificação | — |
