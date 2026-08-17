@@ -147,6 +147,6 @@ Claude Code (`/plugin`), o que remove o registro de todos os hooks.
 ## Reportar uma vulnerabilidade
 
 Encontrou um problema de segurança no plugin? Abra uma issue no repositório
-público (`petrinhu/bigtech_plugin` no Codeberg). Para falhas sensíveis,
+público (`petrinhu/bigtech_plugin` no GitHub). Para falhas sensíveis,
 descreva o impacto e o passo a passo de reprodução sem expor dados de
 terceiros. Correções de segurança são tratadas com prioridade.

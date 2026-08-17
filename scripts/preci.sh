@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # preci.sh — gates locais de pre-CI do plugin "bigtech" (TST-T15).
 #
-# Roda os mesmos gates que o CI do Codeberg (.forgejo/workflows/ci.yml), na ordem,
-# e FALHA no primeiro erro (fail-fast). Rode-o antes de abrir PR / push pra pegar
-# problema na maquina, sem gastar fila de runner.
+# Roda os mesmos gates que o CI futuro no GitHub Actions (.github/workflows/ci.yml),
+# na ordem, e FALHA no primeiro erro (fail-fast). Rode-o antes de abrir PR / push
+# pra pegar problema na maquina, sem gastar fila de runner.
 #
 # Gates (em ordem), sao 8 no total:
 #   1. Gate ZERO-ORFAOS (spec 4.1)   -> python3 scripts/validate_plugin.py

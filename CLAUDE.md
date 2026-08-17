@@ -69,9 +69,8 @@ PHASE 0 DoD (freeze + baseline): SHA dos três repos relevantes; inventário exa
 
 ## Host git
 
-- **GitHub único** para trabalho futuro da campanha (`petrinhu/bigtech_plugin` já existe no SHA `61c3ea4`).
-- **`origin` ainda Codeberg** no baseline local = **dívida da campanha** (migração + purge `.forgejo/` + workflows GitHub).
-- Residual medido no baseline: há `.forgejo/`; **sem** `.github/workflows` no tree local.
+- **GitHub único e oficial:** `https://github.com/petrinhu/bigtech_plugin` — `origin` aponta para este host.
+- Residual de purge: histórico/CHANGELOG e docs de campanha (PHASE 0) ainda podem citar Codeberg legado; CI GitHub Actions multi-OS = fatia BT-4 (workflow ainda pode estar ausente nesta árvore).
 
 ## Reopen (claude / grok -c)
 

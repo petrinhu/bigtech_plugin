@@ -5,7 +5,7 @@
 
 Construção de um **plugin Claude Code distribuível** que empacota a organização "bigtech"
 (constelação de agents C-level + operacionais, sem jogo nem perícia) com skills de orquestração,
-hooks e docs. Destino: `https://codeberg.org/petrinhu/bigtech_plugin.git`. Licença: Apache-2.0.
+hooks e docs. Destino: `https://github.com/petrinhu/bigtech_plugin.git`. Licença: Apache-2.0.
 
 ## Artefatos de construção (locais, não versionados)
 

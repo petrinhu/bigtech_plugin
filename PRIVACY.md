@@ -64,8 +64,7 @@ effective date above is updated when the policy changes.
 
 Questions about this policy can be raised through the public repository issues:
 
-- Codeberg: https://codeberg.org/petrinhu/bigtech_plugin
-- GitHub mirror: https://github.com/petrinhu/bigtech_plugin
+- GitHub: https://github.com/petrinhu/bigtech_plugin
 
 Maintainer handle: `petrinhu`.
 
@@ -130,10 +129,9 @@ projeto. A data de vigência acima é atualizada quando a política muda.
 
 ### Contato
 
-Dúvidas sobre esta política podem ser registradas pelas issues dos repositórios
-públicos:
+Dúvidas sobre esta política podem ser registradas pelas issues do repositório
+público:
 
-- Codeberg: https://codeberg.org/petrinhu/bigtech_plugin
-- Espelho no GitHub: https://github.com/petrinhu/bigtech_plugin
+- GitHub: https://github.com/petrinhu/bigtech_plugin
 
 Handle do mantenedor: `petrinhu`.

@@ -10,7 +10,7 @@
 
 ### You are an AI agent
 
-You are an AI agent (Claude). If the user pointed you at this repository and asked something like "install the bigtech plugin from codeberg.org/petrinhu/bigtech_plugin", this file is your script. Follow the steps below in order, **stop before installing** if the conflict check (the "Name conflicts" section) finds a collision, and report to the user what you did.
+You are an AI agent (Claude). If the user pointed you at this repository and asked something like "install the bigtech plugin from github.com/petrinhu/bigtech_plugin", this file is your script. Follow the steps below in order, **stop before installing** if the conflict check (the "Name conflicts" section) finds a collision, and report to the user what you did.
 
 General rule: prefer the main path (remote marketplace). Use the local-clone alternative only if the user asked for it, if the environment has no network, or if the remote registry fails.
 
@@ -30,7 +30,7 @@ Package identity (confirmed in `.claude-plugin/plugin.json` and `.claude-plugin/
 | Plugin | `bigtech` |
 | Version | `0.2.0` |
 | License | `Apache-2.0` |
-| Repository | `https://codeberg.org/petrinhu/bigtech_plugin` |
+| Repository | `https://github.com/petrinhu/bigtech_plugin` |
 | Author | `petrinhu` |
 
 ### Installation in Claude Code (main path)
@@ -38,7 +38,7 @@ Package identity (confirmed in `.claude-plugin/plugin.json` and `.claude-plugin/
 Run these slash commands in Claude Code, in order:
 
 ```
-/plugin marketplace add codeberg.org/petrinhu/bigtech_plugin
+/plugin marketplace add github.com/petrinhu/bigtech_plugin
 /plugin install bigtech@petrinhu
 ```
 
@@ -65,7 +65,7 @@ What you need to know to make the plugin work on the user's operating system. Tw
 Use this when the user asked to install from a local copy, when there is no network, or when the remote registry failed.
 
 ```bash
-git clone https://codeberg.org/petrinhu/bigtech_plugin
+git clone https://github.com/petrinhu/bigtech_plugin
 ```
 
 Then, in Claude Code, register the marketplace from the cloned path and install:
@@ -136,7 +136,7 @@ From there, `/proj_software` runs the software cycle and `/tab_pendencias` plans
 
 ### Você é um agente de IA
 
-Você é um agente de IA (Claude). Se o usuário apontou você para este repositório e pediu algo como "instala o plugin bigtech de codeberg.org/petrinhu/bigtech_plugin", este arquivo é o seu roteiro. Siga os passos abaixo na ordem, **pare antes de instalar** se a verificação de conflito (seção "Conflito de nomes") acusar colisão, e relate ao usuário o que você fez.
+Você é um agente de IA (Claude). Se o usuário apontou você para este repositório e pediu algo como "instala o plugin bigtech de github.com/petrinhu/bigtech_plugin", este arquivo é o seu roteiro. Siga os passos abaixo na ordem, **pare antes de instalar** se a verificação de conflito (seção "Conflito de nomes") acusar colisão, e relate ao usuário o que você fez.
 
 Regra geral: prefira o caminho principal (marketplace remoto). Use a alternativa de clone local só se o usuário pediu, se o ambiente não tem rede, ou se o registro remoto falhar.
 
@@ -156,7 +156,7 @@ Identidade do pacote (confirmada em `.claude-plugin/plugin.json` e `.claude-plug
 | Plugin | `bigtech` |
 | Versão | `0.2.0` |
 | Licença | `Apache-2.0` |
-| Repositório | `https://codeberg.org/petrinhu/bigtech_plugin` |
+| Repositório | `https://github.com/petrinhu/bigtech_plugin` |
 | Autor | `petrinhu` |
 
 ### Instalação no Claude Code (caminho principal)
@@ -164,7 +164,7 @@ Identidade do pacote (confirmada em `.claude-plugin/plugin.json` e `.claude-plug
 Execute estes comandos de barra no Claude Code, na ordem:
 
 ```
-/plugin marketplace add codeberg.org/petrinhu/bigtech_plugin
+/plugin marketplace add github.com/petrinhu/bigtech_plugin
 /plugin install bigtech@petrinhu
 ```
 
@@ -191,7 +191,7 @@ O que você precisa saber para o plugin funcionar no sistema operacional do usu�
 Use quando o usuário pediu instalação a partir de uma cópia local, quando não há rede, ou quando o registro remoto falhou.
 
 ```bash
-git clone https://codeberg.org/petrinhu/bigtech_plugin
+git clone https://github.com/petrinhu/bigtech_plugin
 ```
 
 Em seguida, no Claude Code, registre o marketplace a partir do caminho clonado e instale:

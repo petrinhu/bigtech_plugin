@@ -4,7 +4,7 @@
   "description": "Marketplace de petrinhu: distribui o plugin bigtech, que monta uma constelação de agents C-level e operacionais com skills de orquestração para tocar produto e ciclo de vida de software como uma bigtech.",
   "owner": {
     "name": "petrinhu",
-    "url": "https://codeberg.org/petrinhu"
+    "url": "https://github.com/petrinhu"
   },
   "plugins": [
     {

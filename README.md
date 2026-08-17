@@ -4,13 +4,13 @@
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-4C8EDA?style=for-the-badge)](./LICENSE)
 
-[![Release](https://img.shields.io/gitea/v/release/petrinhu/bigtech_plugin?gitea_url=https://codeberg.org&style=for-the-badge&color=2EA043&label=release)](https://codeberg.org/petrinhu/bigtech_plugin/releases)
-[![CI status (Forgejo Actions)](https://codeberg.org/petrinhu/bigtech_plugin/actions/workflows/ci.yml/badge.svg)](https://codeberg.org/petrinhu/bigtech_plugin/actions)
+[![Release](https://img.shields.io/github/v/release/petrinhu/bigtech_plugin?style=for-the-badge&color=2EA043&label=release)](https://github.com/petrinhu/bigtech_plugin/releases)
+[![CI](https://img.shields.io/github/actions/workflow/status/petrinhu/bigtech_plugin/ci.yml?style=for-the-badge&label=CI)](https://github.com/petrinhu/bigtech_plugin/actions/workflows/ci.yml)
 
 [![Agents](https://img.shields.io/badge/agents-51-4F4F4F?style=for-the-badge)](#what-it-is)
 [![Skills](https://img.shields.io/badge/skills-4-4F4F4F?style=for-the-badge)](#what-it-is)
 [![Hooks](https://img.shields.io/badge/hooks-6-4F4F4F?style=for-the-badge)](#hooks)
-[![PRs welcome](https://img.shields.io/badge/PRs-welcome-4F4F4F?style=for-the-badge)](https://codeberg.org/petrinhu/bigtech_plugin/pulls)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-4F4F4F?style=for-the-badge)](https://github.com/petrinhu/bigtech_plugin/pulls)
 
 **[English](#english)** (below) · **[Português](#português)** (abaixo)
 
@@ -54,7 +54,7 @@ The non-negotiable principle: **the process adapts to the size of the project, n
 Then install `bigtech` itself:
 
 ```
-/plugin marketplace add codeberg.org/petrinhu/bigtech_plugin
+/plugin marketplace add github.com/petrinhu/bigtech_plugin
 /plugin install bigtech@petrinhu
 ```
 
@@ -68,7 +68,7 @@ The only hard prerequisite is **`python3` resolvable on your PATH** (the plugin'
 - **macOS:** install via `xcode-select --install` or `brew install python`.
 - **Windows (native):** the **Microsoft Store** Python registers the `python3` alias automatically (recommended). The python.org installer gives `python`/`py` but not `python3`; if `python3 --version` fails, the plugin ships a `bin/python3.cmd` shim you can place on your PATH, or just use **WSL**.
 
-The companion dependencies (`superpowers`, `playwright`, `frontend-design`) are installed through Claude Code itself, the same on every OS. The agents' runtime tools are handled automatically (each one is offered or installed per your OS when a task needs it; nothing runs silently). Step-by-step per OS, including verification, in the [Installation wiki page](https://codeberg.org/petrinhu/bigtech_plugin/wiki/Installation).
+The companion dependencies (`superpowers`, `playwright`, `frontend-design`) are installed through Claude Code itself, the same on every OS. The agents' runtime tools are handled automatically (each one is offered or installed per your OS when a task needs it; nothing runs silently). Step-by-step per OS, including verification, in the [Installation wiki page](https://github.com/petrinhu/bigtech_plugin/wiki/Installation).
 
 If you are an AI agent installing this plugin on behalf of a user, see [AGENTS.md](AGENTS.md).
 
@@ -176,7 +176,7 @@ You can change it manually: edit the `model` field in the header of any agent in
 
 ### Documentation
 
-**Wiki (beginner-friendly, didactic):** the [project Wiki](https://codeberg.org/petrinhu/bigtech_plugin/wiki) has one page per agent, hook, and skill, plus a glossary, an installation guide, and a step-by-step usage guide.
+**Wiki (beginner-friendly, didactic):** the [project Wiki](https://github.com/petrinhu/bigtech_plugin/wiki) has one page per agent, hook, and skill, plus a glossary, an installation guide, and a step-by-step usage guide.
 
 The governance manuals ship with the plugin in `docs/` and are injected into the session context:
 
@@ -237,7 +237,7 @@ O princípio inegociável: **o processo se adapta ao porte do projeto, nunca o c
 Em seguida, instale o `bigtech`:
 
 ```
-/plugin marketplace add codeberg.org/petrinhu/bigtech_plugin
+/plugin marketplace add github.com/petrinhu/bigtech_plugin
 /plugin install bigtech@petrinhu
 ```
 
@@ -251,7 +251,7 @@ O único pré-requisito rígido é **`python3` resolvível no seu PATH** (os hoo
 - **macOS:** instale via `xcode-select --install` ou `brew install python`.
 - **Windows (nativo):** o Python da **Microsoft Store** registra o alias `python3` automaticamente (recomendado). O instalador do python.org dá `python`/`py`, mas não o `python3`; se `python3 --version` falhar, o plugin traz um shim `bin/python3.cmd` que você pode colocar no PATH, ou então use **WSL**.
 
-As dependências companion (`superpowers`, `playwright`, `frontend-design`) são instaladas pelo próprio Claude Code, iguais em todo SO. As ferramentas de runtime dos agents são tratadas automaticamente (cada uma é oferecida ou instalada conforme o seu SO quando uma tarefa precisa; nada roda em silêncio). Passo a passo por SO, com verificação, na [página de Instalação da wiki](https://codeberg.org/petrinhu/bigtech_plugin/wiki/Instalacao).
+As dependências companion (`superpowers`, `playwright`, `frontend-design`) são instaladas pelo próprio Claude Code, iguais em todo SO. As ferramentas de runtime dos agents são tratadas automaticamente (cada uma é oferecida ou instalada conforme o seu SO quando uma tarefa precisa; nada roda em silêncio). Passo a passo por SO, com verificação, na [página de Instalação da wiki](https://github.com/petrinhu/bigtech_plugin/wiki/Instalacao).
 
 Se você é um agente de IA instalando este plugin a pedido de um usuário, veja [AGENTS.md](AGENTS.md).
 
@@ -359,7 +359,7 @@ Você pode mudar manualmente: edite o campo `model` no cabeçalho de qualquer ag
 
 ### Documentação
 
-**Wiki (didática, para iniciantes):** a [Wiki do projeto](https://codeberg.org/petrinhu/bigtech_plugin/wiki) tem uma página por agente, hook e skill, além de glossário, guia de instalação e de uso passo a passo.
+**Wiki (didática, para iniciantes):** a [Wiki do projeto](https://github.com/petrinhu/bigtech_plugin/wiki) tem uma página por agente, hook e skill, além de glossário, guia de instalação e de uso passo a passo.
 
 Os manuais de governança acompanham o plugin em `docs/` e são injetados no contexto da sessão:
 
