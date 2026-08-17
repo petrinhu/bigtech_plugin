@@ -7,16 +7,16 @@
 > Cosimo → thread direta (anti-OE; 10 ativos BT-*, grafo linear). Tabela 1.0 histórica
 > foi consolidada por Cosmo/COO a partir de 4 lentes.
 >
-> **Estado atual:** Release 1.0 fechado (ondas W1-W8 + W-WIKI ✅). Campanha ativa **2026-08-16** =
-> IDs **`BT-*`** no topo (ondas **W1..W5**); fechamento **`TST-BT-1` (W6) ✅** → **`AUD-BT-1` (W7)**
-> fica no **fim da tabela** (W7 ainda pendente) + plano
+> **Estado atual:** Release 1.0 fechado (ondas W1-W8 + W-WIKI ✅). Campanha **2026-08-16** =
+> IDs **`BT-*`** no topo (ondas **W1..W5**) + **`TST-BT-1` (W6) ✅** + **`AUD-BT-1` (W7) ✅**
+> (auditoria em `docs/campanha/2026-08-16-aud-bt1-campaign-audit.md`) + plano
 > `PLANO-MELHORIA-BIGTECH-CLAUDE-CODE-2026-08-16.md`. Legados **N9**, **OS-1..5** e **TOOL-1..4**
 > cancelados 2026-08-16 (legacy/OE). Catálogo genérico T5/T12/AUD-DISC|ARCH|COV|DEPS|LANG: **skip**
 > (cobertos por suite 1.0 ✅ ou anti-OE; ver nota add_tests_audit).
 
 - **Caminho crítico (1.0, concluído):** `F1 → H3 → A2* → S1 → TST-ORFAOS → AUD-PRIV → R4`.
 - **Caminho crítico (pós-1.0 histórico):** `N8` ✅; `N9` cancelado 2026-08-16 (legacy/OE, fora da campanha BT-*).
-- **Caminho crítico (campanha BT-\*, ativo):** `BT-0` (W1) → `BT-3`/`BT-1`/`BT-2` (W2) → `BT-5`/`BT-6`/`BT-4` (W3) → `BT-7`/`BT-8` (W4) → `BT-9` (W5) → `TST-BT-1` (W6) → `AUD-BT-1` (W7). Fundação restante = `BT-1` (bloqueia BT-5/BT-6). `BT-9` gated pelo líder; fechamento = revalidação + auditoria de campanha. Reorder 16/08/26: Cosimo → thread direta; 🔍 não bloqueia dependentes de fatia já entregue.
+- **Caminho crítico (campanha BT-\*, fechado):** `BT-0` (W1) → `BT-3`/`BT-1`/`BT-2` (W2) → `BT-5`/`BT-6`/`BT-4` (W3) → `BT-7`/`BT-8` (W4) → `BT-9` (W5) → `TST-BT-1` (W6) → `AUD-BT-1` (W7) ✅. Sem ⏳/🔍 na campanha BT-\*. Reorder 16/08/26: Cosimo → thread direta.
 - **WIP de paralelização:** campanha BT-\* (main despacha ≤2 agents/rodada). WIP pós-1.0 em N9 **encerrado** com o cancelamento legacy/OE. Era 3 durante o 1.0 (gargalo = 1 revisor humano), 4 só em janelas pontuais (W2, fatiamento de A2\*).
 - **One-way-doors (decisão do líder supremo):** `F1` (nome/layout/`source` do marketplace = contrato público), `R4` (primeira publicação pública — host legado da época; canônico agora GitHub). `N9` (marketplace comunitário) permanece one-way-door **se reaberto**, mas está **cancelado** na tabela até go/no-go pós-campanha.
 - **Abreviações de pré-requisito:** `D1* = D1a,D1b,D1c`; `A2* = A2a,A2b,A2c,A2d,A2e`.
@@ -113,7 +113,7 @@
 | TOOL-3 | W24 | Política-Tools | [CANCELADO 2026-08-16: legacy/OE — fora da campanha BT-*; propagação residual agents = verification aging legado.] Propagar missing-tool-policy aos agents. | Média | TOOL-2 | Média | 💡 Decisão tomada | — |
 | TOOL-4 | W24 | Política-Tools | [CANCELADO 2026-08-16: legacy/OE — fora da campanha BT-*; alinhamento TOOLING/TESTES residual = OE se forçado agora.] Install OS-aware no TOOLING.md. | Baixa | TOOL-2 | Baixa | 💡 Decisão tomada | — |
 | TST-BT-1 | W6 | Testes | Revalidar suite campanha: `preci.sh` + pytest hooks + validate_plugin + smoke + CI multi-OS verde no SHA final (pós BT-5..BT-8; espelha T15/T14 no escopo da campanha). Ver `TESTES.md` § Campanha 2026-08-16. | Alta | BT-5,BT-6,BT-7,BT-8 | Média | ✅ Concluído | ✓ |
-| AUD-BT-1 | W7 | Auditoria | Auditoria de campanha bigtech 2026-08-16: dual-authority, porte solo/headcount, source-of-truth, CI matrix, zero host legado operacional. Consolida no espírito de AUD-REPORT (sem recriar REPORT). Ver `AUDITORIAS.md` § Campanha 2026-08-16. | Alta | TST-BT-1, BT-1, BT-5, BT-6 | Alta | ⏳ Pendente | — |
+| AUD-BT-1 | W7 | Auditoria | Auditoria de campanha bigtech 2026-08-16: dual-authority, porte solo/headcount, source-of-truth, CI matrix, zero host legado operacional. Consolida no espírito de AUD-REPORT (sem recriar REPORT). Ver `AUDITORIAS.md` § Campanha 2026-08-16. Relatório: `docs/campanha/2026-08-16-aud-bt1-campaign-audit.md`. | Alta | TST-BT-1, BT-1, BT-5, BT-6 | Alta | ✅ Concluído | ✓ |
 
 ## Tabela de scoring WSJF (itens-pai funcionais)
 
@@ -181,15 +181,15 @@ Onda canônica (CHK-07: pré-req nunca na mesma onda): W1=L0; W2=L1; W3=L2; W4=`
 | BT-8 | Evals de roteamento `/bigtech` | L3 | 8 | 5 | 8 | 21 | 8 | 2.63 | 3 |
 
 > \* `BT-9` tem o maior WSJF do L3, mas a onda é **W5** (porta do líder no fim), não W4.
-> `BT-1` sobe no L1 (fundação / one-way-door de SoT). Itens 🔍 (BT-0/2/3/4) não bloqueiam
-> dependentes de *código* da fatia já entregue; Status permanece 🔍.
+> `BT-1` sobe no L1 (fundação / one-way-door de SoT). Durante a execução, 🔍 não bloqueava
+> dependentes de *código* da fatia já entregue; após W7 todos os BT-\* estão ✅.
 
 ### Fechamento campanha (add_tests_audit 2026-08-16)
 
 | ID | Item | Nível | Pré-requisito | Onda | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | TST-BT-1 | Revalidar suite campanha (preci+CI) | L4 (após impl) | BT-5,BT-6,BT-7,BT-8 | W6 | ✅ |
-| AUD-BT-1 | Auditoria campanha (SoT/porte/CI/host) | L5 (após teste) | TST-BT-1, BT-1, BT-5, BT-6 | W7 | ⏳ |
+| AUD-BT-1 | Auditoria campanha (SoT/porte/CI/host) | L5 (após teste) | TST-BT-1, BT-1, BT-5, BT-6 | W7 | ✅ |
 
 **Skip catálogo (anti-OE / coberto 1.0):** `TST-T5`≈`TST-DEPS`✅; `TST-T12`≈`TST-DEPS`✅+CI/gitleaks;
 `AUD-DISC`/`AUD-ARCH`/`AUD-COV`/`AUD-DEPS`/`AUD-LANG` — sem ⏳ cosmético (escopo campanha em `AUD-BT-1`);
