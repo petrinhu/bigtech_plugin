@@ -356,3 +356,11 @@ gh api repos/petrinhu/bigtech_plugin/branches/main/protection  # 404
 ```
 
 Fim do relatório Phase 0.
+
+## Pós BT-3 (2026-08-16) — medição after
+
+- origin: https://github.com/petrinhu/bigtech_plugin.git
+- .forgejo: ausente
+- refs operacionais host legado em paths de produto (README/AGENTS/plugin.json/…): 0 (exceto este snapshot e métrica before)
+- medição after: `docs/campanha/phase0-metrics-after-bt3.json`
+- commits de entrega local (pré-verificação): `766eb5a` (origin + remove `.forgejo`), `1bfc800` (purge docs/agents), + fatia status/metrics after

@@ -164,7 +164,7 @@ A campanha não mede sucesso por commits, linhas alteradas ou versão publicada.
 | Hooks bigtech/TDD/tab do plugin duplicados por registro global | globais existentes; plugin ainda não habilitado no snapshot auditado | 0 após migração |
 | `solo` usado como porte/classificação arquitetural | presente | 0 |
 | Headcount usado para determinar perfil arquitetural | presente | 0 |
-| Referências operacionais a Codeberg/Forgejo fora de histórico | presentes | 0 |
+| Referências operacionais a host legado (não-GitHub) | presentes | 0 |
 | GitHub Actions para o repo | 0 workflow verificado / só CI do host anterior no baseline | matrix multi-OS espelho tab_pendencias (ubuntu+windows nativos + debian+fedora+arch em container) **verde** + gates semânticos |
 | Proteção de `main` | desativada | ativada com gate obrigatório |
 | Uso inválido de override `model=fable` por Agent tool | presente no vault | 0 |
@@ -402,7 +402,7 @@ Regra para o relatório final: não remover esta limitação dos prompts. Remove
 
 ### Evidência medida (baseline `61c3ea4`, pré-BT-3)
 
-O vault já registrou saída de Codeberg/Forgejo em agosto de 2026. No baseline do plugin ainda havia (passado; alvo BT-3 = purgar):
+O vault já registrou saída do host legado (fora de escopo; GitHub único) em agosto de 2026. No baseline do plugin ainda havia (passado; alvo BT-3 = purgar):
 
 - `homepage`/`repository` apontando para o host legado;
 - instruções de instalação e clone pelo host legado;
@@ -411,7 +411,7 @@ O vault já registrou saída de Codeberg/Forgejo em agosto de 2026. No baseline 
 
 ### Mecanismo do erro
 
-A migração foi aplicada ao vault e a outros artefatos, mas não fechou o ciclo de distribuição deste plugin. **Ordem do líder 2026-08-16:** GitHub único (`github.com/petrinhu/bigtech_plugin`); eliminar Codeberg/Forgejo/Woodpecker operacionais (BT-3).
+A migração foi aplicada ao vault e a outros artefatos, mas não fechou o ciclo de distribuição deste plugin. **Ordem do líder 2026-08-16:** GitHub único (`github.com/petrinhu/bigtech_plugin`); zero refs operacionais a host legado / só GitHub (BT-3).
 
 ---
 
@@ -1744,7 +1744,7 @@ Após workflow estável:
 
 ### DoD Phase 9
 
-- [ ] zero links operacionais ao host legado (Codeberg/Forgejo/Woodpecker);
+- [ ] zero refs a host legado / só GitHub;
 - [ ] GitHub Actions verde;
 - [ ] main protegida;
 - [ ] release process usa GitHub;
@@ -1953,7 +1953,7 @@ Perguntas obrigatórias:
 7. Todos os agents têm route ou justificativa auto-discovery?
 8. Modelo de execução está separado de modelo estratégico?
 9. O tier **[fable][mais recente]** é chamado por caminho tecnicamente válido?
-10. Há qualquer host legado (Codeberg/Forgejo/Woodpecker) operacional ainda ativo?
+10. Há qualquer host legado (não-GitHub) operacional ainda ativo?
 11. GitHub CI e branch protection estão efetivamente ativos?
 12. `tab_pendencias` possui um owner único?
 13. As diferenças pessoais foram preservadas sem vazar para repo público?

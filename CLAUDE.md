@@ -70,7 +70,9 @@ PHASE 0 DoD (freeze + baseline): SHA dos três repos relevantes; inventário exa
 ## Host git
 
 - **GitHub único e oficial:** `https://github.com/petrinhu/bigtech_plugin` — `origin` aponta para este host.
-- Residual de purge: histórico/CHANGELOG e docs de campanha (PHASE 0) ainda podem citar Codeberg legado; CI GitHub Actions multi-OS = fatia BT-4 (workflow ainda pode estar ausente nesta árvore).
+- **BT-3 entregue local** (`origin` GitHub; `.forgejo` ausente; refs operacionais de produto limpas). Status: `🔍 Pendente verificação`.
+- **BT-4:** CI multi-OS GitHub Actions (matrix; workflow ainda pode estar ausente nesta árvore).
+- Snapshots PHASE 0 (`docs/campanha/phase0-metrics-before.json` e baseline md) preservam medição **before** como prova histórica; não são instrução operacional.
 
 ## Reopen (claude / grok -c)
 

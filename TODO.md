@@ -98,7 +98,7 @@
 | BT-0 | W-BT0 | Campanha | PHASE 0 freeze/baseline/inventario campanha 2026-08-16: medir e fechar DoD (SHA repos + agents/skills/hooks + modelos) <!-- intake:cand-BT-0-2026-08-16 --> | Alta | — | Média | 🔍 Pendente verificação | — |
 | BT-1 | W-BT1 | Arquitetura | FABLE-ORG-ARCH: ADR source-of-truth dual-authority vault×plugin (PHASE 1) <!-- intake:cand-BT-1-2026-08-16 --> | Alta | BT-0 | Alta | ⏳ Pendente | — |
 | BT-2 | W-BT1 | Docs | docs/house: sync 10 manuais vault + README de navegação (cópia produto) <!-- intake:cand-BT-2-2026-08-16 --> | Alta | BT-0 | Média | 🔍 Pendente verificação | — |
-| BT-3 | W-BT2 | Distribuição | Remote GitHub canônico + purgar Codeberg/Forgejo operacional (sem apagar histórico git) <!-- intake:cand-BT-3-2026-08-16 --> | Alta | BT-0 | Média | ⏳ Pendente | — |
+| BT-3 | W-BT2 | Distribuição | Remote GitHub canônico + purgar CI/host legado (`.forgejo`) e refs operacionais; oficial `github.com/petrinhu/bigtech_plugin` (sem apagar histórico git) <!-- intake:cand-BT-3-2026-08-16 --> | Alta | BT-0 | Média | 🔍 Pendente verificação | — |
 | BT-4 | W-BT2 | CI | CI multi-OS GitHub Actions (matrix espelho tab_pendencias: Ubuntu/Windows + containers) <!-- intake:cand-BT-4-2026-08-16 --> | Alta | BT-3 | Alta | ⏳ Pendente | — |
 | BT-5 | W-BT3 | Porte | Eliminar solo/headcount como porte (skill /bigtech + hooks + Cosimo alinhados; piso early) <!-- intake:cand-BT-5-2026-08-16 --> | Alta | BT-1 | Média | ⏳ Pendente | — |
 | BT-6 | W-BT3 | Governança | Inventário dual-authority agents: classificar CORE/OVERLAY/STALE/EXCLUSION + plano cutover <!-- intake:cand-BT-6-2026-08-16 --> | Alta | BT-1 | Alta | ⏳ Pendente | — |

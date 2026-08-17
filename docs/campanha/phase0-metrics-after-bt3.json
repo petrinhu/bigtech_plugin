@@ -1,0 +1,55 @@
+{
+  "measured_at": "2026-08-16",
+  "phase": "0",
+  "slice": "BT-3",
+  "status": "implemented_pending_verification",
+  "repos": {
+    "plugin_bigtech": {
+      "path": "/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/plugin_bigtech",
+      "head_at_measurement_base": "1bfc8008b35103dea29ae0688f6ba961ca4218de",
+      "note": "head may advance when this metrics file is committed",
+      "branch": "main",
+      "origin": "https://github.com/petrinhu/bigtech_plugin.git",
+      "github_url": "https://github.com/petrinhu/bigtech_plugin",
+      "version_plugin_json": "0.2.0"
+    }
+  },
+  "bt3_after": {
+    "origin_is_github": true,
+    "origin": "https://github.com/petrinhu/bigtech_plugin.git",
+    "has_forgejo_workflows": false,
+    "has_github_workflows": false,
+    "github_workflows": [],
+    "refs_host_legado_operacionais_produto": {
+      "value": 0,
+      "pattern": "codeberg\\.org|forgejo|woodpecker",
+      "paths_scanned": [
+        "README.md",
+        "AGENTS.md",
+        ".claude-plugin",
+        "SECURITY.md",
+        "PRIVACY.md",
+        "DEVELOPMENT.md",
+        "CHANGELOG.md",
+        "agents",
+        "skills",
+        "hooks",
+        "scripts",
+        "bin"
+      ],
+      "matches": [],
+      "target": 0
+    },
+    "delivery_commits": [
+      "766eb5a chore(bt-3): origin GitHub + remove .forgejo + metadados/install paths",
+      "1bfc800 docs(bt-3): purge Codeberg/Forgejo/Woodpecker from docs wiki agents TODO"
+    ],
+    "exclusions": [
+      "docs/campanha/phase0-metrics-before.json (snapshot before - not rewritten)",
+      "docs/campanha/2026-08-16-phase0-baseline.md (before body preserved; after section appended)",
+      "git history / CHANGELOG historical narrative where retained as past"
+    ]
+  },
+  "alive_files_removed": false,
+  "push_performed": false
+}
