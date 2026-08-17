@@ -15,6 +15,7 @@ Uso: python3 scripts/smoke_offline.py    (exit 0 = PASS)
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -22,6 +23,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 fails: list[str] = []
+# Temp portátil (Windows não tem /tmp). Usado como cwd e em payloads de hook.
+SMOKE_TMP = tempfile.gettempdir()
+SMOKE_TMP_FILE = str(Path(SMOKE_TMP) / "x.py")
 
 
 def fail(msg: str) -> None:
@@ -163,6 +167,11 @@ def run_hook(script: str, payload: dict) -> tuple[int, str]:
     if invocation is None:
         fail(f"hook '{script}' nao esta declarado em hooks.json (forma exec)")
         return 1, ""
+    # Só no smoke: se python3 do hooks.json não resolve no PATH (runner Windows
+    # sem alias), usa o interpretador desta sessão — espelha bin/python3.cmd.
+    # hooks.json permanece com command=python3 (contrato Claude Code).
+    if invocation and invocation[0] == "python3" and shutil.which("python3") is None:
+        invocation = [sys.executable, *invocation[1:]]
     proc = subprocess.run(
         invocation,
         input=json.dumps(payload),
@@ -170,7 +179,7 @@ def run_hook(script: str, payload: dict) -> tuple[int, str]:
         text=True,
         env=env,
         timeout=15,
-        cwd="/tmp",
+        cwd=SMOKE_TMP,
     )
     return proc.returncode, (proc.stdout or "") + (proc.stderr or "")
 
@@ -184,7 +193,10 @@ else:
     print("  session_init: docs-bootstrap OK (cita os manuais)")
 
 # 5b. reinforce: prompt de ativacao deve rotear para /bigtech
-rc, out = run_hook("bigtech_reinforce.py", {"prompt": "montar o time c-level bigtech", "cwd": "/tmp"})
+rc, out = run_hook(
+    "bigtech_reinforce.py",
+    {"prompt": "montar o time c-level bigtech", "cwd": SMOKE_TMP},
+)
 if rc != 0:
     fail(f"bigtech_reinforce exit {rc} (deveria ser 0)")
 if "bigtech" not in out.lower():
@@ -200,7 +212,14 @@ else:
     print("  porte_reminder: exit 0 (silent) OK")
 
 # 5d. tdd_guard: sem config de TDD, deve liberar (exit 0)
-rc, _ = run_hook("tdd_guard.py", {"tool_name": "Edit", "tool_input": {"file_path": "/tmp/x.py"}, "cwd": "/tmp"})
+rc, _ = run_hook(
+    "tdd_guard.py",
+    {
+        "tool_name": "Edit",
+        "tool_input": {"file_path": SMOKE_TMP_FILE},
+        "cwd": SMOKE_TMP,
+    },
+)
 if rc not in (0,):
     fail(f"tdd_guard exit {rc} sem config (deveria liberar com 0)")
 else:
@@ -208,7 +227,7 @@ else:
 
 # 5e. tab_pendencias_reminder: projeto classificado (.bigtech-porte) sem TODO.md
 #     deve disparar o lembrete de /tab_pendencias (exit 0 + cita a skill).
-#     Usa um diretorio temporario isolado para nao depender do estado de /tmp.
+#     Usa um diretorio temporario isolado (portável; não assume /tmp).
 with tempfile.TemporaryDirectory(prefix="bigtech-smoke-") as tmp:
     (Path(tmp) / ".bigtech-porte").write_text("porte=early\n", encoding="utf-8")
     # NAO criamos TODO.md de proposito: e a condicao que arma o gatilho.
@@ -222,7 +241,14 @@ with tempfile.TemporaryDirectory(prefix="bigtech-smoke-") as tmp:
 
 # 5f. tdd_runner: payload minimo, projeto sem .claude/tdd-guard.json -> nao roda
 #     a suite e nunca quebra o fluxo (exit 0).
-rc, _ = run_hook("tdd_runner.py", {"tool_name": "Write", "tool_input": {"file_path": "/tmp/x.py"}, "cwd": "/tmp"})
+rc, _ = run_hook(
+    "tdd_runner.py",
+    {
+        "tool_name": "Write",
+        "tool_input": {"file_path": SMOKE_TMP_FILE},
+        "cwd": SMOKE_TMP,
+    },
+)
 if rc != 0:
     fail(f"tdd_runner exit {rc} sem config (deveria ser 0/inerte)")
 else:
