@@ -34,7 +34,7 @@
 | ID | Onda | Grupo | Descrição Técnica | Prioridade | Pré-requisito | Dificuldade | Status | Estado Auditado |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | BT-0 | W1 | Campanha | PHASE 0 freeze/baseline/inventario campanha 2026-08-16: medir e fechar DoD (SHA repos + agents/skills/hooks + modelos) <!-- intake:cand-BT-0-2026-08-16 --> | Alta | — | Média | ✅ Concluído | ✓ |
-| BT-3 | W2 | Distribuição | Remote GitHub canônico + purgar CI/host legado (`.forgejo`) e refs operacionais; oficial `github.com/petrinhu/bigtech_plugin` (sem apagar histórico git) <!-- intake:cand-BT-3-2026-08-16 --> | Alta | BT-0 | Média | 🔍 Pendente verificação | — |
+| BT-3 | W2 | Distribuição | Remote GitHub canônico + purgar CI/host legado (`.forgejo`) e refs operacionais; oficial `github.com/petrinhu/bigtech_plugin` (sem apagar histórico git) <!-- intake:cand-BT-3-2026-08-16 --> | Alta | BT-0 | Média | ✅ Concluído | ✓ |
 | BT-1 | W2 | Arquitetura | FABLE-ORG-ARCH: ADR source-of-truth dual-authority vault×plugin (PHASE 1) <!-- intake:cand-BT-1-2026-08-16 --> | Alta | BT-0 | Alta | 🔍 Pendente verificação | — |
 | BT-2 | W2 | Docs | docs/house: sync 10 manuais vault + README de navegação (cópia produto) <!-- intake:cand-BT-2-2026-08-16 --> | Alta | BT-0 | Média | 🔍 Pendente verificação | — |
 | BT-5 | W3 | Porte | Eliminar solo/headcount como porte (skill /bigtech + hooks + Cosimo alinhados; piso early) <!-- intake:cand-BT-5-2026-08-16 --> | Alta | BT-1 | Média | ⏳ Pendente | — |
