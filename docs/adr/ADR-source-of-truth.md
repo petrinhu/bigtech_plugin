@@ -2,7 +2,7 @@
 
 **Status:** Aceito (decisão autônoma 2026-08-16; confirmar retroativamente)
 **Data:** 2026-08-16
-**Decisores:** petrus (líder) via FABLE-ORG-ARCH / `software-architect` (autor deste ADR)
+**Decisores:** líder (mantenedor) via FABLE-ORG-ARCH / `software-architect` (autor deste ADR)
 **Item do TODO.md:** BT-1 (bloqueia BT-5 e BT-6; pré-req de AUD-BT-1)
 **Fase do plano:** PHASE 1 de `PLANO-MELHORIA-BIGTECH-CLAUDE-CODE-2026-08-16.md`
 **Licença do artefato:** Apache-2.0. Sem segredos, sem credenciais, sem PII, sem paths de máquina.
@@ -66,8 +66,8 @@ de qualquer port. Host git do produto: somente GitHub.
 ### D1. `bigtech_plugin` é a autoridade do conjunto distribuível
 
 **Owner:** repositório público
-[`https://github.com/petrinhu/bigtech_plugin`](https://github.com/petrinhu/bigtech_plugin)
-(plugin `bigtech`, marketplace `petrinhu`).
+[`https://github.com/<owner>/bigtech_plugin`](https://github.com/<owner>/bigtech_plugin)
+(plugin `bigtech`, marketplace do owner no GitHub; ver `.claude-plugin/marketplace.json`).
 
 **Escopo de autoridade** (núcleo medido na PHASE 0, baseline publicado 0.2.0):
 
@@ -103,10 +103,10 @@ antes do canário). Este ADR define o estado-alvo, não executa a remoção.
 O mesmo princípio aplica-se a skills e hooks **core** homônimos: um registro ativo por
 papel. Dois `tdd_runner` no mesmo evento é defeito, não redundância.
 
-**Grok (`~/.grok` e adaptadores):** não é terceira fonte de verdade do produto. É overlay
-de host (symlink, adapter de hook, mapa de modelo, clone de persona). O pacote
-distribuível continua a ser `bigtech_plugin`. Adaptador que reimplementa workflow core é
-`STALE` ou violação desta decisão.
+**Grok (configuração global do host Grok e adaptadores):** não é terceira fonte de
+verdade do produto. É overlay de host (symlink, adapter de hook, mapa de modelo,
+clone de persona). O pacote distribuível continua a ser `bigtech_plugin`. Adaptador
+que reimplementa workflow core é `STALE` ou violação desta decisão.
 
 ### D3. Personalização fica no overlay, não no produto
 
@@ -141,7 +141,7 @@ ou removido. A ergonomia do comando curto **não** justifica dual authority.
 ### D5. `tab_pendencias` tem owner único: o produto standalone
 
 **Owner:** repositório do produto `tab_pendencias`
-([`https://github.com/petrinhu/tab_pendencias`](https://github.com/petrinhu/tab_pendencias)).
+([`https://github.com/<owner>/tab_pendencias`](https://github.com/<owner>/tab_pendencias)).
 
 O plugin **depende** desse produto por **pin** (submódulo / versão taggeada no host Claude)
 ou **symlink** (host Grok), **não** por fork divergente.
@@ -239,7 +239,8 @@ Não autoriza pin de geração na prosa nem nos briefs dual-host. O ID concreto 
 
 Host oficial e único do produto:
 
-`https://github.com/petrinhu/bigtech_plugin`
+`https://github.com/<owner>/bigtech_plugin`
+(owner = mantenedor do marketplace no GitHub; identidade literal em `.claude-plugin/plugin.json`)
 
 Sem remoto operacional para Forgejo/Codeberg ou outro host. Histórico git **não** se apaga
 (BT-3). Snapshots PHASE 0 que citam o host legado são prova histórica, não instrução.
@@ -321,8 +322,9 @@ contexto (este ADR não publica).
 - Relatório de agent ≠ prova: cutover só após medição (`/agents`, hooks uma vez, sha
   do agent ativo = plugin).
 - Verificação de vazamento é no **histórico** (`git log --all -p`), não só na árvore.
-- Grok adapter que copiar agent core para `~/.grok/agents/` recria dual authority no
-  segundo host; o owner continua a ser o plugin.
+- Grok adapter que copiar agent core para a instalação viva do usuário no host Grok
+  (`agents/` do overlay) recria dual authority no segundo host; o owner continua a
+  ser o plugin.
 - Este ADR está **Aceito em modo autônomo**. O líder confirma retroativamente; se
   recusar um D*, o estado-alvo muda **aqui** antes de BT-6 executar.
 
@@ -346,7 +348,9 @@ contexto (este ADR não publica).
 
 - Implementar BT-5 (eliminar solo/headcount como porte).
 - Implementar BT-6 (inventário classificado + plano de cutover).
-- Remover globais vivos, editar `~/.claude` / `~/.grok`, push, tag remota, release.
+- Remover globais vivos; editar a configuração global do Claude Code do usuário
+  (`` `${CLAUDE_CONFIG_DIR}` `` / instalação viva) ou o overlay Grok equivalente;
+  push, tag remota, release.
 - Redesenhar o produto `tab_pendencias`.
 - Alterar frontmatter `model:` dos 51 agents (literal de plataforma; outra fase).
 
