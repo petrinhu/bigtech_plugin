@@ -71,7 +71,7 @@ PHASE 0 DoD (freeze + baseline): SHA dos três repos relevantes; inventário exa
 
 - **GitHub único e oficial:** `https://github.com/petrinhu/bigtech_plugin` — `origin` aponta para este host.
 - **BT-3 entregue local** (`origin` GitHub; `.forgejo` ausente; refs operacionais de produto limpas). Status: `🔍 Pendente verificação`.
-- **BT-4:** CI multi-OS GitHub Actions (matrix; workflow ainda pode estar ausente nesta árvore).
+- **BT-4 entregue local** (`.github/workflows/ci.yml` multi-OS: ubuntu/windows + debian/fedora/arch containers). Status: `🔍 Pendente verificação` (aguardar Actions verde no remoto).
 - Snapshots PHASE 0 (`docs/campanha/phase0-metrics-before.json` e baseline md) preservam medição **before** como prova histórica; não são instrução operacional.
 
 ## Reopen (claude / grok -c)
