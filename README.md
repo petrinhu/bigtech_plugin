@@ -1,16 +1,13 @@
 # bigtech
 
-[![Claude Code Plugin](https://img.shields.io/badge/Claude_Code-plugin-D97757?style=for-the-badge&logo=anthropic&logoColor=white)](https://code.claude.com/docs/en/plugins)
-[![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-4C8EDA?style=for-the-badge)](./LICENSE)
-
-[![Release](https://img.shields.io/github/v/release/petrinhu/bigtech_plugin?style=for-the-badge&color=2EA043&label=release)](https://github.com/petrinhu/bigtech_plugin/releases)
-[![CI](https://img.shields.io/github/actions/workflow/status/petrinhu/bigtech_plugin/ci.yml?style=for-the-badge&label=CI)](https://github.com/petrinhu/bigtech_plugin/actions/workflows/ci.yml)
-
-[![Agents](https://img.shields.io/badge/agents-51-4F4F4F?style=for-the-badge)](#what-it-is)
-[![Skills](https://img.shields.io/badge/skills-4-4F4F4F?style=for-the-badge)](#what-it-is)
-[![Hooks](https://img.shields.io/badge/hooks-6-4F4F4F?style=for-the-badge)](#hooks)
-[![PRs welcome](https://img.shields.io/badge/PRs-welcome-4F4F4F?style=for-the-badge)](https://github.com/petrinhu/bigtech_plugin/pulls)
+![License](https://img.shields.io/badge/license-Apache--2.0-blue)
+![Type](https://img.shields.io/badge/type-Claude%20Code%20Plugin-blue)
+![Grok](https://img.shields.io/badge/Grok-compatible-black)
+![Status](https://img.shields.io/badge/status-stable-brightgreen)
+![Language](https://img.shields.io/badge/lang-pt--br%20%2F%20en-lightgrey)
+![Agents](https://img.shields.io/badge/agents-51-yellow)
+![CI](https://img.shields.io/github/actions/workflow/status/petrinhu/bigtech_plugin/ci.yml?label=CI)
+![Release](https://img.shields.io/github/v/release/petrinhu/bigtech_plugin?label=release)
 
 **[English](#english)** (below) · **[Português](#português)** (abaixo)
 
@@ -38,45 +35,81 @@ The non-negotiable principle: **the process adapts to the size of the project, n
 
 **Canonical project sizes (porte):** `early` | `scale` | `bigtech`. Headcount is an auxiliary note, not a size value. Legacy `--porte solo` and marker `porte=solo` normalize to `early` (floor is always at least early).
 
-### Campaign 2026-08-16 (closed)
-
-Dual-host Claude+Grok improvement campaign **closed** on GitHub. Product version remains **0.2.0**; work after that tag lives on `main` as post-0.2.0 until the next release. Highlights: GitHub-only host, multi-OS CI matrix, source-of-truth ADR, dual-authority cutover plan (no automatic cutover of `~/.claude`), porte floor `early`, semantic drift gate, offline routing evals, branch protection on `main`, house manuals sync. Release tag: [campanha/2026-08-16-fechada](https://github.com/petrinhu/bigtech_plugin/releases/tag/campanha/2026-08-16-fechada). Index: [docs/campanha/](docs/campanha/README.md).
-
 ### Installation
 
-**Recommended companion: `superpowers`.** `bigtech` pairs very well with [`superpowers`](https://claude.com/plugins/superpowers), Anthropic's suite of engineering and process skills (brainstorming, writing-plans, TDD, debugging, and more). Installing it **before** `bigtech` is recommended for the best experience: the agents and skills lean on those flows when they are available.
+Install on **Claude Code** (native plugin) or **Grok** (compatible materialization). The two hosts do not share a plugin system.
+
+#### Claude Code (native plugin)
+
+**Prerequisite:** `python3` on your PATH (`python3 --version`). Hooks spawn as `python3`.
+
+- **Linux:** usually present; else `sudo apt install python3` (or `dnf` / `pacman` / `zypper`).
+- **macOS:** `xcode-select --install` or `brew install python`.
+- **Windows (native):** Microsoft Store Python registers the `python3` alias (recommended). The python.org installer may only provide `python`/`py`; use the plugin's `bin/python3.cmd` shim on PATH, or **WSL**.
+
+Optional companions (install via Claude Code, same on every OS):
 
 ```
 /plugin install superpowers@claude-plugins-official
-```
-
-**Recommended skill for UI work: `frontend-design`.** When the constellation builds or reshapes interfaces (the `ux-ui-designer`, `visual-design-director`, `art-director`, `frontend-engineer`, and `accessibility-specialist` agents), Anthropic's [`frontend-design`](https://github.com/anthropics/skills/blob/main/skills/frontend-design/SKILL.md) skill helps produce distinctive, intentional visual design instead of templated defaults. It ships in the `example-skills` plugin of the `anthropic-agent-skills` marketplace:
-
-```
 /plugin marketplace add anthropics/skills
 /plugin install example-skills@anthropic-agent-skills
 ```
 
-Then install `bigtech` itself:
+`superpowers` pairs well with the constellation; `frontend-design` (in `example-skills`) helps UI agents avoid generic templates. `playwright` is also useful for browser automation.
+
+Install `bigtech`:
 
 ```
-/plugin marketplace add github.com/petrinhu/bigtech_plugin
+/plugin marketplace add https://github.com/petrinhu/bigtech_plugin
+# or a local clone:
+# /plugin marketplace add /path/to/bigtech_plugin
 /plugin install bigtech@petrinhu
 ```
 
-The first command registers the `petrinhu` marketplace. The second installs the `bigtech` plugin from it. The `bigtech@petrinhu` form disambiguates the source; if the environment has only this marketplace, `/plugin install bigtech` also resolves.
+`bigtech@petrinhu` disambiguates the marketplace; if only this marketplace is registered, `/plugin install bigtech` also resolves.
 
-#### Prerequisites per OS
+**After install:** restart the Claude Code session so `bigtech_session_init` can inject manuals and mode reinforcement.
 
-The only hard prerequisite is **`python3` resolvable on your PATH** (the plugin's hooks are spawned as `python3`). Check it with `python3 --version`:
+**Name conflicts.** If global agents, skills, or hooks in `~/.claude/` already use the same names as this plugin, do **not** install over them. Prefer an isolated profile (`CLAUDE_CONFIG_DIR=...`) or retire only the colliding **bigtech core** names. Do **not** delete personal or unrelated agents (`dr-*`, `game-*`, etc.). Detail: [AGENTS.md](AGENTS.md) and the [Installation wiki page](https://github.com/petrinhu/bigtech_plugin/wiki/Installation).
 
-- **Linux:** almost always already present. If missing: `sudo apt install python3` (or `dnf`/`pacman`/`zypper`).
-- **macOS:** install via `xcode-select --install` or `brew install python`.
-- **Windows (native):** the **Microsoft Store** Python registers the `python3` alias automatically (recommended). The python.org installer gives `python`/`py` but not `python3`; if `python3 --version` fails, the plugin ships a `bin/python3.cmd` shim you can place on your PATH, or just use **WSL**.
+If you are an AI agent installing on behalf of a user, follow [AGENTS.md](AGENTS.md).
 
-The companion dependencies (`superpowers`, `playwright`, `frontend-design`) are installed through Claude Code itself, the same on every OS. The agents' runtime tools are handled automatically (each one is offered or installed per your OS when a task needs it; nothing runs silently). Step-by-step per OS, including verification, in the [Installation wiki page](https://github.com/petrinhu/bigtech_plugin/wiki/Installation).
+#### Grok (compatible; no Claude plugin system)
 
-If you are an AI agent installing this plugin on behalf of a user, see [AGENTS.md](AGENTS.md).
+Grok does **not** load Claude Code marketplaces. **Grok-compatible** means you materialize this repo's agents, skills, and hooks on the Grok host. Example on Linux (paths are illustrative; use your clone path):
+
+```bash
+# 1) Clone (or use an existing checkout)
+git clone https://github.com/petrinhu/bigtech_plugin.git /path/to/bigtech_plugin
+CLONE=/path/to/bigtech_plugin
+
+# 2) Agents: copy the 51 product agents; keep Grok-only agents that are not in the plugin
+mkdir -p ~/.grok/agents
+cp "$CLONE"/agents/*.md ~/.grok/agents/
+
+# 3) Skills: symlink product skills into the Grok skills dir
+mkdir -p ~/.grok/skills
+ln -sfn "$CLONE"/skills/bigtech ~/.grok/skills/bigtech
+ln -sfn "$CLONE"/skills/proj_software ~/.grok/skills/proj_software
+ln -sfn "$CLONE"/skills/visual-design-director ~/.grok/skills/visual-design-director
+# tab_pendencias: prefer the standalone product repo, not a fork of the copy inside this plugin
+# ln -sfn /path/to/tab_pendencias ~/.grok/skills/tab_pendencias
+
+# 4) Hooks: copy relevant Python scripts (prefer real files, not symlinks into another host)
+mkdir -p ~/.grok/hooks/scripts
+cp "$CLONE"/hooks/bigtech_*.py "$CLONE"/hooks/tdd_*.py \
+   "$CLONE"/hooks/tab_pendencias_reminder.py \
+   ~/.grok/hooks/scripts/
+# Register events if your Grok host requires it. If Claude compat is on with
+# hooks=false, bigtech/TDD hooks will not double-fire via that path.
+
+# 5) Optional: ensure skills are discoverable
+# In ~/.grok/config.toml, include ~/.grok/skills under [skills].paths
+
+# 6) Restart Grok (/new or process restart) so agents and skills reload
+```
+
+Summary: **Claude** = install the marketplace plugin. **Grok** = copy/symlink agents, skills, and hooks from this repository onto the host. Runtime parity depends on the host; hooks and the subagent protocol are not identical across platforms.
 
 ### Usage
 
@@ -166,9 +199,9 @@ When invoked, every agent runs a pre-flight check on the backlog table (`TODO.md
 
 ### Compatibility
 
-**Platform.** Works on Linux, macOS, and Windows (native or WSL). The hooks are pure Python and run cross-platform; the one prerequisite is `python3` resolvable on the PATH (see [Prerequisites per OS](#prerequisites-per-os), notably the Windows note). When the `tab_pendencias` skill plans tests or audits that need external tools, each tool is offered for installation with your confirmation, using the command that fits your OS (apt/dnf/brew/winget/choco/scoop) and preferring cross-platform managers (pip/uv, cargo, npm). Nothing is installed silently.
+**Platform.** Works on Linux, macOS, and Windows (native or WSL). The hooks are pure Python and run cross-platform; the hard prerequisite on Claude Code is `python3` on the PATH (see [Claude Code (native plugin)](#claude-code-native-plugin), notably the Windows note). When the `tab_pendencias` skill plans tests or audits that need external tools, each tool is offered for installation with your confirmation, using the command that fits your OS (apt/dnf/brew/winget/choco/scoop) and preferring cross-platform managers (pip/uv, cargo, npm). Nothing is installed silently.
 
-**Built for Claude Code (Anthropic).** The plugin uses Claude Code's own features: life-cycle hooks, skills, the subagent protocol, and the plugin/marketplace format. There is no guarantee it works on other AI assistants or code CLIs (for example, Grok, Gemini CLI, GitHub Copilot CLI, OpenAI Codex, Cursor, or Aider); porting to other platforms may require adaptation and is not officially supported.
+**Built for Claude Code (Anthropic).** The official install path is the Claude Code plugin/marketplace format (life-cycle hooks, skills, subagent protocol). **Grok-compatible:** the same agents, skills, and hook scripts can be materialized on a Grok host (see [Grok (compatible)](#grok-compatible-no-claude-plugin-system)); that path is operational but not a second plugin system. Other assistants or code CLIs (Gemini CLI, GitHub Copilot CLI, OpenAI Codex, Cursor, Aider, etc.) are not supported without their own adaptation.
 
 **Incompatible with the `caveman` plugin.** `caveman` compresses communication and conflicts with this plugin's mode reinforcement. Disable `caveman` before using `bigtech`; the session hook warns you if it detects both active at the same time.
 
@@ -227,45 +260,81 @@ O princípio inegociável: **o processo se adapta ao porte do projeto, nunca o c
 
 **Portes canônicos:** `early` | `scale` | `bigtech`. Headcount é nota auxiliar, não valor de porte. Legado `--porte solo` e marcador `porte=solo` normalizam para `early` (piso sempre early).
 
-### Campanha 2026-08-16 (fechada)
-
-Campanha de melhoria dual-host Claude+Grok **fechada** no GitHub. Versão do produto permanece **0.2.0**; o trabalho após essa tag fica em `main` como post-0.2.0 até a próxima release. Destaques: host só GitHub, CI multi-OS, ADR de fonte da verdade, plano dual-authority (sem cutover automático de `~/.claude`), piso de porte `early`, gate de drift semântico, evals offline de roteamento, branch protection em `main`, sync dos manuais da casa. Tag de release: [campanha/2026-08-16-fechada](https://github.com/petrinhu/bigtech_plugin/releases/tag/campanha/2026-08-16-fechada). Índice: [docs/campanha/](docs/campanha/README.md).
-
 ### Instalação
 
-**Companion recomendado: `superpowers`.** O `bigtech` integra-se muito bem com o [`superpowers`](https://claude.com/plugins/superpowers), a suíte de skills de engenharia e processo da Anthropic (brainstorming, writing-plans, TDD, debugging e outras). É recomendável instalá-lo **antes** do `bigtech` para a melhor experiência: os agents e as skills se apoiam nesses fluxos quando estão disponíveis.
+Instale no **Claude Code** (plugin nativo) ou no **Grok** (materialização compatível). Os dois hosts não compartilham o mesmo sistema de plugins.
+
+#### Claude Code (plugin nativo)
+
+**Pré-requisito:** `python3` no PATH (`python3 --version`). Os hooks são invocados como `python3`.
+
+- **Linux:** em geral já presente; senão `sudo apt install python3` (ou `dnf` / `pacman` / `zypper`).
+- **macOS:** `xcode-select --install` ou `brew install python`.
+- **Windows (nativo):** o Python da Microsoft Store registra o alias `python3` (recomendado). O instalador do python.org pode oferecer só `python`/`py`; use o shim `bin/python3.cmd` do plugin no PATH, ou **WSL**.
+
+Companions opcionais (instalados pelo próprio Claude Code, iguais em todo SO):
 
 ```
 /plugin install superpowers@claude-plugins-official
-```
-
-**Skill recomendada para trabalho de UI: `frontend-design`.** Quando a constelação constrói ou reformula interfaces (os agents `ux-ui-designer`, `visual-design-director`, `art-director`, `frontend-engineer` e `accessibility-specialist`), a skill [`frontend-design`](https://github.com/anthropics/skills/blob/main/skills/frontend-design/SKILL.md) da Anthropic ajuda a produzir um design visual distintivo e intencional, em vez de padrões genéricos de template. Ela é distribuída no plugin `example-skills` do marketplace `anthropic-agent-skills`:
-
-```
 /plugin marketplace add anthropics/skills
 /plugin install example-skills@anthropic-agent-skills
 ```
 
-Em seguida, instale o `bigtech`:
+`superpowers` combina bem com a constelação; `frontend-design` (no `example-skills`) ajuda os agents de UI a evitar templates genéricos. `playwright` também é útil para automação de navegador.
+
+Instale o `bigtech`:
 
 ```
-/plugin marketplace add github.com/petrinhu/bigtech_plugin
+/plugin marketplace add https://github.com/petrinhu/bigtech_plugin
+# ou clone local:
+# /plugin marketplace add /path/to/bigtech_plugin
 /plugin install bigtech@petrinhu
 ```
 
-O primeiro comando registra o marketplace `petrinhu`. O segundo instala o plugin `bigtech` a partir dele. A forma `bigtech@petrinhu` desambigua a origem; se o ambiente só tiver esse marketplace, `/plugin install bigtech` também resolve.
+`bigtech@petrinhu` desambigua o marketplace; se só este marketplace estiver registrado, `/plugin install bigtech` também resolve.
 
-#### Pré-requisitos por SO
+**Depois de instalar:** reinicie a sessão do Claude Code para o `bigtech_session_init` injetar os manuais e o reforço de modo.
 
-O único pré-requisito rígido é **`python3` resolvível no seu PATH** (os hooks do plugin são chamados como `python3`). Confira com `python3 --version`:
+**Conflito de nomes.** Se já houver agents, skills ou hooks globais em `~/.claude/` com os mesmos nomes deste plugin, **não** instale por cima. Prefira um perfil isolado (`CLAUDE_CONFIG_DIR=...`) ou aposente só os nomes do **núcleo bigtech** que colidem. **Não** apague agents pessoais ou de outros domínios (`dr-*`, `game-*`, etc.). Detalhe: [AGENTS.md](AGENTS.md) e a [página de Instalação da wiki](https://github.com/petrinhu/bigtech_plugin/wiki/Instalacao).
 
-- **Linux:** quase sempre já presente. Se faltar: `sudo apt install python3` (ou `dnf`/`pacman`/`zypper`).
-- **macOS:** instale via `xcode-select --install` ou `brew install python`.
-- **Windows (nativo):** o Python da **Microsoft Store** registra o alias `python3` automaticamente (recomendado). O instalador do python.org dá `python`/`py`, mas não o `python3`; se `python3 --version` falhar, o plugin traz um shim `bin/python3.cmd` que você pode colocar no PATH, ou então use **WSL**.
+Se você é um agente de IA instalando a pedido de um usuário, siga [AGENTS.md](AGENTS.md).
 
-As dependências companion (`superpowers`, `playwright`, `frontend-design`) são instaladas pelo próprio Claude Code, iguais em todo SO. As ferramentas de runtime dos agents são tratadas automaticamente (cada uma é oferecida ou instalada conforme o seu SO quando uma tarefa precisa; nada roda em silêncio). Passo a passo por SO, com verificação, na [página de Instalação da wiki](https://github.com/petrinhu/bigtech_plugin/wiki/Instalacao).
+#### Grok (compatível; sem o plugin system do Claude)
 
-Se você é um agente de IA instalando este plugin a pedido de um usuário, veja [AGENTS.md](AGENTS.md).
+O Grok **não** carrega marketplaces do Claude Code. **Grok-compatible** significa materializar os agents, skills e hooks deste repositório no host Grok. Exemplo em Linux (caminhos ilustrativos; use o path do seu clone):
+
+```bash
+# 1) Clone (ou use um checkout já existente)
+git clone https://github.com/petrinhu/bigtech_plugin.git /path/to/bigtech_plugin
+CLONE=/path/to/bigtech_plugin
+
+# 2) Agents: copie os 51 agents do produto; preserve agents só-Grok que não estão no plugin
+mkdir -p ~/.grok/agents
+cp "$CLONE"/agents/*.md ~/.grok/agents/
+
+# 3) Skills: symlink das skills do produto no diretório de skills do Grok
+mkdir -p ~/.grok/skills
+ln -sfn "$CLONE"/skills/bigtech ~/.grok/skills/bigtech
+ln -sfn "$CLONE"/skills/proj_software ~/.grok/skills/proj_software
+ln -sfn "$CLONE"/skills/visual-design-director ~/.grok/skills/visual-design-director
+# tab_pendencias: prefira o repositório standalone, não um fork da cópia embutida neste plugin
+# ln -sfn /path/to/tab_pendencias ~/.grok/skills/tab_pendencias
+
+# 4) Hooks: copie os scripts Python relevantes (prefira arquivos reais, não symlink para outro host)
+mkdir -p ~/.grok/hooks/scripts
+cp "$CLONE"/hooks/bigtech_*.py "$CLONE"/hooks/tdd_*.py \
+   "$CLONE"/hooks/tab_pendencias_reminder.py \
+   ~/.grok/hooks/scripts/
+# Registre os eventos se o host Grok exigir. Se o compat Claude estiver com
+# hooks=false, os hooks bigtech/TDD não disparam em dobro por esse caminho.
+
+# 5) Opcional: garantir descoberta das skills
+# Em ~/.grok/config.toml, inclua ~/.grok/skills em [skills].paths
+
+# 6) Reinicie o Grok (/new ou restart do processo) para recarregar agents e skills
+```
+
+Resumo: **Claude** = instalar o plugin do marketplace. **Grok** = copiar/symlink de agents, skills e hooks deste repositório no host. A paridade de runtime depende do host; hooks e o protocolo de subagents não são idênticos entre plataformas.
 
 ### Uso
 
@@ -355,9 +424,9 @@ Ao serem acionados, todos os agents fazem um pre-flight da tabela de pendências
 
 ### Compatibilidade
 
-**Plataforma.** Funciona em Linux, macOS e Windows (nativo ou WSL). Os hooks são Python puro e rodam de forma cross-platform; o único pré-requisito é `python3` resolvível no PATH (veja [Pré-requisitos por SO](#pré-requisitos-por-so), em especial a nota de Windows). Quando a skill `tab_pendencias` planeja testes ou auditorias que precisam de ferramentas externas, cada ferramenta é oferecida para instalação com a sua confirmação, no comando adequado ao seu SO (apt/dnf/brew/winget/choco/scoop) e preferindo gerenciadores cross-platform (pip/uv, cargo, npm). Nada é instalado em silêncio.
+**Plataforma.** Funciona em Linux, macOS e Windows (nativo ou WSL). Os hooks são Python puro e rodam de forma cross-platform; o pré-requisito rígido no Claude Code é `python3` no PATH (veja [Claude Code (plugin nativo)](#claude-code-plugin-nativo), em especial a nota de Windows). Quando a skill `tab_pendencias` planeja testes ou auditorias que precisam de ferramentas externas, cada ferramenta é oferecida para instalação com a sua confirmação, no comando adequado ao seu SO (apt/dnf/brew/winget/choco/scoop) e preferindo gerenciadores cross-platform (pip/uv, cargo, npm). Nada é instalado em silêncio.
 
-**Feito para o Claude Code (Anthropic).** O plugin usa recursos próprios do Claude Code: hooks de ciclo de vida, skills, o protocolo de subagents e o formato de plugin/marketplace. Não há garantia de funcionamento em outros assistentes de IA ou CLIs de código (por exemplo, Grok, Gemini CLI, GitHub Copilot CLI, OpenAI Codex, Cursor ou Aider); portar para outras plataformas pode exigir adaptação e não é suportado oficialmente.
+**Feito para o Claude Code (Anthropic).** O caminho oficial de instalação é o formato de plugin/marketplace do Claude Code (hooks de ciclo de vida, skills, protocolo de subagents). **Grok-compatible:** os mesmos agents, skills e scripts de hook podem ser materializados num host Grok (veja [Grok (compatível)](#grok-compatível-sem-o-plugin-system-do-claude)); esse caminho é operacional, mas não é um segundo sistema de plugins. Outros assistentes ou CLIs de código (Gemini CLI, GitHub Copilot CLI, OpenAI Codex, Cursor, Aider, etc.) não são suportados sem adaptação própria.
 
 **Incompatível com o plugin `caveman`.** O `caveman` comprime a comunicação e conflita com o reforço de modo deste plugin. Desative o `caveman` antes de usar o `bigtech`; o hook de sessão avisa caso detecte os dois ativos ao mesmo tempo.
 

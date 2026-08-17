@@ -38,7 +38,7 @@ Package identity (confirmed in `.claude-plugin/plugin.json` and `.claude-plugin/
 Run these slash commands in Claude Code, in order:
 
 ```
-/plugin marketplace add github.com/petrinhu/bigtech_plugin
+/plugin marketplace add https://github.com/petrinhu/bigtech_plugin
 /plugin install bigtech@petrinhu
 ```
 
@@ -164,7 +164,7 @@ Identidade do pacote (confirmada em `.claude-plugin/plugin.json` e `.claude-plug
 Execute estes comandos de barra no Claude Code, na ordem:
 
 ```
-/plugin marketplace add github.com/petrinhu/bigtech_plugin
+/plugin marketplace add https://github.com/petrinhu/bigtech_plugin
 /plugin install bigtech@petrinhu
 ```
 
