@@ -47,7 +47,7 @@
 | 4 | `check_semantic_drift.py` | **PASS** | rc=0; 51/51 agents; 4 skills; 6 scripts resolvidos; 0 findings |
 | 5 | `evals/bigtech_routing/run_evals.py` | **PASS** | **10/10** PASS, 0 FAIL (CASE-A..D + 6 portes/política) |
 | 6 | `bash scripts/preci.sh` | **PASS** | **PRE-CI PASS — 10/10** (gates 1–4, 7–9 obrigatórios; 5 ruff, 6 gitleaks, 10 claude validate também verdes) |
-| 7 | CI multi-OS GitHub no SHA | **PASS** | run **#13** `31991473856` SHA `0fd66cd` `conclusion=success` **8/8 jobs** |
+| 7 | CI multi-OS GitHub no SHA | **PASS** | produto **#13** `31991473856` SHA `0fd66cd` 8/8; verificação **#14** `31991691630` SHA `82eb52e` 8/8 |
 
 Nenhum FAIL material. Residuais abaixo **não** impedem ✅.
 
@@ -61,7 +61,7 @@ Nenhum FAIL material. Residuais abaixo **não** impedem ✅.
 | Implementação BT-8 (evals + UTF-8) | `4e8843f5b32ac2871bafe04cd1c8056487ed04c5` | último blob de produto dos evals; CI #12 também 8/8 |
 | Implementação BT-7 (drift) | `4ebacb0fc1e5c5bec5456126469411035372711f` | checker ainda idêntico no HEAD |
 | Tag de produto baseline | `bigtech--v0.2.0` → `61c3ea4d9b5fcd75fb4feb9af7bbb020399d1eb6` | não é o SHA desta revalidação |
-| Este relatório | SHA do commit que o introduz | docs + TODO; sem patch de produto |
+| Este relatório | `82eb52ec908d0f7ecbdf45bf56b84cab6ee368bd` | docs + TODO; tag `campanha/w6-tst-bt1`; CI #14 verde |
 
 `git diff 0fd66cd HEAD` no início desta fatia = vazio.
 
@@ -230,7 +230,20 @@ Matrix bate com `.github/workflows/ci.yml`: 2 OS nativos × 2 Pythons + 3 distro
 
 Run imediatamente anterior de produto com o mesmo 8/8: **#12** `31990648852` SHA `4e8843f` (`fix(bt-8): UTF-8/ASCII-safe stdout`). Commits entre `4e8843f` e `0fd66cd` são só docs de verificação (BT-5/6/8/7) + TODO — não tocam os scripts dos gates.
 
-**CI no SHA deste commit de verificação:** preenchido após o push (docs + TODO; esperado verde). Ver secção final se o run já existir no mesmo ficheiro.
+**CI no SHA deste commit de verificação** (`82eb52e`, docs+TODO, sem patch de produto):
+
+| Campo | Valor |
+|---|---|
+| Número | **#14** |
+| ID | `31991691630` |
+| URL | <https://github.com/petrinhu/bigtech_plugin/actions/runs/31991691630> |
+| Evento | `push` em `main` |
+| HEAD | `82eb52ec908d0f7ecbdf45bf56b84cab6ee368bd` |
+| `conclusion` | **`success`** |
+| Jobs | **8/8** (mesma matrix: ubuntu/windows × 3.11/3.12 + debian/fedora/arch + gitleaks) |
+| Janela UTC | 2026-08-17T03:36:17Z → 03:37:05Z |
+
+Prova medida com `gh run view 31991691630 --json` após `git ls-remote origin refs/heads/main` = `82eb52e`. Item 7 vale no SHA de produto **e** no SHA de verificação.
 
 ---
 
