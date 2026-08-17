@@ -142,11 +142,11 @@ Release de frescor da tabela de pendências. **Não há novo agent nem nova skil
 
 ### Fixed
 
-- **Badge de release no README.** O badge de versão apontava para `v0.1.2` (não fora atualizado nos lançamentos 0.1.3 e 0.1.4). Agora usa o endpoint dinâmico do shields.io para Codeberg (`gitea/v/release`), refletindo automaticamente a última release publicada, sem manutenção manual.
+- **Badge de release no README.** O badge de versão apontava para `v0.1.2` (não fora atualizado nos lançamentos 0.1.3 e 0.1.4). Na época passou a usar badge dinâmico de release no host anterior (legado, removido); o canônico é GitHub Releases.
 
 ### Changed
 
-- **CI no runner `codeberg-medium-lazy`.** O workflow Forgejo Actions passou a rodar no pool lazy da Codeberg (carga flexível, mais disponível) após o runner `codeberg-medium` standard ficar longos períodos em fila sem pegar o job.
+- **CI no runner lazy do host anterior.** O workflow de CI do host legado (removido) passou a rodar em pool lazy (carga flexível) após o runner standard ficar longos períodos em fila.
 
 ## [0.1.4] - 2026-06-13
 
@@ -158,7 +158,7 @@ Release de frescor da tabela de pendências. **Não há novo agent nem nova skil
 
 ### Added
 
-- **Badges no README.** Conjunto curado em estilo `for-the-badge`: Claude Code, Python, licença, release, status de CI (vivo, via Forgejo Actions) e contadores de agents, skills e PRs.
+- **Badges no README.** Conjunto curado em estilo `for-the-badge`: Claude Code, Python, licença, release, status de CI (vivo, via o CI do host da época; legado) e contadores de agents, skills e PRs.
 - **Aviso de compatibilidade.** O README, o `AGENTS.md` e os 50 agents passam a destacar que o plugin é feito para o Claude Code (Anthropic) e que não há garantia de funcionamento em outros assistentes ou CLIs de código (por exemplo, Grok, Gemini CLI, GitHub Copilot CLI, OpenAI Codex, Cursor ou Aider).
 
 ## [0.1.2] - 2026-06-13
@@ -180,7 +180,7 @@ Release de frescor da tabela de pendências. **Não há novo agent nem nova skil
 
 ### Fixed
 
-- **CI verde.** Corrigidos 6 avisos do `ruff` (E402, E702, F841) nos testes dos hooks que reprovavam o workflow Forgejo Actions no Codeberg.
+- **CI verde.** Corrigidos 6 avisos do `ruff` (E402, E702, F841) nos testes dos hooks que reprovavam o workflow de CI do host anterior (legado, removido).
 
 ### Added
 
@@ -198,21 +198,21 @@ Release de frescor da tabela de pendências. **Não há novo agent nem nova skil
 - **13 documentos de governança.** Manuais de organização, pipeline de release, liderança, ferramentas, contrato de qualidade, testes, agile, checklist de deploy, auditorias e princípios de arquitetura, higienizados para distribuição pública.
 - **Marketplace `petrinhu`.** Distribuição via `/plugin marketplace add` e `/plugin install bigtech`, sob a licença Apache-2.0.
 
-[0.2.0]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.2.0
-[0.1.16]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.16
-[0.1.15]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.15
-[0.1.14]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.14
-[0.1.13]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.13
-[0.1.12]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.12
-[0.1.11]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.11
-[0.1.10]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.10
-[0.1.9]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.9
-[0.1.8]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.8
-[0.1.7]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.7
-[0.1.6]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.6
-[0.1.5]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.5
-[0.1.4]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.4
-[0.1.3]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.3
-[0.1.2]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.2
-[0.1.1]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.1
-[0.1.0]: https://codeberg.org/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.0
+[0.2.0]: https://github.com/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.2.0
+[0.1.16]: https://github.com/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.16
+[0.1.15]: https://github.com/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.15
+[0.1.14]: https://github.com/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.14
+[0.1.13]: https://github.com/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.13
+[0.1.12]: https://github.com/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.12
+[0.1.11]: https://github.com/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.11
+[0.1.10]: https://github.com/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.10
+[0.1.9]: https://github.com/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.9
+[0.1.8]: https://github.com/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.8
+[0.1.7]: https://github.com/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.7
+[0.1.6]: https://github.com/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.6
+[0.1.5]: https://github.com/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.5
+[0.1.4]: https://github.com/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.4
+[0.1.3]: https://github.com/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.3
+[0.1.2]: https://github.com/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.2
+[0.1.1]: https://github.com/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.1
+[0.1.0]: https://github.com/petrinhu/bigtech_plugin/releases/tag/bigtech--v0.1.0

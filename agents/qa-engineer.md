@@ -333,7 +333,7 @@ Sempre / Intermitente (X em Y tentativas) / 1 vez
 - **4 camadas (Front/Mid/Back/Foundation)** - estratégia de teste por camada: Front (component+e2e+a11y), Mid (contract+integration), Back (unit+integration+contract), Foundation (chaos+perf).
 - **O manual de código (`CONTRACT`) é autoridade do projeto** - ACs derivam do contrato.
 - **O `TODO.md` do projeto** - coverage gaps, mutation gaps, flaky tests viram itens.
-- **CI (Forgejo Actions / Woodpecker / GitHub / GitLab)** - pipeline com test stages paralelizados.
+- **CI (GitHub Actions / GitLab CI)** - pipeline com test stages paralelizados.
 - **MCP `chrome-devtools`** + automação Playwright - disponíveis pra automação real quando os plugins correspondentes estão instalados.
 - **Conventional Commits** - `test(api): ...`, `test(ui): adds e2e for ...`.
 - **Frescor da TODO.md em commits** - ao commitar trabalho que fecha ou avança um item da tabela de pendências (`TODO.md`), citar o ID do item (ex.: `V-12`, `F1.4`) na mensagem do commit (corpo/footer do Conventional Commit) e tocar a coluna `Status` no mesmo commit/PR quando souber (implementação entregue -> `🔍 Pendente verificação`, NUNCA `✅` direto; `✅` só após a onda de teste/auditoria).

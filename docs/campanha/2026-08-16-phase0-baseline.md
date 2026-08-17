@@ -1,5 +1,7 @@
 # PHASE 0 — Baseline reproduzível (campanha bigtech)
 
+> **Snapshot histórico PHASE 0 (freeze).** Estado medido no baseline; não é instrução operacional atual. Ordem 2026-08-16: GitHub único; purga host legado = BT-3.
+
 **Data da medição:** 2026-08-16  
 **Executor:** implementer (Grok, papel [sonnet]/[grok][modelo anterior ao mais recente])  
 **Plano:** `PLANO-MELHORIA-BIGTECH-CLAUDE-CODE-2026-08-16.md` § PHASE 0  
@@ -347,7 +349,7 @@ Não migrar TODO nesta fase. Antes de backlog BT-* da campanha: sanear CHK-11 no
 git -C "$PLUGIN" rev-parse HEAD   # 61c3ea4…
 git -C ~/.claude rev-parse HEAD   # 5b19b52…
 git -C "$TAB" rev-parse HEAD      # 0546c53…
-git -C "$PLUGIN" remote -v        # origin → codeberg
+git -C "$PLUGIN" remote -v        # no freeze: origin → host legado; alvo atual: GitHub
 gh api repos/petrinhu/bigtech_plugin/branches/main/protection  # 404
 # parser agents → docs/campanha/phase0-agents-inventory.csv
 # metrics → docs/campanha/phase0-metrics-before.json

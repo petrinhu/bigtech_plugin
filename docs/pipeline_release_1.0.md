@@ -193,7 +193,7 @@ Caetano (CTO), via `software-architect` (modo colaborativo: opções antes de gr
 Monorepo (Turborepo, Nx) ou polyrepo, branching (trunk-based, GitHub Flow, GitFlow), Conventional Commits + changelog automatizado.
 
 ### 5.2. CI/CD
-CI: lint, type-check, testes, build, SAST, análise de licenças. CD: deploy automático para staging no merge, promoção para produção. Ferramentas: GitHub Actions, GitLab CI, Forgejo Actions, Woodpecker, ou outra plataforma de CI.
+CI: lint, type-check, testes, build, SAST, análise de licenças. CD: deploy automático para staging no merge, promoção para produção. Ferramentas: GitHub Actions (primário neste produto), GitLab CI, ou outra plataforma de CI do host canônico do projeto.
 
 ### 5.3. Ambientes
 local, dev, staging, production. Paridade via variáveis de ambiente (12-factor). Staging com dados sintéticos ou anonimizados.
@@ -439,8 +439,8 @@ Criticidade sobrepõe headcount: projeto solo que toca prontuário médico, dinh
 | Documentação | Notion, Confluence, Obsidian, BookStack |
 | Design | Figma, Penpot, Sketch |
 | Whiteboarding | Miro, FigJam, Excalidraw, tldraw |
-| Repositório | GitHub, GitLab, Forgejo, Codeberg |
-| CI/CD | GitHub Actions, GitLab CI, Forgejo Actions, Woodpecker |
+| Repositório | GitHub (canônico neste produto), GitLab |
+| CI/CD | GitHub Actions (primário), GitLab CI |
 | Observabilidade | Grafana Stack, Sentry, Datadog, UptimeRobot |
 | Comunicação | Slack, Discord, Mattermost, Zulip |
 | Suporte | Intercom, HelpScout, Crisp, Plain |

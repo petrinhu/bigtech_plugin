@@ -12,7 +12,7 @@
 - **Caminho crítico (1.0, concluído):** `F1 → H3 → A2* → S1 → TST-ORFAOS → AUD-PRIV → R4`.
 - **Caminho crítico (pós-1.0, pendente):** `N8 → N9`. N8 (tag/Release 0.1.6) é a fundação imutável que destrava a distribuição; N9 (marketplace comunitário) é a folha do grafo e a porta sem volta.
 - **WIP de paralelização:** 1 na faixa de manutenção pós-1.0 (gargalo = decisão estratégica do líder supremo em N9, não capacidade técnica). Era 3 durante o 1.0 (gargalo = 1 revisor humano), 4 só em janelas pontuais (W2, fatiamento de A2*).
-- **One-way-doors (decisão do líder supremo):** `F1` (nome/layout/`source` do marketplace = contrato público), `R4` (publicação irreversível no Codeberg) e `N9` (submissão a marketplace comunitário de terceiros = exposição pública irreversível).
+- **One-way-doors (decisão do líder supremo):** `F1` (nome/layout/`source` do marketplace = contrato público), `R4` (primeira publicação pública — host legado da época; canônico agora GitHub) e `N9` (submissão a marketplace comunitário de terceiros = exposição pública irreversível).
 - **Abreviações de pré-requisito:** `D1* = D1a,D1b,D1c`; `A2* = A2a,A2b,A2c,A2d,A2e`.
 
 | Status | Significado |
@@ -60,15 +60,15 @@
 | AUD-QUALITY | W6 | Auditoria | Qualidade/consistência de docs/agents/skills (sem god-doc, refs coerentes, terminologia única CEO). | Média | D1*, A1, A2*, S1 | Média | ✅ Concluído | ✓ |
 | TST-T15 | W7 | Testes | Pré-CI: rodar a suíte local (estática + pytest dos hooks + zero-órfãos) antes do push. | Média | TST-T2, TST-ORFAOS, TST-T14 | Baixa | ✅ Concluído | — |
 | AUD-REPORT | W7 | Auditoria | Relatório final consolidado (score, sumário de achados, remediação) antes do gate. | Alta | AUD-SEC, AUD-PRIV, AUD-LICENSE, AUD-QUALITY | Média | ✅ Concluído | ✓ |
-| R4 | W8 | Release | `git init` + publicar no Codeberg (`codeberg.org/petrinhu/bigtech_plugin`). **Gate de publicação / one-way-door — go/no-go do líder supremo.** | Alta | TST-T14, TST-T15, TST-ORFAOS, AUD-REPORT | Baixa | ✅ Concluído | — |
-| W-WIKI | W8 | Release | Wiki do repo (Codeberg/Forgejo wiki-native) + doc `.md` extensa em registro didático para INICIANTE (explica jargão, passo-a-passo). Deriva de `docs/` (linka, não duplica). Execução via `technical-writer`/`ux-writer`. | Baixa | R4 | Média | ✅ Concluído | ✓ |
+| R4 | W8 | Release | `git init` + primeira publicação pública (host legado da época; canônico agora `github.com/petrinhu/bigtech_plugin`). **Gate de publicação / one-way-door — go/no-go do líder supremo.** | Alta | TST-T14, TST-T15, TST-ORFAOS, AUD-REPORT | Baixa | ✅ Concluído | — |
+| W-WIKI | W8 | Release | Wiki do repo (GitHub wiki-native) + doc `.md` extensa em registro didático para INICIANTE (explica jargão, passo-a-passo). Deriva de `docs/` (linka, não duplica). Execução via `technical-writer`/`ux-writer`. | Baixa | R4 | Média | ✅ Concluído | ✓ |
 | N1 | W9 | Manutenção | Conformidade 100% (`validate --strict` + `tag`): marketplace description + migração `CLAUDE.md` → `DEVELOPMENT.md`. *(release 0.1.2)* | Alta | R4 | Baixa | ✅ Concluído | — |
-| N2 | W9 | Manutenção | Badges no `README` + badge de release dinâmico (`gitea/v/release`). *(releases 0.1.2/0.1.3/0.1.5)* | Média | R4 | Baixa | ✅ Concluído | — |
+| N2 | W9 | Manutenção | Badges no `README` + badge de release dinâmico (endpoint shields do host da época; canônico agora GitHub). *(releases 0.1.2/0.1.3/0.1.5)* | Média | R4 | Baixa | ✅ Concluído | — |
 | N3 | W9 | Manutenção | Aviso de compatibilidade só-Claude (`README` + `AGENTS.md` + os 50 agents). *(release 0.1.3)* | Média | R4 | Baixa | ✅ Concluído | — |
 | N4 | W9 | Manutenção | `AskUserQuestion` no campo `tools` dos 50 agents (alinhamento com a autoridade do líder supremo). *(release 0.1.4)* | Média | R4 | Média | ✅ Concluído | — |
 | N5 | W9 | Manutenção | Integração `tab_pendencias`: hook `tab_pendencias_reminder` + pre-flight de `TODO.md` nos 50 agents + coluna Ferramentas no catálogo. *(release 0.1.6)* | Alta | R4, N4 | Média | ✅ Concluído | — |
 | N6 | W9 | Distribuição | Higienização de distribuição: `docs/superpowers` + `TODO`/`TESTES`/`AUDITORIAS` fora do pacote (gitignored); zero PII/wikilinks no tracked. *(release 0.1.6)* | Alta | R4 | Média | ✅ Concluído | — |
-| N7 | W9 | Manutenção | CI resiliente em `codeberg-medium-lazy` (pipeline tolerante a flaky + lazy). *(releases 0.1.5/0.1.6)* | Média | R4 | Média | ✅ Concluído | — |
+| N7 | W9 | Manutenção | CI resiliente no runner lazy do host anterior (legado, removido; pipeline tolerante a flaky). *(releases 0.1.5/0.1.6)* | Média | R4 | Média | ✅ Concluído | — |
 | N8 | W10 | Release | Fechar 0.1.6: CI verde + tag `bigtech--v0.1.6` (imutável) + Release formal. **One-way-door técnico (tag); destravou N9 e N10.** Concluído: CI verde no lazy (1m4s), tag e Release publicadas. | Alta | N1, N5, N6, N7 | Baixa | ✅ Concluído | — |
 | N10 | W12 | Release | Releases formais retroativas 0.1.0 / 0.1.1 (mecânica de Release repetida x2). **Two-way-door; paralelizável com W11. Opcional: dropar com razão registrada se não for puxado.** | Baixa | N8 | Baixa | ✅ Concluído | — |
 | N11 | W13 | Sincronização | Portar dos fontes a regra "porte nunca rebaixa para solo" (piso early; anti-OE calibrado por complexidade): no `cosimo-chief-of-staff` remover a faixa Solo da tabela de porte e renomear o Pipeline-Sprint para early minimalista; nos ~19 agents trocar "projeto solo" por "projeto pequeno". Espelha o commit `a2d68212`. | Média | — | Média | ✅ Concluído | — |
@@ -83,9 +83,9 @@
 | AUD-R6 | W17 | Auditoria | 🟢 Cosméticos de CI/build (via devops-sre): comentário do CI cita o smoke (F23), `claude plugin validate --strict` oficial no preci/CI (F24), trava de sync de versão entre os 2 manifestos (F25), remover `.gitkeep` redundantes (F26), faixa de ano no NOTICE (F27). | Baixa | — | Baixa | ✅ Concluído | ✓ |
 | I18N-1 | W18 | i18n | **Tradução bilíngue (1-eng-intl + 2-pt-br no MESMO arquivo)** de README, wiki e demais docs user-facing (AGENTS, docs/), via i18n-l10n-specialist: inglês internacional primeiro, pt-br em seguida, no mesmo arquivo. Habilita alcance internacional no marketplace oficial. | Média | AUD-R1, AUD-R3, AUD-R5 | Alta | ✅ Concluído | — |
 | AUD-R7 | W19 | Auditoria | **Re-auditoria final pós-remediação** (internal-auditor): rodar N14 (re-higienização PII/wikilinks) + re-testar os achados; virar Estado Auditado para ✓; gate final antes da submissão ao marketplace. | Alta | AUD-R1, AUD-R2, AUD-R3, AUD-R4, AUD-R5, AUD-R6, I18N-1 | Média | ✅ Concluído | ✓ |
-| DIST-1 | W20 | Distribuição | Criar push mirror no GitHub (origem = Codeberg) para viabilizar a submissão ao marketplace oficial (AUD-D02; resolve AUD-U01). Sincronização automática Codeberg → GitHub. | Alta | AUD-R7 | Média | ✅ Concluído | — |
-| SUB-1 | W21 | Distribuição | Preparar o material de submissão ao marketplace oficial `claude-plugins-community` (via product-marketing-manager + technical-writer): descrição de loja em inglês internacional, keywords/categoria, checklist de prontidão (`validate --strict`, repo público GitHub + Codeberg, LICENSE/SECURITY/README bilíngue), link do mirror GitHub e dossiê de revisão para o líder aprovar antes do envio. | Alta | DIST-1, AUD-R7 | Baixa | ✅ Concluído | — |
-| N9 | W22 | Distribuição | Submeter ao marketplace comunitário oficial `claude-plugins-community` (PR de inclusão), mantendo também o marketplace próprio no Codeberg (AUD-D01: ambos os canais). **One-way-door FORTE: exposição pública em marketplace de terceiros; go/no-go do líder supremo via `AskUserQuestion`.** Gargalo externo: security scan + revisão da Anthropic. | Alta | SUB-1, AUD-R7, DIST-1 | Alta | 🔄 Em andamento | — |
+| DIST-1 | W20 | Distribuição | Estabelecer GitHub público (`github.com/petrinhu/bigtech_plugin`) para submissão ao marketplace oficial (AUD-D02; resolve AUD-U01). Host legado deixou de ser origem. | Alta | AUD-R7 | Média | ✅ Concluído | — |
+| SUB-1 | W21 | Distribuição | Preparar o material de submissão ao marketplace oficial `claude-plugins-community` (via product-marketing-manager + technical-writer): descrição de loja em inglês internacional, keywords/categoria, checklist de prontidão (`validate --strict`, repo público GitHub, LICENSE/SECURITY/README bilíngue), link do repo GitHub e dossiê de revisão para o líder aprovar antes do envio. | Alta | DIST-1, AUD-R7 | Baixa | ✅ Concluído | — |
+| N9 | W22 | Distribuição | Submeter ao marketplace comunitário oficial `claude-plugins-community` (PR de inclusão); canal canônico = **GitHub único** + community marketplace (AUD-D01 reescrito 2026-08-16; sem host legado). **One-way-door FORTE: exposição pública em marketplace de terceiros; go/no-go do líder supremo via `AskUserQuestion`.** Gargalo externo: security scan + revisão da Anthropic. | Alta | SUB-1, AUD-R7, DIST-1 | Alta | 🔄 Em andamento | — |
 | OS-1 | W23 | OS-Agnóstico | 🔴 **(Auditoria 1)** `hooks/hooks.json` invoca `python3` nos 7 comandos → no Windows (que registra `python`/`py`, não `python3`) os 6 hooks ficam **silenciosamente inertes** (governança toda morta). Tornar a invocação portável (resolução de intérprete). **DECIDIDO (líder 2026-06-20): Windows NATIVO** — wrapper `python3`→`python`→`py`; abrange também OS-2 (corrigir TDD no Windows). | Alta | — | Média | 🔍 Pendente verificação | — |
 | OS-2 | W23 | OS-Agnóstico | 🟠 **(Auditoria 1)** Subsistema TDD quebra no Windows mesmo com opt-in: `tdd_runner` `shell=True` (cmd.exe ≠ bash), `tdd_common` glob com `/` vs separador `\` do Windows (classifica tudo como ignored → TDD inerte), preset php `vendor/bin/phpunit` (barra POSIX). Normalizar separador antes do match + documentar que o test_command segue o shell do SO. | Média | OS-1 | Média | 🔍 Pendente verificação | — |
 | OS-3 | W23 | OS-Agnóstico | 🟠 **(Auditoria 1)** `visual-design-director` (agent + skill): abrir navegador (`xdg-open`) e captura de tela (`grim`/`spectacle`/`maim`/`scrot`) são Linux-only. Adicionar gêmeos macOS (`open`/`screencapture`) e Windows (`start`/snipping) e reforçar o MCP chrome-devtools como caminho cross-OS primário. Via frontend-engineer. | Média | — | Baixa | 🔍 Pendente verificação | — |
@@ -116,7 +116,7 @@
 | F1 | Estrutura + plugin.json + marketplace.json | 18 | 18 | 20 | 56 | 2 | 28.0 | 2 |
 | R3 | CHANGELOG | 8 | 9 | 7 | 24 | 1 | 24.0 | 3 |
 | H4 | hooks.json | 13 | 14 | 18 | 45 | 2 | 22.5 | 4 |
-| R4 | Publicar no Codeberg (gate) | 17 | 13 | 9 | 39 | 2 | 19.5 | 5 |
+| R4 | Publicar (gate; host legado→GitHub canônico) | 17 | 13 | 9 | 39 | 2 | 19.5 | 5 |
 | H2 | porte_reminder + reinforce | 14 | 9 | 11 | 34 | 3 | 11.3 | 6 |
 | D4 | ORG §0 (transferência de título) | 16 | 9 | 8 | 33 | 3 | 11.0 | 7 |
 | S2 | Skill /proj_software | 13 | 9 | 11 | 33 | 3 | 11.0 | 8 |
@@ -153,16 +153,16 @@ Os itens N1-N7 já foram entregues nas releases 0.1.2 a 0.1.6 e não pontuam. Os
 ## Decisões one-way-door (go/no-go do líder supremo)
 
 1. **`F1`** — congelar nome (`bigtech`), layout e `source` do marketplace antes de abrir a W2 (contrato público; mudar depois quebra quem já instalou). *(concluído)*
-2. **`R4`** — go/no-go da publicação no Codeberg (irreversível; usuários passam a executar os hooks Python na máquina deles). *(concluído)*
+2. **`R4`** — go/no-go da primeira publicação pública (host legado na época; canônico agora GitHub; irreversível; usuários passam a executar os hooks Python na máquina deles). *(concluído)*
 3. **`N9`** — go/no-go da submissão ao marketplace comunitário `claude-plugins-community` (3ª porta sem volta: expõe o plugin publicamente num marketplace de terceiros, sujeito a security scan e revisão da Anthropic). Decidir via `AskUserQuestion` antes de abrir o PR de inclusão. *(pendente; gated por N8)*
 
 ## Decisões da auditoria (saída da auditoria de 9 dimensões)
 
-- **AUD-D01 (canal de distribuição): DECIDIDO → AMBOS.** Submeter ao marketplace oficial `claude-plugins-community` (auto-update dinâmico) E manter o marketplace próprio no Codeberg como espelho/fallback. README/AGENTS a alinhar para os dois canais (em AUD-R3).
-- **AUD-D02 (espelho no GitHub): DECIDIDO → CRIAR.** Push mirror no GitHub para viabilizar a submissão ao oficial (item `DIST-1`), mantendo o Codeberg como origem. Resolve AUD-U01.
+- **AUD-D01 (canal de distribuição): DECIDIDO → GitHub único + community marketplace (ordem líder 2026-08-16 prevalece sobre “AMBOS” legado).** Submeter ao marketplace oficial `claude-plugins-community` (auto-update dinâmico); host de desenvolvimento e distribuição canônico = `github.com/petrinhu/bigtech_plugin`. Host legado (forja anterior + CI legada) **eliminados** do produto (BT-3).
+- **AUD-D02 (GitHub canônico): DECIDIDO → GitHub é a origem.** Repo público GitHub para desenvolvimento, CI e submissão ao oficial (item `DIST-1` + BT-3). Resolve AUD-U01.
 - **AUD-D03 (glifo de travessão em tabelas): DECIDIDO → MANTER (exceção documentada).** O travessão como valor de célula/estado nas tabelas é símbolo de dado, não prosa; documentar a exceção à regra "zero em-dash". Remediar apenas os 10 em-dash de PROSA real (em AUD-R3/AUD-R5).
 - **AUD-D04 (empacotar testes): pendente** — default: manter `hooks/tests/` e `hooks/README-tdd.md` no pacote (úteis para CI/contribuição). Reavaliar se quiser pacote mínimo.
-- **AUD-U01: RESOLVIDO por AUD-D02** — o GitHub é o canal de submissão garantido; o mirror cobre a incerteza sobre o Codeberg.
+- **AUD-U01: RESOLVIDO por AUD-D02 + ordem 2026-08-16** — o GitHub é o único host canônico e o canal de submissão garantido.
 
 ## Notas de cadência (pós-1.0)
 

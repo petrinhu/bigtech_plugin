@@ -28,7 +28,7 @@
 
 - Push, tag, release, cutover destrutivo de `~/.claude`.
 - Merge vault×plugin de conteúdo “melhor dos dois” (authority = vault; plugin legado não reabre revisão).
-- Edição de `AGENTS.md` (install script permanece Codeberg-oriented até fase de migração GitHub).
+- Edição de `AGENTS.md` (install script reescrito para GitHub em BT-3/F1; fora desta fatia house).
 
 ## Critério de aceite do cutover futuro
 

@@ -763,7 +763,7 @@ Após uma release ser efetivamente lançada (tag publicada + artefatos anexados 
 
 - NUNCA apagar pasta versionada (`src/`, `tests/`, `docs/`, etc.).
 - NUNCA apagar `dist/` se a release ainda não anexou os artefatos no servidor.
-- NUNCA apagar `.git/`, `.github/`, configuração de CI (`.forgejo/`, `.woodpecker/`, `.gitlab-ci.yml`) ou outra config persistente.
+- NUNCA apagar `.git/`, `.github/`, configuração de CI (`.github/workflows/`, `.gitlab-ci.yml`) ou outra config persistente.
 - Sempre listar antes, confirmar depois.
 
 ---

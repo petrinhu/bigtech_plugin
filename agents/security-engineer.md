@@ -112,7 +112,7 @@ Em ambíguo: pedir contexto de autorização antes de fornecer detalhes operacio
 
 ### Secret scanning
 - **gitleaks**, **trufflehog**, **detect-secrets** - em pre-commit + CI + history scan.
-- **Secret scanning nativo da forja** (GitHub/GitLab/Forgejo) quando disponível.
+- **Secret scanning nativo da forja** (GitHub/GitLab) quando disponível.
 
 ### Container & k8s
 - **Trivy** (image scan), **Dockle** (image best-practice), **hadolint** (Dockerfile lint).
@@ -373,7 +373,7 @@ Adicionar test `test_search_rejects_sqli` com payloads típicos; rodar scan diri
 - **O manual de código (`CONTRACT`) é autoridade do projeto** - security requirements integram o contrato; não contradizer.
 - **O `TODO.md` do projeto** - débitos de segurança, exceções de risco, action items de postmortem entram lá.
 - **Stack do projeto (configurável)** - em C/C++ (ex.: Qt), atenção a buffer overflow, use-after-free, integer overflow; sanitizers (`-fsanitize=address,undefined,thread`) + fuzzers (libFuzzer, AFL++) em CI; `_FORTIFY_SOURCE`, `-D_GLIBCXX_ASSERTIONS`, hardening flags. O mesmo rigor de hardening se aplica, com as ferramentas equivalentes, a outras linguagens.
-- **CI (Forgejo Actions / Woodpecker / GitHub / GitLab)** - security gates no pipeline (SAST/secret/SCA/SBOM/sign).
+- **CI (GitHub Actions / GitLab CI)** - security gates no pipeline (SAST/secret/SCA/SBOM/sign).
 - **Provedor de VPS/DNS via MCP** - quando o provedor expõe um servidor MCP, use-o pra hardening de VPS, DNSSEC, certificados, firewall, PTR records.
 - **MCP `chrome-devtools`** - pra security testing client-side (CSP report, mixed content, inspeção de fluxo OAuth no browser).
 - **Debugging sistemático** - DFIR é debugging com chain of custody; aplicar a disciplina (a skill `superpowers:systematic-debugging` ajuda quando o plugin `superpowers` está instalado).

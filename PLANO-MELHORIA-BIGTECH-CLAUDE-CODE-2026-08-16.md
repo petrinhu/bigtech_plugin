@@ -165,7 +165,7 @@ A campanha não mede sucesso por commits, linhas alteradas ou versão publicada.
 | `solo` usado como porte/classificação arquitetural | presente | 0 |
 | Headcount usado para determinar perfil arquitetural | presente | 0 |
 | Referências operacionais a Codeberg/Forgejo fora de histórico | presentes | 0 |
-| GitHub Actions para o repo | 0 workflow verificado / só Forgejo no baseline | matrix multi-OS espelho tab_pendencias (ubuntu+windows nativos + debian+fedora+arch em container) **verde** + gates semânticos |
+| GitHub Actions para o repo | 0 workflow verificado / só CI do host anterior no baseline | matrix multi-OS espelho tab_pendencias (ubuntu+windows nativos + debian+fedora+arch em container) **verde** + gates semânticos |
 | Proteção de `main` | desativada | ativada com gate obrigatório |
 | Uso inválido de override `model=fable` por Agent tool | presente no vault | 0 |
 | Drift semântico detectável automaticamente entre registry/agents/skills/docs | não existe gate específico | gate obrigatório |
@@ -400,18 +400,18 @@ Regra para o relatório final: não remover esta limitação dos prompts. Remove
 
 ## I.12. Migração de hospedagem ficou incompleta
 
-### Evidência medida
+### Evidência medida (baseline `61c3ea4`, pré-BT-3)
 
-O vault já registrou saída de Codeberg/Forgejo em agosto de 2026. Entretanto o repo publicado ainda possui:
+O vault já registrou saída de Codeberg/Forgejo em agosto de 2026. No baseline do plugin ainda havia (passado; alvo BT-3 = purgar):
 
-- `homepage`/`repository` apontando para Codeberg;
-- instruções de instalação e clone pelo Codeberg;
-- `.forgejo/workflows/ci.yml`;
-- nenhuma `.github/workflows/` encontrada na auditoria.
+- `homepage`/`repository` apontando para o host legado;
+- instruções de instalação e clone pelo host legado;
+- CI legado sob path do host anterior;
+- nenhuma `.github/workflows/` encontrada na auditoria da época.
 
 ### Mecanismo do erro
 
-A migração foi aplicada ao vault e a outros artefatos, mas não fechou o ciclo de distribuição deste plugin.
+A migração foi aplicada ao vault e a outros artefatos, mas não fechou o ciclo de distribuição deste plugin. **Ordem do líder 2026-08-16:** GitHub único (`github.com/petrinhu/bigtech_plugin`); eliminar Codeberg/Forgejo/Woodpecker operacionais (BT-3).
 
 ---
 
@@ -445,7 +445,7 @@ O próximo gate precisa testar **semântica**, não só higiene textual.
 
 ## II.1. Repositório distribuível
 
-Baseline auditado:
+Baseline auditado (`61c3ea4`, passado — estado pré-BT-3):
 
 - repo: `petrinhu/bigtech_plugin`;
 - `main`: `61c3ea4d9b5fcd75fb4feb9af7bbb020399d1eb6`;
@@ -454,9 +454,10 @@ Baseline auditado:
 - 51 agents e 4 skills declarados no próprio release/AGENTS;
 - `main` **não protegida**;
 - required status checks: nenhum;
-- CI encontrada: `.forgejo/workflows/ci.yml`;
-- GitHub Actions: nenhum workflow encontrado;
-- metadados do plugin ainda apontam para Codeberg.
+- CI encontrada no baseline: path do host anterior (legado a purgar em BT-3/BT-4);
+- GitHub Actions no baseline: nenhum workflow encontrado;
+- metadados do plugin no baseline ainda apontavam para o host legado.
+- **Alvo pós-BT-3 (ordem 2026-08-16):** host canônico `https://github.com/petrinhu/bigtech_plugin`; zero refs operacionais ao host legado.
 
 ---
 
@@ -1696,15 +1697,15 @@ Não usar `|| true`, “tool missing -> PASS” ou skip silencioso em hard gate.
 - manter `scripts/preci.sh` e GitHub Actions chamando os mesmos scripts-base para evitar duas implementações do gate;
 - rodar pelo menos uma prova em ambiente limpo, sem cache local do mantenedor.
 
-## 9.3. Remover Forgejo só depois do GitHub CI verde
+## 9.3. Remover CI legado só depois do GitHub CI verde
 
-Sequência:
+Sequência (BT-3/BT-4; host canônico = GitHub):
 
 ```text
-add GitHub CI
+add GitHub Actions (.github/workflows/)
 -> run green
--> compare coverage with Forgejo CI
--> only then delete .forgejo/workflows/ci.yml
+-> compare coverage with previous-host CI (if still present)
+-> only then delete legacy CI dirs/workflows
 ```
 
 ## 9.4. Canary de instalação/upgrade no Claude Code
@@ -1739,11 +1740,11 @@ Após workflow estável:
 - manifest/marketplace/changelog em paridade;
 - não reutilizar tag;
 - registrar checks executados e limitações conhecidas;
-- não declarar “GitHub migrado” enquanto instalação/documentação ainda apontar operacionalmente para Codeberg.
+- não declarar “GitHub migrado” enquanto instalação/documentação ainda apontar operacionalmente para o host legado.
 
 ### DoD Phase 9
 
-- [ ] zero links operacionais Codeberg;
+- [ ] zero links operacionais ao host legado (Codeberg/Forgejo/Woodpecker);
 - [ ] GitHub Actions verde;
 - [ ] main protegida;
 - [ ] release process usa GitHub;
@@ -1952,7 +1953,7 @@ Perguntas obrigatórias:
 7. Todos os agents têm route ou justificativa auto-discovery?
 8. Modelo de execução está separado de modelo estratégico?
 9. O tier **[fable][mais recente]** é chamado por caminho tecnicamente válido?
-10. Há qualquer Codeberg/Forgejo operacional ainda ativo?
+10. Há qualquer host legado (Codeberg/Forgejo/Woodpecker) operacional ainda ativo?
 11. GitHub CI e branch protection estão efetivamente ativos?
 12. `tab_pendencias` possui um owner único?
 13. As diferenças pessoais foram preservadas sem vazar para repo público?
@@ -2111,7 +2112,7 @@ core duplicate agents: X -> Y
 hook duplicates: X -> Y
 headcount-dependent classifications: X -> Y
 semantic gate failures: X -> Y
-Codeberg live refs: X -> Y
+legacy-host live refs: X -> Y
 GitHub required gates: X -> Y
 ```
 
@@ -2130,7 +2131,7 @@ Sem delta, não chamar atividade de progresso.
 7. Não usar **[fable][mais recente]** como default diário.
 8. Não passar alias não suportado à Agent tool.
 9. Não declarar plugin atualizado sem provar qual agent venceu a precedência.
-10. Não manter Forgejo CI como único gate de um repo hospedado no GitHub.
+10. Não manter CI legado como único gate de um repo hospedado no GitHub.
 11. Não remover globais antes do canário.
 12. Não publicar overlay pessoal no repo público.
 13. Não deixar `tab_pendencias` virar terceira implementação divergente.
@@ -2184,7 +2185,7 @@ A campanha só termina quando todos forem verdadeiros:
 
 - [ ] GitHub URLs atuais.
 - [ ] GitHub Actions green.
-- [ ] Forgejo operacional removido após paridade.
+- [ ] CI/host legado operacional removido após paridade com GitHub Actions.
 - [ ] `main` protegida.
 - [ ] manifest/marketplace/version parity.
 
