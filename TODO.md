@@ -8,8 +8,8 @@
 > foi consolidada por Cosmo/COO a partir de 4 lentes.
 >
 > **Estado atual:** Release 1.0 fechado (ondas W1-W8 + W-WIKI ✅). Campanha ativa **2026-08-16** =
-> IDs **`BT-*`** no topo (ondas **W1..W5**); fechamento **`TST-BT-1` (W6) → `AUD-BT-1` (W7)** fica no
-> **fim da tabela** (não executar agora; só após BT-*) + plano
+> IDs **`BT-*`** no topo (ondas **W1..W5**); fechamento **`TST-BT-1` (W6) ✅** → **`AUD-BT-1` (W7)**
+> fica no **fim da tabela** (W7 ainda pendente) + plano
 > `PLANO-MELHORIA-BIGTECH-CLAUDE-CODE-2026-08-16.md`. Legados **N9**, **OS-1..5** e **TOOL-1..4**
 > cancelados 2026-08-16 (legacy/OE). Catálogo genérico T5/T12/AUD-DISC|ARCH|COV|DEPS|LANG: **skip**
 > (cobertos por suite 1.0 ✅ ou anti-OE; ver nota add_tests_audit).
@@ -112,7 +112,7 @@
 | TOOL-2 | W24 | Política-Tools | [CANCELADO 2026-08-16: legacy/OE — fora da campanha BT-*; `docs/principles/missing-tool-policy.md` já existe; aging de verificação legado.] Promover missing-tool-policy cross-cutting. | Alta | TOOL-1 | Média | 💡 Decisão tomada | — |
 | TOOL-3 | W24 | Política-Tools | [CANCELADO 2026-08-16: legacy/OE — fora da campanha BT-*; propagação residual agents = verification aging legado.] Propagar missing-tool-policy aos agents. | Média | TOOL-2 | Média | 💡 Decisão tomada | — |
 | TOOL-4 | W24 | Política-Tools | [CANCELADO 2026-08-16: legacy/OE — fora da campanha BT-*; alinhamento TOOLING/TESTES residual = OE se forçado agora.] Install OS-aware no TOOLING.md. | Baixa | TOOL-2 | Baixa | 💡 Decisão tomada | — |
-| TST-BT-1 | W6 | Testes | Revalidar suite campanha: `preci.sh` + pytest hooks + validate_plugin + smoke + CI multi-OS verde no SHA final (pós BT-5..BT-8; espelha T15/T14 no escopo da campanha). Ver `TESTES.md` § Campanha 2026-08-16. | Alta | BT-5,BT-6,BT-7,BT-8 | Média | ⏳ Pendente | — |
+| TST-BT-1 | W6 | Testes | Revalidar suite campanha: `preci.sh` + pytest hooks + validate_plugin + smoke + CI multi-OS verde no SHA final (pós BT-5..BT-8; espelha T15/T14 no escopo da campanha). Ver `TESTES.md` § Campanha 2026-08-16. | Alta | BT-5,BT-6,BT-7,BT-8 | Média | ✅ Concluído | ✓ |
 | AUD-BT-1 | W7 | Auditoria | Auditoria de campanha bigtech 2026-08-16: dual-authority, porte solo/headcount, source-of-truth, CI matrix, zero host legado operacional. Consolida no espírito de AUD-REPORT (sem recriar REPORT). Ver `AUDITORIAS.md` § Campanha 2026-08-16. | Alta | TST-BT-1, BT-1, BT-5, BT-6 | Alta | ⏳ Pendente | — |
 
 ## Tabela de scoring WSJF (itens-pai funcionais)
@@ -188,7 +188,7 @@ Onda canônica (CHK-07: pré-req nunca na mesma onda): W1=L0; W2=L1; W3=L2; W4=`
 
 | ID | Item | Nível | Pré-requisito | Onda | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| TST-BT-1 | Revalidar suite campanha (preci+CI) | L4 (após impl) | BT-5,BT-6,BT-7,BT-8 | W6 | ⏳ |
+| TST-BT-1 | Revalidar suite campanha (preci+CI) | L4 (após impl) | BT-5,BT-6,BT-7,BT-8 | W6 | ✅ |
 | AUD-BT-1 | Auditoria campanha (SoT/porte/CI/host) | L5 (após teste) | TST-BT-1, BT-1, BT-5, BT-6 | W7 | ⏳ |
 
 **Skip catálogo (anti-OE / coberto 1.0):** `TST-T5`≈`TST-DEPS`✅; `TST-T12`≈`TST-DEPS`✅+CI/gitleaks;
