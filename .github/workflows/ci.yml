@@ -63,6 +63,9 @@ jobs:
       - name: check_semantic_drift (BT-7)
         run: python scripts/check_semantic_drift.py
 
+      - name: evals roteamento /bigtech (BT-8)
+        run: python evals/bigtech_routing/run_evals.py
+
       - name: JSON valido plugin.json
         run: python -m json.tool .claude-plugin/plugin.json
 
@@ -154,6 +157,9 @@ jobs:
 
       - name: check_semantic_drift (BT-7)
         run: /tmp/venv/bin/python scripts/check_semantic_drift.py
+
+      - name: evals roteamento /bigtech (BT-8)
+        run: /tmp/venv/bin/python evals/bigtech_routing/run_evals.py
 
   # ---------------------------------------------------------------------
   # gitleaks — historico completo (hard gate)

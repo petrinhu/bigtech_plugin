@@ -6,6 +6,10 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), e
 
 ## [Unreleased]
 
+### Added
+
+- **BT-8: evals offline de roteamento `/bigtech`.** Suite em `evals/bigtech_routing/` (`cases.json` CASE-A..D + portes, `run_evals.py` stdlib, README). Politica pos-BT-5: perfis `early|scale|bigtech`, piso early, nunca `solo` como perfil, headcount peso 0, criticidade eleva agents (CISO/CLO). Gate no `scripts/preci.sh` e no CI multi-OS (`python3 evals/bigtech_routing/run_evals.py`). Nao substitui eval LLM real; e harness de politica de classificacao.
+
 ### Changed
 
 - **BT-5: porte arquitetural sem solo/headcount (piso early).** Valores canonicos de porte = `early | scale | bigtech`. Headcount/capacity humana e nota auxiliar, nao valor de `--porte` nem de `.bigtech-porte`. Skill `/bigtech`, hooks `bigtech_porte_reminder`/`bigtech_reinforce`, Cosimo, `docs/ORG.md`, `pipeline_release_1.0`, `lideranca_pipeline_release`, mapeamento em `/proj_software` e `/tab_pendencias` alinhados. Alias deprecado: `--porte solo` e marcador legado `porte=solo` normalizam para `early` (hooks expoem `early` sem reescrever o arquivo). Pipeline-Sprint renomeado operacionalmente para Pipeline-Early (early minimalista).

@@ -1,0 +1,273 @@
+{
+  "schema": 1,
+  "description": "Evals determinísticos de classificação de porte/roteamento /bigtech (pós-BT-5). Offline, sem LLM.",
+  "policy": {
+    "valid_profiles": ["early", "scale", "bigtech"],
+    "forbidden_as_profile": ["solo"],
+    "floor": "early",
+    "headcount_weight": 0,
+    "notes": "capacity/headcount é nota auxiliar; criticidade e complexidade elevam porte e agents."
+  },
+  "cases": [
+    {
+      "id": "CASE-A",
+      "title": "Trivial local descartável (capacity solo, risco baixo)",
+      "source": "PLANO PHASE 2 CASE-A",
+      "signals": {
+        "criticality": 0,
+        "blast_radius": 0,
+        "coupling": 0,
+        "reversibility": 0,
+        "compliance": 0,
+        "complexity": 0,
+        "distribution": 0,
+        "maintenance": 0,
+        "headcount": 1,
+        "capacity": "solo",
+        "lines_of_code_hint": 200,
+        "domain": "personal-script"
+      },
+      "expected_profile": "early",
+      "forbidden_profiles": ["solo", "scale", "bigtech"],
+      "expected_min_agents": ["celso-ceo", "caetano-cto"],
+      "notes": "Script pessoal de ~200 linhas. Piso early; capacity=solo não vira perfil."
+    },
+    {
+      "id": "CASE-B",
+      "title": "Ecossistema multi-repo com framework e consumidores",
+      "source": "PLANO PHASE 2 CASE-B",
+      "signals": {
+        "criticality": 2,
+        "blast_radius": 3,
+        "coupling": 3,
+        "reversibility": 2,
+        "compliance": 1,
+        "complexity": 2,
+        "distribution": 3,
+        "maintenance": 2,
+        "headcount": 1,
+        "capacity": "solo",
+        "repos": 6,
+        "domain": "framework-multi-consumer"
+      },
+      "expected_profile": "scale",
+      "allowed_profiles": ["scale", "bigtech"],
+      "forbidden_profiles": ["solo", "early"],
+      "expected_min_agents": [
+        "celso-ceo",
+        "caetano-cto",
+        "capitolino-cpo",
+        "cosmo-coo"
+      ],
+      "notes": "Um mantenedor, 6 repos, framework consumido por apps. Headcount 1 não rebaixa."
+    },
+    {
+      "id": "CASE-C",
+      "title": "App pequeno com dado de saúde/PII (capacity solo)",
+      "source": "PLANO PHASE 2 CASE-C",
+      "signals": {
+        "criticality": 3,
+        "blast_radius": 1,
+        "coupling": 1,
+        "reversibility": 2,
+        "compliance": 3,
+        "complexity": 1,
+        "distribution": 1,
+        "maintenance": 2,
+        "headcount": 1,
+        "capacity": "solo",
+        "domain": "health-pii"
+      },
+      "expected_profile": "early",
+      "forbidden_profiles": ["solo"],
+      "expected_min_agents": [
+        "celso-ceo",
+        "caetano-cto",
+        "narciso-ciso",
+        "claudio-clo"
+      ],
+      "notes": "Porte permanece early (anti-OE de cerimônia), mas criticidade eleva CISO+CLO."
+    },
+    {
+      "id": "CASE-D",
+      "title": "Time grande em produto simples sem dado crítico",
+      "source": "PLANO PHASE 2 CASE-D",
+      "signals": {
+        "criticality": 0,
+        "blast_radius": 1,
+        "coupling": 0,
+        "reversibility": 0,
+        "compliance": 0,
+        "complexity": 0,
+        "distribution": 1,
+        "maintenance": 1,
+        "headcount": 40,
+        "capacity": "large-team",
+        "domain": "static-site"
+      },
+      "expected_profile": "early",
+      "forbidden_profiles": ["solo", "bigtech"],
+      "expected_min_agents": ["celso-ceo", "caetano-cto"],
+      "notes": "Headcount alto não promove sozinho a scale/bigtech."
+    },
+    {
+      "id": "PORTE-EARLY-PMF",
+      "title": "Produto early-stage com primeiros usuários reais",
+      "source": "BT-5 / Cosimo Pipeline-Lean",
+      "signals": {
+        "criticality": 1,
+        "blast_radius": 1,
+        "coupling": 1,
+        "reversibility": 1,
+        "compliance": 0,
+        "complexity": 1,
+        "distribution": 2,
+        "maintenance": 2,
+        "headcount": 3,
+        "capacity": "small-team",
+        "domain": "saas-pmf"
+      },
+      "expected_profile": "early",
+      "forbidden_profiles": ["solo"],
+      "expected_min_agents": [
+        "celso-ceo",
+        "caetano-cto",
+        "capitolino-cpo"
+      ]
+    },
+    {
+      "id": "PORTE-SCALE",
+      "title": "Scale-up com base de usuários e regulação emergente",
+      "source": "BT-5 / Cosimo Pipeline-Padrão",
+      "signals": {
+        "criticality": 2,
+        "blast_radius": 2,
+        "coupling": 2,
+        "reversibility": 2,
+        "compliance": 2,
+        "complexity": 2,
+        "distribution": 2,
+        "maintenance": 2,
+        "headcount": 12,
+        "capacity": "mid-team",
+        "domain": "growth-regulated"
+      },
+      "expected_profile": "scale",
+      "forbidden_profiles": ["solo", "early"],
+      "expected_min_agents": [
+        "celso-ceo",
+        "caetano-cto",
+        "capitolino-cpo",
+        "cosmo-coo",
+        "narciso-ciso"
+      ]
+    },
+    {
+      "id": "PORTE-BIGTECH",
+      "title": "Multi-produto, compliance pesado, múltiplos consumidores",
+      "source": "BT-5 / Cosimo Pipeline-Completo",
+      "signals": {
+        "criticality": 3,
+        "blast_radius": 3,
+        "coupling": 3,
+        "reversibility": 3,
+        "compliance": 3,
+        "complexity": 3,
+        "distribution": 3,
+        "maintenance": 3,
+        "headcount": 80,
+        "capacity": "org",
+        "domain": "multi-product-enterprise",
+        "multi_product": true
+      },
+      "expected_profile": "bigtech",
+      "forbidden_profiles": ["solo", "early"],
+      "expected_min_agents": [
+        "celso-ceo",
+        "caetano-cto",
+        "capitolino-cpo",
+        "cosmo-coo",
+        "narciso-ciso",
+        "candido-cdo",
+        "confucio-cfo",
+        "cicero-cro",
+        "claudio-clo"
+      ]
+    },
+    {
+      "id": "FORBID-SOLO-ALIAS",
+      "title": "Hint legado porte=solo normaliza para early",
+      "source": "BT-5 alias deprecado",
+      "signals": {
+        "criticality": 0,
+        "blast_radius": 0,
+        "coupling": 0,
+        "reversibility": 0,
+        "compliance": 0,
+        "complexity": 0,
+        "distribution": 0,
+        "maintenance": 0,
+        "headcount": 1,
+        "capacity": "solo",
+        "legacy_porte_hint": "solo",
+        "domain": "legacy-marker"
+      },
+      "expected_profile": "early",
+      "forbidden_profiles": ["solo"],
+      "expected_min_agents": ["celso-ceo", "caetano-cto"],
+      "notes": "Nunca emitir profile=solo; solo→early."
+    },
+    {
+      "id": "CRIT-MONEY",
+      "title": "Pagamentos/dinheiro eleva CISO mesmo em escopo pequeno",
+      "source": "BT-5 criticidade eleva",
+      "signals": {
+        "criticality": 3,
+        "blast_radius": 1,
+        "coupling": 1,
+        "reversibility": 2,
+        "compliance": 2,
+        "complexity": 1,
+        "distribution": 1,
+        "maintenance": 1,
+        "headcount": 1,
+        "capacity": "solo",
+        "domain": "payments"
+      },
+      "expected_profile": "early",
+      "forbidden_profiles": ["solo"],
+      "expected_min_agents": [
+        "celso-ceo",
+        "caetano-cto",
+        "narciso-ciso"
+      ]
+    },
+    {
+      "id": "IA-CENTRAL",
+      "title": "IA como capability central ativa CAIO em qualquer porte",
+      "source": "Cosimo regra IA",
+      "signals": {
+        "criticality": 1,
+        "blast_radius": 1,
+        "coupling": 1,
+        "reversibility": 1,
+        "compliance": 0,
+        "complexity": 2,
+        "distribution": 1,
+        "maintenance": 1,
+        "headcount": 2,
+        "capacity": "small-team",
+        "domain": "ai-product",
+        "ai_central_capability": true
+      },
+      "expected_profile": "early",
+      "forbidden_profiles": ["solo"],
+      "expected_min_agents": [
+        "celso-ceo",
+        "caetano-cto",
+        "caio-caio",
+        "applied-ai-engineer"
+      ]
+    }
+  ]
+}
