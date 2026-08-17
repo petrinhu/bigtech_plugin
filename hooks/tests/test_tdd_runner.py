@@ -93,24 +93,48 @@ HOOKS_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 def _run_hook(script, payload, home):
     import site
     env = dict(os.environ)
+    home = os.path.realpath(home)
+    # Windows: expanduser("~") prefere USERPROFILE (e HOMEDRIVE/HOMEPATH).
     env["HOME"] = home
+    env["USERPROFILE"] = home
+    if os.name == "nt":
+        drive, path = os.path.splitdrive(home)
+        if drive:
+            env["HOMEDRIVE"] = drive
+        env["HOMEPATH"] = path if path else "\\"
     # Preserva site-packages do usuario real para que pytest seja importavel
     # mesmo quando HOME aponta para tmp_path (que nao tem .local/lib)
     user_site = site.getusersitepackages()
     existing = env.get("PYTHONPATH", "")
-    env["PYTHONPATH"] = f"{user_site}:{existing}" if existing else user_site
+    env["PYTHONPATH"] = (
+        os.pathsep.join([user_site, existing]) if existing else user_site
+    )
     return subprocess.run(
         [sys.executable, os.path.join(HOOKS_DIR, script)],
         input=json.dumps(payload), text=True, capture_output=True, env=env,
     )
 
 
-def test_full_cycle_red_then_green(tmp_path):
+def _state_file(home, project_root):
+    """Caminho do last-run.json sob o home de teste (sem depender de expanduser do host)."""
+    import hashlib
+    h = hashlib.sha256(os.path.realpath(str(project_root)).encode()).hexdigest()[:16]
+    return os.path.join(
+        os.path.realpath(str(home)),
+        ".claude", "state", "tdd-guard", h, "last-run.json",
+    )
+
+
+def test_full_cycle_red_then_green(tmp_path, monkeypatch):
     import pytest
     check = subprocess.run([sys.executable, "-m", "pytest", "--version"],
                            capture_output=True)
     if check.returncode != 0:
         pytest.skip("pytest indisponivel no subprocess; pulando integracao")
+
+    home = os.path.realpath(str(tmp_path))
+    monkeypatch.setenv("HOME", home)
+    monkeypatch.setenv("USERPROFILE", home)
 
     # Projeto pytest minimo com config opt-in
     (tmp_path / ".claude").mkdir()
@@ -127,15 +151,13 @@ def test_full_cycle_red_then_green(tmp_path):
     payload_test = {"tool_name": "Write",
                     "cwd": str(tmp_path),
                     "tool_input": {"file_path": str(tmp_path / "tests" / "test_soma.py")}}
-    proc = _run_hook("tdd_runner.py", payload_test, str(tmp_path))
+    proc = _run_hook("tdd_runner.py", payload_test, home)
     assert proc.returncode == 0   # runner nunca quebra o fluxo
 
-    import hashlib
-    h = hashlib.sha256(os.path.realpath(str(tmp_path)).encode()).hexdigest()[:16]
-    found = str(tmp_path / ".claude" / "state" / "tdd-guard" / h / "last-run.json")
+    found = _state_file(home, tmp_path)
     assert os.path.exists(found), f"estado nao gravado em {found}"
 
-    st = json.load(open(found))
+    st = json.load(open(found, encoding="utf-8"))
     assert st["ran"] is True and st["has_red"] is True   # RED confirmado
 
     # Implementa soma -> GREEN
@@ -143,9 +165,9 @@ def test_full_cycle_red_then_green(tmp_path):
     payload_prod = {"tool_name": "Write",
                     "cwd": str(tmp_path),
                     "tool_input": {"file_path": str(tmp_path / "soma.py")}}
-    _run_hook("tdd_runner.py", payload_prod, str(tmp_path))
+    _run_hook("tdd_runner.py", payload_prod, home)
 
-    st = json.load(open(found))
+    st = json.load(open(found, encoding="utf-8"))
     assert st["ran"] is True and st["has_red"] is False  # GREEN confirmado
 
 
@@ -170,16 +192,15 @@ def test_file_outside_session_cwd_does_not_run_suite(tmp_path):
     neighbor_file = neighbor / "mod.py"
     neighbor_file.write_text("x = 1\n")
 
+    home = os.path.realpath(str(tmp_path))
     # A sessao esta em `session`, mas o arquivo editado e do `vizinho`.
     payload = {"tool_name": "Write",
                "cwd": str(session),
                "tool_input": {"file_path": str(neighbor_file)}}
-    proc = _run_hook("tdd_runner.py", payload, str(tmp_path))
+    proc = _run_hook("tdd_runner.py", payload, home)
     assert proc.returncode == 0          # silent-fail preservado
 
     # A suite do vizinho NAO rodou: nenhum sentinela, nenhum estado.
     assert not sentinel.exists(), "test_command do projeto vizinho foi executado"
-    import hashlib
-    h = hashlib.sha256(os.path.realpath(str(neighbor)).encode()).hexdigest()[:16]
-    state = tmp_path / ".claude" / "state" / "tdd-guard" / h / "last-run.json"
-    assert not state.exists(), "estado gravado para projeto fora do cwd da sessao"
+    state = _state_file(home, neighbor)
+    assert not os.path.exists(state), "estado gravado para projeto fora do cwd da sessao"

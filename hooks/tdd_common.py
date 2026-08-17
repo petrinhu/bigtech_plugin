@@ -51,7 +51,8 @@ def glob_match(rel_path: str, pattern: str) -> bool:
 
 PRESETS = {
     "python-pytest": {
-        "test_command": "pytest -x -q",
+        # Mesmo interpretador do hook (venv/CI/Windows); evita binario "pytest" fora do PATH.
+        "test_command": f"{sys.executable} -m pytest -x -q",
         "production_globs": ["**/*.py"],
         "test_globs": ["tests/**", "**/test_*.py", "**/*_test.py", "**/conftest.py"],
     },

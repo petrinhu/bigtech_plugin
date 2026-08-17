@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 
 import tdd_common as c
 
@@ -22,7 +23,7 @@ def test_glob_match_no_false_positive():
 
 def test_resolve_config_expands_preset():
     cfg = c.resolve_config({"preset": "python-pytest"})
-    assert cfg["test_command"] == "pytest -x -q"
+    assert cfg["test_command"] == f"{sys.executable} -m pytest -x -q"
     assert "**/test_*.py" in cfg["test_globs"]
     assert cfg["strict"] is True           # default
     assert cfg["timeout_sec"] == 120       # default
@@ -69,7 +70,7 @@ def test_load_config_returns_root_and_resolved(tmp_path):
     root = _make_project(tmp_path, {"preset": "python-pytest"})
     got_root, cfg = c.load_config(str(root / "src"))
     assert got_root == os.path.realpath(str(root))
-    assert cfg["test_command"] == "pytest -x -q"
+    assert cfg["test_command"] == f"{sys.executable} -m pytest -x -q"
 
 
 def test_load_config_disabled_returns_none(tmp_path):
