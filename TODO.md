@@ -6,13 +6,15 @@
 > Método: topological sort (Pré-requisito) + WSJF, consolidado por Cosmo/COO a partir de 4 lentes
 > (software-architect, product-manager, engineering-manager, scrum-master).
 >
-> **Estado atual:** Release 1.0 fechado (ondas W1-W8 + W-WIKI ✅). As ondas W9-W12 cobrem a
-> manutenção pós-1.0 (releases 0.1.2 a 0.1.6) e os passos de distribuição que faltam.
+> **Estado atual:** Release 1.0 fechado (ondas W1-W8 + W-WIKI ✅). Campanha ativa **2026-08-16** =
+> IDs **`BT-*`** + plano `PLANO-MELHORIA-BIGTECH-CLAUDE-CODE-2026-08-16.md`. Legados **N9**,
+> **OS-1..5** e **TOOL-1..4** cancelados 2026-08-16 (legacy/OE).
 
 - **Caminho crítico (1.0, concluído):** `F1 → H3 → A2* → S1 → TST-ORFAOS → AUD-PRIV → R4`.
-- **Caminho crítico (pós-1.0, pendente):** `N8 → N9`. N8 (tag/Release 0.1.6) é a fundação imutável que destrava a distribuição; N9 (marketplace comunitário) é a folha do grafo e a porta sem volta.
-- **WIP de paralelização:** 1 na faixa de manutenção pós-1.0 (gargalo = decisão estratégica do líder supremo em N9, não capacidade técnica). Era 3 durante o 1.0 (gargalo = 1 revisor humano), 4 só em janelas pontuais (W2, fatiamento de A2*).
-- **One-way-doors (decisão do líder supremo):** `F1` (nome/layout/`source` do marketplace = contrato público), `R4` (primeira publicação pública — host legado da época; canônico agora GitHub) e `N9` (submissão a marketplace comunitário de terceiros = exposição pública irreversível).
+- **Caminho crítico (pós-1.0 histórico):** `N8` ✅; `N9` cancelado 2026-08-16 (legacy/OE, fora da campanha BT-*).
+- **Caminho crítico (campanha BT-\*, ativo):** `BT-0` → `BT-1`/`BT-2`/`BT-3` → `BT-4`/`BT-5`/`BT-6` → `BT-7`/`BT-8` → `BT-9` (ver plano PHASE).
+- **WIP de paralelização:** campanha BT-\* (main despacha ≤2 agents/rodada). WIP pós-1.0 em N9 **encerrado** com o cancelamento legacy/OE. Era 3 durante o 1.0 (gargalo = 1 revisor humano), 4 só em janelas pontuais (W2, fatiamento de A2\*).
+- **One-way-doors (decisão do líder supremo):** `F1` (nome/layout/`source` do marketplace = contrato público), `R4` (primeira publicação pública — host legado da época; canônico agora GitHub). `N9` (marketplace comunitário) permanece one-way-door **se reaberto**, mas está **cancelado** na tabela até go/no-go pós-campanha.
 - **Abreviações de pré-requisito:** `D1* = D1a,D1b,D1c`; `A2* = A2a,A2b,A2c,A2d,A2e`.
 
 | Status | Significado |
@@ -21,6 +23,7 @@
 | 🔄 Em andamento | em progresso |
 | ⏳ Pendente | não iniciado |
 | 🔍 Pendente verificação | implementado, aguarda validação |
+| 💡 Decisão tomada | abordagem definida / cancelado (legacy-OE) sem emoji próprio |
 
 ## Tabela de pendências
 
@@ -85,16 +88,16 @@
 | AUD-R7 | W19 | Auditoria | **Re-auditoria final pós-remediação** (internal-auditor): rodar N14 (re-higienização PII/wikilinks) + re-testar os achados; virar Estado Auditado para ✓; gate final antes da submissão ao marketplace. | Alta | AUD-R1, AUD-R2, AUD-R3, AUD-R4, AUD-R5, AUD-R6, I18N-1 | Média | ✅ Concluído | ✓ |
 | DIST-1 | W20 | Distribuição | Estabelecer GitHub público (`github.com/petrinhu/bigtech_plugin`) para submissão ao marketplace oficial (AUD-D02; resolve AUD-U01). Host legado deixou de ser origem. | Alta | AUD-R7 | Média | ✅ Concluído | — |
 | SUB-1 | W21 | Distribuição | Preparar o material de submissão ao marketplace oficial `claude-plugins-community` (via product-marketing-manager + technical-writer): descrição de loja em inglês internacional, keywords/categoria, checklist de prontidão (`validate --strict`, repo público GitHub, LICENSE/SECURITY/README bilíngue), link do repo GitHub e dossiê de revisão para o líder aprovar antes do envio. | Alta | DIST-1, AUD-R7 | Baixa | ✅ Concluído | — |
-| N9 | W22 | Distribuição | Submeter ao marketplace comunitário oficial `claude-plugins-community` (PR de inclusão); canal canônico = **GitHub único** + community marketplace (AUD-D01 reescrito 2026-08-16; sem host legado). **One-way-door FORTE: exposição pública em marketplace de terceiros; go/no-go do líder supremo via `AskUserQuestion`.** Gargalo externo: security scan + revisão da Anthropic. | Alta | SUB-1, AUD-R7, DIST-1 | Alta | 🔄 Em andamento | — |
-| OS-1 | W23 | OS-Agnóstico | 🔴 **(Auditoria 1)** `hooks/hooks.json` invoca `python3` nos 7 comandos → no Windows (que registra `python`/`py`, não `python3`) os 6 hooks ficam **silenciosamente inertes** (governança toda morta). Tornar a invocação portável (resolução de intérprete). **DECIDIDO (líder 2026-06-20): Windows NATIVO** — wrapper `python3`→`python`→`py`; abrange também OS-2 (corrigir TDD no Windows). | Alta | — | Média | 🔍 Pendente verificação | — |
-| OS-2 | W23 | OS-Agnóstico | 🟠 **(Auditoria 1)** Subsistema TDD quebra no Windows mesmo com opt-in: `tdd_runner` `shell=True` (cmd.exe ≠ bash), `tdd_common` glob com `/` vs separador `\` do Windows (classifica tudo como ignored → TDD inerte), preset php `vendor/bin/phpunit` (barra POSIX). Normalizar separador antes do match + documentar que o test_command segue o shell do SO. | Média | OS-1 | Média | 🔍 Pendente verificação | — |
-| OS-3 | W23 | OS-Agnóstico | 🟠 **(Auditoria 1)** `visual-design-director` (agent + skill): abrir navegador (`xdg-open`) e captura de tela (`grim`/`spectacle`/`maim`/`scrot`) são Linux-only. Adicionar gêmeos macOS (`open`/`screencapture`) e Windows (`start`/snipping) e reforçar o MCP chrome-devtools como caminho cross-OS primário. Via frontend-engineer. | Média | — | Baixa | 🔍 Pendente verificação | — |
-| OS-4 | W23 | OS-Agnóstico | 🟠 **(Auditoria 1)** Notas de portabilidade por OS em docs (via technical-writer): blocos executáveis Linux-only em `hardware-resource-limits.md` (§1/§5/§7: `nproc`/`free`/`swapon`/`systemd-run`/`flock`), `CONTRACT.md:615` (`-j$(nproc)`), e kits Linux-only no `TOOLING.md`/agents (nft/lynis/oscap/perf/valgrind/strace) com equivalente mac/win ou marca "Linux-only; use WSL/container". | Média | — | Média | 🔍 Pendente verificação | — |
-| OS-5 | W23 | OS-Agnóstico | 🟢 **(Auditoria 1)** Robustez cross-OS dos hooks (cosmético): `tdd_guard` sem `except ValueError` (drives distintos no Win) — simetrizar com `tdd_runner._under()`; exit codes 126/127 POSIX em `tdd_runner`; `encoding="utf-8"` explícito nos 3 `open()` de `tdd_common`. Já degradam para fail-open; sem urgência. | Baixa | — | Baixa | 🔍 Pendente verificação | — |
-| TOOL-1 | W24 | Política-Tools | 🔴 **(Auditoria 2)** Conflito de doutrina: `TOOLING.md:13` manda auto-instalar SILENCIOSAMENTE ("se faltar, instala antes de usar") vs `TESTES.md`/`AUDITORIAS.md` que mandam OFERECER via AskUserQuestion (não instalar sem consentimento); propaga aos 21 agents com Kit Canônico. Reconciliar numa fonte única de protocolo. **DECIDIDO (líder 2026-06-20): doutrina C (híbrido por risco)** — auto-instala userland/sem privilégio; pergunta via AskUserQuestion p/ sudo/sistema/rede; cláusula "nunca recusar a tarefa" sempre vale. | Alta | — | Média | 🔍 Pendente verificação | — |
-| TOOL-2 | W24 | Política-Tools | 🟠 **(Auditoria 2)** Promover a política de ferramenta-ausente a CROSS-CUTTING (hoje só vale p/ TST-*/AUD-*): criar `docs/principles/missing-tool-policy.md` (auto-listado no SessionStart via glob `principles/*.md`) com o protocolo OS-aware (detect → conforme doutrina → instala/pendente) + cláusula NEGATIVA explícita "nunca recuse a tarefa por falta de ferramenta". Via technical-writer. | Alta | TOOL-1 | Média | 🔍 Pendente verificação | — |
-| TOOL-3 | W24 | Política-Tools | 🟠 **(Auditoria 2)** Propagar a policy: trocar a fórmula curta dos 21 agents ("instalar pelo comando do TOOLING") por "seguir a missing-tool-policy"; dar a orientação aos 3 agents Bash-pesados sem cobertura (embedded-firmware-engineer, hardware-engineer, growth-engineer). | Média | TOOL-2 | Média | 🔍 Pendente verificação | — |
-| TOOL-4 | W24 | Política-Tools | 🟢 **(Auditoria 2)** `TOOLING.md`: comandos de install por-linha OS-aware (não só `dnf`) ou apontar à nota de portabilidade; alinhar fraseado de TESTES/AUDITORIAS à policy única. | Baixa | TOOL-2 | Baixa | 🔍 Pendente verificação | — |
+| N9 | W22 | Distribuição | [CANCELADO 2026-08-16: legacy/OE — fora da campanha BT-*; marketplace community = one-way-door externo W22 pós-1.0, não fase BT-0..9. Reabrir só com go/no-go do líder pós-campanha.] Submissão a `claude-plugins-community` (PR); canal canônico GitHub + community (AUD-D01). | Alta | SUB-1, AUD-R7, DIST-1 | Alta | 💡 Decisão tomada | — |
+| OS-1 | W23 | OS-Agnóstico | [CANCELADO 2026-08-16: legacy/OE — fora da campanha BT-*; dívida de verificação legada jun/2026; núcleo coberto por `bin/python3.cmd` + CI multi-OS BT-4.] Auditoria OS: `hooks.json`/`python3` no Windows. Decisão 2026-06-20: Windows nativo. | Alta | — | Média | 💡 Decisão tomada | — |
+| OS-2 | W23 | OS-Agnóstico | [CANCELADO 2026-08-16: legacy/OE — fora da campanha BT-*; verificação legada TDD Windows; núcleo globs/separadores + CI multi-OS BT-4.] TDD no Windows: shell/glob/preset php. | Média | OS-1 | Média | 💡 Decisão tomada | — |
+| OS-3 | W23 | OS-Agnóstico | [CANCELADO 2026-08-16: legacy/OE — fora da campanha BT-*; residual cosmético visual-design-director Linux-only = OE se forçado agora.] Gêmeos macOS/Windows para open/screenshot. | Média | — | Baixa | 💡 Decisão tomada | — |
+| OS-4 | W23 | OS-Agnóstico | [CANCELADO 2026-08-16: legacy/OE — fora da campanha BT-*; residual cosmético docs portabilidade = OE se forçado agora.] Notas OS em hardware-resource-limits/CONTRACT/TOOLING. | Média | — | Média | 💡 Decisão tomada | — |
+| OS-5 | W23 | OS-Agnóstico | [CANCELADO 2026-08-16: legacy/OE — fora da campanha BT-*; residual cosmético hooks (ValueError/exit/encoding) = OE se forçado agora.] Robustez cross-OS fail-open. | Baixa | — | Baixa | 💡 Decisão tomada | — |
+| TOOL-1 | W24 | Política-Tools | [CANCELADO 2026-08-16: legacy/OE — fora da campanha BT-*; doutrina híbrida já decidida 2026-06-20; verification aging legado, não fase BT.] Conflito TOOLING vs TESTES/AUDITORIAS (auto-instalar vs AskUserQuestion). | Alta | — | Média | 💡 Decisão tomada | — |
+| TOOL-2 | W24 | Política-Tools | [CANCELADO 2026-08-16: legacy/OE — fora da campanha BT-*; `docs/principles/missing-tool-policy.md` já existe; aging de verificação legado.] Promover missing-tool-policy cross-cutting. | Alta | TOOL-1 | Média | 💡 Decisão tomada | — |
+| TOOL-3 | W24 | Política-Tools | [CANCELADO 2026-08-16: legacy/OE — fora da campanha BT-*; propagação residual agents = verification aging legado.] Propagar missing-tool-policy aos agents. | Média | TOOL-2 | Média | 💡 Decisão tomada | — |
+| TOOL-4 | W24 | Política-Tools | [CANCELADO 2026-08-16: legacy/OE — fora da campanha BT-*; alinhamento TOOLING/TESTES residual = OE se forçado agora.] Install OS-aware no TOOLING.md. | Baixa | TOOL-2 | Baixa | 💡 Decisão tomada | — |
 | BT-0 | W-BT0 | Campanha | PHASE 0 freeze/baseline/inventario campanha 2026-08-16: medir e fechar DoD (SHA repos + agents/skills/hooks + modelos) <!-- intake:cand-BT-0-2026-08-16 --> | Alta | — | Média | 🔍 Pendente verificação | — |
 | BT-1 | W-BT1 | Arquitetura | FABLE-ORG-ARCH: ADR source-of-truth dual-authority vault×plugin (PHASE 1) <!-- intake:cand-BT-1-2026-08-16 --> | Alta | BT-0 | Alta | ⏳ Pendente | — |
 | BT-2 | W-BT1 | Docs | docs/house: sync 10 manuais vault + README de navegação (cópia produto) <!-- intake:cand-BT-2-2026-08-16 --> | Alta | BT-0 | Média | 🔍 Pendente verificação | — |
@@ -135,26 +138,25 @@
 > D1 e A2 têm WSJF baixo só por serem grandes — por isso foram **fatiados** e entram cedo
 > (W2/W3), pois são pré-requisito de quase tudo. O fatiamento encurta o caminho crítico.
 
-### Scoring WSJF — pendentes pós-1.0 (qualitativo)
+### Scoring WSJF — pós-1.0 (histórico; N8/N10 ✅; N9 cancelado)
 
-Os itens N1-N7 já foram entregues nas releases 0.1.2 a 0.1.6 e não pontuam. Os pendentes são avaliados em escala qualitativa (CoD = valor + criticidade + redução de risco; Job Size = esforço/lead time). O ranking pendente é **N8 > N9 > N10**.
+Os itens N1-N7, N8 e N10 já foram entregues. **N9 foi cancelado 2026-08-16 (legacy/OE)** e não pontua na campanha BT-\*. O ranking abaixo é **histórico** da faixa pós-1.0 (não é o backlog ativo).
 
-| ID | Item | CoD (qualitativo) | Job Size | WSJF (relativo) | Rank pendente |
+| ID | Item | CoD (qualitativo) | Job Size | WSJF (relativo) | Rank (histórico) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| N8 | Fechar 0.1.6 (CI + tag + Release) | Alto (fundação imutável; destrava N9/N10; caminho crítico) | Baixo (fluxo já automatizado 4x) | **Alto** | 1 |
-| N9 | Marketplace comunitário `claude-plugins-community` | Alto (alcance de distribuição; mas gated por N8 e por go/no-go do líder) | Alto (gargalo externo: security scan + revisão Anthropic, lead time imprevisível) | **Médio** | 2 |
-| N10 | Releases retroativas 0.1.0 / 0.1.1 | Baixo (cosmético/histórico; sem destravar nada) | Baixo (mecânica repetida x2) | **Baixo** | 3 |
+| N8 | Fechar 0.1.6 (CI + tag + Release) | Alto (fundação imutável; destrava N9/N10) | Baixo (fluxo já automatizado 4x) | **Alto** | 1 ✅ |
+| N9 | Marketplace comunitário `claude-plugins-community` | Alto (alcance; gated por go/no-go) | Alto (gargalo externo Anthropic) | **Médio** | 2 💡 cancelado legacy/OE |
+| N10 | Releases retroativas 0.1.0 / 0.1.1 | Baixo (cosmético/histórico) | Baixo (mecânica repetida x2) | **Baixo** | 3 ✅ |
 
-> Leitura: N8 é o próximo a puxar (CoD alto, job baixo, é a porta que abre a distribuição).
-> N9 cai para Médio apesar do alto valor porque o job é dominado por um gargalo externo
-> (revisão de terceiros) e está bloqueado por uma decisão estratégica do líder supremo.
-> N10 é opcional e two-way-door: roda em paralelo a N9 ou é dropado com razão registrada.
+> Leitura (histórico): N8 fechou a fundação imutável. N9 era folha one-way-door externa e foi
+> **cancelado** para não competir com a campanha BT-\* (fonte-de-verdade/CI/porte). N10 ✅.
+> Backlog ativo e WSJF da campanha: IDs **BT-0..BT-9** (plano 2026-08-16).
 
 ## Decisões one-way-door (go/no-go do líder supremo)
 
 1. **`F1`** — congelar nome (`bigtech`), layout e `source` do marketplace antes de abrir a W2 (contrato público; mudar depois quebra quem já instalou). *(concluído)*
 2. **`R4`** — go/no-go da primeira publicação pública (host legado na época; canônico agora GitHub; irreversível; usuários passam a executar os hooks Python na máquina deles). *(concluído)*
-3. **`N9`** — go/no-go da submissão ao marketplace comunitário `claude-plugins-community` (3ª porta sem volta: expõe o plugin publicamente num marketplace de terceiros, sujeito a security scan e revisão da Anthropic). Decidir via `AskUserQuestion` antes de abrir o PR de inclusão. *(pendente; gated por N8)*
+3. **`N9`** — go/no-go da submissão ao marketplace comunitário `claude-plugins-community` (3ª porta sem volta se reaberta). **Cancelado 2026-08-16 (legacy/OE)** — fora da campanha BT-\*; reabrir só com go/no-go explícito do líder **depois** da campanha.
 
 ## Decisões da auditoria (saída da auditoria de 9 dimensões)
 
@@ -164,8 +166,17 @@ Os itens N1-N7 já foram entregues nas releases 0.1.2 a 0.1.6 e não pontuam. Os
 - **AUD-D04 (empacotar testes): pendente** — default: manter `hooks/tests/` e `hooks/README-tdd.md` no pacote (úteis para CI/contribuição). Reavaliar se quiser pacote mínimo.
 - **AUD-U01: RESOLVIDO por AUD-D02 + ordem 2026-08-16** — o GitHub é o único host canônico e o canal de submissão garantido.
 
-## Notas de cadência (pós-1.0)
+## Notas de cadência (pós-1.0 → campanha BT-*)
 
-- **WIP = 1 na faixa de manutenção.** O gargalo não é capacidade técnica (o fluxo de Release já rodou 4x, de 0.1.2 a 0.1.6), e sim a decisão estratégica do líder supremo no one-way-door N9. Empurrar N9 antes do go reabriria uma porta sem volta sob risco.
-- **Ordem dos pendentes:** `N8 → N9`, com `N10` opcional em paralelo a `N9`.
-- **N10 é opcional.** Se não for puxado, dropar registrando a razão (valor apenas cosmético/histórico, não destrava nada). Não é dívida bloqueante.
+- **Campanha ativa = BT-\*** (plano `PLANO-MELHORIA-BIGTECH-CLAUDE-CODE-2026-08-16.md`). Main orquestra-only; ≤2 agents/rodada.
+- **N8 ✅, N10 ✅.** **N9, OS-1..5, TOOL-1..4 cancelados 2026-08-16** como legacy/OE (ver seção Cancelamentos).
+- **Não há caminho crítico `N8 → N9` aberto.** WIP de manutenção pós-1.0 em N9 encerrou com o cancelamento; não reabrir N9 durante a campanha sem ordem do líder.
+- **N10** já concluído (não é mais opcional pendente).
+
+## Cancelamentos 2026-08-16 (legacy / anti-OE)
+
+| ID | Motivo |
+| :--- | :--- |
+| N9 | Marketplace `claude-plugins-community` (W22 pós-1.0). One-way-door externo; **fora** das fases BT-0..BT-9. Manter vivo = OE de distribuição paralela à campanha de fonte-de-verdade/CI/porte. Reabrir só com go/no-go explícito do líder **depois** da campanha. |
+| OS-1..OS-5 | Auditoria OS-agnóstico jun/2026; v0.2.0 já marcou OS-agnosticismo; `bin/python3.cmd`, globs Windows, CI multi-OS (BT-4) cobrem o núcleo. Itens presos em 🔍 = **dívida de verificação legada**, não roadmap da campanha. Residual cosmético (OS-3/4/5 docs) = OE se forçado agora. |
+| TOOL-1..TOOL-4 | Auditoria política-tools jun/2026; `docs/principles/missing-tool-policy.md` já existe; doutrina híbrida decidida. Presos em 🔍 = verification aging legado, **não** fase do plano BT. Reabrir só se campanha/auditoria nova exigir. |
