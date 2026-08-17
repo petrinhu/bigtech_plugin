@@ -1,0 +1,391 @@
+{
+  "measured_at": "2026-08-16",
+  "phase": "0",
+  "repos": {
+    "plugin_bigtech": {
+      "path": "/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/plugin_bigtech",
+      "head": "61c3ea4d9b5fcd75fb4feb9af7bbb020399d1eb6",
+      "branch": "main",
+      "dirty": [
+        "PLANO-MELHORIA-BIGTECH-CLAUDE-CODE-2026-08-16.md",
+        "docs/campanha/*"
+      ],
+      "origin": "https://codeberg.org/petrinhu/bigtech_plugin.git",
+      "github_url": "https://github.com/petrinhu/bigtech_plugin",
+      "github_head_matches_local": true,
+      "version_plugin_json": "0.2.0"
+    },
+    "claude_memory": {
+      "path": "/home/petrus/.claude",
+      "head": "5b19b524a7409d5b60ea3a3912b2761877c6c7b8",
+      "branch": "main",
+      "remote": "git@github.com:petrinhu/claude-memory.git",
+      "settings_json_in_git": false,
+      "settings_json_gitignore_rule": ".gitignore:52"
+    },
+    "tab_pendencias": {
+      "path": "/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/tab_pendencias",
+      "head": "0546c53ef5f97dc03975832842c8a73ef3c99e1f",
+      "branch": "main",
+      "origin": "git@github.com:petrinhu/tab_pendencias.git",
+      "claude_submodule_pin": "0546c53ef5f97dc03975832842c8a73ef3c99e1f skills/tab_pendencias (v1.2.2)"
+    }
+  },
+  "primary_metrics_before": {
+    "fontes_verdade_ativas_nucleo_bigtech": {
+      "value": 2,
+      "detail": "plugin_bigtech (produto, NÃO habilitado em enabledPlugins) + ~/.claude agents/skills/hooks globais (vivo)",
+      "target": 1
+    },
+    "agents_core_duplicados_intersecao": {
+      "value": 51,
+      "identical": 0,
+      "diverged": 51,
+      "target": 0
+    },
+    "hooks_bigtech_tdd_tab_globais_presentes": {
+      "value": true,
+      "count_flagged_in_settings": 6,
+      "detail": "tdd_guard, tdd_runner, bigtech_porte_reminder, bigtech_reinforce, tab_pendencias_reminder x2 events",
+      "plugin_enabled": false,
+      "duplication_risk_if_plugin_installed_with_globals": "ALTO — mesmos eventos SessionStart/UserPromptSubmit/PreToolUse/PostToolUse",
+      "target_after_migration": 0
+    },
+    "solo_como_porte_classificacao": {
+      "value": true,
+      "files_with_solo": 6,
+      "files": [
+        "/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/plugin_bigtech/hooks/bigtech_reinforce.py",
+        "/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/plugin_bigtech/hooks/bigtech_porte_reminder.py",
+        "/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/plugin_bigtech/skills/bigtech/SKILL.md",
+        "/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/plugin_bigtech/skills/tab_pendencias/SKILL.md",
+        "/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/plugin_bigtech/skills/proj_software/SKILL.md",
+        "/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/plugin_bigtech/agents/cosimo-chief-of-staff.md"
+      ],
+      "target": 0
+    },
+    "headcount_determina_perfil": {
+      "value": true,
+      "files_with_headcount": 6,
+      "files": [
+        "/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/plugin_bigtech/docs/pipeline_release_1.0.md",
+        "/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/plugin_bigtech/hooks/bigtech_porte_reminder.py",
+        "/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/plugin_bigtech/hooks/bigtech_reinforce.py",
+        "/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/plugin_bigtech/agents/narciso-ciso.md",
+        "/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/plugin_bigtech/skills/bigtech/SKILL.md",
+        "/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/plugin_bigtech/agents/cosimo-chief-of-staff.md"
+      ],
+      "target": 0
+    },
+    "refs_codeberg_forgejo_operacionais": {
+      "value": 13,
+      "files": [
+        "/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/plugin_bigtech/CLAUDE.md",
+        "/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/plugin_bigtech/AGENTS.md",
+        "/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/plugin_bigtech/CHANGELOG.md",
+        "/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/plugin_bigtech/README.md",
+        "/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/plugin_bigtech/SECURITY.md",
+        "/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/plugin_bigtech/PRIVACY.md",
+        "/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/plugin_bigtech/DEVELOPMENT.md",
+        "/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/plugin_bigtech/scripts/preci.sh",
+        "/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/plugin_bigtech/agents/security-engineer.md",
+        "/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/plugin_bigtech/agents/qa-engineer.md",
+        "/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/plugin_bigtech/agents/devops-sre.md",
+        "/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/plugin_bigtech/docs/pipeline_release_1.0.md",
+        "/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/plugin_bigtech/docs/manuals/CONTRACT.md"
+      ],
+      "origin_is_codeberg": true,
+      "has_forgejo_workflows": true,
+      "has_github_workflows": false,
+      "target": 0
+    },
+    "github_actions_multi_os": {
+      "value": 0,
+      "workflows": [],
+      "target": "matrix ubuntu+windows nativos + debian+fedora+arch container"
+    },
+    "protecao_main": {
+      "value": false,
+      "evidence": "gh api branches/main/protection -> HTTP 404 Branch not protected",
+      "target": true
+    },
+    "model_fable_override_agent_tool": {
+      "value": true,
+      "in_agent_frontmatter": false,
+      "locations": [
+        "~/.claude/skills/watchcode/SKILL.md (model `fable` para caetano-cto)",
+        "~/.claude/skills/modelos_sessao/SKILL.md (opção fable no Agent tool)",
+        "~/.claude/hooks/session_models_apply.py (VALIDOS inclui fable)"
+      ],
+      "target": 0
+    },
+    "drift_gate_semantico": {
+      "value": false,
+      "note": "scripts/validate_plugin.py existe; sem gate específico de drift registry/agents/skills/docs",
+      "target": true
+    },
+    "evals_roteamento_bigtech": {
+      "value": false,
+      "target": true
+    }
+  },
+  "agents": {
+    "CORE_ONLY": 0,
+    "VAULT_ONLY": 20,
+    "INTERSECTION": 51,
+    "DUPLICATE_NAME_WITHIN_SCOPE": {
+      "plugin": {},
+      "vault": {}
+    },
+    "plugin_count": 51,
+    "vault_count": 71,
+    "grok_count": 71,
+    "identical_intersection": 0,
+    "diverged_intersection": 51,
+    "vault_only_names": [
+      "3d-artist-rigger",
+      "audio-designer-composer",
+      "dr-advogado",
+      "dr-medico-perito",
+      "dr-medico-psiquiatra",
+      "dr-medico-trabalho",
+      "economy-designer",
+      "engine-graphics-programmer",
+      "engineering-coach",
+      "game-animator",
+      "game-producer",
+      "gameplay_engineer",
+      "lead-game-designer",
+      "learning-designer",
+      "level-designer",
+      "linux-diag",
+      "narrative-designer",
+      "narrative-writer",
+      "product-marketing-manager",
+      "revisor-textual"
+    ],
+    "core_only_names": [],
+    "classification_heuristic": {
+      "CORE-GENERIC": "papéis do produto (plugin) ou interseção de mesmo papel; divergência = recon, não cutover",
+      "PERSONAL-OVERLAY": "médicos da casa, linux-diag, revisor, engineering-coach, PMM",
+      "INTENTIONAL-EXCLUSION": "stack de game design / narrative fora do plugin 0.2.0",
+      "STALE": "não atribuído na fase 0 sem diff semântico (0 identical implica 51 candidatos a recon, não auto-STALE)"
+    }
+  },
+  "models_plugin": {
+    "opus": 51,
+    "sonnet": 0,
+    "herdado": 0,
+    "outros": 0,
+    "effort_absent": 51,
+    "maxTurns_absent": 51,
+    "has_Agent_tool": 12,
+    "has_Bash": 31,
+    "has_disallowedTools": 0,
+    "agent_tool_holders": [
+      "caetano-cto",
+      "caio-caio",
+      "camilo-cmo",
+      "candido-cdo",
+      "capitolino-cpo",
+      "celso-ceo",
+      "cicero-cro",
+      "claudio-clo",
+      "confucio-cfo",
+      "cosimo-chief-of-staff",
+      "cosmo-coo",
+      "narciso-ciso"
+    ],
+    "vault_models": {
+      "opus": 70,
+      "sonnet": 1
+    },
+    "vault_sonnet_agent": "linux-diag"
+  },
+  "skills": {
+    "plugin": [
+      "bigtech",
+      "proj_software",
+      "tab_pendencias",
+      "visual-design-director"
+    ],
+    "vault_skills_count": 46,
+    "plugin_enabled_in_claude_settings": false
+  },
+  "hooks": {
+    "plugin_hooks_json_events": [
+      "SessionStart",
+      "UserPromptSubmit",
+      "PreToolUse",
+      "PostToolUse"
+    ],
+    "plugin_py": [
+      "bigtech_session_init.py",
+      "bigtech_porte_reminder.py",
+      "bigtech_reinforce.py",
+      "tab_pendencias_reminder.py",
+      "tdd_guard.py",
+      "tdd_runner.py",
+      "tdd_common.py"
+    ],
+    "vault_live_flagged": [
+      {
+        "event": "PreToolUse",
+        "script": "tdd_guard.py"
+      },
+      {
+        "event": "PostToolUse",
+        "script": "tdd_runner.py"
+      },
+      {
+        "event": "SessionStart",
+        "script": "bigtech_porte_reminder.py"
+      },
+      {
+        "event": "SessionStart",
+        "script": "tab_pendencias_reminder.py (skill product path)"
+      },
+      {
+        "event": "UserPromptSubmit",
+        "script": "bigtech_reinforce.py"
+      },
+      {
+        "event": "UserPromptSubmit",
+        "script": "tab_pendencias_reminder.py"
+      }
+    ],
+    "vault_missing_vs_plugin": [
+      "bigtech_session_init.py"
+    ],
+    "all_hook_shas_plugin_vs_vault_differ": true
+  },
+  "manuals_inventory": {
+    "CONTRACT.md": {
+      "vault": true,
+      "plugin": "docs/manuals/CONTRACT.md"
+    },
+    "TESTES.md": {
+      "vault": true,
+      "plugin": "docs/manuals/TESTES.md"
+    },
+    "TOOLING.md": {
+      "vault": true,
+      "plugin": "docs/TOOLING.md"
+    },
+    "pipeline_release_1.0.md": {
+      "vault": true,
+      "plugin": "docs/pipeline_release_1.0.md"
+    },
+    "DEPLOY_CHECKLIST.md": {
+      "vault": true,
+      "plugin": "docs/manuals/DEPLOY_CHECKLIST.md"
+    },
+    "lideranca_pipeline_release.md": {
+      "vault": true,
+      "plugin": "docs/lideranca_pipeline_release.md"
+    },
+    "ORG.md": {
+      "vault": true,
+      "plugin": "docs/ORG.md"
+    },
+    "Standards.md": {
+      "vault": true,
+      "plugin": null,
+      "gap": true
+    },
+    "AGILE.md": {
+      "vault": true,
+      "plugin": "docs/manuals/AGILE.md"
+    },
+    "AUDITORIAS.md": {
+      "vault": true,
+      "plugin": "docs/manuals/AUDITORIAS.md"
+    },
+    "gap_list": [
+      "Standards.md ausente no plugin"
+    ],
+    "note": "cópias no plugin são snapshot 0.2.0; drift vault×plugin NÃO medido byte-a-byte nesta fase (exceto existência)"
+  },
+  "tab_pendencias_health": {
+    "todo_audited": "plugin_bigtech/TODO.md (default path from cwd when health run from product? measured both)",
+    "health_note": "todo_health defaulted to product TODO in tab_pendencias cwd when invoked — see report for both",
+    "plugin_todo_schema_cols": 9,
+    "plugin_todo_has_BT_ids": false,
+    "plugin_todo_audit_casa": {
+      "findings": 38,
+      "critical": 1,
+      "important": 36,
+      "cosmetic": 1,
+      "critical_detail": "CHK-11 reconciliação contagem 69 vs 88 (delta 19)"
+    },
+    "tab_product_audit_casa": {
+      "findings": 34,
+      "critical": 0,
+      "important": 33,
+      "cosmetic": 1
+    },
+    "recommendation": "Não migrar TODO nesta fase. Schema 9 colunas OK no header. BT-* ainda não existem — criar na fase de campanha backlog. CHK-11 no plugin TODO é P0 de higiene de tabela."
+  },
+  "top10_agents_by_bytes_plugin": [
+    {
+      "name": "security-engineer",
+      "bytes": 25862,
+      "model": "opus"
+    },
+    {
+      "name": "data-engineer",
+      "bytes": 25478,
+      "model": "opus"
+    },
+    {
+      "name": "devops-sre",
+      "bytes": 24484,
+      "model": "opus"
+    },
+    {
+      "name": "visual-design-director",
+      "bytes": 23836,
+      "model": "opus"
+    },
+    {
+      "name": "compliance-legal",
+      "bytes": 21452,
+      "model": "opus"
+    },
+    {
+      "name": "qa-engineer",
+      "bytes": 21448,
+      "model": "opus"
+    },
+    {
+      "name": "frontend-engineer",
+      "bytes": 19986,
+      "model": "opus"
+    },
+    {
+      "name": "backend-engineer",
+      "bytes": 19961,
+      "model": "opus"
+    },
+    {
+      "name": "data-scientist",
+      "bytes": 16988,
+      "model": "opus"
+    },
+    {
+      "name": "i18n-l10n-specialist",
+      "bytes": 16780,
+      "model": "opus"
+    }
+  ],
+  "boilerplate_plugin_agents": {
+    "Compatibilidade Claude Code": 50,
+    "docs-bootstrap": 50,
+    "Leitura obrigatória": 35,
+    "NUNCA": 50,
+    "AskUserQuestion": 51,
+    "Conventional Commit": 14
+  },
+  "alive_files_removed": false,
+  "push_performed": false
+}
