@@ -51,14 +51,17 @@ jobs:
       - name: Instalar dependencias de teste
         run: pip install -r requirements-dev.txt
 
-      - name: pytest hooks/tests
-        run: python -m pytest hooks/tests -q
+      - name: pytest hooks/tests scripts/tests
+        run: python -m pytest hooks/tests scripts/tests -q
 
       - name: validate_plugin (ZERO-ORFAOS)
         run: python scripts/validate_plugin.py
 
       - name: smoke_offline
         run: python scripts/smoke_offline.py
+
+      - name: check_semantic_drift (BT-7)
+        run: python scripts/check_semantic_drift.py
 
       - name: JSON valido plugin.json
         run: python -m json.tool .claude-plugin/plugin.json
@@ -140,14 +143,17 @@ jobs:
       - name: PATH do venv
         run: echo "/tmp/venv/bin" >> "$GITHUB_PATH"
 
-      - name: pytest hooks/tests
-        run: /tmp/venv/bin/python -m pytest hooks/tests -q
+      - name: pytest hooks/tests scripts/tests
+        run: /tmp/venv/bin/python -m pytest hooks/tests scripts/tests -q
 
       - name: validate_plugin (ZERO-ORFAOS)
         run: /tmp/venv/bin/python scripts/validate_plugin.py
 
       - name: smoke_offline
         run: /tmp/venv/bin/python scripts/smoke_offline.py
+
+      - name: check_semantic_drift (BT-7)
+        run: /tmp/venv/bin/python scripts/check_semantic_drift.py
 
   # ---------------------------------------------------------------------
   # gitleaks — historico completo (hard gate)

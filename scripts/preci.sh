@@ -6,20 +6,21 @@
 # pra pegar problema na maquina, sem gastar fila de runner.
 # Path CI: .github/workflows/ci.yml (BT-4 matrix multi-OS + containers + gitleaks).
 #
-# Gates (em ordem), sao 8 no total:
+# Gates (em ordem), sao 9 no total:
 #   1. Gate ZERO-ORFAOS (spec 4.1)   -> python3 scripts/validate_plugin.py
-#   2. Testes dos hooks (suite dos hooks) -> python3 -m pytest hooks/tests -q
+#   2. Testes (hooks + scripts)      -> python3 -m pytest hooks/tests scripts/tests -q
 #   3. JSON valido (3 manifestos)    -> python3 -m json.tool em cada um
 #   4. Paridade de versao            -> plugin.json == marketplace.json (plugins[0].version)
 #   5. Lint Python (se ruff existir) -> ruff check hooks/ scripts/   [degrada gracioso]
 #   6. Secret scan (se gitleaks)     -> gitleaks detect ... -c .gitleaks.toml [degrada]
 #   7. Smoke offline                 -> python3 scripts/smoke_offline.py (frontmatter + hooks)
-#   8. claude plugin validate (x2)   -> --strict no dir (marketplace); plugin.json
+#   8. Drift semântico (BT-7)        -> python3 scripts/check_semantic_drift.py [obrigatório]
+#   9. claude plugin validate (x2)   -> --strict no dir (marketplace); plugin.json
 #                                      sem --strict (CLAUDE.md de processo) [degrada]
 #
 # Ferramentas opcionais (ruff, gitleaks, claude): se AUSENTES localmente, o gate
 # avisa que "rodara no CI" e segue (nao falha); paridade total e garantida no CI,
-# que as instala. Os gates 1-4 e 7 sao obrigatorios e usam so a stdlib do Python.
+# que as instala. Os gates 1-4, 7 e 8 sao obrigatorios e usam so a stdlib do Python.
 #
 # Uso:
 #   bash scripts/preci.sh        # da raiz do repo ou de qualquer lugar
@@ -43,7 +44,7 @@ else
 fi
 
 GATE_NUM=0
-TOTAL_GATES=8
+TOTAL_GATES=9
 
 # Cabecalho de um gate (numerado).
 gate() {
@@ -83,14 +84,14 @@ else
 fi
 
 # =================================================================================
-# Gate 2 — Testes dos hooks (suite dos hooks)
+# Gate 2 — Testes (hooks + scripts/gates)
 # =================================================================================
-gate "Testes dos hooks: pytest hooks/tests"
+gate "Testes: pytest hooks/tests scripts/tests"
 if ! ${PY} -c 'import pytest' >/dev/null 2>&1; then
   fail "pytest nao instalado localmente. Instale com: ${PY} -m pip install pytest"
 fi
-if ${PY} -m pytest hooks/tests -q; then
-  pass "suite de testes dos hooks verde."
+if ${PY} -m pytest hooks/tests scripts/tests -q; then
+  pass "suite de testes (hooks + scripts) verde."
 else
   fail "pytest reprovou — veja a saida acima."
 fi
@@ -222,7 +223,19 @@ else
 fi
 
 # =================================================================================
-# Gate 8 - claude plugin validate (x2): opcional, degrada gracioso
+# Gate 8 - Drift semântico (BT-7): registry agents/skills/hooks + porte/host
+# =================================================================================
+# Obrigatório, stdlib. Detecta name≠stem, contagem ≠ 51, hook script ausente,
+# porte legado "solo" como primário sem alias, e host legado Codeberg em produto.
+gate "Drift semântico (BT-7): check_semantic_drift.py"
+if ${PY} scripts/check_semantic_drift.py; then
+  pass "drift semântico limpo."
+else
+  fail "drift semântico reprovou — veja acima."
+fi
+
+# =================================================================================
+# Gate 9 - claude plugin validate (x2): opcional, degrada gracioso
 # =================================================================================
 # Validacao oficial da CLI do Claude Code, em DOIS alvos (cobre marketplace +
 # manifesto do plugin):
