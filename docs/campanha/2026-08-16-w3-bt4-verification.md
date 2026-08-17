@@ -289,3 +289,24 @@ git archive 26f8641 | tar -C /var/tmp/bt4-verify-26f8641 -xf -
 python3 -m pytest hooks/tests -q     # 147 passed (nos dois archives)
 bash scripts/preci.sh                # FAIL no HEAD; PASS em 26f8641
 ```
+
+---
+
+## 8. Unblock após sanitize do ADR (pós-auditoria)
+
+**Data da nota:** 2026-08-16  
+**Hora local (medida):** `17/08/26 - 00:00:23`  
+**Causa do HOLD original:** `docs/adr/ADR-source-of-truth.md` (BT-1) violava `local_paths` + `personal` no gate ZERO-ORFAOS; `preci` e o Actions no HEAD falhavam **fora** da matrix BT-4.
+
+**Desbloqueio (implementação BT-1 sanitizada, local):**
+
+| Item DoD | Estado após sanitize |
+|---|---|
+| 1 — `ci.yml` matrix | **PASS** (inalterado; blob já verde em `26f8641`) |
+| 2 — run verde SHA | **PASS** (run #7 em `26f8641`; remoto no HEAD antigo continua histórico) |
+| 3 — `preci` local | **PASS** 8/8 (medido pós-sanitize; 150 pytest) |
+| 4 — pytest hooks | **PASS** (`150 passed`) |
+
+**Veredito atualizado:** **PROMOTE `BT-4` → ✅ + Estado Auditado ✓**.  
+O bloqueio era o ADR de BT-1 no escopo do `validate_plugin`, não defeito da matrix multi-OS. Re-medição: `python3 scripts/validate_plugin.py` PASS; `bash scripts/preci.sh` PRE-CI PASS.  
+Sem push nesta fatia (main pusha a onda). Actions no remoto só re-verifica após o push da onda.
