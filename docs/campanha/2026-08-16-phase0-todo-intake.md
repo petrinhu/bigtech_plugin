@@ -58,3 +58,13 @@ Legados ✅/🔍 intocados. N9 permanece 🔄. Sem full reorder.
 - este relatório
 
 Sem push.
+
+
+## Commits
+
+| SHA | Mensagem |
+|---|---|
+| `06791a0` | docs(todo): intake BT-0..BT-9 campanha bigtech 2026-08-16 (ini + relatório) |
+| `0f2b320` | docs(todo): versionar TODO.md com BT-0..BT-9 (force-add; estava em `.gitignore`) |
+
+Nota: `/TODO.md` em `.gitignore` impediu o 1º commit de levar a tabela; 2º commit restaurou o tracking com `git add -f`. Avaliar em PHASE 1 se o ignore deve sair (dívida de tooling local).
