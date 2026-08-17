@@ -40,7 +40,7 @@
 | BT-5 | W3 | Porte | Eliminar solo/headcount como porte (skill /bigtech + hooks + Cosimo alinhados; piso early) <!-- intake:cand-BT-5-2026-08-16 --> | Alta | BT-1 | Média | ✅ Concluído | ✓ |
 | BT-6 | W3 | Governança | Inventário dual-authority agents: classificar CORE/OVERLAY/STALE/EXCLUSION + plano cutover <!-- intake:cand-BT-6-2026-08-16 --> | Alta | BT-1 | Alta | ✅ Concluído | ✓ |
 | BT-4 | W3 | CI | CI multi-OS GitHub Actions (matrix espelho tab_pendencias: Ubuntu/Windows + containers) <!-- intake:cand-BT-4-2026-08-16 --> | Alta | BT-3 | Alta | ✅ Concluído | ✓ |
-| BT-7 | W4 | Qualidade | Drift gate semântico registry/agents/skills (CI/hook; PHASE posterior) <!-- intake:cand-BT-7-2026-08-16 --> | Média | BT-6 | Alta | 🔍 Pendente verificação | — |
+| BT-7 | W4 | Qualidade | Drift gate semântico registry/agents/skills (CI/hook; PHASE posterior) <!-- intake:cand-BT-7-2026-08-16 --> | Média | BT-6 | Alta | ✅ Concluído | ✓ |
 | BT-8 | W4 | Evals | Evals de roteamento da skill /bigtech (constelação + porte) <!-- intake:cand-BT-8-2026-08-16 --> | Média | BT-5 | Alta | ✅ Concluído | ✓ |
 | BT-9 | W5 | Release | Proteção de main + release gates (go/no-go do líder) (protecao remota GitHub, tag/PR) <!-- intake:cand-BT-9-2026-08-16 --> | Alta | BT-4 | Média | ✅ Concluído | ✓ |
 | F1 | W1 | Fundação | Estrutura de diretórios + `.claude-plugin/plugin.json` (name=bigtech, Apache-2.0) + `marketplace.json` (name=petrinhu, 1 plugin, `source: "./"`). **One-way-door.** | Alta | — | Baixa | ✅ Concluído | — |
