@@ -3,16 +3,17 @@
 > Tabela ordenada **de cima para baixo na ordem de execução** que minimiza retrabalho.
 > A coluna **Onda** marca passos paralelizáveis (igual valor, sem dependência mútua).
 > Fonte de verdade do escopo: `docs/superpowers/specs/2026-06-13-bigtech-plugin-design.md`.
-> Método: topological sort (Pré-requisito) + WSJF, consolidado por Cosmo/COO a partir de 4 lentes
-> (software-architect, product-manager, engineering-manager, scrum-master).
+> Método: topological sort (Pré-requisito) + WSJF. Reorder campanha 2026-08-16:
+> Cosimo → thread direta (anti-OE; 10 ativos BT-*, grafo linear). Tabela 1.0 histórica
+> foi consolidada por Cosmo/COO a partir de 4 lentes.
 >
 > **Estado atual:** Release 1.0 fechado (ondas W1-W8 + W-WIKI ✅). Campanha ativa **2026-08-16** =
-> IDs **`BT-*`** + plano `PLANO-MELHORIA-BIGTECH-CLAUDE-CODE-2026-08-16.md`. Legados **N9**,
+> IDs **`BT-*`** no topo (ondas **W1..W5**) + plano `PLANO-MELHORIA-BIGTECH-CLAUDE-CODE-2026-08-16.md`. Legados **N9**,
 > **OS-1..5** e **TOOL-1..4** cancelados 2026-08-16 (legacy/OE).
 
 - **Caminho crítico (1.0, concluído):** `F1 → H3 → A2* → S1 → TST-ORFAOS → AUD-PRIV → R4`.
 - **Caminho crítico (pós-1.0 histórico):** `N8` ✅; `N9` cancelado 2026-08-16 (legacy/OE, fora da campanha BT-*).
-- **Caminho crítico (campanha BT-\*, ativo):** `BT-0` → `BT-1`/`BT-2`/`BT-3` → `BT-4`/`BT-5`/`BT-6` → `BT-7`/`BT-8` → `BT-9` (ver plano PHASE).
+- **Caminho crítico (campanha BT-\*, ativo):** `BT-0` (W1) → `BT-3`/`BT-1`/`BT-2` (W2) → `BT-5`/`BT-6`/`BT-4` (W3) → `BT-7`/`BT-8` (W4) → `BT-9` (W5). Fundação restante = `BT-1` (bloqueia BT-5/BT-6). `BT-9` gated pelo líder (fim). Reorder 16/08/26: Cosimo → thread direta; 🔍 não bloqueia dependentes de fatia já entregue.
 - **WIP de paralelização:** campanha BT-\* (main despacha ≤2 agents/rodada). WIP pós-1.0 em N9 **encerrado** com o cancelamento legacy/OE. Era 3 durante o 1.0 (gargalo = 1 revisor humano), 4 só em janelas pontuais (W2, fatiamento de A2\*).
 - **One-way-doors (decisão do líder supremo):** `F1` (nome/layout/`source` do marketplace = contrato público), `R4` (primeira publicação pública — host legado da época; canônico agora GitHub). `N9` (marketplace comunitário) permanece one-way-door **se reaberto**, mas está **cancelado** na tabela até go/no-go pós-campanha.
 - **Abreviações de pré-requisito:** `D1* = D1a,D1b,D1c`; `A2* = A2a,A2b,A2c,A2d,A2e`.
@@ -29,6 +30,16 @@
 
 | ID | Onda | Grupo | Descrição Técnica | Prioridade | Pré-requisito | Dificuldade | Status | Estado Auditado |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| BT-0 | W1 | Campanha | PHASE 0 freeze/baseline/inventario campanha 2026-08-16: medir e fechar DoD (SHA repos + agents/skills/hooks + modelos) <!-- intake:cand-BT-0-2026-08-16 --> | Alta | — | Média | 🔍 Pendente verificação | — |
+| BT-3 | W2 | Distribuição | Remote GitHub canônico + purgar CI/host legado (`.forgejo`) e refs operacionais; oficial `github.com/petrinhu/bigtech_plugin` (sem apagar histórico git) <!-- intake:cand-BT-3-2026-08-16 --> | Alta | BT-0 | Média | 🔍 Pendente verificação | — |
+| BT-1 | W2 | Arquitetura | FABLE-ORG-ARCH: ADR source-of-truth dual-authority vault×plugin (PHASE 1) <!-- intake:cand-BT-1-2026-08-16 --> | Alta | BT-0 | Alta | ⏳ Pendente | — |
+| BT-2 | W2 | Docs | docs/house: sync 10 manuais vault + README de navegação (cópia produto) <!-- intake:cand-BT-2-2026-08-16 --> | Alta | BT-0 | Média | 🔍 Pendente verificação | — |
+| BT-5 | W3 | Porte | Eliminar solo/headcount como porte (skill /bigtech + hooks + Cosimo alinhados; piso early) <!-- intake:cand-BT-5-2026-08-16 --> | Alta | BT-1 | Média | ⏳ Pendente | — |
+| BT-6 | W3 | Governança | Inventário dual-authority agents: classificar CORE/OVERLAY/STALE/EXCLUSION + plano cutover <!-- intake:cand-BT-6-2026-08-16 --> | Alta | BT-1 | Alta | ⏳ Pendente | — |
+| BT-4 | W3 | CI | CI multi-OS GitHub Actions (matrix espelho tab_pendencias: Ubuntu/Windows + containers) <!-- intake:cand-BT-4-2026-08-16 --> | Alta | BT-3 | Alta | 🔍 Pendente verificação | — |
+| BT-7 | W4 | Qualidade | Drift gate semântico registry/agents/skills (CI/hook; PHASE posterior) <!-- intake:cand-BT-7-2026-08-16 --> | Média | BT-6 | Alta | ⏳ Pendente | — |
+| BT-8 | W4 | Evals | Evals de roteamento da skill /bigtech (constelação + porte) <!-- intake:cand-BT-8-2026-08-16 --> | Média | BT-5 | Alta | ⏳ Pendente | — |
+| BT-9 | W5 | Release | Proteção de main + release gates (go/no-go do líder) (protecao remota GitHub, tag/PR) <!-- intake:cand-BT-9-2026-08-16 --> | Alta | BT-4 | Média | ⏳ Pendente | — |
 | F1 | W1 | Fundação | Estrutura de diretórios + `.claude-plugin/plugin.json` (name=bigtech, Apache-2.0) + `marketplace.json` (name=petrinhu, 1 plugin, `source: "./"`). **One-way-door.** | Alta | — | Baixa | ✅ Concluído | — |
 | R1 | W2 | Release | `LICENSE` Apache-2.0 + `NOTICE` (pull-early: desbloqueia AUD-LICENSE). | Alta | F1 | Baixa | ✅ Concluído | — |
 | D3 | W2 | Docs | Gerar `docs/principles/hardware-resource-limits.md` **generalizado** (sem specs da máquina); ~20 agents dependem. | Média | F1 | Média | ✅ Concluído | — |
@@ -98,16 +109,6 @@
 | TOOL-2 | W24 | Política-Tools | [CANCELADO 2026-08-16: legacy/OE — fora da campanha BT-*; `docs/principles/missing-tool-policy.md` já existe; aging de verificação legado.] Promover missing-tool-policy cross-cutting. | Alta | TOOL-1 | Média | 💡 Decisão tomada | — |
 | TOOL-3 | W24 | Política-Tools | [CANCELADO 2026-08-16: legacy/OE — fora da campanha BT-*; propagação residual agents = verification aging legado.] Propagar missing-tool-policy aos agents. | Média | TOOL-2 | Média | 💡 Decisão tomada | — |
 | TOOL-4 | W24 | Política-Tools | [CANCELADO 2026-08-16: legacy/OE — fora da campanha BT-*; alinhamento TOOLING/TESTES residual = OE se forçado agora.] Install OS-aware no TOOLING.md. | Baixa | TOOL-2 | Baixa | 💡 Decisão tomada | — |
-| BT-0 | W-BT0 | Campanha | PHASE 0 freeze/baseline/inventario campanha 2026-08-16: medir e fechar DoD (SHA repos + agents/skills/hooks + modelos) <!-- intake:cand-BT-0-2026-08-16 --> | Alta | — | Média | 🔍 Pendente verificação | — |
-| BT-1 | W-BT1 | Arquitetura | FABLE-ORG-ARCH: ADR source-of-truth dual-authority vault×plugin (PHASE 1) <!-- intake:cand-BT-1-2026-08-16 --> | Alta | BT-0 | Alta | ⏳ Pendente | — |
-| BT-2 | W-BT1 | Docs | docs/house: sync 10 manuais vault + README de navegação (cópia produto) <!-- intake:cand-BT-2-2026-08-16 --> | Alta | BT-0 | Média | 🔍 Pendente verificação | — |
-| BT-3 | W-BT2 | Distribuição | Remote GitHub canônico + purgar CI/host legado (`.forgejo`) e refs operacionais; oficial `github.com/petrinhu/bigtech_plugin` (sem apagar histórico git) <!-- intake:cand-BT-3-2026-08-16 --> | Alta | BT-0 | Média | 🔍 Pendente verificação | — |
-| BT-4 | W-BT2 | CI | CI multi-OS GitHub Actions (matrix espelho tab_pendencias: Ubuntu/Windows + containers) <!-- intake:cand-BT-4-2026-08-16 --> | Alta | BT-3 | Alta | 🔍 Pendente verificação | — |
-| BT-5 | W-BT3 | Porte | Eliminar solo/headcount como porte (skill /bigtech + hooks + Cosimo alinhados; piso early) <!-- intake:cand-BT-5-2026-08-16 --> | Alta | BT-1 | Média | ⏳ Pendente | — |
-| BT-6 | W-BT3 | Governança | Inventário dual-authority agents: classificar CORE/OVERLAY/STALE/EXCLUSION + plano cutover <!-- intake:cand-BT-6-2026-08-16 --> | Alta | BT-1 | Alta | ⏳ Pendente | — |
-| BT-7 | W-BT4 | Qualidade | Drift gate semântico registry/agents/skills (CI/hook; PHASE posterior) <!-- intake:cand-BT-7-2026-08-16 --> | Média | BT-6 | Alta | ⏳ Pendente | — |
-| BT-8 | W-BT4 | Evals | Evals de roteamento da skill /bigtech (constelação + porte) <!-- intake:cand-BT-8-2026-08-16 --> | Média | BT-5 | Alta | ⏳ Pendente | — |
-| BT-9 | W-BT5 | Release | Proteção de main + release gates (go/no-go do líder) (protecao remota GitHub, tag/PR) <!-- intake:cand-BT-9-2026-08-16 --> | Alta | BT-4 | Média | ⏳ Pendente | — |
 
 ## Tabela de scoring WSJF (itens-pai funcionais)
 
@@ -152,6 +153,32 @@ Os itens N1-N7, N8 e N10 já foram entregues. **N9 foi cancelado 2026-08-16 (leg
 > **cancelado** para não competir com a campanha BT-\* (fonte-de-verdade/CI/porte). N10 ✅.
 > Backlog ativo e WSJF da campanha: IDs **BT-0..BT-9** (plano 2026-08-16).
 
+### Scoring WSJF — campanha BT-* (2026-08-16, `--reorder`)
+
+Régua Fibonacci `(1,2,3,5,8,13,20)`. `CoD = Valor + Criticidade + Red. Risco`; `WSJF = CoD / Job Size`.
+Job Size = rótulo `Dificuldade` (early: Baixa=2, Média=5, Alta=8). Rank = WSJF **dentro do nível topológico**
+(dependência sempre vence). `BT-9` fica em W5 por julgamento (go/no-go do líder), não por WSJF global.
+
+Níveis topo: L0=`BT-0`; L1=`BT-1,BT-2,BT-3`; L2=`BT-4,BT-5,BT-6`; L3=`BT-7,BT-8,BT-9`.
+Onda canônica (CHK-07: pré-req nunca na mesma onda): W1=L0; W2=L1; W3=L2; W4=`BT-7,BT-8`; W5=`BT-9`.
+
+| ID | Item | Nível | Valor | Criticidade | Red. Risco | CoD | Job Size | WSJF | Rank no nível |
+| :--- | :--- | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| BT-0 | PHASE 0 freeze/baseline | L0 | 13 | 13 | 13 | 39 | 5 | 7.80 | 1 |
+| BT-3 | GitHub canônico + purge host legado | L1 | 13 | 13 | 13 | 39 | 5 | 7.80 | 1 |
+| BT-1 | FABLE ADR source-of-truth vault×plugin | L1 | 20 | 13 | 20 | 53 | 8 | 6.63 | 2 |
+| BT-2 | docs/house sync 10 manuais | L1 | 8 | 8 | 8 | 24 | 5 | 4.80 | 3 |
+| BT-5 | Eliminar solo/headcount (piso early) | L2 | 13 | 8 | 13 | 34 | 5 | 6.80 | 1 |
+| BT-6 | Inventário dual-authority + cutover | L2 | 13 | 8 | 20 | 41 | 8 | 5.13 | 2 |
+| BT-4 | CI multi-OS GitHub Actions | L2 | 13 | 8 | 13 | 34 | 8 | 4.25 | 3 |
+| BT-9 | Proteção de main + release gates | L3 | 13 | 5 | 13 | 31 | 5 | 6.20 | 1* |
+| BT-7 | Drift gate semântico registry | L3 | 8 | 5 | 13 | 26 | 8 | 3.25 | 2 |
+| BT-8 | Evals de roteamento `/bigtech` | L3 | 8 | 5 | 8 | 21 | 8 | 2.63 | 3 |
+
+> \* `BT-9` tem o maior WSJF do L3, mas a onda é **W5** (porta do líder no fim), não W4.
+> `BT-1` sobe no L1 (fundação / one-way-door de SoT). Itens 🔍 (BT-0/2/3/4) não bloqueiam
+> dependentes de *código* da fatia já entregue; Status permanece 🔍.
+
 ## Decisões one-way-door (go/no-go do líder supremo)
 
 1. **`F1`** — congelar nome (`bigtech`), layout e `source` do marketplace antes de abrir a W2 (contrato público; mudar depois quebra quem já instalou). *(concluído)*
@@ -168,7 +195,7 @@ Os itens N1-N7, N8 e N10 já foram entregues. **N9 foi cancelado 2026-08-16 (leg
 
 ## Notas de cadência (pós-1.0 → campanha BT-*)
 
-- **Campanha ativa = BT-\*** (plano `PLANO-MELHORIA-BIGTECH-CLAUDE-CODE-2026-08-16.md`). Main orquestra-only; ≤2 agents/rodada.
+- **Campanha ativa = BT-\*** no topo da tabela (ondas W1..W5; plano `PLANO-MELHORIA-BIGTECH-CLAUDE-CODE-2026-08-16.md`). Main orquestra-only; ≤2 agents/rodada.
 - **N8 ✅, N10 ✅.** **N9, OS-1..5, TOOL-1..4 cancelados 2026-08-16** como legacy/OE (ver seção Cancelamentos).
 - **Não há caminho crítico `N8 → N9` aberto.** WIP de manutenção pós-1.0 em N9 encerrou com o cancelamento; não reabrir N9 durante a campanha sem ordem do líder.
 - **N10** já concluído (não é mais opcional pendente).
