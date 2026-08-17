@@ -22,7 +22,7 @@ wiki/
 /docs/superpowers/
 /docs/auditoria/
 /docs/submission/
-/TODO.md
+# /TODO.md  # campanha: versionar TODO (BT-0); force-add já no histórico
 /TESTES.md
 /AUDITORIAS.md
 
