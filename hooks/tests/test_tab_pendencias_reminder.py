@@ -4,7 +4,6 @@ import subprocess
 
 import tab_pendencias_reminder as t
 
-
 # ------------------------------- helpers ------------------------------------
 
 def _proj(tmp_path, porte=True, todo=True, cfg=None):

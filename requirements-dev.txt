@@ -1,0 +1,5 @@
+# Dependencias de DESENVOLVIMENTO / CI (BT-4).
+# Runtime do plugin (hooks, scripts de gate) e stdlib; isto so cobre a ferramenta
+# de teste e o lint no pre-CI / GitHub Actions. Piso Python: 3.11.
+pytest>=8,<9
+ruff>=0.8

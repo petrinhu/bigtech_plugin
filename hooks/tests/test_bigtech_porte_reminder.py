@@ -141,7 +141,7 @@ def test_subprocess_stdin_invalido_exit_0(tmp_path):
 # FAIL-OPEN: stdin com JSON VALIDO porem NAO-dict (null, [], "x", 12).
 # Antes do fix, data.get(...) lancava AttributeError -> exit 1 (bloqueava).
 # ---------------------------------------------------------------------------
-import pytest   # noqa: E402
+import pytest
 
 NON_DICT_JSON = ("null", "[]", '"x"', "12", "[1, 2, 3]", "true", "3.14")
 

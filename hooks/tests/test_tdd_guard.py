@@ -2,8 +2,9 @@ import json
 import os
 import subprocess
 import sys
-import tdd_guard as g
+
 import tdd_common as c
+import tdd_guard as g
 
 
 def _project(tmp_path, raw=None):

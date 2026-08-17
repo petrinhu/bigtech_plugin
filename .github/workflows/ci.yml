@@ -1,0 +1,159 @@
+name: CI
+
+# BT-4: um unico workflow, matrix multi-OS (filosofia tab_pendencias).
+# Gates hard: falha = job red. Sem continue-on-error nos gates obrigatorios.
+# Sem `|| true` que transforme falha em verde.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ---------------------------------------------------------------------
+  # Job nativo: ubuntu + windows x Python 3.11 / 3.12
+  # ---------------------------------------------------------------------
+  test:
+    name: validate (${{ matrix.os }}, py${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.11", "3.12"]
+    steps:
+      - name: Checkout
+        # actions/checkout v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
+      - name: Setup Python
+        # actions/setup-python v7.0.0
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+          cache-dependency-path: requirements-dev.txt
+
+      - name: Instalar dependencias de teste
+        run: pip install -r requirements-dev.txt
+
+      - name: pytest hooks/tests
+        run: python -m pytest hooks/tests -q
+
+      - name: validate_plugin (ZERO-ORFAOS)
+        run: python scripts/validate_plugin.py
+
+      - name: smoke_offline
+        run: python scripts/smoke_offline.py
+
+      - name: JSON valido plugin.json
+        run: python -m json.tool .claude-plugin/plugin.json
+
+      - name: JSON valido marketplace.json
+        run: python -m json.tool .claude-plugin/marketplace.json
+
+      - name: JSON valido hooks.json
+        run: python -m json.tool hooks/hooks.json
+
+      - name: Paridade de versao plugin.json == marketplace
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, sys
+          plugin = json.load(open(".claude-plugin/plugin.json", encoding="utf-8"))
+          market = json.load(open(".claude-plugin/marketplace.json", encoding="utf-8"))
+          pv = plugin.get("version")
+          mv = (market.get("plugins") or [{}])[0].get("version")
+          if not pv or not mv or pv != mv:
+              print(f"divergencia: plugin={pv!r} marketplace={mv!r}", file=sys.stderr)
+              sys.exit(1)
+          print(f"versao casada: {pv}")
+          PY
+
+      - name: ruff check hooks/ scripts/
+        run: ruff check hooks/ scripts/
+
+      # Ubuntu: espelha o pre-CI completo (gates Python ja rodados acima;
+      # preci.sh revalida e degrada gitleaks/claude se ausentes).
+      - name: preci.sh (Ubuntu only)
+        if: runner.os == 'Linux'
+        run: bash scripts/preci.sh
+
+  # ---------------------------------------------------------------------
+  # Containers: Debian 12, Fedora 41, Arch (sobre ubuntu-latest)
+  # Digests e padrao install reutilizados do tab_pendencias CI-2.
+  # ---------------------------------------------------------------------
+  test-distros:
+    name: validate (${{ matrix.distro }} via container)
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ matrix.image }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - distro: debian
+            image: "docker.io/library/debian:12-slim@sha256:63a496b5d3b99214b39f5ed70eb71a61e590a77979c79cbee4faf991f8c0783e"
+            install: |
+              apt-get update -qq
+              apt-get install -y -qq python3 python3-venv git
+          - distro: fedora
+            image: "docker.io/library/fedora:41@sha256:68bb1ba893be0c05991b2df55bc6571862bab7526fd6053b1ebacd53a2a75366"
+            install: |
+              dnf install -y -q python3 git
+          - distro: archlinux
+            image: "docker.io/library/archlinux:latest@sha256:87465c3afdaede91333d4a9239d6a1ba7f47b2ec74b376e0070e81c25e7e3ff5"
+            install: |
+              pacman -Syu -q --noconfirm --needed python git
+    steps:
+      - name: "Instalar git + python3 (imagem minimalista)"
+        run: ${{ matrix.install }}
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
+      - name: "git safe.directory (checkout host UID + container root)"
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: "Versao do Python neste ambiente"
+        run: python3 --version
+
+      - name: Instalar dependencias (venv em /tmp, PEP 668)
+        run: |
+          python3 -m venv /tmp/venv
+          /tmp/venv/bin/pip install -q -r requirements-dev.txt
+
+      - name: pytest hooks/tests
+        run: /tmp/venv/bin/python -m pytest hooks/tests -q
+
+      - name: validate_plugin (ZERO-ORFAOS)
+        run: /tmp/venv/bin/python scripts/validate_plugin.py
+
+      - name: smoke_offline
+        run: /tmp/venv/bin/python scripts/smoke_offline.py
+
+  # ---------------------------------------------------------------------
+  # gitleaks — historico completo (hard gate)
+  # ---------------------------------------------------------------------
+  secrets-scan:
+    name: gitleaks (secrets)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (historico completo)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+
+      - name: gitleaks
+        # gitleaks/gitleaks-action v3.0.0 (conta pessoal: GITLEAKS_LICENSE nao exigida)
+        uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

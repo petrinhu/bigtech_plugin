@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Gate ZERO-ORFAOS (spec 4.1) do plugin bigtech — validador reutilizavel.
 
-Valida, sobre `agents/`, `skills/` e `docs/` (EXCETO `docs/superpowers/`, que e
-material de processo e contem exemplos legitimos de `[[wikilinks]]` no template de
-higienizacao), o criterio-mae de aceitacao da secao 4.1 da spec:
+Valida, sobre `agents/`, `skills/` e `docs/` (exceto as subarvores em
+`EXCLUDED_SUBTREES` — processo, campanha e copia do vault), o criterio-mae de
+aceitacao da secao 4.1 da spec:
 
   1. ZERO wikilinks `[[ ]]` fora de blocos/trechos de codigo. A unica excecao
      legitima sao atributos C++ ([[nodiscard]], [[likely]], [[maybe_unused]], ...)
@@ -44,11 +44,22 @@ from pathlib import Path
 # Diretorios validados (relativos a raiz do repo).
 SCAN_DIRS = ("agents", "skills", "docs")
 
-# Subarvores ignoradas: processo, nao produto. docs/superpowers contem a spec e o
-# template de higienizacao (exibem `[[ ]]` como EXEMPLO); docs/auditoria e o dossie
-# de auditoria; docs/submission e o material de submissao ao marketplace. Todos
-# gitignored, material de processo local, fora do produto distribuido.
-EXCLUDED_SUBTREES = ("docs/superpowers", "docs/auditoria", "docs/submission")
+# Subarvores ignoradas: processo / nao produto distribuido ao instalador.
+# - docs/superpowers: spec + template de higienizacao (exibem `[[ ]]` como EXEMPLO)
+# - docs/auditoria: dossie de auditoria
+# - docs/submission: material de submissao ao marketplace
+# - docs/campanha: snapshots e metricas da campanha de melhoria (paths, nomes)
+# - docs/house: copia canônica do vault para quem nao tem vault; contem wikilinks
+#   e nomes de papel por desenho. Este gate zero-orfaos NAO re-higieniza o vault:
+#   a higiene do produto distribuido continua em agents/, skills/ e no restante
+#   de docs/ (manuais higienizados em docs/manuals/, principles, etc.).
+EXCLUDED_SUBTREES = (
+    "docs/superpowers",
+    "docs/auditoria",
+    "docs/submission",
+    "docs/campanha",
+    "docs/house",
+)
 
 # Extensoes de texto validadas.
 TEXT_SUFFIXES = (".md",)

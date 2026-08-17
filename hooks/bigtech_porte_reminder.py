@@ -18,11 +18,11 @@ Logica:
 Saida: JSON com hookSpecificOutput.additionalContext quando dispara; nada caso
 contrario. Sempre exit 0 (lembrete, nunca bloqueia).
 """
+import glob
 import json
 import os
 import re
 import sys
-import glob
 
 MARKER = ".bigtech-porte"
 MAX_MARKER_BYTES = 4096

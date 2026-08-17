@@ -1,0 +1,21 @@
+# Lint do plugin bigtech (BT-4 / pre-CI + GitHub Actions).
+# Runtime dos hooks e fail-open por desenho (stdin JSON, marker files, etc.).
+
+target-version = "py311"
+line-length = 100
+
+[lint]
+# Padroes intencionais do produto (nao estilo generico):
+# - BLE001 / S110: hooks engolem Exception e seguem (fail-open), nunca bloqueiam a sessao
+# - EXE001: hooks sao invocados como `python3 <script>` via hooks.json, nao como binario +x
+# - PLW1510: testes e smoke inspecionam returncode explicitamente apos subprocess.run
+ignore = [
+    "BLE001",
+    "S110",
+    "EXE001",
+    "PLW1510",
+]
+
+[lint.per-file-ignores]
+# Suite de testes: fixtures e unpacks parciais sao comuns.
+"hooks/tests/**" = ["RUF059", "SIM115"]

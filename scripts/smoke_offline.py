@@ -61,7 +61,7 @@ for rel, expected_name in manifests.items():
         continue
     try:
         obj = json.loads(p.read_text(encoding="utf-8"))
-    except Exception as e:  # noqa: BLE001
+    except Exception as e:
         fail(f"JSON invalido em {rel}: {e}")
         continue
     if expected_name and obj.get("name") != expected_name:
