@@ -159,7 +159,11 @@ print(f"  hooks type=command: {exec_blocks} (todos forma exec: command=python3 +
 #    (session_init, reinforce, porte_reminder, tab_pendencias_reminder) + 2 de TDD
 #    (tdd_guard, tdd_runner). tab_pendencias_reminder aparece em 2 eventos -> 7 blocos.
 print("[5] Execucao dos hooks (invocacao real do hooks.json, env simulado)")
-env = {**os.environ, "CLAUDE_PLUGIN_ROOT": str(ROOT)}
+# BIGTECH_TAB_REMINDER=full: o smoke valida o contrato do plugin SOZINHO. Sem
+# isso, numa maquina que tambem tem o produto standalone `tab_pendencias`
+# registrado nas settings, o tab_pendencias_reminder cede a ele os gatilhos 1
+# e 2 (anti-duplicacao) e o 5e abaixo falharia por um motivo que nao e defeito.
+env = {**os.environ, "CLAUDE_PLUGIN_ROOT": str(ROOT), "BIGTECH_TAB_REMINDER": "full"}
 
 
 def run_hook(script: str, payload: dict) -> tuple[int, str]:

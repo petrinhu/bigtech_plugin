@@ -2,9 +2,23 @@ import json
 import os
 import subprocess
 
+import pytest
+
 import tab_pendencias_reminder as t
 
 # ------------------------------- helpers ------------------------------------
+
+
+@pytest.fixture(autouse=True)
+def _modo_legado(monkeypatch):
+    """Isola a suite da maquina: por padrao testa o contrato do plugin SOZINHO.
+
+    Sem isto, `cede_ao_produto()` leria o settings.json real do usuario e os
+    testes de gatilho 1/2 passariam ou falhariam conforme o produto standalone
+    `tab_pendencias` estivesse ou nao registrado naquela maquina. Os testes da
+    cessao (abaixo) sobrescrevem a env explicitamente.
+    """
+    monkeypatch.setenv(t.MODO_ENV, "full")
 
 def _proj(tmp_path, porte=True, todo=True, cfg=None):
     if porte:
@@ -147,3 +161,109 @@ def test_limpa_sessoes_antigas(tmp_path):
     os.utime(p, (0, 0))  # mtime epoch -> bem antiga
     t.limpar_sessoes_antigas(t.STATE_TTL_S + 10, state_dir=sd)
     assert not os.path.isfile(p)
+
+
+# ------------- cessao dos gatilhos 1 e 2 ao produto standalone --------------
+
+def _settings(tmp_path, comandos):
+    """Escreve um ~/.claude/settings.json sintetico com os hooks dados."""
+    d = tmp_path / "cfg"
+    d.mkdir(exist_ok=True)
+    blocos = [{"hooks": [{"type": "command", "command": c}]} for c in comandos]
+    (d / "settings.json").write_text(
+        json.dumps({"hooks": {"SessionStart": blocos}}), encoding="utf-8"
+    )
+    return str(d)
+
+
+def test_produto_registrado_detecta_comando_em_settings(tmp_path, monkeypatch):
+    cfg = _settings(tmp_path, [
+        "python3 $HOME/.claude/skills/tab_pendencias/tools/hooks/"
+        "tab_pendencias_reminder.py",
+    ])
+    monkeypatch.setenv("CLAUDE_CONFIG_DIR", cfg)
+    assert t.produto_registrado() is True
+
+
+def test_produto_registrado_ignora_o_proprio_plugin(tmp_path, monkeypatch):
+    cfg = _settings(tmp_path, [
+        "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/tab_pendencias_reminder.py",
+    ])
+    monkeypatch.setenv("CLAUDE_CONFIG_DIR", cfg)
+    assert t.produto_registrado() is False
+
+
+def test_produto_registrado_ignora_caminho_do_plugin_root(tmp_path, monkeypatch):
+    cfg = _settings(tmp_path, [
+        "python3 /opt/plug/hooks/tab_pendencias_reminder.py",
+    ])
+    monkeypatch.setenv("CLAUDE_CONFIG_DIR", cfg)
+    monkeypatch.setenv("CLAUDE_PLUGIN_ROOT", "/opt/plug")
+    assert t.produto_registrado() is False
+
+
+def test_produto_ausente_quando_settings_nao_existe(tmp_path, monkeypatch):
+    monkeypatch.setenv("CLAUDE_CONFIG_DIR", str(tmp_path / "vazio"))
+    assert t.produto_registrado() is False
+
+
+def test_settings_corrompido_nao_levanta(tmp_path, monkeypatch):
+    d = tmp_path / "cfg"
+    d.mkdir()
+    (d / "settings.json").write_text("{ isto nao e json", encoding="utf-8")
+    monkeypatch.setenv("CLAUDE_CONFIG_DIR", str(d))
+    assert t.produto_registrado() is False
+
+
+def test_cede_suprime_gatilho_criar(tmp_path):
+    data = _proj(tmp_path, porte=True, todo=False)
+    assert t.avaliar_sessionstart(data, 1000.0, ceder=True) is None
+    assert t.avaliar_sessionstart(data, 1000.0, ceder=False) is not None
+
+
+def test_cede_suprime_gatilho_staleness(tmp_path):
+    run = _git_init(tmp_path)
+    data = _proj(tmp_path, porte=True, todo=True, cfg={"commits": 0, "dias": 0})
+    run(["add", "-A"])
+    run(["commit", "-qm", "boot"])
+    (tmp_path / "x.txt").write_text("x")
+    run(["add", "-A"])
+    run(["commit", "-qm", "c1"])
+    agora = 9e9  # muito no futuro -> dias estoura qualquer limiar
+    assert t.avaliar_sessionstart(data, agora, ceder=False) is not None
+    assert t.avaliar_sessionstart(data, agora, ceder=True) is None
+
+
+def test_cede_nao_afeta_gatilho_4_tempo_de_sessao(tmp_path, monkeypatch):
+    """O nudge de tempo de sessao nao existe no produto -> nunca e cedido."""
+    cfg = _settings(tmp_path, [
+        "python3 $HOME/.claude/skills/tab_pendencias/tools/hooks/"
+        "tab_pendencias_reminder.py",
+    ])
+    monkeypatch.setenv("CLAUDE_CONFIG_DIR", cfg)
+    monkeypatch.setenv(t.MODO_ENV, "auto")
+    assert t.cede_ao_produto() is True
+
+    sd = str(tmp_path / "state")
+    os.makedirs(sd, exist_ok=True)
+    data = _proj(tmp_path, porte=True, todo=True)
+    data["session_id"] = "s-gate-1"
+    t.carimbar_sessao("s-gate-1", 0.0, state_dir=sd)
+    msg = t.avaliar_userprompt(data, 10 * 3600.0, state_dir=sd)
+    assert msg and "Sessao ha" in msg
+
+
+def test_modo_off_silencia_tudo(tmp_path, monkeypatch):
+    monkeypatch.setenv(t.MODO_ENV, "off")
+    data = _proj(tmp_path, porte=True, todo=False)
+    assert t.avaliar_sessionstart(data, 1000.0) is None
+    sd = str(tmp_path / "state2")
+    os.makedirs(sd, exist_ok=True)
+    data["session_id"] = "s-off-1"
+    t.carimbar_sessao("s-off-1", 0.0, state_dir=sd)
+    assert t.avaliar_userprompt(data, 10 * 3600.0, state_dir=sd) is None
+
+
+def test_modo_invalido_cai_em_auto(monkeypatch):
+    monkeypatch.setenv(t.MODO_ENV, "lixo")
+    assert t.modo_operacao() == "auto"

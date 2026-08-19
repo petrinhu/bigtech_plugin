@@ -8,6 +8,10 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), e
 
 Trabalho **post-0.2.0** em `main` (versão do plugin em `plugin.json` / marketplace permanece **0.2.0** até release semver futura). Campanha dual-host Claude+Grok **2026-08-16 fechada** - tag de marco: [campanha/2026-08-16-fechada](https://github.com/petrinhu/bigtech_plugin/releases/tag/campanha/2026-08-16-fechada). Índice dos relatórios: [docs/campanha/README.md](docs/campanha/README.md).
 
+### Fixed
+
+- **`tab_pendencias_reminder`: fim do lembrete duplicado quando o produto standalone está ligado.** O `tab_pendencias` virou produto standalone (repo próprio, GPL-3.0) e o motor de sinais dele reescreveu, em 2026-08, os gatilhos 1 (CRIAR) e 2 (STALENESS) que nasceram neste hook em 2026-06. Com os dois registrados, cada `SessionStart` e cada `UserPromptSubmit` emitiam **duas** mensagens de mesmo teor. Agora o hook detecta se o produto está registrado nas settings do usuário e, nesse caso, **cede a ele os gatilhos 1 e 2**, mantendo só o que o produto não tem: o carimbo de sessão (3) e o nudge de tempo de sessão (4). Instalação **só-plugin** (sem o produto) mantém o comportamento legado integral. Override: `BIGTECH_TAB_REMINDER=full` (nunca cede) / `off` (não emite nada) / `auto` (padrão). Duas lacunas conhecidas da cessão estão documentadas no cabeçalho do hook em vez de perdidas em silêncio: projeto com `.bigtech-porte` fora de repo git, e `TODO.md` defasado sem nenhum item ⏳/🔄.
+
 ### Added
 
 - **BT-8: evals offline de roteamento `/bigtech`.** Suite em `evals/bigtech_routing/` (`cases.json` CASE-A..D + portes, `run_evals.py` stdlib, README). Política pós-BT-5: perfis `early|scale|bigtech`, piso early, nunca `solo` como perfil, headcount peso 0, criticidade eleva agents (CISO/CLO). Gate no `scripts/preci.sh` e no CI multi-OS (`python3 evals/bigtech_routing/run_evals.py`). Não substitui eval LLM real; é harness de política de classificação.

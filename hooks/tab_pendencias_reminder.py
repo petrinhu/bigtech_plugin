@@ -21,6 +21,12 @@ Gatilho sequencial com bigtech_porte_reminder.py: sem .bigtech-porte, quem
 lembra e aquele hook (-> /bigtech, cujo Cosimo ja exige a tabela). Este so age
 quando o porte ja foi classificado.
 
+CONVIVENCIA COM O PRODUTO STANDALONE (ver `cede_ao_produto`): quando o hook do
+produto `tab_pendencias` tambem esta registrado nas settings do usuario, os
+gatilhos 1 e 2 sao cedidos a ele (que os reescreveu em 2026-08) e este hook
+mantem so o 3 e o 4, que o produto nao tem. Sem o produto, comportamento
+legado integral.
+
 Config opcional `.tab-staleness.json` na raiz (defaults embutidos):
   {"off": false, "commits": 5, "dias": 2, "modo": "e", "horas_sessao": 2}
 `off: true` desliga os gatilhos 2 e 4 (o gatilho 1 de CRIAR continua).
@@ -47,6 +53,103 @@ STATE_PREFIX = "claude-tab-sess-"
 STATE_TTL_S = 24 * 3600  # limpeza de carimbos de sessao velhos
 
 DEFAULTS = {"off": False, "commits": 5, "dias": 2, "modo": "e", "horas_sessao": 2}
+
+MODO_ENV = "BIGTECH_TAB_REMINDER"
+
+
+# ------------------ convivencia com o produto standalone --------------------
+#
+# `tab_pendencias` virou produto standalone (repo proprio, GPL-3.0) e o motor
+# de sinais dele (tools/session_signals.py, 2026-08) REESCREVEU os gatilhos 1
+# (CRIAR -> TAB_TODO_CREATE_REQUIRED) e 2 (STALENESS ->
+# TAB_STATUS_SYNC_RECOMMENDED), que nasceram aqui em 2026-06. Com os dois
+# ligados, cada evento saia DUPLICADO: uma mensagem daqui e outra, de mesmo
+# teor, do produto.
+#
+# Regra: se o produto estiver REGISTRADO como hook nas settings do usuario,
+# este hook cede a ele os gatilhos 1 e 2 e mantem so o que o produto NAO tem
+# -- o carimbo de sessao (3) e o nudge de tempo de sessao (4). Numa instalacao
+# so-plugin (sem o produto) nada muda: comportamento legado integral.
+#
+# Lacunas conhecidas da cessao -- documentadas de proposito, nao perdidas em
+# silencio (o produto nao cobre estes dois casos):
+#   - projeto com .bigtech-porte que NAO e repo git: o produto exige git para
+#     o TAB_TODO_CREATE_REQUIRED;
+#   - TODO.md defasado sem nenhum item ⏳/🔄: o produto exige trabalho pendente
+#     para o TAB_STATUS_SYNC_RECOMMENDED (havendo 🔍 costuma cair no
+#     TAB_VERIFICATION_AGING, que e sinal proprio dele).
+# Quem quiser o comportamento legado de volta: BIGTECH_TAB_REMINDER=full.
+
+def modo_operacao():
+    """auto (default) | full (nunca cede) | off (nao emite nada)."""
+    v = (os.environ.get(MODO_ENV) or "auto").strip().lower()
+    return v if v in ("auto", "full", "off") else "auto"
+
+
+def _dirs_de_config():
+    d = (os.environ.get("CLAUDE_CONFIG_DIR") or "").strip()
+    return [d] if d else [os.path.join(os.path.expanduser("~"), ".claude")]
+
+
+def _comandos_de_settings(caminho):
+    """Strings `command + args` de todo hook declarado num settings.json."""
+    achados = []
+    try:
+        with open(caminho, encoding="utf-8") as fh:
+            data = json.load(fh)
+    except Exception:
+        return achados
+    hooks = data.get("hooks") if isinstance(data, dict) else None
+    if not isinstance(hooks, dict):
+        return achados
+    for blocos in hooks.values():
+        if not isinstance(blocos, list):
+            continue
+        for bloco in blocos:
+            if not isinstance(bloco, dict):
+                continue
+            for h in bloco.get("hooks") or []:
+                if not isinstance(h, dict):
+                    continue
+                partes = [str(h.get("command") or "")]
+                args = h.get("args")
+                if isinstance(args, list):
+                    partes.extend(str(a) for a in args)
+                achados.append(" ".join(partes))
+    return achados
+
+
+def produto_registrado():
+    """True se o hook do produto standalone consta das settings do usuario.
+
+    So conta registro que NAO aponta para dentro deste plugin -- o plugin se
+    declara via hooks.json/${CLAUDE_PLUGIN_ROOT}, nunca via settings.json.
+    """
+    raiz_plugin = (os.environ.get("CLAUDE_PLUGIN_ROOT") or "").strip()
+    for d in _dirs_de_config():
+        for nome in ("settings.json", "settings.local.json"):
+            for cmd in _comandos_de_settings(os.path.join(d, nome)):
+                if "tab_pendencias" not in cmd:
+                    continue
+                if "CLAUDE_PLUGIN_ROOT" in cmd:
+                    continue
+                if raiz_plugin and raiz_plugin in cmd:
+                    continue
+                return True
+    return False
+
+
+def cede_ao_produto():
+    """Se True, os gatilhos 1 e 2 sao do produto. Falha -> nao cede."""
+    m = modo_operacao()
+    if m == "full":
+        return False
+    if m == "off":
+        return True
+    try:
+        return produto_registrado()
+    except Exception:
+        return False
 
 
 # ----------------------------- config ---------------------------------------
@@ -233,12 +336,20 @@ MSG_CRIAR = (
     "criar o TODO.md, este lembrete vira checagem de defasagem."
 )
 
-def avaliar_sessionstart(data, agora):
+def avaliar_sessionstart(data, agora, ceder=None):
+    if modo_operacao() == "off":
+        return None
+    if ceder is None:
+        ceder = cede_ao_produto()
     raiz = _cwd(data)
     if not raiz or not _tem(raiz, PORTE_MARKER):
         return None
     if not _tem(raiz, TODO_FILE):
-        return MSG_CRIAR
+        # gatilho 1 (CRIAR): do produto quando ele esta ligado.
+        return None if ceder else MSG_CRIAR
+    if ceder:
+        # gatilho 2 (STALENESS): do produto quando ele esta ligado.
+        return None
     cfg = carregar_config(raiz)
     if cfg.get("off"):
         return None
@@ -246,6 +357,9 @@ def avaliar_sessionstart(data, agora):
     return msg_staleness(commits, dias, cfg)
 
 def avaliar_userprompt(data, agora, state_dir=None):
+    # Gatilho 4 NAO e cedido: o produto nao tem nocao de tempo de sessao.
+    if modo_operacao() == "off":
+        return None
     session_id = data.get("session_id")
     estado = ler_sessao(session_id, state_dir)
     if estado is None or estado.get("avisado"):
