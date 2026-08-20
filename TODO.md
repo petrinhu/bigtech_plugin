@@ -1,18 +1,36 @@
-# TODO — Plugin `bigtech` (planejamento e pendências)
+> **ESTRUTURA CANÔNICA DO ARQUIVO — NÃO QUEBRAR A TABELA:** (1) **Comentários e instruções** (só no cabeçalho, acima da tabela) · (2) **TABELA UNIFICADA** (exatamente uma tabela markdown de trabalho: `| ID | Onda | … | Status |`) · **EOF** imediatamente após a última linha da tabela. **Proibido:** segunda tabela; linha em branco **dentro** da tabela (o Markdown parte o arquivo em várias tabelas); qualquer seção de checklist/INBOX/WSJF **depois** da tabela (isso vai no cabeçalho).
 
-> Tabela ordenada **de cima para baixo na ordem de execução** que minimiza retrabalho.
-> A coluna **Onda** marca passos paralelizáveis (igual valor, sem dependência mútua).
-> Fonte de verdade do escopo: `docs/superpowers/specs/2026-06-13-bigtech-plugin-design.md`.
-> Método: topological sort (Pré-requisito) + WSJF. Reorder campanha 2026-08-16:
-> Cosimo → thread direta (anti-OE; 10 ativos BT-*, grafo linear). Tabela 1.0 histórica
-> foi consolidada por Cosmo/COO a partir de 4 lentes.
->
+# TODO — Plugin `bigtech`
+
+Tabela ordenada **de cima para baixo na ordem de execução** que minimiza retrabalho.
+A coluna **Onda** marca passos paralelizáveis (igual valor, sem dependência mútua).
+Fonte de verdade do escopo: `docs/superpowers/specs/2026-06-13-bigtech-plugin-design.md`.
+Método: topological sort (Pré-requisito) + WSJF. Reorder campanha 2026-08-16:
+Cosimo → thread direta (anti-OE; 10 ativos BT-*, grafo linear). Tabela 1.0 histórica
+foi consolidada por Cosmo/COO a partir de 4 lentes.
+
 > **Estado atual:** Release 1.0 fechado (ondas W1-W8 + W-WIKI ✅). Campanha **2026-08-16** =
 > IDs **`BT-*`** no topo (ondas **W1..W5**) + **`TST-BT-1` (W6) ✅** + **`AUD-BT-1` (W7) ✅**
 > (auditoria em `docs/campanha/2026-08-16-aud-bt1-campaign-audit.md`) + plano
 > `PLANO-MELHORIA-BIGTECH-CLAUDE-CODE-2026-08-16.md`. Legados **N9**, **OS-1..5** e **TOOL-1..4**
 > cancelados 2026-08-16 (legacy/OE). Catálogo genérico T5/T12/AUD-DISC|ARCH|COV|DEPS|LANG: **skip**
 > (cobertos por suite 1.0 ✅ ou anti-OE; ver nota add_tests_audit).
+
+> Convenção de frescor: implementação entregue → `🔍 Pendente verificação` (nunca `✅` direto).
+> `✅ Concluído` só após a onda de teste/auditoria correspondente. Citar o ID do item na mensagem
+> do commit. Trabalho novo no meio do caminho → anexar na INBOX (no cabeçalho), não reordenar na hora.
+
+## Legenda de Status
+
+- **✅ Concluído** · finalizada.
+- **🔄 Em andamento** · em progresso.
+- **🟡 Parcial** · parte entregue, resto pendente.
+- **⏳ Pendente** · não iniciado.
+- **💡 Decisão tomada** · abordagem definida, ou cancelado (legacy/OE) sem emoji próprio.
+- **🎨 Pendente design** · aguarda design antes de implementar.
+- **🔍 Pendente verificação** · implementado, aguarda validação.
+
+## Caminhos críticos, WIP e convenções
 
 - **Caminho crítico (1.0, concluído):** `F1 → H3 → A2* → S1 → TST-ORFAOS → AUD-PRIV → R4`.
 - **Caminho crítico (pós-1.0 histórico):** `N8` ✅; `N9` cancelado 2026-08-16 (legacy/OE, fora da campanha BT-*).
@@ -21,15 +39,114 @@
 - **One-way-doors (decisão do líder supremo):** `F1` (nome/layout/`source` do marketplace = contrato público), `R4` (primeira publicação pública — host legado da época; canônico agora GitHub). `N9` (marketplace comunitário) permanece one-way-door **se reaberto**, mas está **cancelado** na tabela até go/no-go pós-campanha.
 - **Abreviações de pré-requisito:** `D1* = D1a,D1b,D1c`; `A2* = A2a,A2b,A2c,A2d,A2e`.
 
-| Status | Significado |
-|:---|:---|
-| ✅ Concluído | finalizada |
-| 🔄 Em andamento | em progresso |
-| ⏳ Pendente | não iniciado |
-| 🔍 Pendente verificação | implementado, aguarda validação |
-| 💡 Decisão tomada | abordagem definida / cancelado (legacy-OE) sem emoji próprio |
+## Scoring WSJF — itens-pai funcionais (1.0)
 
-## Tabela de pendências
+`CoD = Valor + Criticidade + Redução de Risco`; `WSJF = CoD / Job Size`. Rank = ordem decrescente de WSJF (justifica a prioridade *dentro* de cada nível topológico). `D1` e `A2` aparecem como item-pai (fatiados em D1a-c / A2a-e na execução; sub-lotes herdam o WSJF do pai).
+
+- **R1** · Item LICENSE + NOTICE · Valor 13 · Criticidade 14 · Red. Risco 19 · CoD 46 · Job Size 1 · WSJF 46.0 · Rank 1
+- **F1** · Item Estrutura + plugin.json + marketplace.json · Valor 18 · Criticidade 18 · Red. Risco 20 · CoD 56 · Job Size 2 · WSJF 28.0 · Rank 2
+- **R3** · Item CHANGELOG · Valor 8 · Criticidade 9 · Red. Risco 7 · CoD 24 · Job Size 1 · WSJF 24.0 · Rank 3
+- **H4** · Item hooks.json · Valor 13 · Criticidade 14 · Red. Risco 18 · CoD 45 · Job Size 2 · WSJF 22.5 · Rank 4
+- **R4** · Item Publicar (gate; host legado→GitHub canônico) · Valor 17 · Criticidade 13 · Red. Risco 9 · CoD 39 · Job Size 2 · WSJF 19.5 · Rank 5
+- **H2** · Item porte_reminder + reinforce · Valor 14 · Criticidade 9 · Red. Risco 11 · CoD 34 · Job Size 3 · WSJF 11.3 · Rank 6
+- **D4** · Item ORG §0 (transferência de título) · Valor 16 · Criticidade 9 · Red. Risco 8 · CoD 33 · Job Size 3 · WSJF 11.0 · Rank 7
+- **S2** · Item Skill /proj_software · Valor 13 · Criticidade 9 · Red. Risco 11 · CoD 33 · Job Size 3 · WSJF 11.0 · Rank 8
+- **S3** · Item Skill /tab_pendencias · Valor 11 · Criticidade 8 · Red. Risco 10 · CoD 29 · Job Size 3 · WSJF 9.7 · Rank 9
+- **R2** · Item README · Valor 16 · Criticidade 13 · Red. Risco 15 · CoD 44 · Job Size 5 · WSJF 8.8 · Rank 10
+- **D3** · Item hardware-resource-limits · Valor 9 · Criticidade 7 · Red. Risco 10 · CoD 26 · Job Size 3 · WSJF 8.7 · Rank 11
+- **S1** · Item Skill /bigtech · Valor 16 · Criticidade 11 · Red. Risco 13 · CoD 40 · Job Size 5 · WSJF 8.0 · Rank 12
+- **D2** · Item 3 docs de princípios · Valor 11 · Criticidade 8 · Red. Risco 9 · CoD 28 · Job Size 5 · WSJF 5.6 · Rank 13
+- **H3** · Item bigtech_session_init (docs-bootstrap) · Valor 17 · Criticidade 12 · Red. Risco 16 · CoD 45 · Job Size 8 · WSJF 5.6 · Rank 14
+- **A1** · Item 12 agents C-level · Valor 18 · Criticidade 11 · Red. Risco 15 · CoD 44 · Job Size 8 · WSJF 5.5 · Rank 15
+- **H1** · Item hooks TDD · Valor 12 · Criticidade 8 · Red. Risco 10 · CoD 30 · Job Size 8 · WSJF 3.8 · Rank 16
+- **D1** · Item 9 docs canônicos *(→ D1a/b/c)* · Valor 17 · Criticidade 11 · Red. Risco 14 · CoD 42 · Job Size 13 · WSJF 3.2 · Rank 17
+- **A2** · Item 38 agents operacionais *(→ A2a–e)* · Valor 17 · Criticidade 11 · Red. Risco 15 · CoD 43 · Job Size 20 · WSJF 2.2 · Rank 18
+
+> Leitura: F1 e R1 são "small bets de alta alavancagem" (baratos, desbloqueiam tudo) → topo.
+> D1 e A2 têm WSJF baixo só por serem grandes — por isso foram **fatiados** e entram cedo
+> (W2/W3), pois são pré-requisito de quase tudo. O fatiamento encurta o caminho crítico.
+
+## Scoring WSJF — pós-1.0 (histórico; N8/N10 ✅; N9 cancelado)
+
+Os itens N1-N7, N8 e N10 já foram entregues. **N9 foi cancelado 2026-08-16 (legacy/OE)** e não pontua na campanha BT-\*. O ranking abaixo é **histórico** da faixa pós-1.0 (não é o backlog ativo).
+
+- **N8** · Item Fechar 0.1.6 (CI + tag + Release) · CoD (qualitativo) Alto (fundação imutável; destrava N9/N10) · Job Size Baixo (fluxo já automatizado 4x) · WSJF (relativo) **Alto** · Rank (histórico) 1 ✅
+- **N9** · Item Marketplace comunitário `claude-plugins-community` · CoD (qualitativo) Alto (alcance; gated por go/no-go) · Job Size Alto (gargalo externo Anthropic) · WSJF (relativo) **Médio** · Rank (histórico) 2 💡 cancelado legacy/OE
+- **N10** · Item Releases retroativas 0.1.0 / 0.1.1 · CoD (qualitativo) Baixo (cosmético/histórico) · Job Size Baixo (mecânica repetida x2) · WSJF (relativo) **Baixo** · Rank (histórico) 3 ✅
+
+> Leitura (histórico): N8 fechou a fundação imutável. N9 era folha one-way-door externa e foi
+> **cancelado** para não competir com a campanha BT-\* (fonte-de-verdade/CI/porte). N10 ✅.
+> Backlog ativo e WSJF da campanha: IDs **BT-0..BT-9** (plano 2026-08-16).
+
+## Scoring WSJF — campanha BT-* (2026-08-16, `--reorder`)
+
+Régua Fibonacci `(1,2,3,5,8,13,20)`. `CoD = Valor + Criticidade + Red. Risco`; `WSJF = CoD / Job Size`.
+Job Size = rótulo `Dificuldade` (early: Baixa=2, Média=5, Alta=8). Rank = WSJF **dentro do nível topológico**
+(dependência sempre vence). `BT-9` fica em W5 por julgamento (go/no-go do líder), não por WSJF global.
+
+Níveis topo: L0=`BT-0`; L1=`BT-1,BT-2,BT-3`; L2=`BT-4,BT-5,BT-6`; L3=`BT-7,BT-8,BT-9`.
+Onda canônica (CHK-07: pré-req nunca na mesma onda): W1=L0; W2=L1; W3=L2; W4=`BT-7,BT-8`; W5=`BT-9`.
+
+- **BT-0** · Item PHASE 0 freeze/baseline · Nível L0 · Valor 13 · Criticidade 13 · Red. Risco 13 · CoD 39 · Job Size 5 · WSJF 7.80 · Rank no nível 1
+- **BT-3** · Item GitHub canônico + purge host legado · Nível L1 · Valor 13 · Criticidade 13 · Red. Risco 13 · CoD 39 · Job Size 5 · WSJF 7.80 · Rank no nível 1
+- **BT-1** · Item FABLE ADR source-of-truth vault×plugin · Nível L1 · Valor 20 · Criticidade 13 · Red. Risco 20 · CoD 53 · Job Size 8 · WSJF 6.63 · Rank no nível 2
+- **BT-2** · Item docs/house sync 10 manuais · Nível L1 · Valor 8 · Criticidade 8 · Red. Risco 8 · CoD 24 · Job Size 5 · WSJF 4.80 · Rank no nível 3
+- **BT-5** · Item Eliminar solo/headcount (piso early) · Nível L2 · Valor 13 · Criticidade 8 · Red. Risco 13 · CoD 34 · Job Size 5 · WSJF 6.80 · Rank no nível 1
+- **BT-6** · Item Inventário dual-authority + cutover · Nível L2 · Valor 13 · Criticidade 8 · Red. Risco 20 · CoD 41 · Job Size 8 · WSJF 5.13 · Rank no nível 2
+- **BT-4** · Item CI multi-OS GitHub Actions · Nível L2 · Valor 13 · Criticidade 8 · Red. Risco 13 · CoD 34 · Job Size 8 · WSJF 4.25 · Rank no nível 3
+- **BT-9** · Item Proteção de main + release gates · Nível L3 · Valor 13 · Criticidade 5 · Red. Risco 13 · CoD 31 · Job Size 5 · WSJF 6.20 · Rank no nível 1*
+- **BT-7** · Item Drift gate semântico registry · Nível L3 · Valor 8 · Criticidade 5 · Red. Risco 13 · CoD 26 · Job Size 8 · WSJF 3.25 · Rank no nível 2
+- **BT-8** · Item Evals de roteamento `/bigtech` · Nível L3 · Valor 8 · Criticidade 5 · Red. Risco 8 · CoD 21 · Job Size 8 · WSJF 2.63 · Rank no nível 3
+
+> \* `BT-9` tem o maior WSJF do L3, mas a onda é **W5** (porta do líder no fim), não W4.
+> `BT-1` sobe no L1 (fundação / one-way-door de SoT). Durante a execução, 🔍 não bloqueava
+> dependentes de *código* da fatia já entregue; após W7 todos os BT-\* estão ✅.
+
+## Fechamento da campanha (add_tests_audit 2026-08-16)
+
+Os dois itens abaixo estão na TABELA UNIFICADA com o mesmo ID; aqui fica só o nível topológico deles.
+
+- **TST-BT-1** · Item Revalidar suite campanha (preci+CI) · Nível L4 (após impl) · Pré-requisito BT-5,BT-6,BT-7,BT-8 · Onda W6 · Status ✅
+- **AUD-BT-1** · Item Auditoria campanha (SoT/porte/CI/host) · Nível L5 (após teste) · Pré-requisito TST-BT-1, BT-1, BT-5, BT-6 · Onda W7 · Status ✅
+
+**Skip catálogo (anti-OE / coberto 1.0):** `TST-T5`≈`TST-DEPS`✅; `TST-T12`≈`TST-DEPS`✅+CI/gitleaks;
+`AUD-DISC`/`AUD-ARCH`/`AUD-COV`/`AUD-DEPS`/`AUD-LANG` — sem ⏳ cosmético (escopo campanha em `AUD-BT-1`);
+`AUD-SEC`/`AUD-QUALITY`/`AUD-REPORT` já ✅; `W-WIKI` ✅ (CHK-14).
+
+## Decisões one-way-door (go/no-go do líder supremo)
+
+1. **`F1`** — congelar nome (`bigtech`), layout e `source` do marketplace antes de abrir a W2 (contrato público; mudar depois quebra quem já instalou). *(concluído)*
+2. **`R4`** — go/no-go da primeira publicação pública (host legado na época; canônico agora GitHub; irreversível; usuários passam a executar os hooks Python na máquina deles). *(concluído)*
+3. **`N9`** — go/no-go da submissão ao marketplace comunitário `claude-plugins-community` (3ª porta sem volta se reaberta). **Cancelado 2026-08-16 (legacy/OE)** — fora da campanha BT-\*; reabrir só com go/no-go explícito do líder **depois** da campanha.
+
+## Decisões da auditoria (saída da auditoria de 9 dimensões)
+
+- **AUD-D01 (canal de distribuição): DECIDIDO → GitHub único + community marketplace (ordem líder 2026-08-16 prevalece sobre “AMBOS” legado).** Submeter ao marketplace oficial `claude-plugins-community` (auto-update dinâmico); host de desenvolvimento e distribuição canônico = `github.com/petrinhu/bigtech_plugin`. Host legado (forja anterior + CI legada) **eliminados** do produto (BT-3).
+- **AUD-D02 (GitHub canônico): DECIDIDO → GitHub é a origem.** Repo público GitHub para desenvolvimento, CI e submissão ao oficial (item `DIST-1` + BT-3). Resolve AUD-U01.
+- **AUD-D03 (glifo de travessão em tabelas): DECIDIDO → MANTER (exceção documentada).** O travessão como valor de célula/estado nas tabelas é símbolo de dado, não prosa; documentar a exceção à regra "zero em-dash". Remediar apenas os 10 em-dash de PROSA real (em AUD-R3/AUD-R5).
+- **AUD-D04 (empacotar testes): pendente** — default: manter `hooks/tests/` e `hooks/README-tdd.md` no pacote (úteis para CI/contribuição). Reavaliar se quiser pacote mínimo.
+- **AUD-U01: RESOLVIDO por AUD-D02 + ordem 2026-08-16** — o GitHub é o único host canônico e o canal de submissão garantido.
+
+## Notas de cadência (pós-1.0 → campanha BT-*)
+
+- **Campanha ativa = BT-\*** no topo da tabela (ondas W1..W5; plano `PLANO-MELHORIA-BIGTECH-CLAUDE-CODE-2026-08-16.md`). Main orquestra-only; ≤2 agents/rodada.
+- **N8 ✅, N10 ✅.** **N9, OS-1..5, TOOL-1..4 cancelados 2026-08-16** como legacy/OE (ver Cancelamentos).
+- **Não há caminho crítico `N8 → N9` aberto.** WIP de manutenção pós-1.0 em N9 encerrou com o cancelamento; não reabrir N9 durante a campanha sem ordem do líder.
+- **N10** já concluído (não é mais opcional pendente).
+
+## Cancelamentos 2026-08-16 (legacy / anti-OE)
+
+Os itens seguem na TABELA UNIFICADA com Status `💡 Decisão tomada`; o motivo detalhado fica aqui.
+
+- **N9** · Motivo Marketplace `claude-plugins-community` (W22 pós-1.0). One-way-door externo; **fora** das fases BT-0..BT-9. Manter vivo = OE de distribuição paralela à campanha de fonte-de-verdade/CI/porte. Reabrir só com go/no-go explícito do líder **depois** da campanha.
+- **OS-1..OS-5** · Motivo Auditoria OS-agnóstico jun/2026; v0.2.0 já marcou OS-agnosticismo; `bin/python3.cmd`, globs Windows, CI multi-OS (BT-4) cobrem o núcleo. Itens presos em 🔍 = **dívida de verificação legada**, não roadmap da campanha. Residual cosmético (OS-3/4/5 docs) = OE se forçado agora.
+- **TOOL-1..TOOL-4** · Motivo Auditoria política-tools jun/2026; `docs/principles/missing-tool-policy.md` já existe; doutrina híbrida decidida. Presos em 🔍 = verification aging legado, **não** fase do plano BT. Reabrir só se campanha/auditoria nova exigir.
+
+## INBOX
+
+Trabalho novo que aparecer no meio do caminho entra aqui como bullet e só depois vira linha da tabela (com ID, Onda e Pré-requisito atribuídos). Vazia em 20/08/2026.
+
+## TABELA UNIFICADA
 
 | ID | Onda | Grupo | Descrição Técnica | Prioridade | Pré-requisito | Dificuldade | Status | Estado Auditado |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -114,112 +231,3 @@
 | TOOL-4 | W24 | Política-Tools | [CANCELADO 2026-08-16: legacy/OE — fora da campanha BT-*; alinhamento TOOLING/TESTES residual = OE se forçado agora.] Install OS-aware no TOOLING.md. | Baixa | TOOL-2 | Baixa | 💡 Decisão tomada | — |
 | TST-BT-1 | W6 | Testes | Revalidar suite campanha: `preci.sh` + pytest hooks + validate_plugin + smoke + CI multi-OS verde no SHA final (pós BT-5..BT-8; espelha T15/T14 no escopo da campanha). Ver `TESTES.md` § Campanha 2026-08-16. | Alta | BT-5,BT-6,BT-7,BT-8 | Média | ✅ Concluído | ✓ |
 | AUD-BT-1 | W7 | Auditoria | Auditoria de campanha bigtech 2026-08-16: dual-authority, porte solo/headcount, source-of-truth, CI matrix, zero host legado operacional. Consolida no espírito de AUD-REPORT (sem recriar REPORT). Ver `AUDITORIAS.md` § Campanha 2026-08-16. Relatório: `docs/campanha/2026-08-16-aud-bt1-campaign-audit.md`. | Alta | TST-BT-1, BT-1, BT-5, BT-6 | Alta | ✅ Concluído | ✓ |
-
-## Tabela de scoring WSJF (itens-pai funcionais)
-
-`CoD = Valor + Criticidade + Redução de Risco`; `WSJF = CoD / Job Size`. Rank = ordem decrescente de WSJF (justifica a prioridade *dentro* de cada nível topológico). `D1` e `A2` aparecem como item-pai (fatiados em D1a-c / A2a-e na execução; sub-lotes herdam o WSJF do pai).
-
-| ID | Item | Valor | Criticidade | Red. Risco | CoD | Job Size | WSJF | Rank |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| R1 | LICENSE + NOTICE | 13 | 14 | 19 | 46 | 1 | 46.0 | 1 |
-| F1 | Estrutura + plugin.json + marketplace.json | 18 | 18 | 20 | 56 | 2 | 28.0 | 2 |
-| R3 | CHANGELOG | 8 | 9 | 7 | 24 | 1 | 24.0 | 3 |
-| H4 | hooks.json | 13 | 14 | 18 | 45 | 2 | 22.5 | 4 |
-| R4 | Publicar (gate; host legado→GitHub canônico) | 17 | 13 | 9 | 39 | 2 | 19.5 | 5 |
-| H2 | porte_reminder + reinforce | 14 | 9 | 11 | 34 | 3 | 11.3 | 6 |
-| D4 | ORG §0 (transferência de título) | 16 | 9 | 8 | 33 | 3 | 11.0 | 7 |
-| S2 | Skill /proj_software | 13 | 9 | 11 | 33 | 3 | 11.0 | 8 |
-| S3 | Skill /tab_pendencias | 11 | 8 | 10 | 29 | 3 | 9.7 | 9 |
-| R2 | README | 16 | 13 | 15 | 44 | 5 | 8.8 | 10 |
-| D3 | hardware-resource-limits | 9 | 7 | 10 | 26 | 3 | 8.7 | 11 |
-| S1 | Skill /bigtech | 16 | 11 | 13 | 40 | 5 | 8.0 | 12 |
-| D2 | 3 docs de princípios | 11 | 8 | 9 | 28 | 5 | 5.6 | 13 |
-| H3 | bigtech_session_init (docs-bootstrap) | 17 | 12 | 16 | 45 | 8 | 5.6 | 14 |
-| A1 | 12 agents C-level | 18 | 11 | 15 | 44 | 8 | 5.5 | 15 |
-| H1 | hooks TDD | 12 | 8 | 10 | 30 | 8 | 3.8 | 16 |
-| D1 | 9 docs canônicos *(→ D1a/b/c)* | 17 | 11 | 14 | 42 | 13 | 3.2 | 17 |
-| A2 | 38 agents operacionais *(→ A2a–e)* | 17 | 11 | 15 | 43 | 20 | 2.2 | 18 |
-
-> Leitura: F1 e R1 são "small bets de alta alavancagem" (baratos, desbloqueiam tudo) → topo.
-> D1 e A2 têm WSJF baixo só por serem grandes — por isso foram **fatiados** e entram cedo
-> (W2/W3), pois são pré-requisito de quase tudo. O fatiamento encurta o caminho crítico.
-
-### Scoring WSJF — pós-1.0 (histórico; N8/N10 ✅; N9 cancelado)
-
-Os itens N1-N7, N8 e N10 já foram entregues. **N9 foi cancelado 2026-08-16 (legacy/OE)** e não pontua na campanha BT-\*. O ranking abaixo é **histórico** da faixa pós-1.0 (não é o backlog ativo).
-
-| ID | Item | CoD (qualitativo) | Job Size | WSJF (relativo) | Rank (histórico) |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| N8 | Fechar 0.1.6 (CI + tag + Release) | Alto (fundação imutável; destrava N9/N10) | Baixo (fluxo já automatizado 4x) | **Alto** | 1 ✅ |
-| N9 | Marketplace comunitário `claude-plugins-community` | Alto (alcance; gated por go/no-go) | Alto (gargalo externo Anthropic) | **Médio** | 2 💡 cancelado legacy/OE |
-| N10 | Releases retroativas 0.1.0 / 0.1.1 | Baixo (cosmético/histórico) | Baixo (mecânica repetida x2) | **Baixo** | 3 ✅ |
-
-> Leitura (histórico): N8 fechou a fundação imutável. N9 era folha one-way-door externa e foi
-> **cancelado** para não competir com a campanha BT-\* (fonte-de-verdade/CI/porte). N10 ✅.
-> Backlog ativo e WSJF da campanha: IDs **BT-0..BT-9** (plano 2026-08-16).
-
-### Scoring WSJF — campanha BT-* (2026-08-16, `--reorder`)
-
-Régua Fibonacci `(1,2,3,5,8,13,20)`. `CoD = Valor + Criticidade + Red. Risco`; `WSJF = CoD / Job Size`.
-Job Size = rótulo `Dificuldade` (early: Baixa=2, Média=5, Alta=8). Rank = WSJF **dentro do nível topológico**
-(dependência sempre vence). `BT-9` fica em W5 por julgamento (go/no-go do líder), não por WSJF global.
-
-Níveis topo: L0=`BT-0`; L1=`BT-1,BT-2,BT-3`; L2=`BT-4,BT-5,BT-6`; L3=`BT-7,BT-8,BT-9`.
-Onda canônica (CHK-07: pré-req nunca na mesma onda): W1=L0; W2=L1; W3=L2; W4=`BT-7,BT-8`; W5=`BT-9`.
-
-| ID | Item | Nível | Valor | Criticidade | Red. Risco | CoD | Job Size | WSJF | Rank no nível |
-| :--- | :--- | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| BT-0 | PHASE 0 freeze/baseline | L0 | 13 | 13 | 13 | 39 | 5 | 7.80 | 1 |
-| BT-3 | GitHub canônico + purge host legado | L1 | 13 | 13 | 13 | 39 | 5 | 7.80 | 1 |
-| BT-1 | FABLE ADR source-of-truth vault×plugin | L1 | 20 | 13 | 20 | 53 | 8 | 6.63 | 2 |
-| BT-2 | docs/house sync 10 manuais | L1 | 8 | 8 | 8 | 24 | 5 | 4.80 | 3 |
-| BT-5 | Eliminar solo/headcount (piso early) | L2 | 13 | 8 | 13 | 34 | 5 | 6.80 | 1 |
-| BT-6 | Inventário dual-authority + cutover | L2 | 13 | 8 | 20 | 41 | 8 | 5.13 | 2 |
-| BT-4 | CI multi-OS GitHub Actions | L2 | 13 | 8 | 13 | 34 | 8 | 4.25 | 3 |
-| BT-9 | Proteção de main + release gates | L3 | 13 | 5 | 13 | 31 | 5 | 6.20 | 1* |
-| BT-7 | Drift gate semântico registry | L3 | 8 | 5 | 13 | 26 | 8 | 3.25 | 2 |
-| BT-8 | Evals de roteamento `/bigtech` | L3 | 8 | 5 | 8 | 21 | 8 | 2.63 | 3 |
-
-> \* `BT-9` tem o maior WSJF do L3, mas a onda é **W5** (porta do líder no fim), não W4.
-> `BT-1` sobe no L1 (fundação / one-way-door de SoT). Durante a execução, 🔍 não bloqueava
-> dependentes de *código* da fatia já entregue; após W7 todos os BT-\* estão ✅.
-
-### Fechamento campanha (add_tests_audit 2026-08-16)
-
-| ID | Item | Nível | Pré-requisito | Onda | Status |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| TST-BT-1 | Revalidar suite campanha (preci+CI) | L4 (após impl) | BT-5,BT-6,BT-7,BT-8 | W6 | ✅ |
-| AUD-BT-1 | Auditoria campanha (SoT/porte/CI/host) | L5 (após teste) | TST-BT-1, BT-1, BT-5, BT-6 | W7 | ✅ |
-
-**Skip catálogo (anti-OE / coberto 1.0):** `TST-T5`≈`TST-DEPS`✅; `TST-T12`≈`TST-DEPS`✅+CI/gitleaks;
-`AUD-DISC`/`AUD-ARCH`/`AUD-COV`/`AUD-DEPS`/`AUD-LANG` — sem ⏳ cosmético (escopo campanha em `AUD-BT-1`);
-`AUD-SEC`/`AUD-QUALITY`/`AUD-REPORT` já ✅; `W-WIKI` ✅ (CHK-14).
-
-## Decisões one-way-door (go/no-go do líder supremo)
-
-1. **`F1`** — congelar nome (`bigtech`), layout e `source` do marketplace antes de abrir a W2 (contrato público; mudar depois quebra quem já instalou). *(concluído)*
-2. **`R4`** — go/no-go da primeira publicação pública (host legado na época; canônico agora GitHub; irreversível; usuários passam a executar os hooks Python na máquina deles). *(concluído)*
-3. **`N9`** — go/no-go da submissão ao marketplace comunitário `claude-plugins-community` (3ª porta sem volta se reaberta). **Cancelado 2026-08-16 (legacy/OE)** — fora da campanha BT-\*; reabrir só com go/no-go explícito do líder **depois** da campanha.
-
-## Decisões da auditoria (saída da auditoria de 9 dimensões)
-
-- **AUD-D01 (canal de distribuição): DECIDIDO → GitHub único + community marketplace (ordem líder 2026-08-16 prevalece sobre “AMBOS” legado).** Submeter ao marketplace oficial `claude-plugins-community` (auto-update dinâmico); host de desenvolvimento e distribuição canônico = `github.com/petrinhu/bigtech_plugin`. Host legado (forja anterior + CI legada) **eliminados** do produto (BT-3).
-- **AUD-D02 (GitHub canônico): DECIDIDO → GitHub é a origem.** Repo público GitHub para desenvolvimento, CI e submissão ao oficial (item `DIST-1` + BT-3). Resolve AUD-U01.
-- **AUD-D03 (glifo de travessão em tabelas): DECIDIDO → MANTER (exceção documentada).** O travessão como valor de célula/estado nas tabelas é símbolo de dado, não prosa; documentar a exceção à regra "zero em-dash". Remediar apenas os 10 em-dash de PROSA real (em AUD-R3/AUD-R5).
-- **AUD-D04 (empacotar testes): pendente** — default: manter `hooks/tests/` e `hooks/README-tdd.md` no pacote (úteis para CI/contribuição). Reavaliar se quiser pacote mínimo.
-- **AUD-U01: RESOLVIDO por AUD-D02 + ordem 2026-08-16** — o GitHub é o único host canônico e o canal de submissão garantido.
-
-## Notas de cadência (pós-1.0 → campanha BT-*)
-
-- **Campanha ativa = BT-\*** no topo da tabela (ondas W1..W5; plano `PLANO-MELHORIA-BIGTECH-CLAUDE-CODE-2026-08-16.md`). Main orquestra-only; ≤2 agents/rodada.
-- **N8 ✅, N10 ✅.** **N9, OS-1..5, TOOL-1..4 cancelados 2026-08-16** como legacy/OE (ver seção Cancelamentos).
-- **Não há caminho crítico `N8 → N9` aberto.** WIP de manutenção pós-1.0 em N9 encerrou com o cancelamento; não reabrir N9 durante a campanha sem ordem do líder.
-- **N10** já concluído (não é mais opcional pendente).
-
-## Cancelamentos 2026-08-16 (legacy / anti-OE)
-
-| ID | Motivo |
-| :--- | :--- |
-| N9 | Marketplace `claude-plugins-community` (W22 pós-1.0). One-way-door externo; **fora** das fases BT-0..BT-9. Manter vivo = OE de distribuição paralela à campanha de fonte-de-verdade/CI/porte. Reabrir só com go/no-go explícito do líder **depois** da campanha. |
-| OS-1..OS-5 | Auditoria OS-agnóstico jun/2026; v0.2.0 já marcou OS-agnosticismo; `bin/python3.cmd`, globs Windows, CI multi-OS (BT-4) cobrem o núcleo. Itens presos em 🔍 = **dívida de verificação legada**, não roadmap da campanha. Residual cosmético (OS-3/4/5 docs) = OE se forçado agora. |
-| TOOL-1..TOOL-4 | Auditoria política-tools jun/2026; `docs/principles/missing-tool-policy.md` já existe; doutrina híbrida decidida. Presos em 🔍 = verification aging legado, **não** fase do plano BT. Reabrir só se campanha/auditoria nova exigir. |
