@@ -81,6 +81,7 @@ def _home_descartavel(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     home = tmp_path / "home_descartavel"
     home.mkdir()
     monkeypatch.setenv("HOME", str(home))
+    monkeypatch.setenv("USERPROFILE", str(home))  # Windows: o perfil sai daqui (CONS-R11)
     monkeypatch.delenv("BIGTECH_VAULT", raising=False)
     return home
 
@@ -434,6 +435,8 @@ def test_main_check_sem_chave_sai_3(tmp_path: Path, monkeypatch: pytest.MonkeyPa
     assert sh.main(["--vault", str(vault), "--house", str(house), "--check"]) == 3
 
 
+@pytest.mark.skipif(sys.platform == "win32",
+                    reason="modo 600 e POSIX; no Windows a chave fica no perfil, protegida pelo ACL")
 def test_gerar_chave_cria_600_e_nao_sobrescreve(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     chave = tmp_path / "sync_house.key"
     monkeypatch.setenv("BIGTECH_SYNC_KEY_FILE", str(chave))
@@ -445,6 +448,8 @@ def test_gerar_chave_cria_600_e_nao_sobrescreve(tmp_path: Path, monkeypatch: pyt
     assert chave.read_text(encoding="utf-8") == conteudo
 
 
+@pytest.mark.skipif(sys.platform == "win32",
+                    reason="recusa por modo 644 e POSIX; no Windows o modo nao existe (ACL do perfil)")
 def test_chave_com_permissao_aberta_recusa(tmp_path: Path) -> None:
     chave = tmp_path / "aberta.key"
     chave.write_text(CHAVE.hex() + "\n", encoding="utf-8")
@@ -564,3 +569,51 @@ def test_arquivo_local_malformado_e_erro_2_nunca_fallback(
     _chave_local(tmp_path, monkeypatch)
     _vault_path_local(_home_descartavel, conteudo)
     assert sh.main(["--house", str(house), "--check"]) == 2
+
+
+# ---------------------------------------------------------------------------
+# CONS-R11: Windows (CRLF, sem bits POSIX, sem diretorio pessoal)
+# ---------------------------------------------------------------------------
+
+_README_BASE = "# docs/house\n\n<!-- sync:tabela inicio -->\n<!-- sync:tabela fim -->\n"
+
+
+def test_vault_com_crlf_confere_igual_ao_lf(tmp_path: Path) -> None:
+    """Um vault salvo com CRLF (Windows) nao pode divergir do manual gerado."""
+    vault = tmp_path / "vault"
+    vault.mkdir()
+    for nome in sh.MANUAIS:
+        (vault / f"{nome}.md").write_bytes(f"# {nome}\r\n\r\nTexto.\r\n".encode())
+    house = tmp_path / "house"
+    house.mkdir()
+    (house / "README.md").write_text(_README_BASE, encoding="utf-8")
+    sh.sincronizar(vault, house, "2026-11-20", "write", CHAVE)
+    res = sh.sincronizar(vault, house, "2026-11-20", "check", CHAVE)
+    assert res.divergentes == []
+
+
+def test_chave_com_modo_aberto_nao_e_recusada_fora_do_posix(tmp_path: Path, monkeypatch) -> None:
+    """Sem bits POSIX (Windows), a chave nao e recusada por modo: fica no perfil do usuario."""
+    monkeypatch.setattr(sh, "_modo_posix", lambda: False)
+    chave = tmp_path / "sem_modo.key"
+    chave.write_text(CHAVE.hex() + "\n", encoding="utf-8")
+    chave.chmod(0o644)
+    assert sh.carregar_chave(chave) == CHAVE
+
+
+def test_sem_diretorio_pessoal_sai_2_sem_traceback(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys
+) -> None:
+    """Sem HOME nem USERPROFILE (Windows sem perfil), o erro e de uso (2), nunca RuntimeError."""
+    monkeypatch.delenv("BIGTECH_VAULT", raising=False)
+    monkeypatch.delenv("BIGTECH_SYNC_KEY_FILE", raising=False)
+    monkeypatch.setattr(sh.os.path, "expanduser", lambda p: p)
+
+    def sem_home(cls):
+        raise RuntimeError("Could not determine home directory.")
+
+    monkeypatch.setattr(sh.Path, "home", classmethod(sem_home))
+    house = tmp_path / "house"
+    house.mkdir()
+    assert sh.main(["--house", str(house), "--check"]) == 2
+    assert "erro" in capsys.readouterr().err

@@ -222,16 +222,34 @@ def aplicar_transformacoes(corpo: str) -> tuple[str, dict[str, int]]:
 # ---------------------------------------------------------------------------
 
 
+def _modo_posix() -> bool:
+    """Bits de modo POSIX so existem fora do Windows (CONS-R11). No Windows a
+    chave fica no perfil do usuario, protegida pelo ACL, e o modo 600 nao se aplica."""
+    return hasattr(os, "getuid")
+
+
+def _diretorio_pessoal() -> Path:
+    """HOME (ou USERPROFILE, no Windows). Sem ele e erro de uso (2), nunca RuntimeError.
+
+    Path.home() levanta RuntimeError quando nenhuma das duas variaveis existe,
+    o que derrubava o gate com traceback no runner Windows (CONS-R11).
+    """
+    home = os.path.expanduser("~")
+    if home == "~" or not os.path.isabs(home):
+        raise ErroSync("nao foi possivel determinar o diretorio pessoal (HOME ou USERPROFILE)")
+    return Path(home)
+
+
 def caminho_chave() -> Path:
     env = os.environ.get("BIGTECH_SYNC_KEY_FILE")
     if env:
         return Path(env).expanduser()
-    return Path.home() / ".config" / "bigtech" / "sync_house.key"
+    return _diretorio_pessoal() / ".config" / "bigtech" / "sync_house.key"
 
 
 def caminho_vault_local() -> Path:
     """Arquivo local, fora do repo, com o caminho do vault em uma linha (CONS-10A)."""
-    return Path.home() / ".config" / "bigtech" / "vault_path"
+    return _diretorio_pessoal() / ".config" / "bigtech" / "vault_path"
 
 
 def ler_vault_local(arq: Path) -> Path | None:
@@ -272,7 +290,7 @@ def carregar_chave(path: Path) -> bytes | None:
     """Chave local, ou None quando o arquivo nao existe. Recusa permissao aberta."""
     if not path.is_file():
         return None
-    if path.stat().st_mode & 0o077:
+    if _modo_posix() and path.stat().st_mode & 0o077:
         raise ErroSync(f"permissao aberta na chave {path}; use chmod 600")
     try:
         chave = bytes.fromhex(path.read_text(encoding="utf-8").strip())
@@ -376,7 +394,8 @@ def _ler_vault(vault: Path, nome: str) -> str:
     arq = vault / f"{nome}.md"
     if not arq.is_file():
         raise ErroSync(f"manual ausente no vault: {nome}.md")
-    return arq.read_bytes().decode("utf-8")
+    # Vault salvo com CRLF (Windows) tem de comparar igual ao manual gerado em LF.
+    return arq.read_bytes().decode("utf-8").replace("\r\n", "\n")
 
 
 @dataclass
@@ -450,7 +469,7 @@ def sincronizar(
         if modo == "write":
             prep = _preparar(texto_vault, nome, data_hoje, chave)
             house.mkdir(parents=True, exist_ok=True)
-            arq.write_text(prep.texto, encoding="utf-8")
+            arq.write_text(prep.texto, encoding="utf-8", newline="\n")
         else:
             if not arq.is_file():
                 divergentes.append(arq.name)
@@ -470,7 +489,7 @@ def sincronizar(
     atual_readme = readme.read_text(encoding="utf-8")
     novo_readme = renderizar_readme(atual_readme, entradas)
     if modo == "write":
-        readme.write_text(novo_readme, encoding="utf-8")
+        readme.write_text(novo_readme, encoding="utf-8", newline="\n")
         return ResultadoSync([], False)
     if chave is None:
         # Sem chave a tabela do README (com HMAC) nao e reproduzivel; so o corpo foi conferido.
