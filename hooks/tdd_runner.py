@@ -6,6 +6,8 @@ Opt-in: so roda em projetos com .claude/tdd-guard.json. Nunca quebra o fluxo
 """
 import json
 import os
+import re
+import shutil
 import subprocess
 import sys
 import time
@@ -18,6 +20,40 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import tdd_common as c
+
+# Builtins do cmd.exe: nao sao programas no PATH, entao `which` nao os acha.
+_CMD_BUILTINS = frozenset({
+    "cd", "chdir", "dir", "echo", "type", "set", "call", "cls", "copy", "del",
+    "erase", "md", "mkdir", "rd", "rmdir", "ren", "rename", "move", "if", "for",
+    "exit", "start", "pushd", "popd", "ver", "vol", "path", "title",
+})
+
+
+def _primeiro_token(cmd: str) -> str:
+    """Nome do programa do comando (sem aspas), ou '' se nao houver."""
+    m = re.match(r'\s*"?([^"\s&|;<>]+)', cmd or "")
+    return m.group(1) if m else ""
+
+
+def _nao_executou(cmd, returncode, nt=None, which=shutil.which) -> bool:
+    """True se o comando nao chegou a rodar (programa ausente), e nao um teste vermelho.
+
+    POSIX: 126/127 e 9009 (equivalente do cmd.exe). No Windows, cmd.exe sai com 1
+    para programa inexistente, o que e indistinguivel de teste vermelho pelo
+    codigo. Entao, SO no Windows e SO com codigo != 0, o programa do comando e
+    checado no PATH: ausente (e nao builtin do cmd) = nao rodou. Programa presente
+    que falha continua vermelho real.
+    """
+    if returncode in (126, 127, 9009):
+        return True
+    if returncode == 0:
+        return False
+    if not (os.name == "nt" if nt is None else nt):
+        return False
+    tok = _primeiro_token(cmd)
+    if not tok or tok.lower() in _CMD_BUILTINS:
+        return False
+    return which(tok) is None
 
 
 def run_suite(cfg: dict, project_root: str, runner=subprocess.run) -> dict:
@@ -32,10 +68,9 @@ def run_suite(cfg: dict, project_root: str, runner=subprocess.run) -> dict:
         return {"ran": False, "reason": str(e), "ts": int(time.time())}
     except subprocess.TimeoutExpired:
         return {"ran": False, "reason": "timeout", "ts": int(time.time())}
-    # 126/127 sao POSIX (nao executavel / nao encontrado). 9009 e o equivalente
-    # do cmd.exe no Windows para "comando nao encontrado". Tratar como nao-rodou
-    # evita registrar um falso has_red quando o test_command nem existe.
-    if proc.returncode in (126, 127, 9009):
+    # Tratar como nao-rodou evita registrar um falso has_red quando o
+    # test_command nem existe (POSIX 126/127, 9009, e o caso Windows de _nao_executou).
+    if _nao_executou(cmd, proc.returncode):
         return {"ran": False,
                 "reason": f"comando nao executavel (exit {proc.returncode})",
                 "ts": int(time.time())}

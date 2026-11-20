@@ -91,13 +91,20 @@ def default_state_dir():
     return os.path.join(home, ".cache", STATE_DIRNAME)
 
 
+def _modo_posix():
+    """Bits de modo POSIX (dono/grupo/outros) so existem fora do Windows.
+    No Windows o os.stat devolve 0o777 e o bit de grupo nao diz nada (CONS-R11)."""
+    return hasattr(os, "getuid")
+
+
 def _dono_e_proprio(st):
-    return not hasattr(os, "getuid") or st.st_uid == os.getuid()
+    return not _modo_posix() or st.st_uid == os.getuid()
 
 
 def verificar_diretorio_privado(base):
     """True se `base` existe, nao e symlink, e do usuario, sem escrita de
-    grupo/outros. Nunca cria nada e nunca segue symlink (lstat)."""
+    grupo/outros (so onde o modo POSIX existe). Nunca cria nada e nunca
+    segue symlink (lstat)."""
     try:
         st = os.lstat(base)
     except OSError:
@@ -106,7 +113,7 @@ def verificar_diretorio_privado(base):
         return False
     if not _dono_e_proprio(st):
         return False
-    return not (st.st_mode & 0o022)
+    return not (_modo_posix() and st.st_mode & 0o022)
 
 
 def garantir_diretorio_privado(base):
@@ -124,7 +131,7 @@ def garantir_diretorio_privado(base):
         raise PermissionError("estado: caminho nao e diretorio; recusado")
     if not _dono_e_proprio(st):
         raise PermissionError("estado: diretorio pertence a outro usuario")
-    if st.st_mode & 0o077:
+    if _modo_posix() and st.st_mode & 0o077:
         os.chmod(base, 0o700)  # e nosso: fecha o modo
     return base
 

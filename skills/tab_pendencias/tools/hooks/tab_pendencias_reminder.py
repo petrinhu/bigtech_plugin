@@ -310,8 +310,11 @@ def main(argv=None):
     except Exception:
         raw = ""
     out = run_hook(raw)
+    # ensure_ascii (padrao): a saida e ASCII, portanto cabe em qualquer code
+    # page do pipe. Com ensure_ascii=False, o Windows (cp1252) levantava
+    # UnicodeEncodeError com ⏳/🔍 e o fail-open deixava o hook mudo (CONS-R11).
     try:
-        sys.stdout.write(json.dumps(out, ensure_ascii=False))
+        sys.stdout.write(json.dumps(out))
         sys.stdout.write("\n")
     except Exception:
         pass

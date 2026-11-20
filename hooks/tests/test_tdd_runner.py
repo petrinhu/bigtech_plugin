@@ -223,6 +223,8 @@ def test_runner_nao_rodou_avisa_em_json_posttooluse(tmp_path):
     proc = _run_hook("tdd_runner.py", payload, home)
     assert proc.returncode == 0
     assert proc.stderr == ""
+    assert proc.stdout.strip(), (
+        f"sem aviso em stdout (exit {proc.returncode}); stderr={proc.stderr!r}")
     saida = json.loads(proc.stdout)
     assert "TDD runner" in saida["systemMessage"]
     hso = saida["hookSpecificOutput"]
@@ -278,3 +280,33 @@ def test_runner_config_json_invalida_avisa_em_json(tmp_path):
 def test_runner_preset_desconhecido_avisa_em_json(tmp_path):
     saida = _runner_config_invalida(tmp_path, json.dumps({"preset": "python_pytest"}))
     assert "preset desconhecido" in saida["systemMessage"]
+
+
+# ---------------------------------------------------------------------------
+# CONS-R11: comando ausente no Windows sai com codigo 1 (cmd.exe), nao 9009.
+# Vermelho real so quando o programa existe e falha; ausente vira "nao rodou".
+# ---------------------------------------------------------------------------
+
+def test_nt_comando_ausente_nao_e_vermelho_real():
+    assert r._nao_executou("comando_xyz --flag", 1, nt=True, which=lambda t: None)
+
+
+def test_nt_programa_presente_com_falha_e_vermelho_real():
+    assert not r._nao_executou("python -m pytest", 1, nt=True, which=lambda t: "C:/py.exe")
+
+
+def test_nt_builtin_do_cmd_nao_conta_como_ausente():
+    assert not r._nao_executou("cd sub && pytest", 1, nt=True, which=lambda t: None)
+
+
+def test_posix_codigo_1_continua_vermelho_real():
+    assert not r._nao_executou("comando_xyz", 1, nt=False, which=lambda t: None)
+
+
+def test_sucesso_nunca_e_nao_executou():
+    assert not r._nao_executou("comando_xyz", 0, nt=True, which=lambda t: None)
+
+
+def test_codigos_posix_de_nao_executavel_continuam_valendo():
+    assert r._nao_executou("comando_xyz", 127, nt=False, which=lambda t: None)
+    assert r._nao_executou("comando_xyz", 9009, nt=False, which=lambda t: None)

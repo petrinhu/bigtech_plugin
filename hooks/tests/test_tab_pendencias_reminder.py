@@ -123,3 +123,18 @@ def test_plugin_nao_emite_criar_nem_staleness(tmp_path):
     assert not hasattr(t, "avaliar_sessionstart")
     assert not hasattr(t, "msg_staleness")
     assert not hasattr(t, "produto_registrado")
+
+
+# ------------- CONS-R11: Windows nao tem bits de modo POSIX -----------------
+
+def test_estado_legivel_em_sistema_sem_bits_posix(tmp_path, monkeypatch):
+    """No Windows os.stat devolve 0o777: o bit de grupo/outros nao diz nada
+    sobre o dono. O hook precisa ler o proprio carimbo mesmo assim."""
+    monkeypatch.setattr(t, "_modo_posix", lambda: False)
+    sd = tmp_path / "estado"
+    sd.mkdir()
+    os.chmod(sd, 0o777)
+    t.carimbar_sessao("win", 100.0, state_dir=str(sd))
+    estado = t.ler_sessao("win", state_dir=str(sd))
+    assert estado is not None
+    assert estado["start"] == 100.0
