@@ -6,11 +6,16 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), e
 
 ## [Unreleased]
 
-Trabalho **post-0.2.0** em `main` (versão do plugin em `plugin.json` / marketplace permanece **0.2.0** até release semver futura). Campanha dual-host Claude+Grok **2026-08-16 fechada** - tag de marco: [campanha/2026-08-16-fechada](https://github.com/petrinhu/bigtech_plugin/releases/tag/campanha/2026-08-16-fechada). Índice dos relatórios: [docs/campanha/README.md](docs/campanha/README.md).
+Trabalho **post-0.2.0** em `main` (versão do plugin em `plugin.json` / marketplace: **0.2.1**, bump patch desta onda; release semver ainda não cortada). Campanha dual-host Claude+Grok **2026-08-16 fechada** - tag de marco: [campanha/2026-08-16-fechada](https://github.com/petrinhu/bigtech_plugin/releases/tag/campanha/2026-08-16-fechada). Índice dos relatórios: [docs/campanha/README.md](docs/campanha/README.md).
 
 ### Fixed
 
+- **`proj_software`: cópia do plugin alinhada à decisão do líder de 2026-08-18.** A thread principal nunca codifica, em nenhum nível (S0 incluído); a cópia do plugin ainda dizia "Main thread codifica direto" em S0, "main thread + 2-3 sob demanda" em S1 e mandava o deploy para a main thread no S1. Agora `skills/proj_software/SKILL.md` é cópia integral da versão global, e o plugin passa a ser a fonte única dessa skill.
 - **`tab_pendencias_reminder`: fim do lembrete duplicado quando o produto standalone está ligado.** O `tab_pendencias` virou produto standalone (repo próprio, GPL-3.0) e o motor de sinais dele reescreveu, em 2026-08, os gatilhos 1 (CRIAR) e 2 (STALENESS) que nasceram neste hook em 2026-06. Com os dois registrados, cada `SessionStart` e cada `UserPromptSubmit` emitiam **duas** mensagens de mesmo teor. Agora o hook detecta se o produto está registrado nas settings do usuário e, nesse caso, **cede a ele os gatilhos 1 e 2**, mantendo só o que o produto não tem: o carimbo de sessão (3) e o nudge de tempo de sessão (4). Instalação **só-plugin** (sem o produto) mantém o comportamento legado integral. Override: `BIGTECH_TAB_REMINDER=full` (nunca cede) / `off` (não emite nada) / `auto` (padrão). Duas lacunas conhecidas da cessão estão documentadas no cabeçalho do hook em vez de perdidas em silêncio: projeto com `.bigtech-porte` fora de repo git, e `TODO.md` defasado sem nenhum item ⏳/🔄.
+
+### Removed
+
+- **`skills/tab_pendencias/` removida do plugin.** A skill `/tab_pendencias` passa a vir só do produto standalone (repo próprio, GPL-3.0, github.com/petrinhu/tab_pendencias), que é a versão viva. A cópia embutida estava velha. O hook `tab_pendencias_reminder` continua no plugin; numa instalação só-plugin ele cita `/tab_pendencias`, que só existe com o produto standalone instalado. README, AGENTS.md, CLAUDE.md e as descrições do `plugin.json` e do `marketplace.json` foram ajustados para 3 skills (`bigtech`, `proj_software`, `visual-design-director`).
 
 ### Added
 

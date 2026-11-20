@@ -19,7 +19,7 @@ General rule: prefer the main path (remote marketplace). Use the local-clone alt
 `bigtech` is a plugin for Claude Code that packages a product-and-engineering organization:
 
 - **51 agents.** 12 C-level (CEO, CPO, CTO, CMO, COO, CISO, CDO, CAIO, CFO, CRO, CLO, and Chief of Staff) and 39 operational agents that do the work (including `visual-design-director`, the visual design director).
-- **4 skills.** 3 orchestration skills plus 1 agent shortcut. `/bigtech` assembles the constellation and classifies the project size, `/proj_software` runs the software development life cycle (SDLC), `/tab_pendencias` plans the backlog by value and dependency; `/visual-design-director` delegates to the visual-design-director agent for rendered high-fidelity design.
+- **3 skills.** 2 orchestration skills plus 1 agent shortcut. `/bigtech` assembles the constellation and classifies the project size, `/proj_software` runs the software development life cycle (SDLC); `/visual-design-director` delegates to the visual-design-director agent for rendered high-fidelity design. `/tab_pendencias` is not shipped by this plugin: install the standalone product (github.com/petrinhu/tab_pendencias).
 - **Governance and TDD hooks.** Bootstrap of the manuals into the session, size reassessment, operating-mode reinforcement, TDD guard-rail (red, green, refactor), and a test runner.
 
 Package identity (confirmed in `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`):
@@ -82,7 +82,7 @@ Replace `<local-clone-path>` with the absolute path of the directory where you c
 Confirm the three signals. If any of them fails, report it to the user before moving on.
 
 1. **The 51 agents show up.** List the available agents and check for the C-level ones (`celso-ceo`, `capitolino-cpo`, `caetano-cto`, `camilo-cmo`, `cosmo-coo`, `narciso-ciso`, `candido-cdo`, `caio-caio`, `confucio-cfo`, `cicero-cro`, `claudio-clo`, `cosimo-chief-of-staff`) and a sample of the operational ones (`software-architect`, `backend-engineer`, `qa-engineer`, `visual-design-director`, `technical-writer`).
-2. **The 4 skills exist.** `/bigtech`, `/proj_software`, `/tab_pendencias`, and `/visual-design-director` must be listed and invokable.
+2. **The 3 skills exist.** `/bigtech`, `/proj_software`, and `/visual-design-director` must be listed and invokable. `/tab_pendencias` comes from the standalone product, installed separately.
 3. **The hooks run.** When starting a new session, `bigtech_session_init` should inject the path of the manuals into the context. On a code project not yet classified, `bigtech_porte_reminder` reassesses the size. Use `/plugin` to confirm that the plugin is active and that the hooks are registered.
 
 ### ⚠️ Name conflicts (check BEFORE installing)
@@ -145,7 +145,7 @@ Regra geral: prefira o caminho principal (marketplace remoto). Use a alternativa
 `bigtech` é um plugin para o Claude Code que empacota uma organização de produto e engenharia:
 
 - **51 agents.** 12 C-level (CEO, CPO, CTO, CMO, COO, CISO, CDO, CAIO, CFO, CRO, CLO e Chief of Staff) e 39 operacionais que executam o trabalho (incluindo `visual-design-director`, o diretor de design visual).
-- **4 skills.** 3 de orquestração mais 1 atalho de agent. `/bigtech` monta a constelação e classifica o porte do projeto, `/proj_software` toca o ciclo de vida de software (SDLC), `/tab_pendencias` planeja o backlog por valor e dependência; `/visual-design-director` delega ao agent visual-design-director para design de alta fidelidade renderizado.
+- **3 skills.** 2 de orquestração mais 1 atalho de agent. `/bigtech` monta a constelação e classifica o porte do projeto, `/proj_software` toca o ciclo de vida de software (SDLC); `/visual-design-director` delega ao agent visual-design-director para design de alta fidelidade renderizado. `/tab_pendencias` não vem neste plugin: instale o produto standalone (github.com/petrinhu/tab_pendencias).
 - **Hooks de governança e TDD.** Bootstrap dos manuais na sessão, reavaliação de porte, reforço do modo de operação, guard-rail de TDD (red, green, refactor) e runner de testes.
 
 Identidade do pacote (confirmada em `.claude-plugin/plugin.json` e `.claude-plugin/marketplace.json`):
@@ -208,7 +208,7 @@ Substitua `<caminho-local-do-clone>` pelo caminho absoluto do diretório onde vo
 Confirme os três sinais. Se algum falhar, relate ao usuário antes de seguir.
 
 1. **Os 51 agents aparecem.** Liste os agents disponíveis e confira a presença dos C-level (`celso-ceo`, `capitolino-cpo`, `caetano-cto`, `camilo-cmo`, `cosmo-coo`, `narciso-ciso`, `candido-cdo`, `caio-caio`, `confucio-cfo`, `cicero-cro`, `claudio-clo`, `cosimo-chief-of-staff`) e de uma amostra dos operacionais (`software-architect`, `backend-engineer`, `qa-engineer`, `visual-design-director`, `technical-writer`).
-2. **As 4 skills existem.** `/bigtech`, `/proj_software`, `/tab_pendencias` e `/visual-design-director` devem estar listadas e invocáveis.
+2. **As 3 skills existem.** `/bigtech`, `/proj_software` e `/visual-design-director` devem estar listadas e invocáveis. `/tab_pendencias` vem do produto standalone, instalado à parte.
 3. **Os hooks rodam.** Ao iniciar uma nova sessão, o `bigtech_session_init` deve injetar o caminho dos manuais no contexto. Em projeto de código ainda não classificado, o `bigtech_porte_reminder` reavalia o porte. Use `/plugin` para confirmar que o plugin está ativo e que os hooks estão registrados.
 
 ### ⚠️ Conflito de nomes (verifique ANTES de instalar)

@@ -15,7 +15,7 @@
 
 ## English
 
-> Structure any project like a digital-product company: a constellation of 51 agents (12 C-level + 39 operational), 4 skills, and governance and TDD hooks. Scales from **early** through **scale** to **bigtech** (deprecated alias: `solo` → `early`).
+> Structure any project like a digital-product company: a constellation of 51 agents (12 C-level + 39 operational), 3 skills, and governance and TDD hooks. Scales from **early** through **scale** to **bigtech** (deprecated alias: `solo` → `early`).
 
 ### Welcome, supreme leader
 
@@ -28,7 +28,7 @@ High-stakes decisions (macro architecture, scope, stack, go/no-go, irreversible 
 `bigtech` packages a complete product-and-engineering organization as a plugin for Claude Code:
 
 - **51 agents.** 12 C-level (strategy, product, engineering, marketing, operations, security, data, AI, finance, revenue, legal, chief of staff) and 39 operational agents that do the work.
-- **4 skills.** 3 orchestration skills plus 1 agent shortcut. `/bigtech` assembles the constellation, `/proj_software` runs the software development life cycle (SDLC), `/tab_pendencias` plans the backlog by value and dependency; `/visual-design-director` is a shortcut that delegates to the visual-design-director agent for rendered high-fidelity design.
+- **3 skills.** 2 orchestration skills plus 1 agent shortcut. `/bigtech` assembles the constellation, `/proj_software` runs the software development life cycle (SDLC); `/visual-design-director` is a shortcut that delegates to the visual-design-director agent for rendered high-fidelity design. `/tab_pendencias` is not shipped by this plugin: it comes from the standalone product [tab_pendencias](https://github.com/petrinhu/tab_pendencias).
 - **Governance and TDD hooks.** Test guard-rail (red, green, refactor), project-size reassessment, operating-mode reinforcement, and bootstrap of the manuals into the session.
 
 The non-negotiable principle: **the process adapts to the size of the project, never the other way around.** A 200-line CLI does not summon the whole team. The Chief of Staff classifies the size and turns on only what is needed, preventing over-engineering.
@@ -92,7 +92,7 @@ mkdir -p ~/.grok/skills
 ln -sfn "$CLONE"/skills/bigtech ~/.grok/skills/bigtech
 ln -sfn "$CLONE"/skills/proj_software ~/.grok/skills/proj_software
 ln -sfn "$CLONE"/skills/visual-design-director ~/.grok/skills/visual-design-director
-# tab_pendencias: prefer the standalone product repo, not a fork of the copy inside this plugin
+# tab_pendencias: use the standalone product repo (github.com/petrinhu/tab_pendencias); this plugin no longer ships a copy
 # ln -sfn /path/to/tab_pendencias ~/.grok/skills/tab_pendencias
 
 # 4) Hooks: copy relevant Python scripts (prefer real files, not symlinks into another host)
@@ -113,7 +113,7 @@ Summary: **Claude** = install the marketplace plugin. **Grok** = copy/symlink ag
 
 ### Usage
 
-The 3 orchestration skills are the entry points. Invoke them with a slash or describe your intent in natural language; the mode reinforcement routes the request to the right skill. The 4th skill, `/visual-design-director`, is an agent shortcut for design work.
+The 2 orchestration skills are the entry points. Invoke them with a slash or describe your intent in natural language; the mode reinforcement routes the request to the right skill. The 3rd skill, `/visual-design-director`, is an agent shortcut for design work.
 
 #### `/bigtech`: assemble the constellation
 
@@ -138,6 +138,8 @@ Orchestrates the software development life cycle across 5 macro-phases, allocati
 Use it when starting a new software project: "I'm going to build software", "new system", "build a feature", "which flow to follow".
 
 #### `/tab_pendencias`: WSJF planning table
+
+> Not shipped by this plugin. Install the standalone product: [tab_pendencias](https://github.com/petrinhu/tab_pendencias).
 
 Creates and maintains a backlog table ordered top to bottom in the sequence that minimizes rework, combining topological ordering (dependency) with WSJF (value). The "Wave" column marks steps of equal value that run in parallel.
 
@@ -240,7 +242,7 @@ Distributed under the [Apache-2.0](./LICENSE) license.
 
 ## Português
 
-> Estruture qualquer projeto como uma empresa de produto digital: uma constelação de 51 agents (12 C-level + 39 operacionais), 4 skills e hooks de governança e TDD. Dimensionável de **early** passando por **scale** até **bigtech** (alias depreciado: `solo` → `early`).
+> Estruture qualquer projeto como uma empresa de produto digital: uma constelação de 51 agents (12 C-level + 39 operacionais), 3 skills e hooks de governança e TDD. Dimensionável de **early** passando por **scale** até **bigtech** (alias depreciado: `solo` → `early`).
 
 ### Bem-vindo, líder supremo
 
@@ -253,7 +255,7 @@ Decisões de altíssimo valor (arquitetura macro, escopo, stack, go/no-go, deplo
 `bigtech` empacota uma organização completa de produto e engenharia em forma de plugin para o Claude Code:
 
 - **51 agents.** 12 C-level (estratégia, produto, engenharia, marketing, operações, segurança, dados, IA, finanças, receita, jurídico, chief of staff) e 39 operacionais que executam o trabalho.
-- **4 skills.** 3 de orquestração mais 1 atalho de agent. `/bigtech` monta a constelação, `/proj_software` toca o ciclo de vida de software (SDLC), `/tab_pendencias` planeja o backlog por valor e dependência; `/visual-design-director` é um atalho que delega ao agent visual-design-director para design de alta fidelidade renderizado.
+- **3 skills.** 2 de orquestração mais 1 atalho de agent. `/bigtech` monta a constelação, `/proj_software` toca o ciclo de vida de software (SDLC); `/visual-design-director` é um atalho que delega ao agent visual-design-director para design de alta fidelidade renderizado. `/tab_pendencias` não vem neste plugin: vem do produto standalone, [tab_pendencias](https://github.com/petrinhu/tab_pendencias).
 - **Hooks de governança e TDD.** Guard-rail de testes (red, green, refactor), reavaliação de porte do projeto, reforço do modo de operação e bootstrap dos manuais na sessão.
 
 O princípio inegociável: **o processo se adapta ao porte do projeto, nunca o contrário.** Um CLI de 200 linhas não chama o time inteiro. O Chief of Staff classifica o porte e liga só o necessário, prevenindo over-engineering.
@@ -317,7 +319,7 @@ mkdir -p ~/.grok/skills
 ln -sfn "$CLONE"/skills/bigtech ~/.grok/skills/bigtech
 ln -sfn "$CLONE"/skills/proj_software ~/.grok/skills/proj_software
 ln -sfn "$CLONE"/skills/visual-design-director ~/.grok/skills/visual-design-director
-# tab_pendencias: prefira o repositório standalone, não um fork da cópia embutida neste plugin
+# tab_pendencias: use o repositório standalone (github.com/petrinhu/tab_pendencias); este plugin não traz mais cópia
 # ln -sfn /path/to/tab_pendencias ~/.grok/skills/tab_pendencias
 
 # 4) Hooks: copie os scripts Python relevantes (prefira arquivos reais, não symlink para outro host)
@@ -338,7 +340,7 @@ Resumo: **Claude** = instalar o plugin do marketplace. **Grok** = copiar/symlink
 
 ### Uso
 
-As 3 skills de orquestração são os pontos de entrada. Invoque por barra ou descreva a intenção em linguagem natural; o reforço de modo roteia o pedido para a skill certa. A 4ª skill, `/visual-design-director`, é um atalho de agent para trabalho de design.
+As 2 skills de orquestração são os pontos de entrada. Invoque por barra ou descreva a intenção em linguagem natural; o reforço de modo roteia o pedido para a skill certa. A 3ª skill, `/visual-design-director`, é um atalho de agent para trabalho de design.
 
 #### `/bigtech`: montar a constelação
 
@@ -363,6 +365,8 @@ Orquestra o ciclo de vida de software em 5 macrofases, alocando os agents de eng
 Use quando começar um projeto novo de software: "vou criar um software", "novo sistema", "construir feature", "qual fluxo seguir".
 
 #### `/tab_pendencias`: tabela de planejamento WSJF
+
+> Este plugin não traz essa skill. Instale o produto standalone: [tab_pendencias](https://github.com/petrinhu/tab_pendencias).
 
 Cria e mantém uma tabela de pendências ordenada de cima para baixo na sequência que minimiza retrabalho, combinando ordenação topológica (dependência) com WSJF (valor). A coluna "Onda" marca passos de igual valor que rodam em paralelo.
 

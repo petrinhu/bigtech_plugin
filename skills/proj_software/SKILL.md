@@ -51,7 +51,7 @@ Se o usuário não disse: **pergunte 1-3 itens críticos**, não mais. Maioria d
 Use o **mínimo viável**. Cada agente adiciona overhead de comunicação e processo.
 
 ### Nível S0: Script / Prototype (≤ 1 semana, capacity 1 pessoa, sem deploy)
-**Agentes:** nenhum subagente necessário. Main thread codifica direto.
+**Agentes:** um único agente especialista (o mais próximo do stack, ex. `backend-engineer`) implementa. A thread principal só confere: lê, mede, verifica, despacha e reporta; nunca produz. **Decisão do líder, 2026-08-18: esta regra vale sem exceção de tamanho, inclusive em S0.** Time enxuto continua sendo o objetivo (1 agente, não uma constelação); só não é a thread principal quem digita.
 - Sem PRD, sem ADR, sem RFC, sem CI elaborada.
 - Sem `software-architect`: overkill.
 - Apenas: leia o problema, escreva, teste, use.
@@ -59,14 +59,14 @@ Use o **mínimo viável**. Cada agente adiciona overhead de comunicação e proc
 - Doc: README mínimo é suficiente.
 
 ### Nível S1: App pessoal / MVP interno (≤ 1 mês, 1-2 pessoas, deploy simples)
-**Agentes ativos:** main thread + 2-3 sob demanda.
+**Agentes ativos:** 1 agente implementador (o mais próximo do stack) + 2-3 especialistas sob demanda. A thread principal só confere: lê, mede, verifica, despacha e reporta; nunca produz (decisão do líder, 2026-08-18: sem exceção de tamanho).
 - `product-manager` opcional (só se requirements ambíguos)
 - `software-architect` **apenas** quando trade-off real existe (escolha de banco, sync × async)
 - `qa-engineer` sob demanda (test plan curto, não pirâmide completa)
 - `security-engineer` sob demanda para checklist OWASP top 10
 - Sem `engineering-manager` / `scrum-master` / `tech-lead` formal
 - Sem `data-engineer` separado se não há analytics
-- Sem `devops-sre` separado: main thread cuida do deploy
+- Sem `devops-sre` separado: o agente implementador do nível cuida do deploy sob despacho (a thread principal não executa deploy; decisão do líder, 2026-08-18)
 - Doc: README + 1-2 ADRs em decisões one-way door
 
 ### Nível S2: Produto pequeno / startup early-stage (1-6 meses, 3-8 devs)
