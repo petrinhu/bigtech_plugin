@@ -1,8 +1,10 @@
 # Arquitetura e princípios universais
+> As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário.
+
 
 Aplicáveis a **todo projeto novo** e como meta de refatoração para projetos existentes. Desvios devem virar item rastreado na tabela de pendências.
 
-Princípios relacionados: [anti-patterns](anti-patterns.md) · [metodologia ágil](agile-methodology.md). Manuais de engenharia que detalham o fluxo: [CONTRACT](../manuals/CONTRACT.md), [TESTES](../manuals/TESTES.md), [AGILE](../manuals/AGILE.md).
+Princípios relacionados: [anti-patterns](anti-patterns.md) · [metodologia ágil](agile-methodology.md). Manuais de engenharia que detalham o fluxo: [CONTRACT](../house/CONTRACT.md), [TESTES](../house/TESTES.md), [AGILE](../house/AGILE.md).
 
 ## Arquitetura em 4 camadas
 
@@ -33,7 +35,7 @@ Violar consciente é permitido **com comentário explicando o porquê**. Violar 
 
 ## TDD obrigatório (red / green / refactor)
 
-Para todo código de domínio (back) e endpoint (mid):
+Para todo código de comportamento (regra de domínio, endpoint, adaptador com lógica, script de produção):
 
 1. **Red**: escrever o teste **primeiro**, rodá-lo, ver falhar. O teste descreve a regra desejada antes de existir implementação. Sem teste vermelho, não há licença para escrever código de produção.
 2. **Green**: código mínimo para o teste passar. Sem elegância, sem otimização. Objetivo exclusivamente: sair do vermelho.
@@ -41,10 +43,10 @@ Para todo código de domínio (back) e endpoint (mid):
 
 Ciclo curto (idealmente < 10 min por iteração). **Cobertura não é meta**, mudança guiada por teste é. Bug fix sempre começa por teste que reproduz o bug em vermelho; só então a correção.
 
-Exceções aceitáveis (script ad-hoc descartável, exploração de API externa, protótipo throwaway) devem ser declaradas explicitamente, não viram default.
+Exceções (protótipo descartável, script ad-hoc, adaptador que só encaminha) devem ser declaradas explicitamente, não viram default.
 
 ## Ver também
 
 - Anti-patterns universais a evitar: [anti-patterns](anti-patterns.md).
 - Metodologia ágil e decomposição de trabalho: [metodologia ágil](agile-methodology.md).
-- Detalhamento do fluxo de engenharia: [CONTRACT](../manuals/CONTRACT.md) · [TESTES](../manuals/TESTES.md) · [AGILE](../manuals/AGILE.md).
+- Detalhamento do fluxo de engenharia: [CONTRACT](../house/CONTRACT.md) · [TESTES](../house/TESTES.md) · [AGILE](../house/AGILE.md).

@@ -2,7 +2,7 @@
 
 **Data da verificação:** 2026-08-16  
 **Hora local (medida):** `16/08/26 - 23:56:58` (`date '+%d/%m/%y - %H:%M:%S'`)  
-**Papel:** verificador de campanha — host Grok, papel [grok][mais recente]  
+**Papel:** verificador de campanha — segundo host (removido na 2.0.0), papel [segundo-host][mais recente]  
 **Item:** `BT-4` (CI multi-OS GitHub Actions: Ubuntu/Windows nativos + containers Debian/Fedora/Arch + gitleaks)  
 **DoD desta ordem de serviço:**
 
@@ -173,7 +173,7 @@ escopo: agents, skills, docs (exceto docs/superpowers, docs/auditoria,
         docs/submission, docs/campanha, docs/house)
 arquivos .md validados: 74
 [FAIL] local_paths  1 violação
-       docs/adr/ADR-source-of-truth.md:349  `~/.claude` / `~/.grok`
+       docs/adr/ADR-source-of-truth.md:349  `~/.claude` / `segundo host (removido na 2.0.0)`
 [FAIL] personal     5 violações
        :5   "petrus (líder)"
        :69  github.com/petrinhu/bigtech_plugin

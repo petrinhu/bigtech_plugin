@@ -139,7 +139,7 @@
     },
     "plugin_count": 51,
     "vault_count": 71,
-    "grok_count": 71,
+    "segundo_host_count": 71,
     "identical_intersection": 0,
     "diverged_intersection": 51,
     "vault_only_names": [

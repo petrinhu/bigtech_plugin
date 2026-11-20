@@ -45,7 +45,7 @@ Forças em jogo agora (antes de mover arquivos):
 2. Personalização do mantenedor é legítima e **não** deve ser apagada para “ficar igual”.
 3. `tab_pendencias` já é produto standalone com owner próprio; um fork divergente no plugin
    recria dual authority num terceiro eixo.
-4. A campanha é dual-host (Claude Code e Grok Build). Slug de geração de modelo na prosa
+4. A campanha é dual-host (Claude Code e um segundo host). Slug de geração de modelo na prosa
    envelhece no dia seguinte e vira spec falsa.
 5. Host git legado deixou de ser operacional (BT-3 local). Só GitHub é canônico.
 
@@ -76,7 +76,7 @@ de qualquer port. Host git do produto: somente GitHub.
 | Agents core | 51 | 12 C-level + 39 operacionais (inclui `visual-design-director`) |
 | Skills core do plugin | 4 | `bigtech`, `proj_software`, `visual-design-director`; `tab_pendencias` ver D5 |
 | Hooks core | 6 scripts + `hooks.json` | `bigtech_session_init`, `bigtech_porte_reminder`, `bigtech_reinforce`, `tdd_guard`, `tdd_runner`, `tdd_common` + reminder tab **embutido só como shim** (D5) |
-| Docs core do produto | README, AGENTS.md (install), SECURITY, NOTICE, `docs/principles/`, `docs/adr/`, specs do plugin | o que explica e governa o pacote |
+| Docs core do produto | README, LLM.md (install), SECURITY, NOTICE, `docs/principles/`, `docs/adr/`, specs do plugin | o que explica e governa o pacote |
 
 **Exceção documentada (não é dual authority do produto):** os **manuais da casa** em
 `docs/house/` são **cópia de distribuição** dos manuais do vault claudebrain. Se o usuário
@@ -103,7 +103,7 @@ antes do canário). Este ADR define o estado-alvo, não executa a remoção.
 O mesmo princípio aplica-se a skills e hooks **core** homônimos: um registro ativo por
 papel. Dois `tdd_runner` no mesmo evento é defeito, não redundância.
 
-**Grok (configuração global do host Grok e adaptadores):** não é terceira fonte de
+**Segundo host (configuração global do host e adaptadores):** não é terceira fonte de
 verdade do produto. É overlay de host (symlink, adapter de hook, mapa de modelo,
 clone de persona). O pacote distribuível continua a ser `bigtech_plugin`. Adaptador
 que reimplementa workflow core é `STALE` ou violação desta decisão.
@@ -144,7 +144,7 @@ ou removido. A ergonomia do comando curto **não** justifica dual authority.
 ([`https://github.com/<owner>/tab_pendencias`](https://github.com/<owner>/tab_pendencias)).
 
 O plugin **depende** desse produto por **pin** (submódulo / versão taggeada no host Claude)
-ou **symlink** (host Grok), **não** por fork divergente.
+ou **symlink** (segundo host), **não** por fork divergente.
 
 A PHASE 0 mediu um risco já materializado: o plugin **embute** uma cópia da skill, enquanto
 a instalação viva aponta para o produto. Essa cópia embutida **não** é fonte de verdade.
@@ -170,7 +170,7 @@ Checklist obrigatório, executável, versionado no runbook privado da campanha (
 ADR público além da regra):
 
 1. Registrar `LAST_KNOWN_GOOD_PLUGIN_SHA` (SHA do plugin canário verde).
-2. Registrar SHA de `claude-memory` (e, se o host Grok tiver árvore versionada afetada, o
+2. Registrar SHA de `claude-memory` (e, se o segundo host tiver árvore versionada afetada, o
    SHA correspondente).
 3. Exportar inventário de agents/skills/hooks que saem do escopo **ativo** (nome, path,
    sha256).
@@ -189,7 +189,7 @@ o último estado verde é executável e documentado.
 **Proibido:**
 
 - daemon, timer, hook ou rotina que copie alterações **nos dois sentidos**
-  (vault ↔ plugin, ou Grok ↔ plugin) de forma permanente;
+  (vault ↔ plugin, ou segundo host ↔ plugin) de forma permanente;
 - “espelho contínuo” que trate as duas árvores como a mesma autoridade.
 
 Isto apenas **automatizaria dual authority**. Sync pontual, **unidirecional**, com
@@ -219,21 +219,18 @@ Heurística PHASE 0 (não é cutover; BT-6 revalida):
 
 **Proibido** apagar diferença só para os dois lados parecerem iguais.
 
-### D9. Dual-host Claude / Grok: papéis, sem hardcode de versão de modelo
+### D9. Modelo dos agents: herdado da sessão, sem hardcode de versão
 
-Prosa operacional, ADRs, briefs e o plano da campanha usam **papel relativo** ao catálogo
-**atual** do host. É **proibido** gravar slug de geração (“4.5”, “4.6”, “Sonnet 4”,
-“Opus 5”) em prosa.
+Prosa operacional, ADRs, briefs e o plano da campanha **não** gravam slug de geração
+(“4.5”, “4.6”, “Sonnet 4”, “Opus 5”). O ID concreto resolve-se **só na hora do spawn**,
+consultando o catálogo vivo do host.
 
-| Papel | Claude Code | Grok Build | Uso |
-|---|---|---|---|
-| Implementação / fatia | **[sonnet][mais recente]** | **[grok][modelo anterior ao mais recente]** | código, testes, docs mecânicas |
-| Orquestração / auditoria cotidiana | **[opus][mais recente]** | **[grok][modelo anterior ao mais recente]** | main, C-level planejando, review de rotina |
-| Teto (`FABLE-*`, redesign global) | **[fable][mais recente]** | **[grok][mais recente]** | só gates `FABLE-*` ou ordem do líder |
+Os agents do plugin declaram `model: inherit`: herdam o modelo de quem os despacha. Quem
+despacha escolhe o modelo, e as regras de modelo e de esforço do usuário prevalecem sobre
+qualquer default do plugin.
 
-Frontmatter YAML do Claude (`model: opus` / `model: sonnet`) é literal de **plataforma**.
-Não autoriza pin de geração na prosa nem nos briefs dual-host. O ID concreto resolve-se
-**só na hora do spawn**, consultando o catálogo vivo do host.
+Revisão de 2026-11-20: a tabela de modelo fixo por papel saiu deste ADR; o padrão passou a
+ser `inherit`.
 
 ### D10. Host git: somente GitHub
 
@@ -322,7 +319,7 @@ contexto (este ADR não publica).
 - Relatório de agent ≠ prova: cutover só após medição (`/agents`, hooks uma vez, sha
   do agent ativo = plugin).
 - Verificação de vazamento é no **histórico** (`git log --all -p`), não só na árvore.
-- Grok adapter que copiar agent core para a instalação viva do usuário no host Grok
+- Adaptador do segundo host que copiar agent core para a instalação viva do usuário
   (`agents/` do overlay) recria dual authority no segundo host; o owner continua a
   ser o plugin.
 - Este ADR está **Aceito em modo autônomo**. O líder confirma retroativamente; se
@@ -349,10 +346,10 @@ contexto (este ADR não publica).
 - Implementar BT-5 (eliminar solo/headcount como porte).
 - Implementar BT-6 (inventário classificado + plano de cutover).
 - Remover globais vivos; editar a configuração global do Claude Code do usuário
-  (`` `${CLAUDE_CONFIG_DIR}` `` / instalação viva) ou o overlay Grok equivalente;
+  (`` `${CLAUDE_CONFIG_DIR}` `` / instalação viva) ou o overlay equivalente do segundo host;
   push, tag remota, release.
 - Redesenhar o produto `tab_pendencias`.
-- Alterar frontmatter `model:` dos 51 agents (literal de plataforma; outra fase).
+- Alterar frontmatter `model:` dos agents (literal de plataforma; outra fase).
 
 ---
 

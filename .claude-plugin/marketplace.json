@@ -1,18 +1,29 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
   "name": "petrinhu",
-  "description": "Marketplace de petrinhu: distribui o plugin bigtech, que monta uma constelação de agents C-level e operacionais com skills de orquestração para tocar produto e ciclo de vida de software como uma bigtech.",
+  "description": "Marketplace de petrinhu: distribui o plugin bigtech, que monta uma constelação de agents C-level e operacionais com skills de orquestração, e o pacote bigtech-completo, que traz os recomendados.",
   "owner": {
     "name": "petrinhu",
     "url": "https://github.com/petrinhu"
   },
+  "allowCrossMarketplaceDependenciesOn": [
+    "claude-plugins-official"
+  ],
   "plugins": [
     {
       "name": "bigtech",
       "source": "./",
-      "description": "Constelação de agents C-level e operacionais com skills de orquestração (bigtech, proj_software) para tocar produto e SDLC como uma bigtech.",
+      "description": "Constelação de 71 agents, C-level e operacionais, com skills de orquestração (bigtech, proj_software) para tocar produto e SDLC como uma bigtech. Sem os recomendados (playwright, superpowers, frontend-design) o plugin fica muito comprometido. Para instalar tudo, use bigtech-completo.",
       "category": "workflow",
-      "version": "0.2.1",
+      "version": "2.0.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "bigtech-completo",
+      "source": "./bundles/bigtech-completo",
+      "description": "Pacote completo: o bigtech mais playwright, superpowers e frontend-design. Recomendado para a experiência completa.",
+      "category": "workflow",
+      "version": "2.0.0",
       "license": "Apache-2.0"
     }
   ]

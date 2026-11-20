@@ -2,7 +2,7 @@
 
 **Data da verificação:** 2026-08-16  
 **Hora local (medida):** `16/08/26 - 23:50:59` (`date '+%d/%m/%y - %H:%M:%S'`)  
-**Papel:** verificador de campanha — host Grok, papel [grok][mais recente]  
+**Papel:** verificador de campanha — segundo host (removido na 2.0.0), papel [segundo-host][mais recente]  
 **Item:** `BT-2` (`docs/house`: sync 10 manuais vault + README de navegação)  
 **DoD desta fatia:** `TODO.md` BT-2 + `docs/campanha/2026-08-16-phase0-house-plan.md` (cópia/sync; **não** o cutover de paths)  
 **HEAD do plugin no início desta auditoria:** `2ea32f52fd11780b7042c7afcb51cb51cee9351b` (working tree limpa)  
@@ -113,16 +113,16 @@ Valores (iguais nos três lados para body; file = header+body):
 
 | Arquivo | sha256_vault (= body) | sha256_house_file |
 |---|---|---|
-| CONTRACT.md | `80cc659ed4633a29da9fc8e4fc9b851478d73424ffbdd0a40970c75af25c3b94` | `65fa239836f0ca58c8410dd08129c4c4e5e19a6ce219313ded7fd3a679eef989` |
-| TESTES.md | `12728cd747b9df5cb01b8ea167a49666649bf8747c937f2ee2609d42cb099e5e` | `eadb448b8294f6687aaa2ad8d6b9515af9a3e81122dbd10a6f6449340590bc2b` |
-| TOOLING.md | `8e1c870e427aa21d47825f408f20733e1e2288fc98431322f9e7a29c5dcbdfc3` | `37789d51bafc387aa52ea5b58d7e28c0db4b8c576a0e2c70ebf22a2707c5209e` |
-| pipeline_release_1.0.md | `77ceee6f22e3ca31d27286595baadddb17ba51e07b49f1aaa30737c6dcdab759` | `3a7d901282d70d5124d567728b992bb7a61332eb60bfa98f25f70779daf66152` |
-| DEPLOY_CHECKLIST.md | `9b7ca5fa65b38ebb223125e4d1810fbcb319c79263f011b75eeccb5daf428bdc` | `066c5e2be257a0469d31736b7d6ee001f088b609bb2fab90e4cffb4e74c00d6b` |
-| lideranca_pipeline_release.md | `88457ef1728364a3419732b70acf4e8c83d713ce9be714dc104ff158fbb342ca` | `04bb02590616f7fc4751485aa226bc67655d964caf87f78c63ef2f229adfd3a8` |
-| ORG.md | `7fc6c87c85cca67c3b5a6ae3c9b79be074b4646fe3d2ca2b0d0de9fffa7c3f18` | `0883522518b074cfacdc41bf2922fa8c971679d2cda653b450840b51e1ea9287` |
-| Standards.md | `6e384fee46f0af7c56530bd2fc4ecff2df48aeedd94889905b60a9a7e20ab614` | `5b89aaa03c435ea2cf7731a63accac274f4ce655af1fa15433fe9e2d28fa4cc6` |
-| AGILE.md | `9a96eaa08eb71b6196507516352c58ae0f71af44d9d88641ed95db2df6ab34c8` | `9286c2dfe876bd0365439bac883d09e68980ec2ddc2c6c18772256b0d554179e` |
-| AUDITORIAS.md | `6cf4d3e55d9925a7b30eeedf12a54ce904aa8971c7457781338d6b014ceb6c43` | `608077399f90810d0a24a094e408132b698d54cd22e30a5d61090d82ad4603ad` |
+| CONTRACT.md | `<removido por privacidade em 2026-11-20>` | `65fa239836f0ca58c8410dd08129c4c4e5e19a6ce219313ded7fd3a679eef989` |
+| TESTES.md | `<removido por privacidade em 2026-11-20>` | `eadb448b8294f6687aaa2ad8d6b9515af9a3e81122dbd10a6f6449340590bc2b` |
+| TOOLING.md | `<removido por privacidade em 2026-11-20>` | `37789d51bafc387aa52ea5b58d7e28c0db4b8c576a0e2c70ebf22a2707c5209e` |
+| pipeline_release_1.0.md | `<removido por privacidade em 2026-11-20>` | `3a7d901282d70d5124d567728b992bb7a61332eb60bfa98f25f70779daf66152` |
+| DEPLOY_CHECKLIST.md | `<removido por privacidade em 2026-11-20>` | `066c5e2be257a0469d31736b7d6ee001f088b609bb2fab90e4cffb4e74c00d6b` |
+| lideranca_pipeline_release.md | `<removido por privacidade em 2026-11-20>` | `04bb02590616f7fc4751485aa226bc67655d964caf87f78c63ef2f229adfd3a8` |
+| ORG.md | `<removido por privacidade em 2026-11-20>` | `0883522518b074cfacdc41bf2922fa8c971679d2cda653b450840b51e1ea9287` |
+| Standards.md | `<removido por privacidade em 2026-11-20>` | `5b89aaa03c435ea2cf7731a63accac274f4ce655af1fa15433fe9e2d28fa4cc6` |
+| AGILE.md | `<removido por privacidade em 2026-11-20>` | `9286c2dfe876bd0365439bac883d09e68980ec2ddc2c6c18772256b0d554179e` |
+| AUDITORIAS.md | `<removido por privacidade em 2026-11-20>` | `608077399f90810d0a24a094e408132b698d54cd22e30a5d61090d82ad4603ad` |
 
 Isto prova sync real, não só “os ficheiros existem”.
 

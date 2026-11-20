@@ -72,7 +72,8 @@ def test_production_blocked_when_all_green(tmp_path, monkeypatch):
     c.write_state(os.path.realpath(str(root)), {"ran": True, "has_red": False})
     code, msg = g.evaluate(_write(tmp_path, fp="src/x.py"), {})
     assert code == 2
-    assert "refactor" in msg.lower()
+    assert "TDD_PHASE" not in msg and "TDD_GUARD" not in msg
+    assert "peça ao usuário" in msg
 
 
 def test_refactor_toggle_permits_green(tmp_path, monkeypatch):
@@ -191,7 +192,8 @@ def test_subprocess_blocks_production_green(tmp_path, monkeypatch):
     c.write_state(os.path.realpath(str(root)), {"ran": True, "has_red": False})
     proc = _run_guard(_write(tmp_path, fp="src/x.py"), {"HOME": str(tmp_path)})
     assert proc.returncode == 2
-    assert "refactor" in proc.stderr.lower()
+    assert "TDD_PHASE" not in proc.stderr and "TDD_GUARD" not in proc.stderr
+    assert "peça ao usuário" in proc.stderr
 
 
 def test_subprocess_invalid_stdin_fails_open(tmp_path):
@@ -200,3 +202,92 @@ def test_subprocess_invalid_stdin_fails_open(tmp_path):
         input="nao eh json", text=True, capture_output=True,
     )
     assert proc.returncode == 0
+
+
+# ---------------------------------------------------------------------------
+# CONS-R2: avisos com exit 0 saem em JSON no stdout (o Claude nao le stderr
+# de hook com exit 0; a doc diz "Claude never sees stderr from a hook that
+# exits 0"). Bloqueio com exit 2 continua em stderr.
+# ---------------------------------------------------------------------------
+
+def test_aviso_exit0_sai_em_json_no_stdout(tmp_path, monkeypatch):
+    root = _project(tmp_path)
+    monkeypatch.setenv("HOME", str(tmp_path))
+    c.write_state(os.path.realpath(str(root)), {"ran": False, "reason": "timeout"})
+    proc = _run_guard(_write(tmp_path, fp="src/x.py"), {"HOME": str(tmp_path)})
+    assert proc.returncode == 0
+    assert proc.stderr == ""
+    saida = json.loads(proc.stdout)
+    assert "TDD guard" in saida["systemMessage"]
+    hso = saida["hookSpecificOutput"]
+    assert hso["hookEventName"] == "PreToolUse"
+    assert hso["additionalContext"] == saida["systemMessage"]
+
+
+def test_bloqueio_exit2_fica_em_stderr_e_stdout_vazio(tmp_path, monkeypatch):
+    root = _project(tmp_path)
+    monkeypatch.setenv("HOME", str(tmp_path))
+    c.write_state(os.path.realpath(str(root)), {"ran": True, "has_red": False})
+    proc = _run_guard(_write(tmp_path, fp="src/x.py"), {"HOME": str(tmp_path)})
+    assert proc.returncode == 2
+    assert proc.stdout == ""
+    assert "TDD guard" in proc.stderr
+
+
+def test_permissao_sem_aviso_nao_emite_nada(tmp_path, monkeypatch):
+    root = _project(tmp_path)
+    monkeypatch.setenv("HOME", str(tmp_path))
+    c.write_state(os.path.realpath(str(root)), {"ran": True, "has_red": True})
+    proc = _run_guard(_write(tmp_path, fp="src/x.py"), {"HOME": str(tmp_path)})
+    assert proc.returncode == 0
+    assert proc.stdout == ""
+    assert proc.stderr == ""
+
+
+def test_erro_interno_exit0_sai_em_json(monkeypatch, capsys):
+    import io
+    monkeypatch.setattr(sys, "stdin", io.StringIO("{}"))
+
+    def boom(data, env):
+        raise RuntimeError("falha simulada")
+
+    monkeypatch.setattr(g, "evaluate", boom)
+    assert g.main() == 0
+    saida = json.loads(capsys.readouterr().out)
+    assert "falha simulada" in saida["systemMessage"]
+    assert saida["hookSpecificOutput"]["hookEventName"] == "PreToolUse"
+
+
+# ---------------------------------------------------------------------------
+# CONS-R10 (N1): config invalida nao desliga o guard em silencio. O motivo sai
+# em JSON no stdout (exit 0, stderr vazio), para o Claude e o usuario verem.
+# ---------------------------------------------------------------------------
+
+def _config_invalida(tmp_path, conteudo):
+    (tmp_path / ".claude").mkdir()
+    (tmp_path / ".claude" / "tdd-guard.json").write_text(conteudo)
+    (tmp_path / "src").mkdir()
+
+
+def _assert_aviso_json_guard(proc):
+    assert proc.returncode == 0
+    assert proc.stderr == ""
+    saida = json.loads(proc.stdout)
+    assert "tdd-guard.json" in saida["systemMessage"]
+    hso = saida["hookSpecificOutput"]
+    assert hso["hookEventName"] == "PreToolUse"
+    assert hso["additionalContext"] == saida["systemMessage"]
+
+
+def test_guard_config_json_invalida_avisa_em_json(tmp_path):
+    _config_invalida(tmp_path, "{ nao eh json")
+    proc = _run_guard(_write(tmp_path, fp="src/x.py"), {"HOME": str(tmp_path)})
+    _assert_aviso_json_guard(proc)
+    assert "JSON invalido" in json.loads(proc.stdout)["systemMessage"]
+
+
+def test_guard_preset_desconhecido_avisa_em_json(tmp_path):
+    _config_invalida(tmp_path, json.dumps({"preset": "python_pytest"}))
+    proc = _run_guard(_write(tmp_path, fp="src/x.py"), {"HOME": str(tmp_path)})
+    _assert_aviso_json_guard(proc)
+    assert "preset desconhecido" in json.loads(proc.stdout)["systemMessage"]

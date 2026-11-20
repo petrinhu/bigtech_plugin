@@ -21,6 +21,12 @@
             "command": "python3",
             "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/tab_pendencias_reminder.py"],
             "timeout": 15
+          },
+          {
+            "type": "command",
+            "command": "python3",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/skills/tab_pendencias/tools/hooks/tab_pendencias_reminder.py"],
+            "timeout": 15
           }
         ]
       }
@@ -39,6 +45,12 @@
             "command": "python3",
             "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/tab_pendencias_reminder.py"],
             "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "python3",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/skills/tab_pendencias/tools/hooks/tab_pendencias_reminder.py"],
+            "timeout": 10
           }
         ]
       }
@@ -53,7 +65,7 @@
             "timeout": 15
           }
         ],
-        "matcher": "Write|Edit|MultiEdit"
+        "matcher": "Write|Edit"
       }
     ],
     "PostToolUse": [
@@ -66,7 +78,7 @@
             "timeout": 180
           }
         ],
-        "matcher": "Write|Edit|MultiEdit"
+        "matcher": "Write|Edit"
       }
     ]
   }

@@ -68,20 +68,21 @@ def test_find_project_root_none_when_absent(tmp_path):
 
 def test_load_config_returns_root_and_resolved(tmp_path):
     root = _make_project(tmp_path, {"preset": "python-pytest"})
-    got_root, cfg = c.load_config(str(root / "src"))
+    got_root, cfg, motivo = c.load_config(str(root / "src"))
+    assert motivo is None
     assert got_root == os.path.realpath(str(root))
     assert cfg["test_command"] == f"{sys.executable} -m pytest -x -q"
 
 
 def test_load_config_disabled_returns_none(tmp_path):
     root = _make_project(tmp_path, {"preset": "python-pytest", "enabled": False})
-    got_root, cfg = c.load_config(str(root))
-    assert got_root is None and cfg is None
+    got_root, cfg, motivo = c.load_config(str(root))
+    assert got_root is None and cfg is None and motivo is None
 
 
 def test_load_config_no_project_returns_none(tmp_path):
-    got_root, cfg = c.load_config(str(tmp_path))
-    assert got_root is None and cfg is None
+    got_root, cfg, motivo = c.load_config(str(tmp_path))
+    assert got_root is None and cfg is None and motivo is None
 
 
 def test_classify_precedence():
@@ -214,24 +215,26 @@ def test_glob_match_bare_double_star_matches_all():
     assert c.glob_match("x", "**")
 
 
-# --- BUG I1: load_config silencia config malformada ---
+# --- CONS-R10 (N1): config invalida devolve o motivo, sem stderr ---
 
-def test_load_config_malformed_warns(tmp_path, capsys):
+def test_load_config_malformed_devolve_motivo_sem_stderr(tmp_path, capsys):
     d = tmp_path / ".claude"
     d.mkdir()
     (d / "tdd-guard.json").write_text("{ nao eh json")
-    root, cfg = c.load_config(str(tmp_path))
+    root, cfg, motivo = c.load_config(str(tmp_path))
     assert root is None and cfg is None
-    assert "tdd" in capsys.readouterr().err.lower()
+    assert motivo is not None and "JSON invalido" in motivo
+    assert capsys.readouterr().err == ""
 
 
-def test_load_config_bad_preset_warns(tmp_path, capsys):
+def test_load_config_bad_preset_devolve_motivo_sem_stderr(tmp_path, capsys):
     d = tmp_path / ".claude"
     d.mkdir()
     (d / "tdd-guard.json").write_text(json.dumps({"preset": "python_pytest"}))  # typo
-    root, cfg = c.load_config(str(tmp_path))
+    root, cfg, motivo = c.load_config(str(tmp_path))
     assert root is None and cfg is None
-    assert capsys.readouterr().err != ""
+    assert motivo is not None and "preset desconhecido" in motivo
+    assert capsys.readouterr().err == ""
 
 
 # --- BUG I3/M3: parse_totals ---

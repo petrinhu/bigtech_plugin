@@ -2,7 +2,7 @@
 
 > **Tipo (Diátaxis):** Explanation + Reference (convenção). **Audiência:** quem opera o plugin (o líder) e os agents de implementação.
 > **Escopo:** convenção do plugin para manter o `TODO.md` de projeto fresco durante um sprint. Complementa a skill `/tab_pendencias`.
-> **Last-reviewed:** 2026-06-20 · **Owner:** mantenedor do projeto · **Aplica a:** todo projeto com `TODO.md` (skill `/tab_pendencias`).
+> **Last-reviewed:** 2026-11-20 · **Owner:** mantenedor do projeto · **Aplica a:** todo projeto com `TODO.md` (skill `/tab_pendencias`).
 
 Este documento registra a **convenção de frescor** (Camadas 0+1, já adotadas pelo plugin) e descreve, de forma genérica, uma **escada de escalonamento** opcional (Camadas 2-4) para quem mais tarde precisar de mais automação. O foco é a convenção: marcar status é barato e manual; reordenar é caro e raro.
 
@@ -13,7 +13,7 @@ Este documento registra a **convenção de frescor** (Camadas 0+1, já adotadas 
 A `TODO.md` apodrece porque um único verbo informal - "atualizar a tabela" - **acopla duas operações de naturezas opostas**:
 
 1. **Sincronizar status** (marcar um item como concluído): operação **determinística, barata, frequente** e **derivável do git** (o commit que fecha o trabalho já existe). Não exige julgamento.
-2. **Re-planejar** (adicionar trabalho novo + reordenar por dependência topológica + WSJF + ondas): operação de **julgamento do time de agents**, **cara** e **rara**. Exige contexto, priorização e decisão.
+2. **Re-planejar** (adicionar trabalho novo + reordenar por dependência topológica + WSJF + ondas): operação de **julgamento** (o agent propõe, o usuário decide), **cara** e **rara**. Exige contexto, priorização e decisão.
 
 O custo alto de (2) **contamina** (1): por estarem sob o mesmo verbo, "marcar um item" passa a *parecer* que exige convocar o time de agents. Como convocar é caro, ninguém marca. O resultado é que a maior parte da defasagem observada é da categoria **"feito mas não marcado"** - trabalho concluído cujo status nunca foi tocado, não trabalho novo a planejar.
 
@@ -28,9 +28,9 @@ A distinção é a ideia central deste documento:
 | Eixo | O que é | Custo | Frequência | Quem faz |
 |---|---|---|---|---|
 | **Status** | Em que ponto o item está (`🔍`, `✅`, etc.) | Barato | Frequente (a cada item fechado) | Quem abre o PR, à mão, no mesmo commit |
-| **Prioridade** | Em que ordem fazer (dependência + WSJF + ondas) | Caro | Rara (só com input novo) | O time de agents, via `/tab_pendencias --reorder` |
+| **Prioridade** | Em que ordem fazer (dependência + WSJF + ondas) | Caro | Rara (só com input novo) | O usuário decide, com a thread principal executando, via `/tab_pendencias --reorder` |
 
-Status é higiene barata e local. Prioridade é decisão cara e soberana. **Nunca tratá-las com o mesmo verbo.**
+Status é higiene barata e local. Prioridade é decisão cara, do usuário. **Nunca tratá-las com o mesmo verbo.**
 
 ---
 
@@ -67,17 +67,17 @@ Isso evita o **"falso-done"**: o board dizer `✅ Concluído` enquanto o teste o
 
 Trabalho novo descoberto durante o sprint vai para a **INBOX imediatamente** - 1 linha, **sem ordenar**. Captura barata agora; priorização cara depois.
 
-- **Local padrão:** seção `## INBOX (descobertas não priorizadas)` no fim do `TODO.md` de projeto.
-- **Quando há worktrees / PRs paralelos:** trocar a seção por **um arquivo-por-descoberta** em `inbox/` (ex.: `inbox/2026-06-20-cache-stale.md`), para não gerar conflito de merge na mesma linha do `TODO.md`.
+- **Local padrão:** seção `## INBOX (descobertas não priorizadas)` no `TODO.md` de projeto, no formato da tabela de pendências do usuário (posição e drenagem).
+- **Worktrees e PRs paralelos:** a INBOX continua no `TODO.md`, na mesma forma; a convenção de paralelismo do usuário, se houver, prevalece.
 - **Regra de conflito da INBOX:** em merge, sempre **UNIÃO**, **NUNCA descartar linha**. Toda descoberta sobrevive.
-- **Drenagem:** a skill `/tab_pendencias` **drena a INBOX** no `--create` / `--reorder` - integra cada item na ordenação (dependência + WSJF + ondas) e **esvazia** a INBOX. **INBOX não-vazia é o gatilho natural de reordenar.**
+- **Drenagem:** a skill `/tab_pendencias` **drena a INBOX** no `--create` / `--reorder` - integra cada item na ordenação (dependência + WSJF + ondas) e **esvazia** a INBOX. **INBOX não-vazia é o gatilho natural para propor reordenação ao usuário.**
 
 O hook `tab_pendencias_reminder.py` (incluído no plugin) continua lembrando:
 
 - **`SessionStart`** - por defasagem detectada no git (commits que fecharam trabalho sem status tocado);
 - **`UserPromptSubmit`** - por tempo de sessão decorrido.
 
-A mensagem do hook **distingue as duas ações**: a barata (sincronizar status - faça você mesmo no commit) versus a cara (reordenar - ato consciente do time, só com input novo). O hook só lembra; nunca bloqueia nem reordena.
+A mensagem do hook **distingue as duas ações**: a barata (sincronizar status - faça você mesmo no commit) versus a cara (reordenar - decisão do usuário, só com input novo). O hook só lembra; nunca bloqueia nem reordena.
 
 ---
 
@@ -94,9 +94,9 @@ A convenção acima **só se aplica a um dos tipos**. Não confundir:
 
 > **Marcar status nunca dispara o time de agents.**
 >
-> **Reordenar só quando um input de priorização muda** - nova dependência, item ficou urgente, ou INBOX não-vazia - sempre como **ato consciente na thread principal** (ou via PR que o usuário aprova), respeitando a **autoridade do usuário sobre prioridade**.
+> **Reordenar só quando um input de priorização muda** - nova dependência, item ficou urgente, ou INBOX não-vazia - sempre com **decisão do usuário** (direta ou via PR que ele aprova).
 
-Status é higiene barata e local. Prioridade é decisão cara e soberana. Nunca tratá-las com o mesmo verbo.
+Status é higiene barata e local. Prioridade é decisão cara, do usuário. Nunca tratá-las com o mesmo verbo.
 
 ---
 
@@ -133,8 +133,8 @@ A metade **mecânica** do frescor (sincronizar status, drenar INBOX) é determin
 ## Ver também
 
 - Skill `/tab_pendencias` (seção "Frescor: manter a tabela viva no sprint") - a convenção operacional resumida.
-- [manuals/AGILE.md](manuals/AGILE.md) - WSJF, fluxo e WIP.
-- [manuals/TESTES.md](manuals/TESTES.md) e [manuals/AUDITORIAS.md](manuals/AUDITORIAS.md) - as ondas `TST-*`/`AUD-*` que liberam o `✅`.
+- [manuals/AGILE.md](house/AGILE.md) - WSJF, fluxo e WIP.
+- [manuals/TESTES.md](house/TESTES.md) e [manuals/AUDITORIAS.md](house/AUDITORIAS.md) - as ondas `TST-*`/`AUD-*` que liberam o `✅`.
 
 ## Fontes
 

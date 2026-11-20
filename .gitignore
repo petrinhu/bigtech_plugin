@@ -17,8 +17,8 @@ wiki/
 
 # Artefatos de construcao/processo — NAO distribuir no pacote publico (ficam locais).
 # Contem material de processo e, no caso de docs/superpowers, ate PII/wikilinks de
-# exemplo. Patterns ANCORADOS na raiz (barra inicial) para NAO afetar os manuais
-# homonimos em docs/manuals/ (docs/manuals/TESTES.md e AUDITORIAS.md permanecem).
+# exemplo. Patterns ANCORADOS na raiz (barra inicial) para NAO afetar arquivos
+# homonimos em outras pastas.
 /docs/superpowers/
 /docs/auditoria/
 /docs/submission/
@@ -28,3 +28,6 @@ wiki/
 
 # Roteiro de porte gerado por outra sessao (working file local, nao e produto)
 /atualizar_instruct.md
+
+# Worktrees de trabalho locais: cópia do repo para trabalho paralelo, nunca versionada.
+.worktrees/

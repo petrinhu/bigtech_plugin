@@ -15,7 +15,7 @@ Proibido nesta fatia (e até o go explícito da PHASE 11):
 - apagar, mover, renomear `~/.claude/agents/*`
 - desligar hooks globais homônimos
 - substituir skills globais pelas do plugin
-- tocar `~/.grok/agents/` como se fosse a SoT
+- tocar `segundo host (removido na 2.0.0)` como se fosse a SoT
 - sync bidirecional / daemon / “espelho contínuo”
 - publicar `VAULT_ONLY` no repo público
 
@@ -34,7 +34,7 @@ Uma fonte de verdade para o núcleo distribuível: `bigtech_plugin`.
 | `tab_pendencias` | produto standalone (pin/symlink); cópia embutida no plugin não é SoT |
 | Hooks core (`bigtech_*`, `tdd_*`) | um registro (plugin); globais homônimos fora do `settings` ativo |
 | Hooks pessoais | ficam |
-| Grok | overlay de host (symlink/adapter); **não** 51 cópias core como terceira SoT |
+| Segundo host (removido na 2.0.0) | overlay de host (symlink/adapter); **não** 51 cópias core como terceira SoT |
 | Rollback | executável a partir do histórico git + perfil isolado |
 
 ## 2. Pré-condições (não pular)
@@ -59,7 +59,7 @@ Cada passo prova o anterior. Nenhum `rm` no passo de canário.
 1. Registrar no runbook privado (não precisa republicar PII):
    - `LAST_KNOWN_GOOD_PLUGIN_SHA` = SHA do plugin que passou o canário.
    - SHA de `claude-memory` **antes** da remoção (hoje: `5b19b524`; re-medir na hora).
-   - SHA Grok / adaptadores se a árvore versionada for afetada.
+   - SHA segundo host (removido na 2.0.0) / adaptadores se a árvore versionada for afetada.
 2. Exportar inventário ativo (nome, path, sha256) dos 51 que **vão sair do escopo ativo**. O CSV desta fatia é o modelo; re-hashear na hora (a árvore vault pode ter mudado).
 3. Garantir que os 51 blobs existem no histórico git de `claude-memory`. Sem isso, não há rollback barato. Sem `rm` fora de git.
 
@@ -116,7 +116,7 @@ Push de `claude-memory` só com autorização do líder nesse contexto.
 
 1. Se a ergonomia `/bigtech` (e `/proj_software`) for necessária no overlay: **wrapper D4** (encaminha para `/bigtech:bigtech` ou namespace vigente). Sem rubrica de porte, sem lista de agents, sem segundo `SKILL.md` de produto.
 2. Remover ou reduzir qualquer skill global que **reimplemente** o workflow (isso é `STALE`).
-3. `tab_pendencias`: **não** usar a cópia embutida do plugin como SoT. Manter pin/submódulo (Claude) e symlink (Grok) para o produto. Atualizar pin quando o produto taggear; não “consertar” no fork do plugin.
+3. `tab_pendencias`: **não** usar a cópia embutida do plugin como SoT. Manter pin/submódulo (Claude) e symlink (segundo host, removido na 2.0.0) para o produto. Atualizar pin quando o produto taggear; não “consertar” no fork do plugin.
 
 ### Passo F - Hooks globais
 
@@ -128,14 +128,14 @@ Push de `claude-memory` só com autorização do líder nesse contexto.
 3. Prova: um `SessionStart` no perfil isolado **e** (depois) no vivo gera **uma** linha de hook core, não duas.
 4. Backup do `settings.json` **não** vai para o repo do plugin (segredos).
 
-### Passo G - Grok (segundo host)
+### Passo G - segundo host (removido na 2.0.0)
 
 Não é cutover de produto. É impedir terceira autoridade.
 
-1. Depois do plugin canário existir no Grok (compat / marketplace / path do repo): os 51 `~/.grok/agents/<core>.md` **não** podem continuar como cópia ativa se o host os sombrear.
-2. Preferir: host carrega o plugin; overlay Grok = adapter (hooks stdin, mapa de modelo, symlink de skill).
-3. Os 20 `VAULT_ONLY` no Grok seguem a mesma classe (exclusão / overlay).
-4. **Não** nesta fatia. **Não** apagar `~/.grok/agents` agora.
+1. Depois do plugin canário existir no segundo host (removido na 2.0.0) (compat / marketplace / path do repo): os 51 arquivos `agents/<core>.md` do segundo host **não** podem continuar como cópia ativa se o host os sombrear.
+2. Preferir: host carrega o plugin; overlay do segundo host (removido na 2.0.0) = adapter (hooks stdin, mapa de modelo, symlink de skill).
+3. Os 20 `VAULT_ONLY` no segundo host (removido na 2.0.0) seguem a mesma classe (exclusão / overlay).
+4. **Não** nesta fatia. **Não** apagar `segundo host (removido na 2.0.0)` agora.
 
 ### Passo H - Verificar e só então chamar “cutover feito”
 
@@ -196,7 +196,7 @@ Lista nominal: CSV. Não improvisar um 52º nome.
 |---|---|
 | Hook TDD/bigtech a correr duas vezes no vivo | canário isolado; só então desligar globais (F) |
 | Operador usa Cósimo vault (solo/headcount) depois de BT-5 | some no Passo D; até lá, dual authority **mente** no host vivo |
-| Grok continua com 51 cópias | Passo G; senão a métrica “1 SoT” falha no segundo host |
+| Segundo host (removido na 2.0.0) continua com 51 cópias | Passo G; senão a métrica “1 SoT” falha no segundo host |
 | Wrapper `/bigtech` volta a crescer | qualquer corpo além de encaminhar = `STALE` (D4) |
 | Relatório de agente “já cortei os 51” | orquestrador re-mede `ls` + sha; relatório ≠ prova |
 | Settings com token no commit de cutover | settings continua gitignored; backup fora do plugin |

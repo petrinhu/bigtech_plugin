@@ -1,9 +1,10 @@
 <!--
   docs/house sync
   origem: vault claudebrain / TOOLING.md
-  path_vault: /home/petrus/IDrive/Documentos/projetos_claudebrain/TOOLING.md
-  sync_date: 2026-08-16
-  regra: se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
+  sync_date: 2026-11-20
+  hmac_vault_sha256: 93d7abb6f16fbc61827f7131dd0a72c6d04d9a470302c439f5625c9885e050f1
+  transformacoes: T1=0 T2=0 T3a=0 T3=0 T4=0 T5=0
+  regra: As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário. Se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
   sem segredos: não incluir tokens/credenciais
 -->
 # TOOLING.md — Ferramentas FOSS Automatizáveis dos Agents
@@ -15,10 +16,12 @@ Hub: [[Standards]]. Irmãos: [[CONTRACT]], [[TESTES]], [[AGILE]], [[DEPLOY_CHECK
 ## Legenda de status
 
 - ✓ **temos** (instalado no sistema)
-- ⬇ **baixar** (faltando, instalar sob demanda com o comando da coluna)
+- ⬇ **baixar** (faltando; instalar conforme a regra abaixo)
 - ↺ **preferir** (temos o moderno; usar no lugar do legado)
 
-Regra: o agent usa a ferramenta canônica do seu domínio SEMPRE que aplicável (não reinventa em shell cru). Se faltar (⬇), instala com o comando aqui antes de usar. Respeitar limites de hardware ([[feedback_hardware_resource_limits]]) e prioridade MCP ([[feedback_mcp_priority]]).
+Regra: o agent usa a ferramenta canônica do seu domínio SEMPRE que aplicável (não reinventa em shell cru). Se faltar (⬇): ferramenta de linha de comando de uso geral pode ser instalada com o comando desta tabela, com aviso. Biblioteca, dependência de projeto, modelo, extensão, navegador e serviço só com permissão do usuário. Se faltar algo sem permissão, pare e diga o que falta; não prossiga com contorno; nunca falhe calado. Respeitar limites de hardware ([[feedback_hardware_resource_limits]]) e prioridade MCP ([[feedback_mcp_priority]]).
+
+> **Portabilidade dos comandos (agnóstico de SO).** Os comandos de instalação usam `dnf` (Fedora/RHEL) e `apt` (Debian/Ubuntu) como exemplos. Adapte ao gerenciador do sistema: `apt`, `dnf`, `pacman` ou `zypper` no Linux; `brew` no macOS; `winget`, `choco` ou `scoop` no Windows. Prefira gerenciadores cross-platform quando houver: `pip`/`uv`, `cargo` e `npm`/`pnpm` valem igual em Windows, macOS e Linux. Para detectar uma ferramenta, use `command -v <ferramenta>` no Unix ou no WSL, e `Get-Command <ferramenta>` ou `where <ferramenta>` no Windows. No Windows, rodar o Claude Code via WSL torna válidos os comandos Unix deste manual.
 
 ---
 
@@ -63,17 +66,17 @@ Regra: o agent usa a ferramenta canônica do seu domínio SEMPRE que aplicável 
 
 | Ferramenta | Status | Para quê | Agents | Instalar |
 |---|---|---|---|---|
-| pytest | ⬇ | testes Python (por venv) | qa, data | `uv pip install pytest` (no venv) |
+| pytest | ⬇ | testes Python (por venv) | qa, data | `uv pip install pytest` (no venv; biblioteca: só com permissão do usuário) |
 | ctest | ✓ | testes C++/CMake | qa, backend | (vem com cmake) |
-| playwright | ✓ | e2e browser | qa, frontend | `npm i -g playwright` |
+| playwright | ✓ | e2e browser | qa, frontend | usa navegador já instalado; baixar engines de navegador só com permissão do usuário. Pacote: `npm i -g playwright` |
 | k6 | ⬇ | teste de carga HTTP scriptável | performance, qa | binário em dl.k6.io |
 | locust | ⬇ | teste de carga em Python | performance | `pipx install locust` |
 | hyperfine | ⬇ | benchmark de CLI reproduzível | performance, qa | `sudo dnf install hyperfine` |
-| perf | ✓ | profiling CPU (kernel) | performance | `sudo dnf install perf` |
-| valgrind | ✓ | memcheck/callgrind | performance, backend | `sudo dnf install valgrind` |
-| heaptrack | ✓ | profiling de heap | performance | `sudo dnf install heaptrack` |
+| perf | ✓ | profiling CPU (kernel) - **(Linux; no mac use Instruments/`sample`, no Windows use WPR/ETW ou WSL)** | performance | `sudo dnf install perf` |
+| valgrind | ✓ | memcheck/callgrind - **(Linux/macOS; no Windows use Dr. Memory ou WSL)** | performance, backend | `sudo dnf install valgrind` |
+| heaptrack | ✓ | profiling de heap - **(Linux; no mac e no Windows use o profiler nativo ou WSL/container)** | performance | `sudo dnf install heaptrack` |
 | py-spy | ⬇ | profiling Python sampling | performance, data | `pipx install py-spy` |
-| strace / ltrace | ✓/⬇ | trace de syscalls/libcalls | performance, linux-diag | `sudo dnf install strace ltrace` |
+| strace / ltrace | ✓/⬇ | trace de syscalls/libcalls - **(Linux; no mac use `dtruss`/Instruments, no Windows use WSL ou Process Monitor)** | performance, linux-diag | `sudo dnf install strace ltrace` |
 
 ---
 
@@ -95,9 +98,9 @@ Regra: o agent usa a ferramenta canônica do seu domínio SEMPRE que aplicável 
 | openssl | ✓ | cripto, inspeção de cert/TLS | security, network-security | (base) |
 | cosign | ⬇ | assinar/verificar artefato | security, devops | `go install github.com/sigstore/cosign/v2/cmd/cosign@latest` |
 | age + sops | ⬇ | cripto de segredo / secrets em git | security, devops | `sudo dnf install age` ; sops binário |
-| lynis | ✓ | auditoria de hardening do host | internal-auditor, network-security | `sudo dnf install lynis` |
-| chkrootkit | ✓ | detecção de rootkit | network-security | `sudo dnf install chkrootkit` |
-| OpenSCAP (`oscap`) | ⬇ | compliance/benchmark CIS | internal-auditor, security | `sudo dnf install openscap-scanner scap-security-guide` |
+| lynis | ✓ | auditoria de hardening do host - **(Linux/macOS; no Windows use WSL ou ferramenta de baseline nativa)** | internal-auditor, network-security | `sudo dnf install lynis` |
+| chkrootkit | ✓ | detecção de rootkit - **(Linux; no mac e no Windows use o antimalware da plataforma ou WSL/container)** | network-security | `sudo dnf install chkrootkit` |
+| OpenSCAP (`oscap`) | ⬇ | compliance/benchmark CIS - **(Linux; no mac e no Windows use o SCAP nativo da plataforma ou WSL/container)** | internal-auditor, security | `sudo dnf install openscap-scanner scap-security-guide` |
 
 ---
 
@@ -109,7 +112,7 @@ Regra: o agent usa a ferramenta canônica do seu domínio SEMPRE que aplicável 
 | mtr | ⬇ | traceroute contínuo | `sudo dnf install mtr` |
 | iperf3 | ⬇ | medir banda entre hosts | `sudo dnf install iperf3` |
 | tcpdump / tshark | ✓ | captura de pacote | `sudo dnf install tcpdump wireshark-cli` |
-| nftables (`nft`) | ✓ | firewall (preferir sobre iptables) | (base) |
+| nftables (`nft`) | ✓ | firewall (preferir sobre iptables) - **(Linux; no mac use `pf`/`pfctl`, no Windows use `netsh advfirewall` ou `New-NetFirewallRule`)** | (base) |
 | wireguard-tools (`wg`) | ⬇ | VPN moderna | `sudo dnf install wireguard-tools` |
 | ss | ✓ | sockets/conexões | (base) |
 | ipcalc | ✓ | cálculo de subnet | `sudo dnf install ipcalc` |
@@ -144,7 +147,7 @@ Regra: o agent usa a ferramenta canônica do seu domínio SEMPRE que aplicável 
 | miller (`mlr`) | ⬇ | processar CSV/TSV/JSON em pipe | `sudo dnf install miller` |
 | dasel | ⬇ | query JSON/YAML/TOML/CSV unificado | `go install github.com/TomWright/dasel/v2/cmd/dasel@latest` |
 | dbt | ⬇ | transformação analítica (ELT) | `pipx install dbt-core` |
-| ollama | ✓ | LLM local (respeitar VRAM 4GB) | (instalado) |
+| ollama | ✓ | LLM local (meça a VRAM e a RAM da sua máquina antes de escolher o modelo) | (instalado) |
 | whisper.cpp | ⬇ | STT local | build github.com/ggerganov/whisper.cpp |
 
 ---
@@ -205,7 +208,7 @@ Regra: o agent usa a ferramenta canônica do seu domínio SEMPRE que aplicável 
 | mobile-engineer | toolchain nativo, lighthouse (web views), adb |
 | devops-sre | podman, tofu, ansible, just, restic, caddy, hadolint, yamllint, age/sops, trivy |
 | network-engineer | dig, mtr, iperf3, tcpdump/tshark, wg, nmap, ss, ipcalc, whois |
-| network-security-engineer | nft, nmap, suricata, fail2ban, tcpdump/tshark, openssl, lynis, nuclei |
+| network-security-engineer | nft, nmap, suricata, fail2ban, tcpdump/tshark, openssl, lynis, nuclei (nft, fail2ban e lynis são Linux; em mac e Windows use o equivalente nativo ou WSL/container) |
 | qa-engineer | pytest, ctest, playwright, hyperfine, k6 |
 | performance-engineer | k6, locust, hyperfine, perf, valgrind, heaptrack, py-spy, strace |
 | security-engineer | semgrep, gitleaks, trufflehog, trivy, grype, syft, bandit, osv-scanner, nuclei, zaproxy, cosign, openssl |

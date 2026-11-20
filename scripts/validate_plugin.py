@@ -2,24 +2,40 @@
 """Gate ZERO-ORFAOS (spec 4.1) do plugin bigtech — validador reutilizavel.
 
 Valida, sobre `agents/`, `skills/` e `docs/` (exceto as subarvores em
-`EXCLUDED_SUBTREES` — processo, campanha e copia do vault), o criterio-mae de
+`EXCLUDED_SUBTREES` - processo e campanha), o criterio-mae de
 aceitacao da secao 4.1 da spec:
 
   1. ZERO wikilinks `[[ ]]` fora de blocos/trechos de codigo. A unica excecao
      legitima sao atributos C++ ([[nodiscard]], [[likely]], [[maybe_unused]], ...)
      dentro de uma fence de codigo (``` ... ```) ou de inline-code (`...`).
-  2. ZERO paths locais (`/home/petrus`, `~/.claude`).
-  3. ZERO termos pessoais do autor-soberano (petrus, petrinhu, kaiser, hostinger,
-     e-mail do autor). NOTA: "lider supremo / soberano" aplicado AO USUARIO que
-     instala e uma feature de produto (transferencia de titulo, spec 4.2) e NAO e
-     violacao; por isso nao entra nesta lista.
-  4. ZERO referencias aos 20 agents/skills excluidos (jogo, pericia, sobreposicao,
-     pessoal) nem as skills `/proj_jogo` e `/pericia-medica`.
-  5. ZERO links Markdown relativos `.md` apontando para arquivo inexistente
+  2. ZERO paths locais (`/home/petrus`, `~/.claude`). Vale para `.md` e, dentro
+     de `skills/`, tambem para `.py`, `.sh` e `.json`.
+  3. ZERO termos pessoais do autor e de projetos privados (ver PERSONAL_TERMS).
+     Vale para `.md` e, dentro de `skills/`, tambem para `.py`, `.sh` e `.json`.
+     NOTA: "lider supremo / soberano" aplicado AO USUARIO que instala e uma
+     feature de produto (transferencia de titulo, spec 4.2) e NAO e violacao;
+     por isso nao entra nesta lista.
+  4. ZERO links Markdown relativos `.md` apontando para arquivo inexistente
      (checagem ativa de orfaos; ignora http(s)://, mailto: e ancoras `#`).
+  Em `docs/house/` (copia do vault, CONS-04B) valem so as dimensoes 2 e 3: a
+  dimensao 2 fica restrita a caminho `/home/`, e a 3 recebe os termos privados
+  extras lidos do arquivo local (ver `carregar_termos_privados`).
+  5. Varredura nao vazia: ao menos um `.md` no escopo. Varredura vazia reprova
+     (fail-closed): uma raiz sem nada a validar nao pode aprovar por silencio.
+
+Lista de arquivos (CONS-03B): dentro de repo git, so o que o git versiona
+(`git ls-files`); `node_modules/` nao rastreado fica de fora. Fora de git, varredura
+de disco, com aviso na saida.
+
+Agents de jogo, pericia, pedagogia e sobreposicao ENTRAM no plugin (lista de excluidos
+revogada em 20/11/2026): nao ha mais lista de refs excluidas.
 
 Uso:
     python3 scripts/validate_plugin.py [--root DIR] [--quiet]
+
+Termos privados extras (projetos e areas pessoais) ficam num arquivo LOCAL e
+nao versionado: `$BIGTECH_TERMOS_PRIVADOS` ou `~/.config/bigtech/termos_privados.txt`.
+Sem o arquivo, a saida avisa que rodou so com a lista publica.
 
 Saida:
     - relatorio por dimensao (PASS/FAIL com contagem e localizacao das violacoes);
@@ -33,6 +49,7 @@ from __future__ import annotations
 
 import argparse
 import re
+import subprocess
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -52,17 +69,29 @@ SCAN_DIRS = ("agents", "skills", "docs")
 # - docs/house: copia canônica do vault para quem nao tem vault; contem wikilinks
 #   e nomes de papel por desenho. Este gate zero-orfaos NAO re-higieniza o vault:
 #   a higiene do produto distribuido continua em agents/, skills/ e no restante
-#   de docs/ (manuais higienizados em docs/manuals/, principles, etc.).
+#   de docs/ (manuais higienizados em docs/house/, principles, etc.).
 EXCLUDED_SUBTREES = (
     "docs/superpowers",
     "docs/auditoria",
     "docs/submission",
     "docs/campanha",
-    "docs/house",
 )
 
-# Extensoes de texto validadas.
+# Copia do vault (CONS-04B). Entra no escopo so para as dimensoes 2 (caminho local)
+# e 3 (termo pessoal). Wikilink e link orfao NAO valem aqui: os manuais preservam
+# a sintaxe do vault (ver CONS-10).
+HOUSE_SUBTREE = "docs/house"
+
+# Variavel que o Claude Code troca pela raiz do plugin nos corpos de agents e skills.
+PLUGIN_ROOT_VAR = "${CLAUDE_PLUGIN_ROOT}/"
+
+# Extensoes de texto validadas em todo o escopo (wikilink e link orfao: so .md).
 TEXT_SUFFIXES = (".md",)
+
+# Extensoes de codigo e configuracao varridas SO em skills/, para as dimensoes
+# de caminho local e termo pessoal (CONS-03). Wikilink e link orfao NAO valem
+# aqui: `[[ -f x ]]` em shell e sintaxe, nao wikilink.
+SKILL_CODE_SUFFIXES = (".py", ".sh", ".json")
 
 # Atributos C++ que NAO sao wikilinks. So sao tolerados dentro de codigo; um
 # `[[nodiscard]]` em prosa corrida ainda seria reportado (defensivo).
@@ -86,9 +115,13 @@ PERSONAL_TERMS = (
     r"petrus",
     r"petrinhu",
     r"kaiser",
-    r"hostinger",
     r"petrinhu@yahoo\.com\.br",
     r"yahoo\.com\.br",
+    # Projetos e pessoas privados (CONS-03, incluido em 20/11/2026).
+    r"gusworld",
+    r"glintfx",
+    r"drpetrus",
+    r"justi[cç]a federal",
 )
 
 # Paths locais proibidos.
@@ -97,38 +130,12 @@ LOCAL_PATHS = (
     r"~/\.claude",
 )
 
-# Os 20 agents/skills excluidos + 2 skills excluidas (spec 2.2 / Apendice A cat. 9).
-# Ordenados por especificidade; usados como \b...\b para reduzir falso-positivo.
-EXCLUDED_REFS = (
-    # Jogo (10 agents)
-    r"3d-artist-rigger",
-    r"audio-designer-composer",
-    r"economy-designer",
-    r"engine-graphics-programmer",
-    r"game-animator",
-    r"gameplay_engineer",
-    r"game-producer",
-    r"lead-game-designer",
-    r"level-designer",
-    r"narrative-designer",
-    # Pericia/forense (4 agents)
-    r"dr-advogado",
-    r"dr-medico-perito",
-    r"dr-medico-psiquiatra",
-    r"dr-medico-trabalho",
-    r"dr-medico",  # cobre qualquer dr-medico-* nao listado
-    # Pessoal/literario/pedagogico (4 agents)
-    r"narrative-writer",
-    r"revisor-textual",
-    r"learning-designer",
-    r"linux-diag",
-    # Sobreposicao (2 agents)
-    r"engineering-coach",
-    r"product-marketing-manager",
-    # Skills excluidas (2)
-    r"proj_jogo",
-    r"pericia-medica",
-)
+# Em docs/house a dimensao 2 vale so para caminho de home de qualquer usuario:
+# `~/.claude` e convencao publica do plugin, nao dado pessoal.
+HOUSE_LOCAL_PATHS = (r"/home/",)
+
+# Arquivo LOCAL com termos privados extras (um por linha, `#` comenta). Nao versionado.
+TERMOS_PRIVADOS_ENV = "BIGTECH_TERMOS_PRIVADOS"
 
 # Whitelist explicita de violacoes conhecidas-e-aceitas. Cada entrada precisa de
 # justificativa; nenhuma deveria existir no estado limpo. Formato:
@@ -145,11 +152,36 @@ RE_WIKILINK = re.compile(r"\[\[([^\]\n]+?)\]\]")
 RE_FENCE = re.compile(r"^\s*(`{3,}|~{3,})")
 RE_INLINE_CODE = re.compile(r"`[^`\n]*`")
 RE_MD_LINK = re.compile(r"\]\(\s*([^)\s]+?)\s*\)")
-RE_PERSONAL = re.compile("|".join(PERSONAL_TERMS), re.IGNORECASE)
 RE_LOCAL_PATH = re.compile("|".join(LOCAL_PATHS), re.IGNORECASE)
-RE_EXCLUDED = re.compile(
-    "|".join(rf"\b{term}\b" for term in EXCLUDED_REFS), re.IGNORECASE
-)
+RE_HOUSE_LOCAL_PATH = re.compile("|".join(HOUSE_LOCAL_PATHS), re.IGNORECASE)
+
+
+def padrao_pessoal(termos_extra: tuple[str, ...] = ()) -> re.Pattern[str]:
+    """Regex dos termos pessoais: lista publica + termos locais (com fronteira de palavra)."""
+    extras = tuple(r"(?<!\w)" + re.escape(t) + r"(?!\w)" for t in termos_extra)
+    return re.compile("|".join(PERSONAL_TERMS + extras), re.IGNORECASE)
+
+
+def termos_privados_path() -> Path:
+    """Arquivo local de termos privados: variavel de ambiente ou caminho padrao do usuario."""
+    import os
+
+    env = os.environ.get(TERMOS_PRIVADOS_ENV)
+    if env:
+        return Path(env).expanduser()
+    return Path.home() / ".config" / "bigtech" / "termos_privados.txt"
+
+
+def carregar_termos_privados(path: Path) -> tuple[str, ...] | None:
+    """Le os termos extras. None quando o arquivo nao existe (rodar so com a lista publica)."""
+    if not path.is_file():
+        return None
+    termos: list[str] = []
+    for linha in path.read_text(encoding="utf-8").splitlines():
+        limpo = linha.strip()
+        if limpo and not limpo.startswith("#"):
+            termos.append(limpo)
+    return tuple(termos)
 
 
 @dataclass
@@ -188,20 +220,79 @@ def is_in_excluded_subtree(rel_path: Path) -> bool:
     )
 
 
-def collect_files(root: Path) -> list[Path]:
-    files: list[Path] = []
+def scanned_suffixes(scan_dir: str) -> tuple[str, ...]:
+    """Extensoes varridas em cada diretorio do escopo."""
+    if scan_dir == "skills":
+        return TEXT_SUFFIXES + SKILL_CODE_SUFFIXES
+    return TEXT_SUFFIXES
+
+
+def repo_git_raiz(root: Path) -> bool:
+    """True quando `root` e a raiz de um repo git (nao apenas um diretorio dentro dele)."""
+    try:
+        proc = subprocess.run(
+            ["git", "-C", str(root), "rev-parse", "--show-toplevel"],
+            capture_output=True,
+            check=False,
+        )
+    except OSError:  # git ausente
+        return False
+    if proc.returncode != 0:
+        return False
+    topo = Path(proc.stdout.decode("utf-8", errors="replace").strip())
+    return topo.resolve() == root.resolve()
+
+
+def fonte_da_lista(root: Path) -> str:
+    """Rotulo da origem da lista de arquivos (aparece na saida do CLI)."""
+    if repo_git_raiz(root):
+        return "git ls-files (somente arquivos versionados)"
+    return "fora de git: varredura de disco"
+
+
+def _candidatos_git(root: Path) -> list[str]:
+    """Caminhos relativos (posix) versionados pelo git, sem node_modules nao rastreado."""
+    proc = subprocess.run(
+        ["git", "-C", str(root), "ls-files", "-z"],
+        capture_output=True,
+        check=True,
+    )
+    return [
+        p for p in proc.stdout.decode("utf-8", errors="replace").split("\0") if p
+    ]
+
+
+def _candidatos_disco(root: Path) -> list[str]:
+    """Caminhos relativos (posix) de todo o disco nas pastas do escopo (fallback fora de git)."""
+    out: list[str] = []
     for scan_dir in SCAN_DIRS:
         base = root / scan_dir
-        if not base.is_dir():
+        if base.is_dir():
+            out.extend(
+                path.relative_to(root).as_posix()
+                for path in base.rglob("*")
+                if path.is_file()
+            )
+    return out
+
+
+def collect_files(root: Path) -> list[Path]:
+    """Arquivos do escopo: versionados (git ls-files) ou, fora de git, varredura de disco.
+
+    Aplica depois o mesmo filtro de pastas, extensoes e subarvores excluidas nos dois casos.
+    """
+    candidatos = _candidatos_git(root) if repo_git_raiz(root) else _candidatos_disco(root)
+    files: list[Path] = []
+    for rel in sorted(candidatos):
+        rel_path = Path(rel)
+        if not rel_path.parts or rel_path.parts[0] not in SCAN_DIRS:
             continue
-        for path in sorted(base.rglob("*")):
-            if not path.is_file():
-                continue
-            if path.suffix not in TEXT_SUFFIXES:
-                continue
-            rel = path.relative_to(root)
-            if is_in_excluded_subtree(rel):
-                continue
+        if rel_path.suffix not in scanned_suffixes(rel_path.parts[0]):
+            continue
+        if is_in_excluded_subtree(rel_path):
+            continue
+        path = root / rel_path
+        if path.is_file():
             files.append(path)
     return files
 
@@ -313,7 +404,12 @@ def check_orphan_links(
             path_part = target.split("#", 1)[0].split("?", 1)[0]
             if not path_part.lower().endswith(".md"):
                 continue
-            resolved = (src_dir / path_part).resolve()
+            if path_part.startswith(PLUGIN_ROOT_VAR):
+                # `${CLAUDE_PLUGIN_ROOT}` e a raiz do plugin, que e a raiz do repo.
+                alvo = root / path_part[len(PLUGIN_ROOT_VAR):]
+            else:
+                alvo = src_dir / path_part
+            resolved = alvo.resolve()
             if not resolved.is_file():
                 out.append(
                     Violation(rel, idx + 1, f"link orfao -> {target}  (resolve: {resolved})")
@@ -347,8 +443,16 @@ def filter_whitelist(dim_name: str, violations: list[Violation]) -> list[Violati
 # ---------------------------------------------------------------------------
 
 
-def run(root: Path) -> tuple[list[DimensionResult], int, int]:
+def is_house_path(rel: str) -> bool:
+    return rel == HOUSE_SUBTREE or rel.startswith(HOUSE_SUBTREE + "/")
+
+
+def run(
+    root: Path, termos_extra: tuple[str, ...] = ()
+) -> tuple[list[DimensionResult], int, int]:
     files = collect_files(root)
+    md_count = 0
+    re_pessoal = padrao_pessoal(termos_extra)
 
     dims = {
         "wikilinks": DimensionResult(
@@ -359,10 +463,10 @@ def run(root: Path) -> tuple[list[DimensionResult], int, int]:
             "local_paths", "ZERO paths locais (/home/petrus, ~/.claude)"
         ),
         "personal": DimensionResult(
-            "personal", "ZERO termos pessoais do autor (petrus, kaiser, hostinger, e-mail)"
+            "personal", "ZERO termos pessoais do autor e de projetos privados (PERSONAL_TERMS)"
         ),
-        "excluded": DimensionResult(
-            "excluded", "ZERO refs aos 20 excluidos + /proj_jogo + /pericia-medica"
+        "varredura": DimensionResult(
+            "varredura", "varredura nao vazia: ao menos 1 .md no escopo"
         ),
         "orphan_links": DimensionResult(
             "orphan_links", "ZERO links Markdown relativos .md orfaos"
@@ -379,14 +483,29 @@ def run(root: Path) -> tuple[list[DimensionResult], int, int]:
         lines = text.splitlines()
         code_flags = code_line_flags(lines)
 
-        dims["wikilinks"].violations.extend(check_wikilinks(rel, lines, code_flags))
+        house = is_house_path(rel)
         dims["local_paths"].violations.extend(
-            check_regex_dim(rel, lines, RE_LOCAL_PATH)
+            check_regex_dim(rel, lines, RE_HOUSE_LOCAL_PATH if house else RE_LOCAL_PATH)
         )
-        dims["personal"].violations.extend(check_regex_dim(rel, lines, RE_PERSONAL))
-        dims["excluded"].violations.extend(check_regex_dim(rel, lines, RE_EXCLUDED))
-        dims["orphan_links"].violations.extend(
-            check_orphan_links(rel_path, root, lines, code_flags)
+        dims["personal"].violations.extend(check_regex_dim(rel, lines, re_pessoal))
+        if path.suffix == ".md":
+            # Dimensao 5 (links orfaos) vale tambem para docs/house (CONS-13): sem excecao.
+            dims["orphan_links"].violations.extend(
+                check_orphan_links(rel_path, root, lines, code_flags)
+            )
+        if path.suffix == ".md" and not house:
+            md_count += 1
+            dims["wikilinks"].violations.extend(
+                check_wikilinks(rel, lines, code_flags)
+            )
+
+    if md_count == 0:
+        dims["varredura"].violations.append(
+            Violation(
+                "(raiz)",
+                0,
+                f"nenhum .md em {', '.join(SCAN_DIRS)}: varredura vazia reprova (fail-closed)",
+            )
         )
 
     results: list[DimensionResult] = []
@@ -395,7 +514,7 @@ def run(root: Path) -> tuple[list[DimensionResult], int, int]:
         results.append(dim)
 
     exit_code = 0 if all(d.ok for d in results) else 1
-    return results, exit_code, len(files)
+    return results, exit_code, md_count
 
 
 def main() -> int:
@@ -414,12 +533,26 @@ def main() -> int:
     args = parser.parse_args()
 
     root = args.root.resolve()
-    results, exit_code, n_files = run(root)
+    if not root.is_dir():
+        print(f"erro: raiz inexistente: {root}", file=sys.stderr)
+        return 1
+    caminho_termos = termos_privados_path()
+    termos_extra = carregar_termos_privados(caminho_termos)
+    results, exit_code, n_files = run(root, termos_extra or ())
 
     print("== Gate ZERO-ORFAOS (spec 4.1) -- plugin bigtech ==")
     print(f"raiz: {root}")
     print(f"escopo: {', '.join(SCAN_DIRS)} (exceto {', '.join(EXCLUDED_SUBTREES)})")
+    print(f"lista de arquivos: {fonte_da_lista(root)}")
+    if termos_extra is None:
+        print(
+            f"AVISO: sem arquivo de termos privados ({caminho_termos}); "
+            "rodou so com a lista publica"
+        )
+    else:
+        print(f"termos privados locais: {len(termos_extra)} carregados")
     print(f"arquivos .md validados: {n_files}")
+    print("codigo de skills (.py, .sh, .json) varrido nas dimensoes de caminho e termo")
     print("-" * 72)
 
     for dim in results:
@@ -437,9 +570,9 @@ def main() -> int:
     overall = "PASS" if exit_code == 0 else "FAIL"
     failed = [d.name for d in results if not d.ok]
     if exit_code == 0:
-        print(f"RESULTADO: {overall} — todas as 5 dimensoes do gate 4.1 limpas.")
+        print(f"RESULTADO: {overall}: todas as 5 dimensoes do gate 4.1 limpas.")
     else:
-        print(f"RESULTADO: {overall} — dimensoes com violacao: {', '.join(failed)}")
+        print(f"RESULTADO: {overall}: dimensoes com violacao: {', '.join(failed)}")
     return exit_code
 
 

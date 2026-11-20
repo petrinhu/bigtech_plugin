@@ -16,7 +16,7 @@ distribuível via `.gitignore` (não vão para o repo público nem são carregad
   acesso a docs em runtime, mapa de rastreabilidade).
 - **Tabela de pendências** (`TODO.md`, ordenada por execução; a coluna Onda marca passos paralelizáveis).
 - **Manuais de teste/auditoria do próprio projeto** (`TESTES.md`, `AUDITORIAS.md` na raiz) e o relatório
-  de auditoria. Não confundir com os manuais de governança que **acompanham** o plugin em `docs/manuals/`.
+  de auditoria. Não confundir com os manuais de governança que **acompanham** o plugin em `docs/house/`.
 
 Eles guiam a construção, mas, por conterem material de processo (e, no caso da spec/template/relatório,
 até nome do autor e wikilinks de exemplo), ficam restritos à cópia de trabalho local.

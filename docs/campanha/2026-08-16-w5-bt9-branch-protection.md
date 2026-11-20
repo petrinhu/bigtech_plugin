@@ -145,7 +145,7 @@ Com `enforce_admins: false`, a conta **admin** do repositório (`petrinhu`, perm
 ## O que isto **não** é
 
 - **Não** é tag de release semântica de produto (`vX.Y.Z`). Tag desta fatia = campanha `campanha/w5-bt9-branch-protection`.
-- **Não** cutover de `~/.claude` / `~/.grok`.
+- **Não** cutover de `~/.claude` / `segundo host (removido na 2.0.0)`.
 - **Não** exige CODEOWNERS nem review humano (solo).
 - **Não** ruleset enterprise-only; classic protection basta e foi o que a API aceitou.
 - **Não** fecha `TST-BT-1` / `AUD-BT-1` (ondas W6/W7 de revalidação e auditoria de campanha).

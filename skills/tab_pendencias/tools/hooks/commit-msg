@@ -1,0 +1,6 @@
+#!/bin/sh
+# SPDX-License-Identifier: Apache-2.0
+# Licença: Apache-2.0 (ver NOTICE na raiz do plugin).
+# Pass-through: delega ao hook local do repo. Necessario porque um
+# core.hooksPath global sombreia o .git/hooks/ proprio do repositorio.
+. "$(dirname "$0")/_chain.sh"

@@ -1,12 +1,10 @@
-"""Testes do hook SessionStart `bigtech_session_init.py` (AUD-F08).
+"""Testes do hook SessionStart `bigtech_session_init.py`.
 
-Exercita as funções puras importáveis (docs-bootstrap, leitura de enabledPlugins,
-blocos de compatibilidade e de dependências) com asserts de VALOR, mais um teste
-de contrato via subprocess (exit 0 + JSON parseável).
+Cobre: docs-bootstrap (caminho docs/house), compatibilidade com caveman e o
+aviso de dependencias recomendadas ausentes (CONS-14, texto de CONS-12A).
 
-Isolamento: `_config_dir()` resolve CLAUDE_CONFIG_DIR ou $HOME/.claude. Todos os
-testes que tocam settings.json apontam CLAUDE_CONFIG_DIR para um diretório
-controlado (monkeypatch) — nunca lemos o settings.json real do usuário.
+Isolamento: nenhum teste le o settings.json real. Os escopos (usuario,
+projeto, local) apontam para diretorios temporarios.
 """
 import json
 import os
@@ -15,132 +13,232 @@ import sys
 
 import bigtech_session_init as s
 
+HOOKS_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PLUGIN_ROOT = os.path.dirname(HOOKS_DIR)
 
-# ---------------------------------------------------------------------------
-# _enabled_plugin_names: lê settings.json -> enabledPlugins (best-effort).
-# ---------------------------------------------------------------------------
-def _write_settings(tmp_path, enabled_plugins):
-    cfg = tmp_path / "config"
+FORMA_CURTA = (
+    "Falta {faltando}. Sem as dependências recomendadas o bigtech fica muito "
+    "comprometido. Instale o pacote bigtech-completo."
+)
+PRECEDENCIA_LONGA = (
+    "As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras "
+    "que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste "
+    "plugin em qualquer conflito. Onde divergirem, siga as do usuário."
+)
+
+
+def _settings(path, enabled):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps({"enabledPlugins": enabled}), encoding="utf-8")
+
+
+def _cfg(tmp_path):
+    cfg = tmp_path / "cfg"
     cfg.mkdir(exist_ok=True)
-    (cfg / "settings.json").write_text(
-        json.dumps({"enabledPlugins": enabled_plugins}), encoding="utf-8"
-    )
     return cfg
 
 
-def test_enabled_plugin_names_extrai_nome_curto_e_filtra_desabilitados(tmp_path, monkeypatch):
-    cfg = _write_settings(tmp_path, {
+def _proj(tmp_path):
+    proj = tmp_path / "proj"
+    proj.mkdir(exist_ok=True)
+    return proj
+
+
+# ---------------------------------------------------------------------------
+# Leitura dos escopos
+# ---------------------------------------------------------------------------
+
+def test_nome_curto_e_so_os_habilitados(tmp_path):
+    cfg = _cfg(tmp_path)
+    _settings(cfg / "settings.json", {
         "caveman@petrinhu": True,
-        "playwright@anthropic": True,
-        "superpowers@obra": False,     # desabilitado -> não entra
+        "playwright@claude-plugins-official": True,
+        "superpowers@obra": False,
     })
-    monkeypatch.setenv("CLAUDE_CONFIG_DIR", str(cfg))
-    names = s._enabled_plugin_names()
+    names, ilegiveis = s.coletar_habilitados(_proj(tmp_path), cfg)
     assert names == {"caveman", "playwright"}
+    assert ilegiveis == []
 
 
-def test_enabled_plugin_names_arquivo_ausente_retorna_set_vazio(tmp_path, monkeypatch):
-    # CLAUDE_CONFIG_DIR aponta para diretório sem settings.json -> set() vazio.
-    monkeypatch.setenv("CLAUDE_CONFIG_DIR", str(tmp_path / "vazio"))
-    assert s._enabled_plugin_names() == set()
+def test_settings_ausente_nao_e_ilegivel_e_nao_habilita_nada(tmp_path):
+    names, ilegiveis = s.coletar_habilitados(_proj(tmp_path), tmp_path / "vazio")
+    assert names == set()
+    assert ilegiveis == []
 
 
-def test_enabled_plugin_names_json_corrompido_retorna_set_vazio(tmp_path, monkeypatch):
-    cfg = tmp_path / "config"
-    cfg.mkdir()
+def test_settings_corrompido_vai_para_ilegiveis(tmp_path):
+    cfg = _cfg(tmp_path)
     (cfg / "settings.json").write_text("{ nao eh json", encoding="utf-8")
-    monkeypatch.setenv("CLAUDE_CONFIG_DIR", str(cfg))
-    assert s._enabled_plugin_names() == set()
+    _, ilegiveis = s.coletar_habilitados(_proj(tmp_path), cfg)
+    assert ilegiveis == [str(cfg / "settings.json")]
+
+
+def test_dependencia_so_no_settings_do_projeto_conta(tmp_path):
+    proj = _proj(tmp_path)
+    _settings(proj / ".claude" / "settings.json", {"playwright@claude-plugins-official": True})
+    names, _ = s.coletar_habilitados(proj, _cfg(tmp_path))
+    assert "playwright" in names
+
+
+def test_settings_local_do_projeto_conta(tmp_path):
+    proj = _proj(tmp_path)
+    _settings(proj / ".claude" / "settings.local.json", {"superpowers@claude-plugins-official": True})
+    names, _ = s.coletar_habilitados(proj, _cfg(tmp_path))
+    assert "superpowers" in names
 
 
 # ---------------------------------------------------------------------------
-# _compat_block: aviso de incompatibilidade com caveman.
+# Quais dependencias faltam
 # ---------------------------------------------------------------------------
-def test_compat_block_escala_aviso_quando_caveman_ativo():
-    block = s._compat_block({"caveman", "playwright"})
-    assert "INCOMPATIBILIDADE DETECTADA" in block
-    assert "caveman" in block
-    assert "DESATIVE" in block
+
+def test_sem_nenhuma_dependencia_lista_as_quatro():
+    assert s.dependencias_faltando(set()) == [
+        "playwright", "superpowers", "frontend-design",
+    ]
 
 
-def test_compat_block_aviso_generico_sem_caveman():
-    block = s._compat_block({"playwright"})
-    assert "INCOMPATIBILIDADE DETECTADA" not in block
-    assert "caveman" in block      # ainda menciona o conflito potencial
+def test_todas_habilitadas_nao_falta_nenhuma():
+    names = {"playwright", "superpowers", "frontend-design"}
+    assert s.dependencias_faltando(names) == []
 
 
-# ---------------------------------------------------------------------------
-# _deps_block: sugestão de dependências ausentes.
-# ---------------------------------------------------------------------------
-def test_deps_block_set_vazio_recomenda_generico():
-    # Conjunto vazio = não conseguimos ler enabledPlugins; não afirmamos ausência.
-    block = s._deps_block(set())
-    assert "superpowers" in block and "playwright" in block
-    assert "ausentes" not in block.lower()
+def test_frontend_design_vale_tambem_via_example_skills():
+    names = {"playwright", "superpowers", "example-skills"}
+    assert s.dependencias_faltando(names) == []
 
 
-def test_deps_block_lista_apenas_o_que_falta():
-    # superpowers presente, playwright ausente -> só playwright é sugerido.
-    block = s._deps_block({"superpowers"})
-    assert "playwright" in block
-    assert "superpowers" not in block
-    assert "ausentes" in block.lower()
-
-
-def test_deps_block_vazio_quando_todas_sugeridas_presentes():
-    block = s._deps_block({"superpowers", "playwright"})
-    assert block == ""
+def test_so_uma_faltando_nomeia_so_ela():
+    names = {"playwright", "frontend-design"}
+    assert s.dependencias_faltando(names) == ["superpowers"]
 
 
 # ---------------------------------------------------------------------------
-# _docs_block: docs-bootstrap com e sem CLAUDE_PLUGIN_ROOT.
+# Texto do aviso (forma curta aprovada em CONS-12A)
 # ---------------------------------------------------------------------------
-def test_docs_block_usa_root_quando_presente(tmp_path, monkeypatch):
+
+def test_aviso_usa_a_forma_curta_literal_com_os_nomes(tmp_path):
+    cfg = _cfg(tmp_path)
+    _settings(cfg / "settings.json", {"superpowers@obra": True})
+    bloco = s.deps_block(_proj(tmp_path), cfg)
+    esperado = FORMA_CURTA.format(faltando="playwright, frontend-design")
+    assert esperado in bloco
+
+
+def test_aviso_vazio_quando_nada_falta(tmp_path):
+    cfg = _cfg(tmp_path)
+    _settings(cfg / "settings.json", {
+        "playwright@claude-plugins-official": True,
+        "superpowers@claude-plugins-official": True,
+        "frontend-design@claude-plugins-official": True,
+    })
+    assert s.deps_block(_proj(tmp_path), cfg) == ""
+
+
+def test_aviso_aparece_em_toda_sessao_sem_dependencia(tmp_path):
+    cfg = _cfg(tmp_path)
+    assert FORMA_CURTA.format(faltando="playwright, superpowers, frontend-design") \
+        in s.deps_block(_proj(tmp_path), cfg)
+    assert FORMA_CURTA.format(faltando="playwright, superpowers, frontend-design") \
+        in s.deps_block(_proj(tmp_path), cfg)
+
+
+def test_settings_ilegivel_nao_afirma_ausencia_e_diz_que_nao_conferiu(tmp_path):
+    cfg = _cfg(tmp_path)
+    (cfg / "settings.json").write_text("{ isto nao e json", encoding="utf-8")
+    bloco = s.deps_block(_proj(tmp_path), cfg)
+    assert "Não consegui conferir" in bloco
+    assert "Falta" not in bloco
+    assert "settings.json" in bloco
+
+
+# ---------------------------------------------------------------------------
+# Docs-bootstrap: caminho de docs/house
+# ---------------------------------------------------------------------------
+
+def test_docs_block_aponta_para_docs_house(tmp_path, monkeypatch):
     monkeypatch.setenv("CLAUDE_PLUGIN_ROOT", str(tmp_path))
     block = s._docs_block()
-    assert "DOCS-BOOTSTRAP" in block
-    assert str(tmp_path / "docs") in block      # caminho absoluto de docs/
-    assert "ORG.md" in block
+    assert str(tmp_path / "docs" / "house") in block
     assert "REGRA:" in block
+
+
+def test_manuais_anunciados_existem_em_docs_house():
+    casa = os.path.join(PLUGIN_ROOT, "docs", "house")
+    for nome in s.MANUALS:
+        assert os.path.isfile(os.path.join(casa, nome)), nome
 
 
 def test_docs_block_fallback_sem_root(monkeypatch):
     monkeypatch.delenv("CLAUDE_PLUGIN_ROOT", raising=False)
     block = s._docs_block()
     assert "CLAUDE_PLUGIN_ROOT ausente" in block
-    assert "ORG.md" in block                     # manuais ainda listados
+    assert "ORG.md" in block
     assert "REGRA:" in block
 
 
-# ---------------------------------------------------------------------------
-# build_context: concatena os três blocos não-vazios.
-# ---------------------------------------------------------------------------
-def test_build_context_concatena_blocos(tmp_path, monkeypatch):
-    cfg = _write_settings(tmp_path, {"caveman@x": True})
-    monkeypatch.setenv("CLAUDE_CONFIG_DIR", str(cfg))
+def test_docs_block_declara_precedencia_do_usuario(tmp_path, monkeypatch):
     monkeypatch.setenv("CLAUDE_PLUGIN_ROOT", str(tmp_path))
-    ctx = s.build_context()
-    assert "DOCS-BOOTSTRAP" in ctx                 # _docs_block
-    assert "INCOMPATIBILIDADE DETECTADA" in ctx    # _compat_block (caveman on)
+    assert PRECEDENCIA_LONGA in s._docs_block()
+
+
+def test_docs_block_declara_precedencia_sem_root(monkeypatch):
+    monkeypatch.delenv("CLAUDE_PLUGIN_ROOT", raising=False)
+    assert PRECEDENCIA_LONGA in s._docs_block()
 
 
 # ---------------------------------------------------------------------------
-# Contrato end-to-end via subprocess: exit 0 + JSON parseável.
+# Compatibilidade com caveman (inalterada)
 # ---------------------------------------------------------------------------
-HOOKS_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+def test_compat_block_escala_aviso_quando_caveman_ativo():
+    block = s._compat_block({"caveman", "playwright"})
+    assert "INCOMPATIBILIDADE DETECTADA" in block
+    assert "DESATIVE" not in block
+    assert "decisao" in block
 
 
-def test_subprocess_exit_0_e_json_parseavel(tmp_path):
+def test_compat_block_aviso_generico_sem_caveman():
+    block = s._compat_block({"playwright"})
+    assert "INCOMPATIBILIDADE DETECTADA" not in block
+
+
+# ---------------------------------------------------------------------------
+# Contrato end-to-end: subprocess, por sessao
+# ---------------------------------------------------------------------------
+
+def _run(tmp_path, cfg_dir, cwd=None):
     env = dict(os.environ)
-    env["CLAUDE_PLUGIN_ROOT"] = str(tmp_path)
-    env["CLAUDE_CONFIG_DIR"] = str(tmp_path / "config-vazio")   # sem settings.json
-    proc = subprocess.run(
+    env["CLAUDE_PLUGIN_ROOT"] = str(PLUGIN_ROOT)
+    env["CLAUDE_CONFIG_DIR"] = str(cfg_dir)
+    payload = {"hook_event_name": "SessionStart", "cwd": str(cwd or tmp_path)}
+    return subprocess.run(
         [sys.executable, os.path.join(HOOKS_DIR, "bigtech_session_init.py")],
-        input=json.dumps({"hook_event_name": "SessionStart"}),
-        text=True, capture_output=True, env=env,
+        input=json.dumps(payload), text=True, capture_output=True, env=env,
     )
+
+
+def test_subprocess_exit_0_e_json_com_aviso(tmp_path):
+    proc = _run(tmp_path, tmp_path / "config-vazio")
     assert proc.returncode == 0
-    obj = json.loads(proc.stdout)
-    hso = obj["hookSpecificOutput"]
-    assert hso["hookEventName"] == "SessionStart"
-    assert "DOCS-BOOTSTRAP" in hso["additionalContext"]
+    ctx = json.loads(proc.stdout)["hookSpecificOutput"]["additionalContext"]
+    assert "DOCS-BOOTSTRAP" in ctx
+    assert PRECEDENCIA_LONGA in ctx
+    assert FORMA_CURTA.format(faltando="playwright, superpowers, frontend-design") in ctx
+
+
+def test_subprocess_aviso_repete_na_segunda_sessao(tmp_path):
+    cfg = tmp_path / "config-vazio"
+    primeira = _run(tmp_path, cfg)
+    segunda = _run(tmp_path, cfg)
+    for proc in (primeira, segunda):
+        ctx = json.loads(proc.stdout)["hookSpecificOutput"]["additionalContext"]
+        assert "Falta playwright" in ctx
+
+
+def test_subprocess_settings_ilegivel_nao_quebra_a_sessao(tmp_path):
+    cfg = _cfg(tmp_path)
+    (cfg / "settings.json").write_text("{ quebrado", encoding="utf-8")
+    proc = _run(tmp_path, cfg)
+    assert proc.returncode == 0
+    ctx = json.loads(proc.stdout)["hookSpecificOutput"]["additionalContext"]
+    assert "Não consegui conferir" in ctx

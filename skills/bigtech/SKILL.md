@@ -1,15 +1,15 @@
 ---
 name: bigtech
-description: "Monta o time de agents C-level (constelação) para um projeto como se fosse uma bigtech. Invoca Cósimo (Chief of Staff), classifica o PORTE do projeto, seleciona a VARIANTE de pipeline (anti over-engineering), e devolve o MAPA DE ATIVAÇÃO (quais C-levels e agents operacionais ligar, em quais das 12 fases). Opcionalmente dispara os C-levels ativos. Camada de NEGÓCIO e LIDERANÇA (produto, marketing, vendas, legal, finanças, release); delega a execução de engenharia ao /proj_software. Use quando o usuário disser \"montar o time\", \"organizar como bigtech\", \"qual pipeline e quais agents\", \"quem lidera isso\", \"classificar o porte\", \"estruturar a empresa do projeto\", ou invocar /bigtech. Para SDLC puro de engenharia sem camada de negócio, usar /proj_software."
+description: "Monta o time de agents C-level (constelação) para um projeto como se fosse uma bigtech. Invoca Cósimo (Chief of Staff), classifica o PORTE do projeto, seleciona a VARIANTE de pipeline (anti over-engineering), e devolve o MAPA DE ATIVAÇÃO (quais C-levels e agents operacionais ligar, em quais das 12 fases). Opcionalmente dispara os C-levels ativos. Camada de NEGÓCIO e LIDERANÇA (produto, marketing, vendas, legal, finanças, release); delega a execução de engenharia ao /bigtech:proj_software. Use quando o usuário disser \"montar o time\", \"organizar como bigtech\", \"qual pipeline e quais agents\", \"quem lidera isso\", \"classificar o porte\", \"estruturar a empresa do projeto\", ou invocar /bigtech:bigtech. Para SDLC puro de engenharia sem camada de negócio, usar /bigtech:proj_software."
 argument-hint: "[caminho ou descrição do projeto] [--porte early|scale|bigtech] [--dispatch]"
 allowed-tools: [Read, Grep, Glob, Bash, Agent, TodoWrite]
 ---
 
 # bigtech: montar a constelação C-level via Cósimo
 
-Materializa a organização descrita nos manuais de governança e liderança do plugin (`ORG`, `pipeline_release_1.0`, `lideranca_pipeline_release`). Esta skill opera na **camada de empresa** (C-levels + pipeline de produto de 12 fases). A execução de engenharia (fases 4 a 9) é delegada ao `/proj_software`, que aloca os agents operacionais de engenharia por nível S0-S4.
+Materializa a organização descrita nos manuais de governança e liderança do plugin (`ORG`, `pipeline_release_1.0`, `lideranca_pipeline_release`). Esta skill opera na **camada de empresa** (C-levels + pipeline de produto de 12 fases). A execução de engenharia (fases 4 a 9) é delegada ao `/bigtech:proj_software`, que aloca os agents operacionais de engenharia por nível S0-S4.
 
-> **Acesso aos manuais.** O caminho absoluto de `docs/` é injetado no contexto da sessão pelo docs-bootstrap (hook `SessionStart`). Esta skill é carregada de um diretório conhecido, então também pode ler os manuais por caminho relativo (a partir de `skills/bigtech/`): governança em [`ORG`](../../docs/ORG.md), pipeline em [`pipeline_release_1.0`](../../docs/pipeline_release_1.0.md), liderança em [`lideranca_pipeline_release`](../../docs/lideranca_pipeline_release.md). Se o caminho não estiver no contexto, localize via Glob `**/bigtech/docs/**/<NOME>.md`.
+> **Acesso aos manuais.** O caminho absoluto de `docs/` é injetado no contexto da sessão pelo docs-bootstrap (hook `SessionStart`). Esta skill é carregada de um diretório conhecido, então também pode ler os manuais por caminho relativo (a partir de `skills/bigtech/`): governança em `ORG` (`${CLAUDE_PLUGIN_ROOT}/docs/house/ORG.md`), pipeline em `pipeline_release_1.0` (`${CLAUDE_PLUGIN_ROOT}/docs/house/pipeline_release_1.0.md`), liderança em `lideranca_pipeline_release` (`${CLAUDE_PLUGIN_ROOT}/docs/house/lideranca_pipeline_release.md`). Se o caminho não estiver no contexto, localize via Glob `**/bigtech:bigtech/docs/**/<NOME>.md`.
 
 > **Regra de ouro (anti-OE):** quem decide o tamanho do time é Cósimo. Porte arquitetural = `early | scale | bigtech` (piso **early**). Headcount/capacity humana **não** define porte. Em early, a maioria dos C-levels fica dormente. Calibrar por complexidade, criticidade e escala.
 
@@ -39,7 +39,7 @@ Se há projeto em CWD, leia `CLAUDE.md`, `TODO.md` e `README` do projeto para in
 
 ## 1. Invocar Cósimo (Chief of Staff)
 
-Dispare o agent `cosimo-chief-of-staff` (tool Agent, subagent_type `cosimo-chief-of-staff`) passando os sinais coletados. Peça que devolva o **mapa de ativação** no formato:
+Dispare o agent `bigtech:cosimo-chief-of-staff` (tool Agent, subagent_type `bigtech:cosimo-chief-of-staff`) passando os sinais coletados. Peça que devolva o **mapa de ativação** no formato:
 
 ```
 PORTE: <early | scale | bigtech>
@@ -53,7 +53,7 @@ GATILHO DE RE-ROTEAMENTO: <quando re-avaliar o porte>
 JUSTIFICATIVA ANTI-OE: <por que esse nível e não mais>
 ```
 
-> **Repasse o caminho absoluto de `docs/` no prompt da task de Cósimo.** Subagents não herdam o contexto da sessão (o docs-bootstrap só alcança a thread principal e as skills); sem o caminho no prompt, Cósimo não consegue abrir os manuais de governança (`ORG`, `pipeline_release_1.0`, `lideranca_pipeline_release`) que sustentam a classificação de porte. Use o caminho injetado no contexto da sessão; se ele não estiver disponível, resolva via Glob `**/bigtech/docs/` e inclua o resultado no prompt.
+> **Repasse o caminho absoluto de `docs/` no prompt da task de Cósimo.** Subagents não herdam o contexto da sessão (o docs-bootstrap só alcança a thread principal e as skills); sem o caminho no prompt, Cósimo não consegue abrir os manuais de governança (`ORG`, `pipeline_release_1.0`, `lideranca_pipeline_release`) que sustentam a classificação de porte. Use o caminho injetado no contexto da sessão; se ele não estiver disponível, resolva via Glob `**/bigtech:bigtech/docs/` e inclua o resultado no prompt.
 
 Se o usuário passou `--porte`, normalize alias deprecado (`solo` → `early` + aviso) e informe a Cósimo como hint; deixe ele validar contra os sinais (criticidade e complexidade sobrepõem headcount/capacity).
 
@@ -65,7 +65,7 @@ Mostre o mapa de ativação de forma legível: tabela fase x C-level ativo, list
 
 Mapeamento de porte entre as duas camadas (mantenha coerência):
 
-| Porte (Cósimo / bigtech) | Variante de pipeline | Nível SDLC (/proj_software) |
+| Porte (Cósimo / bigtech) | Variante de pipeline | Nível SDLC (/bigtech:proj_software) |
 |---|---|---|
 | early (minimalista / projeto pequeno) | Pipeline-Early | S0 / S1 |
 | early (early-stage / PMF) | Pipeline-Lean | S2 |
@@ -80,39 +80,58 @@ Para cada **C-level ativo**, dispare o agent correspondente (tool Agent) para li
 
 | Fase do pipeline | C-level (agent) |
 |---|---|
-| 0 Ideação, 11 coordenação | `celso-ceo` |
-| 1-3 Discovery/Definição/Design, 12 Pós | `capitolino-cpo` |
-| 4-9 Arquitetura a Beta (engenharia) | `caetano-cto` -> **delega ao /proj_software** |
-| 8 Segurança | `narciso-ciso` |
-| 8 Jurídico | `claudio-clo` |
-| 2 e 6-12 Dados (se ativo) | `candido-cdo` |
-| 10 GTM | `camilo-cmo` |
-| 10 Pricing/orçamento (se ativo) | `confucio-cfo` |
-| 10-11 Receita (se ativo) | `cicero-cro` |
-| 6-11 Execução cross-func | `cosmo-coo` |
+| 0 Ideação, 11 coordenação | `bigtech:celso-ceo` |
+| 1-3 Discovery/Definição/Design, 12 Pós | `bigtech:capitolino-cpo` |
+| 4-9 Arquitetura a Beta (engenharia) | `bigtech:caetano-cto` -> **delega ao /bigtech:proj_software** |
+| 8 Segurança | `bigtech:narciso-ciso` |
+| 8 Jurídico | `bigtech:claudio-clo` |
+| 2 e 6-12 Dados (se ativo) | `bigtech:candido-cdo` |
+| 10 GTM | `bigtech:camilo-cmo` |
+| 10 Pricing/orçamento (se ativo) | `bigtech:confucio-cfo` |
+| 10-11 Receita (se ativo) | `bigtech:cicero-cro` |
+| 6-11 Execução cross-func | `bigtech:cosmo-coo` |
 
-> **Ao disparar cada C-level via Agent tool, inclua o caminho absoluto de `docs/` no prompt da task.** O subagent não herda o contexto da sessão; sem o caminho ele não abre os manuais que precisa para decidir (governança, manuais de execução em `docs/manuals/`). Repasse o caminho de `docs/` vindo do contexto da sessão (ou resolvido via Glob `**/bigtech/docs/`) em toda task de C-level.
+> **Ao disparar cada C-level via Agent tool, inclua o caminho absoluto de `docs/` no prompt da task.** O subagent não herda o contexto da sessão; sem o caminho ele não abre os manuais que precisa para decidir (governança, manuais de execução em `${CLAUDE_PLUGIN_ROOT}/docs/house/`). Repasse o caminho de `docs/` vindo do contexto da sessão (ou resolvido via Glob `**/bigtech:bigtech/docs/`) em toda task de C-level.
 
-Cada C-level devolve decisões + mapa de delegação aos seus operacionais; a thread principal dispara os operacionais (repassando o mesmo caminho de `docs/` no prompt de cada um). Para as fases de engenharia, **invoque `/proj_software`** em vez de re-listar os eng agents aqui (DRY).
+Cada C-level devolve decisões + mapa de delegação aos seus operacionais; a thread principal dispara os operacionais (repassando o mesmo caminho de `docs/` no prompt de cada um). Para as fases de engenharia, **invoque `/bigtech:proj_software`** em vez de re-listar os eng agents aqui (DRY).
 
-**Invariante de ordem (testes x auditoria):** testes são enabler/DoD (TDD, shift-left): rodam COM a implementação nas Fases 6-7, nunca depois. Auditoria (Fase 8 e 12.6, `internal-auditor`) é downstream: depende de código já testado. Ao gerar plano/tabela via `/tab_pendencias`, a auditoria sempre tem como `Pré-requisito` os itens de código+teste. Nunca sequenciar teste após auditoria. Leia [`TESTES`](../../docs/manuals/TESTES.md), [`AUDITORIAS`](../../docs/manuals/AUDITORIAS.md) e [`AGILE`](../../docs/manuals/AGILE.md) (TDD/DoD) antes de fechar a ordem.
+**Invariante de ordem (testes x auditoria):** testes são enabler/DoD (TDD, shift-left): rodam COM a implementação nas Fases 6-7, nunca depois. Auditoria (Fase 8 e 12.6, `bigtech:internal-auditor`) é downstream: depende de código já testado. Ao gerar plano/tabela via `/bigtech:tab_pendencias`, a auditoria sempre tem como `Pré-requisito` os itens de código+teste. Nunca sequenciar teste após auditoria. Leia `TESTES` (`${CLAUDE_PLUGIN_ROOT}/docs/house/TESTES.md`), `AUDITORIAS` (`${CLAUDE_PLUGIN_ROOT}/docs/house/AUDITORIAS.md`) e `AGILE` (`${CLAUDE_PLUGIN_ROOT}/docs/house/AGILE.md`) (TDD/DoD) antes de fechar a ordem.
 
 ---
 
 ## 4. Gravar o marcador de porte
 
-Após classificar, grave o marcador `.bigtech-porte` na raiz do projeto (uma linha: `porte=<early|scale|bigtech>` + data + variante). **Nunca** grave `porte=solo` (alias deprecado; se um marcador legado tiver `solo`, os hooks normalizam a leitura para `early`). Isso silencia o lembrete do hook SessionStart (`bigtech_porte_reminder.py`). Reescreva o marcador quando o porte mudar no re-roteamento.
+Após classificar, grave (ou devolva o texto ao usuário, se as regras dele reservarem a escrita no repositório) o marcador `.bigtech-porte` na raiz do projeto (uma linha: `porte=<early|scale|bigtech>` + data + variante). **Nunca** grave `porte=solo` (alias deprecado; se um marcador legado tiver `solo`, os hooks normalizam a leitura para `early`). Isso silencia o lembrete do hook SessionStart (`bigtech_porte_reminder.py`). Reescreva o marcador quando o porte mudar no re-roteamento.
 
 ## 5. Re-roteamento
 
-Registre o porte escolhido e o gatilho de re-avaliação. A cada marco (fim de fase, release, mudança de complexidade/criticidade, capacity humana só como sinal auxiliar, novo requisito regulatório), reinvoque `/bigtech` ou Cósimo para checar se o projeto subiu ou desceu de porte, e ajustar a constelação. Documente a transição no changelog/diário do projeto e atualize [`ORG`](../../docs/ORG.md) se a estrutura mudar.
+Registre o porte escolhido e o gatilho de re-avaliação. A cada marco (fim de fase, release, mudança de complexidade/criticidade, capacity humana só como sinal auxiliar, novo requisito regulatório), reinvoque `/bigtech:bigtech` ou Cósimo para checar se o projeto subiu ou desceu de porte, e ajustar a constelação. Documente a transição no changelog ou diário do projeto e na governança do próprio projeto; os manuais do plugin não são editados.
 
 ---
 
+## Roteamento de domínios e skills novas
+
+Além dos C-levels, esta skill conhece os agents e as skills de domínio do plugin. O catálogo dos 71 agents, por domínio e com o gatilho de cada um, está na seção "Catálogo de agents" do agent `bigtech:cosimo-chief-of-staff`; consulte-o antes de rotear.
+
+- **Projeto de jogo:** `/bigtech:proj_jogo` orquestra o desenvolvimento de jogo e aloca os agents de jogo por etapa (design, produção, arte, áudio e código). Sem projeto de jogo declarado, eles não entram.
+- **Caso médico-jurídico:** `/bigtech:pericia-medica` aciona o quarteto (`bigtech:dr-medico-perito`, `bigtech:dr-medico-trabalho`, `bigtech:dr-medico-psiquiatra`, `bigtech:dr-advogado`) conforme a natureza do caso. Cada um também tem atalho próprio: `/bigtech:dr-medico-perito`, `/bigtech:dr-medico-trabalho`, `/bigtech:dr-medico-psiquiatra` e `/bigtech:dr-advogado`.
+- **Ensino e capacitação:** `/bigtech:learning-designer` (aula, plano de aula, quiz, rubrica).
+- **Diagnóstico Linux:** `/bigtech:suporte-linux`, que coleta com `bigtech:linux-diag` em modo somente leitura.
+- **Pendências:** `/bigtech:tab_pendencias` (tabela canônica; substitui qualquer referência sem o prefixo do plugin).
+- **Vigia de crashes:** `/bigtech:watchcode {on|off|status}`, quando se quer vigiar o journal e os coredumps enquanto agentes ou a thread principal codam; crash da sessão vai ao `bigtech:caetano-cto` para diagnóstico, e crash de outra sessão ou do sistema vira relatório.
+- **Conexão com a tampa fechada:** `/bigtech:manter_ligado {on|off|status|limpar}`, quando o laptop vai na mochila; mantém a conexão de dados e salva o estado das sessões com a bateria baixa (só Linux com systemd).
+- **Design visual de alta fidelidade:** `/bigtech:visual-design-director`, para design visual, redesign, mockup renderizado e spec visual; conduz o agent `bigtech:visual-design-director`.
+- **Monitor de agentes:** `/bigtech:olhe_agentes {on|off|status}`, quando se quer um tick a cada 5 minutos que vigia se os agentes pararam; o monitor vive na sessão e morre com ela.
+- **Marketing de produto:** `bigtech:product-marketing-manager` atua sob `bigtech:camilo-cmo`; blog, SEO e calendário editorial ficam com `bigtech:content-seo`.
+- **Desenvolvimento de pessoas:** `bigtech:engineering-coach` trabalha junto de `bigtech:engineering-manager`, que mantém a promoção e a performance formal.
+- **Revisão e narrativa:** `bigtech:revisor-textual` (copydesk e cânone), `bigtech:narrative-designer` (arquitetura) e `bigtech:narrative-writer` (prosa final).
+
 ## Integração com ecossistema
 
-- Agent `cosimo-chief-of-staff`: o roteador que esta skill invoca.
-- Skill `/proj_software`: execução SDLC de engenharia (fases 4-9); esta skill delega a ela.
-- Skill `/tab_pendencias`: tabela canônica de pendências (formato de [`ORG`](../../docs/ORG.md)).
-- Docs canônicos: [`ORG`](../../docs/ORG.md), [`pipeline_release_1.0`](../../docs/pipeline_release_1.0.md), [`lideranca_pipeline_release`](../../docs/lideranca_pipeline_release.md), e os 5 manuais em `docs/manuals/`: [`CONTRACT`](../../docs/manuals/CONTRACT.md), [`TESTES`](../../docs/manuals/TESTES.md), [`AGILE`](../../docs/manuals/AGILE.md), [`DEPLOY_CHECKLIST`](../../docs/manuals/DEPLOY_CHECKLIST.md), [`AUDITORIAS`](../../docs/manuals/AUDITORIAS.md).
+- Agent `bigtech:cosimo-chief-of-staff`: o roteador que esta skill invoca.
+- Skill `/bigtech:proj_software`: execução SDLC de engenharia (fases 4-9); esta skill delega a ela.
+- Skill `/bigtech:tab_pendencias`: tabela canônica de pendências (formato de `ORG` (`${CLAUDE_PLUGIN_ROOT}/docs/house/ORG.md`)).
+- Docs canônicos: `ORG` (`${CLAUDE_PLUGIN_ROOT}/docs/house/ORG.md`), `pipeline_release_1.0` (`${CLAUDE_PLUGIN_ROOT}/docs/house/pipeline_release_1.0.md`), `lideranca_pipeline_release` (`${CLAUDE_PLUGIN_ROOT}/docs/house/lideranca_pipeline_release.md`), e os 5 manuais em `${CLAUDE_PLUGIN_ROOT}/docs/house/`: `CONTRACT` (`${CLAUDE_PLUGIN_ROOT}/docs/house/CONTRACT.md`), `TESTES` (`${CLAUDE_PLUGIN_ROOT}/docs/house/TESTES.md`), `AGILE` (`${CLAUDE_PLUGIN_ROOT}/docs/house/AGILE.md`), `DEPLOY_CHECKLIST` (`${CLAUDE_PLUGIN_ROOT}/docs/house/DEPLOY_CHECKLIST.md`), `AUDITORIAS` (`${CLAUDE_PLUGIN_ROOT}/docs/house/AUDITORIAS.md`).
 - Linguagem default: pt-br.
+
+As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário.

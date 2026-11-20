@@ -1,6 +1,6 @@
 ---
 name: proj_software
-description: "Orquestra ciclo de vida de software (SDLC estendido) em 5 macrofases, alocando os agentes corretos por etapa, com proteção anti-over-engineering em projetos pequenos e trilha de escalonamento (S0 protótipo → S1/S2 early → S3 scale → S4 enterprise). Aplica DevSecOps / Shift-Left (security transversal). Use IMEDIATAMENTE quando o usuário disser \"vou criar um software\", \"começar projeto\", \"criar app\", \"novo sistema\", \"construir [feature/produto]\", \"estruturar projeto\", \"como fazer X em produção\", \"qual fluxo seguir\", ou invocar /proj_software. Use também quando a conversa começa um projeto novo de software sem mencionar skill."
+description: "Orquestra ciclo de vida de software (SDLC estendido) em 5 macrofases, alocando os agentes corretos por etapa, com proteção anti-over-engineering em projetos pequenos e trilha de escalonamento (S0 protótipo → S1/S2 early → S3 scale → S4 enterprise). Aplica DevSecOps / Shift-Left (security transversal).  Para projeto de jogo, a rota é /bigtech:proj_jogo; para Linux, /bigtech:suporte-linux; para pendências, /bigtech:tab_pendencias; para pessoas, bigtech:engineering-coach. Use IMEDIATAMENTE quando o usuário disser \"vou criar um software\", \"começar projeto\", \"criar app\", \"novo sistema\", \"construir [feature/produto]\", \"estruturar projeto\", \"como fazer X em produção\", \"qual fluxo seguir\", ou invocar /bigtech:proj_software. Use também quando a conversa começa um projeto novo de software sem mencionar skill."
 ---
 
 # proj_software: orquestração SDLC com squad de engenharia
@@ -11,17 +11,17 @@ Aplica o **macrofluxo de engenharia em 5 fases** delegando aos agentes corretos.
 
 ## Leitura obrigatória antes de alocar o squad
 
-**Antes de definir o nível (S0-S4) e disparar qualquer agente, leia os manuais que acompanham o plugin.** O caminho absoluto de `docs/` é injetado no contexto da sessão pelo docs-bootstrap (hook `SessionStart`) e, como esta skill é carregada de diretório conhecido, o Read relativo também funciona. Se o caminho não estiver no contexto, localize os arquivos via Glob `**/bigtech/docs/**/<NOME>.md`. Leia o manual relevante ao tipo de decisão **antes** de fechá-la:
+**Antes de definir o nível (S0-S4) e disparar qualquer agente, leia os manuais que acompanham o plugin.** O caminho absoluto de `docs/` é injetado no contexto da sessão pelo docs-bootstrap (hook `SessionStart`) e, como esta skill é carregada de diretório conhecido, o Read relativo também funciona. Se o caminho não estiver no contexto, localize os arquivos via Glob `**/bigtech:bigtech/docs/**/<NOME>.md`. Leia o manual relevante ao tipo de decisão **antes** de fechá-la:
 
-- **Padrão de código** (estrutura, SOLID, convenções de commit): [`CONTRACT`](../../docs/manuals/CONTRACT.md).
-- **Qualidade e testes** (pirâmide, cobertura do crítico, TDD): [`TESTES`](../../docs/manuals/TESTES.md).
-- **Cadência ágil** (sprint, INVEST, métricas de fluxo): [`AGILE`](../../docs/manuals/AGILE.md).
-- **Deploy e rollback** (gates da Fase 5): [`DEPLOY_CHECKLIST`](../../docs/manuals/DEPLOY_CHECKLIST.md).
-- **Checklists de gate por fase**: [`AUDITORIAS`](../../docs/manuals/AUDITORIAS.md).
+- **Padrão de código** (estrutura, SOLID, convenções de commit): `CONTRACT` (`${CLAUDE_PLUGIN_ROOT}/docs/house/CONTRACT.md`).
+- **Qualidade e testes** (pirâmide, cobertura do crítico, TDD): `TESTES` (`${CLAUDE_PLUGIN_ROOT}/docs/house/TESTES.md`).
+- **Cadência ágil** (sprint, INVEST, métricas de fluxo): `AGILE` (`${CLAUDE_PLUGIN_ROOT}/docs/house/AGILE.md`).
+- **Deploy e rollback** (gates da Fase 5): `DEPLOY_CHECKLIST` (`${CLAUDE_PLUGIN_ROOT}/docs/house/DEPLOY_CHECKLIST.md`).
+- **Checklists de gate por fase**: `AUDITORIAS` (`${CLAUDE_PLUGIN_ROOT}/docs/house/AUDITORIAS.md`).
 - **Princípios de arquitetura** (4 camadas, anti-over-engineering): [`arquitetura-principios`](../../docs/principles/arquitetura-principios.md).
 - **Métodos ágeis** (Scrum + Kanban + escalonamento): [`agile-methodology`](../../docs/principles/agile-methodology.md).
 - **Anti-padrões proibidos** (commit publicado, force-push, etc.): [`anti-patterns`](../../docs/principles/anti-patterns.md).
-- **Ferramentas FOSS por agent**: [`TOOLING`](../../docs/TOOLING.md).
+- **Ferramentas FOSS por agent**: `TOOLING` (`${CLAUDE_PLUGIN_ROOT}/docs/house/TOOLING.md`).
 
 > **Ao despachar um agent via Agent tool, inclua o caminho absoluto de `docs/` no prompt da task.** Subagents não herdam o contexto da sessão (o docs-bootstrap só alcança a thread principal e as skills); sem o caminho no prompt, o agent não consegue abrir o manual citado.
 
@@ -33,7 +33,7 @@ Antes de invocar qualquer agente, identifique:
 
 | Dimensão | Pergunta |
 |---|---|
-| Capacity / tamanho eng (nota, não porte bigtech) | Protótipo 1 pessoa / Pequeno (1-3) / Médio (4-10) / Grande (10-50) / Enterprise (50+): mapeia a S0-S4; porte arquitetural (`early|scale|bigtech`) vem de `/bigtech` |
+| Capacity / tamanho eng (nota, não porte bigtech) | Protótipo 1 pessoa / Pequeno (1-3) / Médio (4-10) / Grande (10-50) / Enterprise (50+): mapeia a S0-S4; porte arquitetural (`early|scale|bigtech`) vem de `/bigtech:bigtech` |
 | Stake | Pessoal / Interno / Cliente externo / Crítico (financeiro, saúde, segurança de vida) |
 | Time-to-live | Dias / semanas / meses / anos |
 | Compliance | Nenhuma / leve (LGPD básico) / regulada (PCI, HIPAA, SOX) |
@@ -50,56 +50,56 @@ Se o usuário não disse: **pergunte 1-3 itens críticos**, não mais. Maioria d
 
 Use o **mínimo viável**. Cada agente adiciona overhead de comunicação e processo.
 
-### Nível S0: Script / Prototype (≤ 1 semana, capacity 1 pessoa, sem deploy)
-**Agentes:** um único agente especialista (o mais próximo do stack, ex. `backend-engineer`) implementa. A thread principal só confere: lê, mede, verifica, despacha e reporta; nunca produz. **Decisão do líder, 2026-08-18: esta regra vale sem exceção de tamanho, inclusive em S0.** Time enxuto continua sendo o objetivo (1 agente, não uma constelação); só não é a thread principal quem digita.
+### Nível S0: Script / Prototype (1 pessoa, sem deploy)
+**Agentes:** um único agente especialista (o mais próximo do stack, ex. `bigtech:backend-engineer`) implementa. A thread principal só confere: lê, mede, verifica, despacha e reporta; nunca produz. Esta regra vale sem exceção de tamanho, inclusive em S0. Time enxuto continua sendo o objetivo (1 agente, não uma constelação); só não é a thread principal quem digita.
 - Sem PRD, sem ADR, sem RFC, sem CI elaborada.
-- Sem `software-architect`: overkill.
-- Apenas: leia o problema, escreva, teste, use.
-- **Guardrails:** `superpowers:brainstorming` se requirements ambíguos; `superpowers:test-driven-development` se não-trivial.
+- Sem `bigtech:software-architect`: overkill.
+- Apenas: leia o problema, escreva o teste que falha, escreva o código, use.
+- **Guardrails:** `superpowers:brainstorming` se requirements ambíguos; `superpowers:test-driven-development` em todo código de comportamento (exceção declarada: protótipo descartável, script avulso).
 - Doc: README mínimo é suficiente.
 
-### Nível S1: App pessoal / MVP interno (≤ 1 mês, 1-2 pessoas, deploy simples)
-**Agentes ativos:** 1 agente implementador (o mais próximo do stack) + 2-3 especialistas sob demanda. A thread principal só confere: lê, mede, verifica, despacha e reporta; nunca produz (decisão do líder, 2026-08-18: sem exceção de tamanho).
-- `product-manager` opcional (só se requirements ambíguos)
-- `software-architect` **apenas** quando trade-off real existe (escolha de banco, sync × async)
-- `qa-engineer` sob demanda (test plan curto, não pirâmide completa)
-- `security-engineer` sob demanda para checklist OWASP top 10
-- Sem `engineering-manager` / `scrum-master` / `tech-lead` formal
-- Sem `data-engineer` separado se não há analytics
-- Sem `devops-sre` separado: o agente implementador do nível cuida do deploy sob despacho (a thread principal não executa deploy; decisão do líder, 2026-08-18)
+### Nível S1: App pessoal / MVP interno (1-2 pessoas, deploy simples)
+**Agentes ativos:** 1 agente implementador (o mais próximo do stack) + 2-3 especialistas sob demanda. A thread principal só confere: lê, mede, verifica, despacha e reporta; nunca produz (sem exceção de tamanho).
+- `bigtech:product-manager` opcional (só se requirements ambíguos)
+- `bigtech:software-architect` **apenas** quando trade-off real existe (escolha de banco, sync × async)
+- `bigtech:qa-engineer` sob demanda (test plan curto, não pirâmide completa)
+- `bigtech:security-engineer` sob demanda para checklist OWASP top 10
+- Sem `bigtech:engineering-manager` / `bigtech:scrum-master` / `bigtech:tech-lead` formal
+- Sem `bigtech:data-engineer` separado se não há analytics
+- Sem `bigtech:devops-sre` separado: o agente implementador do nível cuida do deploy sob despacho (a thread principal não executa deploy)
 - Doc: README + 1-2 ADRs em decisões one-way door
 
-### Nível S2: Produto pequeno / startup early-stage (1-6 meses, 3-8 devs)
+### Nível S2: Produto pequeno / startup early-stage (3-8 devs)
 **Agentes ativos comuns:**
-- `product-manager` (visão/escopo)
-- `software-architect` (decisões one-way door)
-- `ux-ui-designer` se há interface
-- `frontend-engineer` + `backend-engineer` (implementação)
-- `qa-engineer` (test pyramid básica)
-- `devops-sre` (CI/CD básico, monitoring básico)
-- `security-engineer` (threat model leve + SAST/SCA em CI + checklist OWASP)
-- `technical-writer` opcional (README + docs API)
+- `bigtech:product-manager` (visão/escopo)
+- `bigtech:software-architect` (decisões one-way door)
+- `bigtech:ux-ui-designer` se há interface
+- `bigtech:frontend-engineer` + `bigtech:backend-engineer` (implementação)
+- `bigtech:qa-engineer` (test pyramid básica)
+- `bigtech:devops-sre` (CI/CD básico, monitoring básico)
+- `bigtech:security-engineer` (threat model leve + SAST/SCA em CI + checklist OWASP)
+- `bigtech:technical-writer` opcional (README + docs API)
 - Doc: PRD curto, ADRs em decisões importantes, README + getting-started
 
-### Nível S3: Produto médio / scale-up (6m-2 anos, 8-30 devs, múltiplos times)
+### Nível S3: Produto médio / scale-up (8-30 devs, múltiplos times)
 **Adicionar a S2:**
-- `tech-lead` por squad
-- `engineering-manager` por área
-- `scrum-master` ou ágil distribuído nos times
-- `ux-writer` separado
-- `accessibility-specialist` se cliente-facing
-- `i18n-l10n-specialist` se multi-locale
-- `data-engineer` + `data-scientist` se há analytics / ML
-- `mobile-engineer` se há app
-- `compliance-legal` se regulado
-- `engineering-manager` cuida do growth e da mentoria do time
+- `bigtech:tech-lead` por squad
+- `bigtech:engineering-manager` por área
+- `bigtech:scrum-master` ou ágil distribuído nos times
+- `bigtech:ux-writer` separado
+- `bigtech:accessibility-specialist` se cliente-facing
+- `bigtech:i18n-l10n-specialist` se multi-locale
+- `bigtech:data-engineer` + `bigtech:data-scientist` se há analytics / ML
+- `bigtech:mobile-engineer` se há app
+- `bigtech:compliance-legal` se regulado
+- `bigtech:engineering-manager` cuida do growth e da mentoria do time
 
-### Nível S4: Enterprise / regulado / multi-time (2+ anos, 30+ devs)
+### Nível S4: Enterprise / regulado / multi-time (30+ devs)
 **Squad completa.** Incluir:
-- `ml-engineer` se ML em produção
-- `engineering-manager` formal por área, com trilha de mentoria/coaching do time
-- `embedded-firmware-engineer` se HW envolvido
-- `hardware-engineer` se HW envolvido
+- `bigtech:ml-engineer` se ML em produção
+- `bigtech:engineering-manager` formal por área, com trilha de mentoria/coaching do time
+- `bigtech:embedded-firmware-engineer` se HW envolvido
+- `bigtech:hardware-engineer` se HW envolvido
 - Process completo, docs robustas, compliance ativa, observability matura
 
 ---
@@ -108,17 +108,17 @@ Use o **mínimo viável**. Cada agente adiciona overhead de comunicação e proc
 
 ### Fase 1: Concepção, Design de Sistemas, Especificação
 
-**S0:** pular ou 30 minutos de brainstorming pessoal.
+**S0:** pular ou brainstorming pessoal curto.
 **S1:** PRD-em-1-página + 1-2 ADRs.
 **S2+:** pleno.
 
 **Agentes** (escalonado por nível):
-- `product-manager`: visão, escopo, roadmap, MVP
-- `ux-ui-designer`: jornada e interface (se há UI)
-- `ux-writer`: microcópia e voice/tone (S2+)
-- `accessibility-specialist`: validação WCAG (S2+ cliente-facing)
-- `software-architect`: estrutura, stack, padrões integração
-- `security-engineer` (**Shift-Left**): threat model + crypto primitives + classificação de dado
+- `bigtech:product-manager`: visão, escopo, roadmap, MVP
+- `bigtech:ux-ui-designer`: jornada e interface (se há UI)
+- `bigtech:ux-writer`: microcópia e voice/tone (S2+)
+- `bigtech:accessibility-specialist`: validação WCAG (S2+ cliente-facing)
+- `bigtech:software-architect`: estrutura, stack, padrões integração
+- `bigtech:security-engineer` (**Shift-Left**): threat model + crypto primitives + classificação de dado
 
 **Gates de fase:**
 - Problema validado (não inventado)
@@ -130,19 +130,20 @@ Use o **mínimo viável**. Cada agente adiciona overhead de comunicação e proc
 ### Fase 2: Implementação
 
 **Agentes:**
-- `engineering-manager` (S3+): gestão de pessoas, mentoria e growth do time
-- `scrum-master` (S2+): facilitação ágil
-- `tech-lead` (S3+): liderança técnica por squad
-- `backend-engineer`: server-side
-- `frontend-engineer`: UI (desktop/web)
-- `mobile-engineer`: clients iOS/Android (se aplicável)
-- `embedded-firmware-engineer`: firmware/IoT (se aplicável)
-- `security-engineer` (**transversal**): SAST/SCA em CI, code review crítico em autenticação/sessão/crypto
+- `bigtech:engineering-manager` (S3+): gestão de pessoas, mentoria e growth do time
+- `bigtech:engineering-coach` (S3+): IDP e prática deliberada do engenheiro, sem autoridade hierárquica; promoção e performance formal seguem com `bigtech:engineering-manager`
+- `bigtech:scrum-master` (S2+): facilitação ágil
+- `bigtech:tech-lead` (S3+): liderança técnica por squad
+- `bigtech:backend-engineer`: server-side
+- `bigtech:frontend-engineer`: UI (desktop/web)
+- `bigtech:mobile-engineer`: clients iOS/Android (se aplicável)
+- `bigtech:embedded-firmware-engineer`: firmware/IoT (se aplicável)
+- `bigtech:security-engineer` (**transversal**): SAST/SCA em CI, code review crítico em autenticação/sessão/crypto
 
 **Gates:**
 - Branch protection + PR review obrigatório
 - SAST/SCA limpos
-- Test coverage do crítico (não 100% por vaidade): siga a pirâmide de [`TESTES`](../../docs/manuals/TESTES.md)
+- Test coverage do crítico (não 100% por vaidade): siga a pirâmide de `TESTES` (`${CLAUDE_PLUGIN_ROOT}/docs/house/TESTES.md`)
 
 ### Fase 3: Dados, IA, MLOps
 
@@ -150,19 +151,19 @@ Use o **mínimo viável**. Cada agente adiciona overhead de comunicação e proc
 **S2+:** ativa se há analytics/ML.
 
 **Agentes:**
-- `data-engineer`: pipelines, warehouse, lineage
-- `data-scientist`: modelos, stats, responsible AI
-- `ml-engineer`: MLOps em produção
-- `applied-ai-engineer`: integração de LLM/IA aplicada ao produto
-- `security-engineer` (**transversal**): governança PII no pipeline, model supply chain, prompt injection se LLM
+- `bigtech:data-engineer`: pipelines, warehouse, lineage
+- `bigtech:data-scientist`: modelos, stats, responsible AI
+- `bigtech:ml-engineer`: MLOps em produção
+- `bigtech:applied-ai-engineer`: integração de LLM/IA aplicada ao produto
+- `bigtech:security-engineer` (**transversal**): governança PII no pipeline, model supply chain, prompt injection se LLM
 
 ### Fase 4: Qualidade, Segurança, Compliance, Docs
 
 **Agentes:**
-- `qa-engineer`: pirâmide de testes proporcional
-- `security-engineer` (**gatekeeper formal**): DAST + pentest controlado + relatório
-- `compliance-legal`: LGPD/GDPR/app store/OSS license (proporcional)
-- `technical-writer`: docs API + how-to + reference
+- `bigtech:qa-engineer`: pirâmide de testes proporcional
+- `bigtech:security-engineer` (**gatekeeper formal**): DAST + pentest controlado + relatório
+- `bigtech:compliance-legal`: LGPD/GDPR/app store/OSS license (proporcional)
+- `bigtech:technical-writer`: docs API + how-to + reference
 
 **Gates:**
 - Test pyramid validada (não só unit; não só e2e)
@@ -173,10 +174,10 @@ Use o **mínimo viável**. Cada agente adiciona overhead de comunicação e proc
 ### Fase 5: Integração Contínua, Operação, Sustentação
 
 **Agentes:**
-- `devops-sre`: CI/CD, infra, SLO, IR
-- `i18n-l10n-specialist`: locale/RTL/ICU/CLDR (se multi-locale)
-- `security-engineer` (**transversal**): SecOps, WAF, IDS/IPS, secrets, IR playbook
-- `product-manager`: métricas pós-launch, próximo ciclo
+- `bigtech:devops-sre`: CI/CD, infra, SLO, IR
+- `bigtech:i18n-l10n-specialist`: locale/RTL/ICU/CLDR (se multi-locale)
+- `bigtech:security-engineer` (**transversal**): SecOps, WAF, IDS/IPS, secrets, IR playbook
+- `bigtech:product-manager`: métricas pós-launch, próximo ciclo
 
 **Gates:**
 - Pipeline CI/CD operante (no provedor de CI do projeto)
@@ -184,13 +185,13 @@ Use o **mínimo viável**. Cada agente adiciona overhead de comunicação e proc
 - Backup + restore drill testado
 - Runbook por alerta crítico
 - Postmortem template pronto
-- Antes do go, rode os checks de [`DEPLOY_CHECKLIST`](../../docs/manuals/DEPLOY_CHECKLIST.md)
+- Antes do go, rode os checks de `DEPLOY_CHECKLIST` (`${CLAUDE_PLUGIN_ROOT}/docs/house/DEPLOY_CHECKLIST.md`)
 
 ---
 
 ## 3. Shift-Left de segurança (security-engineer transversal)
 
-`security-engineer` opera em **todas as 5 fases**, não só na 4:
+`bigtech:security-engineer` opera em **todas as 5 fases**, não só na 4:
 
 | Fase | Atuação |
 |---|---|
@@ -198,7 +199,7 @@ Use o **mínimo viável**. Cada agente adiciona overhead de comunicação e proc
 | 2. Implementação | SAST/SCA em CI bloqueando PR; code review crítico em auth/sessão/IO externo |
 | 3. Dados/IA | Governança PII, anonimização, model supply chain, prompt injection |
 | 4. QA | DAST + fuzzing + pentest controlado + report formal |
-| 5. Operação | WAF, IDS/IPS, secrets vault, IR playbook compartilhado com `devops-sre` |
+| 5. Operação | WAF, IDS/IPS, secrets vault, IR playbook compartilhado com `bigtech:devops-sre` |
 
 **Calibre por nível:** S0 = não precisa; S1 = checklist OWASP top 10; S2 = threat model leve + SAST; S3+ = pleno DevSecOps.
 
@@ -220,7 +221,7 @@ Use o **mínimo viável**. Cada agente adiciona overhead de comunicação e proc
 | Microsserviços antes de monolito modular | Voltar a monolito modular bem-fatorado |
 | Event-driven sem necessidade de desacoplamento real | Síncrono + função |
 | Cache antes de medir latência | Remover; medir; só adicionar quando dor real |
-| Abstração genérica pra UMA implementação | Inline o código; quando a 2ª aparecer, abstrair |
+| Abstração genérica pra UMA implementação | Manter o código concreto; extrair só na 3ª ocorrência do mesmo padrão |
 | Feature flag pra mudança one-shot reversível por re-deploy | Sem flag |
 | Kubernetes pra app de 100 usuários | systemd + Caddy + Postgres num VPS |
 | 3 camadas de DI / factories sem polimorfismo real | Construtor direto |
@@ -266,7 +267,7 @@ Projetos crescem. Reconheça **sinais** e migre **incrementalmente**, não big-b
 - Múltiplas regiões / multi-locale
 - Analytics / ML em produção
 
-**Ações:** introduzir tech leads, `engineering-manager` por área (gestão e mentoria), scrum master, data engineering, design system formal, runbooks, SLO formal, capacity planning.
+**Ações:** introduzir tech leads, `bigtech:engineering-manager` por área (gestão e mentoria), scrum master, data engineering, design system formal, runbooks, SLO formal, capacity planning.
 
 **S3 → S4:**
 - 30+ devs
@@ -274,14 +275,14 @@ Projetos crescem. Reconheça **sinais** e migre **incrementalmente**, não big-b
 - Crítico (financeiro, saúde, vida)
 - Multi-tenant grande
 
-**Ações:** introduzir compliance dedicado, security DevSecOps maduro, trilha de mentoria/coaching formal sob o `engineering-manager`, processo de change management, capacity engineering, DR multi-region testado.
+**Ações:** introduzir compliance dedicado, security DevSecOps maduro, trilha de mentoria/coaching formal sob o `bigtech:engineering-manager`, processo de change management, capacity engineering, DR multi-region testado.
 
 ### Refactor pra suportar crescimento (não rewrite)
 
 - **Monolito modular** bem fatorado escala muito mais do que se imagina. Extrair serviço só quando dor real aparece (escala independente, time independente, stack incompatível).
 - **Postgres + extensões** (Citus, TimescaleDB) sustenta startup inteiro até centenas de GB.
 - **Self-host VPS → managed cloud → k8s** é progressão natural; pular k8s pra app de 100 usuários é over.
-- **Test pyramid** cresce com produto. Começa só com unit do crítico; adiciona integration; e2e por último.
+- **Test pyramid** cresce com produto. Começa com unit de todo comportamento novo (TDD); adiciona integration; e2e por último.
 - **Observability**: logs estruturados desde D1; métricas RED quando deploy frequente; traces quando distribuído.
 
 ---
@@ -300,7 +301,7 @@ Projetos crescem. Reconheça **sinais** e migre **incrementalmente**, não big-b
 ```
 
 ### S2+: PRD estruturado
-[Invocar `product-manager`: template completo embutido lá]
+[Invocar `bigtech:product-manager`: template completo embutido lá]
 
 ### S1+: ADR mínimo
 ```markdown
@@ -337,9 +338,14 @@ Status: Accepted | Date: YYYY-MM-DD
 
 ## Integração com ecossistema
 
-- Os agentes são acionados conforme a matriz (a constelação C-level completa é montada pela skill `/bigtech`). **Ao despachar um agent, inclua no prompt o caminho absoluto de `docs/`**: subagents não herdam o contexto de sessão.
-- Skill **`/bigtech`**: camada de NEGÓCIO/liderança (C-levels, pipeline de produto de 12 fases, GTM, release). Quando um projeto precisa de produto/marketing/vendas/release além da engenharia, comece por `/bigtech`; ela delega a execução de engenharia (fases 4-9) de volta a esta skill. Os níveis S0-S4 daqui mapeiam aos portes arquiteturais `early|scale|bigtech` de lá (S0/S1 ≈ early minimalista; S2 ≈ early Lean; S3 ≈ scale; S4 ≈ bigtech).
-- Skill **`/tab_pendencias`**: tabela canônica de pendências.
-- O pipeline de CI é configurado pelo `devops-sre` no provedor de CI do projeto.
-- Princípios transversais: 4 camadas, SOLID, TDD e convenções de commit estão em [`arquitetura-principios`](../../docs/principles/arquitetura-principios.md) e [`CONTRACT`](../../docs/manuals/CONTRACT.md).
+- Os agentes são acionados conforme a matriz (a constelação C-level completa é montada pela skill `/bigtech:bigtech`). **Ao despachar um agent, inclua no prompt o caminho absoluto de `docs/`**: subagents não herdam o contexto de sessão.
+- Skill **`/bigtech:bigtech`**: camada de NEGÓCIO/liderança (C-levels, pipeline de produto de 12 fases, GTM, release). Quando um projeto precisa de produto/marketing/vendas/release além da engenharia, comece por `/bigtech:bigtech`; ela delega a execução de engenharia (fases 4-9) de volta a esta skill. Os níveis S0-S4 daqui mapeiam aos portes arquiteturais `early|scale|bigtech` de lá (S0/S1 ≈ early minimalista; S2 ≈ early Lean; S3 ≈ scale; S4 ≈ bigtech).
+- Skill **`/bigtech:tab_pendencias`**: tabela canônica de pendências.
+- Projeto de jogo: esta skill não conduz o ciclo de jogo; use **`/bigtech:proj_jogo`**, que aloca os agents de jogo (`bigtech:gameplay-engineer`, `bigtech:engine-graphics-programmer` etc.) por etapa.
+- Diagnóstico Linux de máquina ou serviço: **`/bigtech:suporte-linux`** (coleta com `bigtech:linux-diag`, somente leitura).
+- Ensino e capacitação: **`/bigtech:learning-designer`**; coaching de engenheiro: `bigtech:engineering-coach`.
+- O pipeline de CI é configurado pelo `bigtech:devops-sre` no provedor de CI do projeto.
+- Princípios transversais: 4 camadas, SOLID, TDD e convenções de commit estão em [`arquitetura-principios`](../../docs/principles/arquitetura-principios.md) e `CONTRACT` (`${CLAUDE_PLUGIN_ROOT}/docs/house/CONTRACT.md`).
 - Linguagem default: **pt-br**.
+
+As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário.

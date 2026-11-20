@@ -1,9 +1,10 @@
 <!--
   docs/house sync
   origem: vault claudebrain / Standards.md
-  path_vault: /home/petrus/IDrive/Documentos/projetos_claudebrain/Standards.md
-  sync_date: 2026-08-16
-  regra: se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
+  sync_date: 2026-11-20
+  hmac_vault_sha256: 28a9d129ba72df0f943b1ebd9d6032840c65c9cddb585b9e9096ffdf040a1974
+  transformacoes: T1=1 T2=0 T3a=0 T3=0 T4=0 T5=0
+  regra: As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário. Se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
   sem segredos: não incluir tokens/credenciais
 -->
 # Standards & Manuais de Referência
@@ -16,7 +17,7 @@ Hub canônico do vault. Os manuais oficiais ficam na **raiz** (este diretório).
 - [[TESTES]] : Guia Completo de Testes, Qualidade e Auditoria (T1-T15, A1-A13)
 - [[AGILE]] : Metodologia Ágil (Manifesto, Scrum, Kanban, PDCA, INVEST)
 - [[DEPLOY_CHECKLIST]] : Checklist 7 fases de deploy irreversível
-- [[AUDITORIAS]] : Checklists C++/Python/Web com prioridade 🔴🟠🟢
+- [[AUDITORIAS]] : Checklists C++/Python/Web com prioridade CRÍTICO, IMPORTANTE ou COSMÉTICO
 - [[TOOLING]] : Ferramentas FOSS automatizáveis dos agents (catálogo tool->agent, status temos/baixar, comando de instalar, kit canônico por agent)
 
 ## Organização e Pipeline (constelação de agents)
@@ -36,7 +37,6 @@ Sessão nova: o [[CLAUDE]] da raiz já injeta os 5 manuais como obrigatórios. N
 ## Estrutura PARA (configurada)
 
 - [[Projects]] : 16 projetos ativos (C++/Qt, Python, Web, embedded)
-- [[Areas]] : 4 responsabilidades contínuas ([[Areas/clinica]], [[Areas/hardware]], [[Areas/formacao]], [[Areas/financas]])
 - [[Resources]] : referência reutilizável ([[Resources/Standards]], [[Resources/Livros]], [[Resources/Snippets]], [[Resources/Prompts]], [[Resources/Datasets]])
 - [[Inbox]] : captura rápida pré-triagem (triar semanalmente)
 - [[Journal]] : notas datadas ([[Journal/daily]] + [[Journal/eventos]])

@@ -61,11 +61,26 @@ def _under(path: str, base: str) -> bool:
     return rel == "." or not rel.startswith("..")
 
 
+def emite_aviso(msg: str) -> None:
+    """Aviso com exit 0: JSON no stdout. A doc de hooks diz: "Claude never sees
+    stderr from a hook that exits 0". `systemMessage` mostra ao usuario;
+    `hookSpecificOutput.additionalContext` chega ao Claude, junto do resultado
+    da ferramenta (PostToolUse aceita o campo)."""
+    print(json.dumps({
+        "systemMessage": msg,
+        "hookSpecificOutput": {
+            "hookEventName": "PostToolUse",
+            "additionalContext": msg,
+        },
+    }))
+
+
 def main() -> int:
     try:
         data = json.load(sys.stdin)
     except Exception:
         return 0
+    aviso = None
     try:
         if str(os.environ.get("TDD_GUARD", "")).lower() == "off":
             return 0
@@ -82,8 +97,14 @@ def main() -> int:
         if session_cwd and not _under(fp, session_cwd):
             return 0          # arquivo fora do cwd da sessao; nao roda a suite
         start = os.path.dirname(os.path.realpath(fp)) or os.getcwd()
-        root, cfg = c.load_config(start)
+        root, cfg, motivo = c.load_config(start)
         if cfg is None:
+            if motivo:
+                # Config existe e esta invalida: o runner NAO roda a suite. Avisa
+                # em JSON (exit 0) em vez de ficar inerte em silencio.
+                emite_aviso(
+                    f"TDD runner: config ignorada ({motivo}). O guard nao esta "
+                    "ativo neste projeto ate a config ser corrigida.")
             return 0
         rel = os.path.relpath(os.path.realpath(fp), root)
         if c.classify(rel, cfg) not in ("production", "test"):
@@ -91,10 +112,11 @@ def main() -> int:
         state = run_suite(cfg, root)
         c.write_state(root, state)
         if not state.get("ran"):
-            print(f"TDD runner: testes nao rodaram ({state.get('reason')}).",
-                  file=sys.stderr)
+            aviso = f"TDD runner: testes nao rodaram ({state.get('reason')})."
     except Exception as e:
-        print(f"TDD runner: erro interno ignorado ({e}).", file=sys.stderr)
+        aviso = f"TDD runner: erro interno ignorado ({e})."
+    if aviso:
+        emite_aviso(aviso)
     return 0
 
 

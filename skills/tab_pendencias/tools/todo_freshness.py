@@ -1,0 +1,177 @@
+#!/usr/bin/env python3
+# tools/todo_freshness.py -- hook post-commit warn-only de frescor da TODO.md
+# SPDX-License-Identifier: Apache-2.0
+# Licença: Apache-2.0 (ver NOTICE na raiz do plugin).
+# Derivado do projeto standalone tab_pendencias, do mesmo autor, relicenciado sob Apache-2.0.
+"""
+tools/todo_freshness.py
+
+Git hook (Camada 2 local) de frescor da TODO.md. Cross-platform (stdlib),
+warn-only, nunca bloqueia. Chamado pelo shim `post-commit`. Logica compartilhada
+em todo_lib.py.
+
+Dois avisos, so quando ha lacuna acionavel (silencioso caso contrario):
+1. O commit tocou codigo mas nao citou nenhum ID do TODO.md.
+2. O commit cita um ID cujo Status ainda e "Pendente"/"Em andamento" (lembra:
+   implementacao entregue -> "Pendente verificacao"; "Concluido" so apos a onda
+   de teste/auditoria).
+
+Registra adesao em $GIT_DIR/todo-freshness.log para medir antes de automatizar.
+
+ENC-1: warn-only continua exit 0 SEMPRE, mas a excecao na leitura do TODO.md
+deixa de ser engolida em silencio -- vai para stderr (tipo + mensagem) e para
+o log de adesao (linha "erro=leitura_todo:<Tipo>", nunca "code=..."/"cited=..."
+para nao contaminar a metrica de _adesao do todo_health.py). --verbose
+acrescenta o traceback completo em stderr, sem mudar o exit code.
+"""
+import argparse
+import os
+import sys
+import traceback
+from datetime import datetime, timezone
+
+import todo_lib as L
+
+try:
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
+
+
+class _AlwaysZeroParser(argparse.ArgumentParser):
+    """Excecao de contrato (D-6/CLI-1): freshness roda como git hook
+    warn-only, e um exit != 0 quebraria o commit de quem instalou. Ao
+    contrario de todo_sync.py/todo_health.py, aqui NENHUM caminho do
+    argparse (--help, flag desconhecida, valor faltando) pode alterar o
+    exit code do processo -- so decide o texto impresso."""
+
+    def exit(self, status=0, message=None):
+        if message:
+            self._print_message(message, sys.stderr)
+        sys.exit(0)
+
+
+def _build_parser():
+    p = _AlwaysZeroParser(
+        prog="todo_freshness.py",
+        description=(
+            "Git hook post-commit (Camada 2 local) de frescor da TODO.md: "
+            "avisa, sem NUNCA bloquear o commit, quando o commit tocou "
+            "codigo sem citar ID do TODO.md, ou cita um ID cujo Status "
+            "ainda esta pendente."
+        ),
+        epilog="Exit code: sempre 0 (warn-only; avisos vao para stderr).",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    p.add_argument(
+        "-v", "--verbose", action="store_true",
+        help="Alem da linha curta (tipo + mensagem), imprime o traceback "
+             "completo de uma excecao na leitura do TODO.md em stderr. Nao "
+             "muda o exit code (warn-only continua sempre 0).")
+    return p
+
+# Re-export (compat de testes + clareza).
+parse_todo = L.parse_status_map
+is_pending = L.is_pending
+cited_ids = L.cited_ids
+touched_code = L.touched_code   # subiu p/ a lib: o todo_sync.py tambem usa
+
+
+def build_warnings(message, files, items):
+    warns = []
+    cited = L.cited_ids(message, list(items.keys()))
+    for i in cited:
+        if L.is_pending(items[i]):
+            warns.append(
+                f"[todo-fresh] o commit cita {i}, mas no TODO.md o Status segue "
+                f"'{items[i]}'. Se entregou, atualize o Status (implementacao -> "
+                "'Pendente verificacao'; 'Concluido' so apos a onda de "
+                "teste/auditoria)."
+            )
+    if touched_code(files) and not cited:
+        exemplo = next(iter(items)) if items else "ID"
+        warns.append(
+            "[todo-fresh] o commit tocou codigo mas nao citou nenhum ID de item "
+            f"do TODO.md. Se fecha ou avanca um item, cite o ID (ex: {exemplo}) "
+            "na mensagem para rastrear o status. (refactor/exploracao pode "
+            "legitimamente nao mapear; isto so avisa, nunca bloqueia.)"
+        )
+    return warns, cited
+
+
+def _log_adesao(root, touched, n_cited, n_warns):
+    gd = L.git_dir(root)
+    if not gd:
+        return
+    try:
+        stamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        with open(os.path.join(gd, "todo-freshness.log"), "a",
+                  encoding="utf-8") as fh:
+            fh.write(f"{stamp} code={int(touched)} cited={n_cited} "
+                     f"warns={n_warns}\n")
+    except Exception:
+        pass
+
+
+def _warn_leitura_falhou(root, exc, verbose):
+    """ENC-1: a leitura do TODO.md pode falhar (arquivo ilegivel, encoding
+    invalido, TODO.md e um diretorio etc.). O nucleo aqui continua warn-only
+    (exit 0 SEMPRE -- isto NUNCA muda), mas a excecao deixa de ser engolida
+    em silencio: uma linha curta (tipo + mensagem) sempre vai para stderr, e
+    uma entrada para o log de adesao (formato "erro=leitura_todo:<Tipo>",
+    deliberadamente sem os campos "code="/"cited="/"warns=" para o
+    todo_health.py._adesao no filtrar por "code=1" continuar ignorando-a sem
+    contorno especial). --verbose acrescenta o traceback completo."""
+    print(f"[todo-fresh] leitura do TODO.md falhou ({type(exc).__name__}: "
+          f"{exc}); avisos de frescor pulados neste commit.", file=sys.stderr)
+    if verbose:
+        traceback.print_exc(file=sys.stderr)
+    gd = L.git_dir(root)
+    if not gd:
+        return
+    try:
+        stamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        with open(os.path.join(gd, "todo-freshness.log"), "a",
+                  encoding="utf-8") as fh:
+            fh.write(f"{stamp} erro=leitura_todo:{type(exc).__name__}\n")
+    except Exception:
+        pass
+
+
+def main(argv=None):
+    args = _build_parser().parse_args(sys.argv[1:] if argv is None else argv)
+    root = L.repo_root()
+    if not root:
+        return 0
+    todo = L.find_todo(root)
+    if not todo:
+        return 0
+    try:
+        with open(todo, encoding="utf-8") as fh:
+            text = fh.read()
+    except Exception as exc:
+        _warn_leitura_falhou(root, exc, args.verbose)
+        return 0
+    items = L.parse_status_map(text)
+    if not items:
+        return 0
+    message = L.git(["log", "-1", "--format=%B"], cwd=root)
+    # ROOT-1: sem --root, 'git diff-tree' devolve saida VAZIA quando HEAD e o
+    # commit RAIZ (sem pai) -- confirmado ao vivo com git real. Sem isto,
+    # touched_code(files) era sempre False no 1o commit de qualquer repo, e o
+    # aviso "tocou codigo mas nao citou ID" nunca disparava ali. --root so
+    # afeta o caso do commit sem pai (trata-o como diff contra a arvore
+    # vazia); nenhum outro commit muda de comportamento.
+    files = [f for f in L.git(
+        ["diff-tree", "--root", "--no-commit-id", "--name-only", "-r", "HEAD"],
+        cwd=root
+    ).splitlines() if f]
+    warns, cited = build_warnings(message, files, items)
+    _log_adesao(root, touched_code(files), len(cited), len(warns))
+    for w in warns:
+        print(w, file=sys.stderr)
+    return 0  # warn-only: NUNCA bloqueia
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

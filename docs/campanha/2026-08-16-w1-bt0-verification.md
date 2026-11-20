@@ -2,7 +2,7 @@
 
 **Data da verificação:** 2026-08-16  
 **Hora local (medida):** `16/08/26 - 23:46:05` (`date '+%d/%m/%y - %H:%M:%S'`)  
-**Papel:** auditor de campanha — host Grok, papel [grok][mais recente]  
+**Papel:** auditor de campanha — segundo host (removido na 2.0.0), papel [segundo-host][mais recente]  
 **Item:** `BT-0` (PHASE 0 freeze / baseline / inventário)  
 **DoD canônico:** `PLANO-MELHORIA-BIGTECH-CLAUDE-CODE-2026-08-16.md` § PHASE 0 (linhas 677–684)  
 **HEAD do plugin no início desta auditoria:** `26f8641edb56e0d9cacd42e3df2410b8c7752a32` (working tree limpa)  
@@ -75,7 +75,7 @@ git -C ~/.claude submodule status skills/tab_pendencias  # 0546c53… (v1.2.2)
 | `~/.claude` HEAD **ainda é** o SHA do freeze | **PASS** (não andou) |
 | `tab_pendencias` HEAD **ainda é** o SHA do freeze | **PASS** |
 | Pin Claude submodule = mesmo SHA (`v1.2.2`) | **PASS** |
-| Symlink Grok `~/.grok/skills/tab_pendencias` → produto | **PASS** |
+| Symlink do segundo host (removido na 2.0.0) `tab_pendencias` → produto | **PASS** |
 | `settings.json` gitignored e presente em disco | **PASS** |
 
 ### Residual (não-FAIL)
@@ -111,7 +111,7 @@ Bate com o baseline (`CORE_ONLY=0 VAULT_ONLY=20 INTERSECTION=51`) e com `phase0-
 |---|---:|---:|:---:|
 | plugin `agents/*.md` | 51 | 51 (names únicos 51) | ✅ |
 | vault `~/.claude/agents/*.md` | 71 | 71 | ✅ |
-| grok `~/.grok/agents/*.md` | 71 | 71 | ✅ |
+| segundo host (removido na 2.0.0) | 71 | 71 | ✅ |
 | plugin skills | 4 (`bigtech`, `proj_software`, `tab_pendencias`, `visual-design-director`) | 4 mesmos dirs | ✅ |
 | vault skills | 46 | 46 | ✅ |
 | plugin hooks `.py` | 7 (3 bigtech + reminder + tdd_*) | 7 | ✅ |

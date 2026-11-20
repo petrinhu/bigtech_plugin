@@ -1,23 +1,24 @@
-# Changelog
+## [2.0.0] - 2026-11-20
 
-Todas as mudanças relevantes deste projeto são documentadas neste arquivo.
+Release de consolidação do plugin. A constelação passa a ter **71 agents** (12 C-level e 59 operacionais) e **15 skills**. Esta versão absorve o bloco `[Unreleased]`, que estava sem tag: a versão 0.2.1 nunca foi publicada. Campanha 2026-08-16 fechada, tag de marco: [campanha/2026-08-16-fechada](https://github.com/petrinhu/bigtech_plugin/releases/tag/campanha/2026-08-16-fechada). Índice dos relatórios: [docs/campanha/README.md](docs/campanha/README.md).
 
-O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), e o projeto adota o [Versionamento Semântico](https://semver.org/lang/pt-BR/).
+### Breaking
 
-## [Unreleased]
+- **`AGENTS.md` virou `LLM.md`.** Não há arquivo de ponte. Ferramentas que procuravam `AGENTS.md` sozinhas (Codex, Cursor e outras) deixam de encontrá-lo; atualize as referências.
+- **Suporte ao Grok saiu do plugin.** Saem a seção de instalação do Grok, o selo "Grok-compatible" e as instruções de Grok de README, LLM.md, documentação, scripts e testes. O plugin passa a ser só para Claude Code. As entradas antigas deste changelog continuam citando o Grok como histórico.
 
-Trabalho **post-0.2.0** em `main` (versão do plugin em `plugin.json` / marketplace: **0.2.1**, bump patch desta onda; release semver ainda não cortada). Campanha dual-host Claude+Grok **2026-08-16 fechada** - tag de marco: [campanha/2026-08-16-fechada](https://github.com/petrinhu/bigtech_plugin/releases/tag/campanha/2026-08-16-fechada). Índice dos relatórios: [docs/campanha/README.md](docs/campanha/README.md).
-
-### Fixed
-
-- **`proj_software`: cópia do plugin alinhada à decisão do líder de 2026-08-18.** A thread principal nunca codifica, em nenhum nível (S0 incluído); a cópia do plugin ainda dizia "Main thread codifica direto" em S0, "main thread + 2-3 sob demanda" em S1 e mandava o deploy para a main thread no S1. Agora `skills/proj_software/SKILL.md` é cópia integral da versão global, e o plugin passa a ser a fonte única dessa skill.
-- **`tab_pendencias_reminder`: fim do lembrete duplicado quando o produto standalone está ligado.** O `tab_pendencias` virou produto standalone (repo próprio, GPL-3.0) e o motor de sinais dele reescreveu, em 2026-08, os gatilhos 1 (CRIAR) e 2 (STALENESS) que nasceram neste hook em 2026-06. Com os dois registrados, cada `SessionStart` e cada `UserPromptSubmit` emitiam **duas** mensagens de mesmo teor. Agora o hook detecta se o produto está registrado nas settings do usuário e, nesse caso, **cede a ele os gatilhos 1 e 2**, mantendo só o que o produto não tem: o carimbo de sessão (3) e o nudge de tempo de sessão (4). Instalação **só-plugin** (sem o produto) mantém o comportamento legado integral. Override: `BIGTECH_TAB_REMINDER=full` (nunca cede) / `off` (não emite nada) / `auto` (padrão). Duas lacunas conhecidas da cessão estão documentadas no cabeçalho do hook em vez de perdidas em silêncio: projeto com `.bigtech-porte` fora de repo git, e `TODO.md` defasado sem nenhum item ⏳/🔄.
-
-### Removed
-
-- **`skills/tab_pendencias/` removida do plugin.** A skill `/tab_pendencias` passa a vir só do produto standalone (repo próprio, GPL-3.0, github.com/petrinhu/tab_pendencias), que é a versão viva. A cópia embutida estava velha. O hook `tab_pendencias_reminder` continua no plugin; numa instalação só-plugin ele cita `/tab_pendencias`, que só existe com o produto standalone instalado. README, AGENTS.md, CLAUDE.md e as descrições do `plugin.json` e do `marketplace.json` foram ajustados para 3 skills (`bigtech`, `proj_software`, `visual-design-director`).
+- **`github-gossips` saiu do plugin.** Continua disponível fora do plugin; o plugin não registra mais o servidor dele. O `pubmed` saiu do bundle `bigtech-completo`.
 
 ### Added
+
+- **Pacote `bigtech-completo` com o aviso de dependência.** Traz o `bigtech` mais `playwright`, `superpowers`, `frontend-design` (marketplace `claude-plugins-official`). Sem o marketplace adicionado antes, o pacote fica instalado e não carrega. Recusar as dependências é instalar só o `bigtech`. O aviso aparece no README (EN e PT), no LLM.md e na descrição do painel. (CONS-16)
+- **Aviso de dependência no início da sessão.** O hook `bigtech_session_init` mostra só as dependências recomendadas que faltam, nomeando cada uma. (CONS-14)
+- **Três skills novas:** `watchcode` (vigia journal e coredumps e captura crashes), `manter_ligado` (só Linux com systemd), `olhe_agentes` (monitor de agents). (CONS-09W, CONS-09G, CONS-09S)
+- **20 agents novos:** o time de desenvolvimento de jogos (entre eles `gameplay-engineer`, antes `gameplay_engineer`), os agents médico-periciais e jurídicos, o pedagógico, o literário e os de diagnóstico. (CONS-06, CONS-07)
+- **Skills que chamam os agents entram no plugin:** `dr-advogado`, `dr-medico-perito`, `dr-medico-psiquiatra`, `dr-medico-trabalho`, `learning-designer`, `pericia-medica`, `proj_jogo` e `suporte-linux`. (CONS-09)
+- **Skill `tab_pendencias` de volta ao plugin**, sob Apache-2.0, com a escrita de estado endurecida (inbox, journal, lock e sync recusam symlink e diretório alheio). Desfaz a remoção descrita no bloco anterior. (CONS-05, CONS-05S)
+- **Manuais em `docs/house/`**, cópia única do vault com transformação só de privacidade, e a regra de que as instruções do usuário prevalecem sobre o plugin. (CONS-10, CONS-04A)
+- **Ícone do plugin** pelo art-director. (CONS-11A)
 
 - **BT-8: evals offline de roteamento `/bigtech`.** Suite em `evals/bigtech_routing/` (`cases.json` CASE-A..D + portes, `run_evals.py` stdlib, README). Política pós-BT-5: perfis `early|scale|bigtech`, piso early, nunca `solo` como perfil, headcount peso 0, criticidade eleva agents (CISO/CLO). Gate no `scripts/preci.sh` e no CI multi-OS (`python3 evals/bigtech_routing/run_evals.py`). Não substitui eval LLM real; é harness de política de classificação.
 - **BT-7: gate de drift semântico.** Registry/agents/skills alinhados; falha no CI/`preci` se o inventário canônico divergir do pacote.
@@ -30,8 +31,26 @@ Trabalho **post-0.2.0** em `main` (versão do plugin em `plugin.json` / marketpl
 
 ### Changed
 
+- **Contagens e roteamento:** 71 agents, 15 skills, com o roteamento do Cósimo e os evals alinhados. (CONS-12, CONS-12C)
+- **Versão 2.0.0** em `plugin.json`, `marketplace.json` e no `bigtech-completo`. (CONS-16)
+- **`model: inherit`** nos agents: quem despacha escolhe o modelo, dentro das regras do usuário.
+- **Padrões que mudam para todos** (decisões do líder): TDD em código de comportamento, sem número-meta de cobertura; biblioteca, modelo, extensão e navegador só com permissão; sem captura da tela nem navegador na sessão viva; sem emoji em modelos de documento; saídas de escape do `tdd_guard` removidas da mensagem ao modelo. (CONS-15)
+- **Hook do `tab_pendencias`:** um só lembrete de `TODO.md`, sem comando inexistente. (CONS-14, CONS-14A)
+
 - **BT-5: porte arquitetural sem solo/headcount (piso early).** Valores canônicos de porte = `early | scale | bigtech`. Headcount/capacity humana é nota auxiliar, não valor de `--porte` nem de `.bigtech-porte`. Skill `/bigtech`, hooks `bigtech_porte_reminder`/`bigtech_reinforce`, Cosimo, `docs/ORG.md`, `pipeline_release_1.0`, `lideranca_pipeline_release`, mapeamento em `/proj_software` e `/tab_pendencias` alinhados. Alias deprecado: `--porte solo` e marcador legado `porte=solo` normalizam para `early` (hooks expõem `early` sem reescrever o arquivo). Pipeline-Sprint renomeado operacionalmente para Pipeline-Early (early minimalista).
 - **BT-3: host git só GitHub.** `origin` -> `github.com/petrinhu/bigtech_plugin`; remoção de `.forgejo` e purga operacional de Codeberg/Forgejo/Woodpecker em paths de produto e install.
+
+### Fixed
+
+- **`proj_software`: cópia do plugin alinhada à decisão do líder de 2026-08-18.** A thread principal nunca codifica, em nenhum nível (S0 incluído); a cópia do plugin ainda dizia "Main thread codifica direto" em S0, "main thread + 2-3 sob demanda" em S1 e mandava o deploy para a main thread no S1. Agora `skills/proj_software/SKILL.md` é cópia integral da versão global, e o plugin passa a ser a fonte única dessa skill.
+- **`tab_pendencias_reminder`: fim do lembrete duplicado quando o produto standalone está ligado.** O `tab_pendencias` virou produto standalone (repo próprio, GPL-3.0) e o motor de sinais dele reescreveu, em 2026-08, os gatilhos 1 (CRIAR) e 2 (STALENESS) que nasceram neste hook em 2026-06. Com os dois registrados, cada `SessionStart` e cada `UserPromptSubmit` emitiam **duas** mensagens de mesmo teor. Agora o hook detecta se o produto está registrado nas settings do usuário e, nesse caso, **cede a ele os gatilhos 1 e 2**, mantendo só o que o produto não tem: o carimbo de sessão (3) e o nudge de tempo de sessão (4). Instalação **só-plugin** (sem o produto) mantém o comportamento legado integral. Override: `BIGTECH_TAB_REMINDER=full` (nunca cede) / `off` (não emite nada) / `auto` (padrão). Duas lacunas conhecidas da cessão estão documentadas no cabeçalho do hook em vez de perdidas em silêncio: projeto com `.bigtech-porte` fora de repo git, e `TODO.md` defasado sem nenhum item ⏳/🔄.
+- **Privacidade na árvore:** `scripts/sync_house.py` e o portão de `docs/house` não carregam caminhos nem nomes pessoais. (CONS-04B)
+- **`docs/principles/anti-patterns.md`:** a regra de amend local foi trocada por "sem reescrever commit; correção em commit novo". (CONS-17)
+
+### Removed
+
+- **Suporte ao Grok** (ver Breaking).
+- **Remoção de `skills/tab_pendencias/`** descrita no bloco anterior: revertida; a skill volta ao plugin (ver Added).
 
 ### Verified (campanha)
 

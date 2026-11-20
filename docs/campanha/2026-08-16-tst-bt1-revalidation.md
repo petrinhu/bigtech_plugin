@@ -2,7 +2,7 @@
 
 **Data da verificação:** 2026-08-17  
 **Hora local (medida):** `17/08/26 - 00:34:14` (`date '+%d/%m/%y - %H:%M:%S'`)  
-**Papel:** QA/verificador de campanha — host Grok, papel [grok][mais recente]  
+**Papel:** QA/verificador de campanha — segundo host (removido na 2.0.0), papel [segundo-host][mais recente]  
 **Item:** `TST-BT-1` (revalidar suíte campanha: `preci.sh` + pytest + `validate_plugin` + smoke + drift + evals + CI multi-OS no SHA final, pós BT-5..BT-8)  
 **DoD desta ordem de serviço:**
 

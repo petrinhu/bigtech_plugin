@@ -129,26 +129,33 @@ def find_project_root(start_dir: str):
 
 
 def load_config(start_dir: str):
+    """Devolve (root, cfg, motivo).
+
+    - Sem projeto ou com `enabled: false`: (None, None, None), guard inerte de propósito.
+    - Config inválida (JSON quebrado ou preset desconhecido): (None, None, motivo).
+      O motivo é devolvido ao chamador, que o emite como aviso em JSON no stdout.
+      Não escreve em stderr: a doc de hooks diz que o Claude não lê stderr de hook
+      com exit 0, então o guard não poderia desligar em silêncio.
+    - Válida: (root, cfg, None).
+    """
     root = find_project_root(start_dir)
     if root is None:
-        return None, None
+        return None, None, None
     config_path = os.path.join(root, ".claude", "tdd-guard.json")
     try:
         with open(config_path, encoding="utf-8") as f:
             raw = json.load(f)
     except json.JSONDecodeError as e:
-        print(f"tdd-guard: JSON invalido em {config_path}: {e}", file=sys.stderr)
-        return None, None
+        return None, None, f"JSON invalido em {config_path}: {e}"
     except Exception:
-        return None, None
+        return None, None, None
     if raw.get("enabled") is False:
-        return None, None
+        return None, None, None
     try:
         cfg = resolve_config(raw)
     except ValueError as e:
-        print(f"tdd-guard: {e}", file=sys.stderr)
-        return None, None
-    return root, cfg
+        return None, None, f"{config_path}: {e}"
+    return root, cfg, None
 
 
 def classify(rel_path: str, cfg: dict) -> str:

@@ -204,3 +204,77 @@ def test_file_outside_session_cwd_does_not_run_suite(tmp_path):
     assert not sentinel.exists(), "test_command do projeto vizinho foi executado"
     state = _state_file(home, neighbor)
     assert not os.path.exists(state), "estado gravado para projeto fora do cwd da sessao"
+
+
+# ---------------------------------------------------------------------------
+# CONS-R2: aviso do runner com exit 0 sai em JSON no stdout (PostToolUse),
+# nao em stderr, que o Claude nunca lê nesse caso.
+# ---------------------------------------------------------------------------
+
+def test_runner_nao_rodou_avisa_em_json_posttooluse(tmp_path):
+    (tmp_path / ".claude").mkdir()
+    (tmp_path / ".claude" / "tdd-guard.json").write_text(json.dumps({
+        "preset": "python-pytest",
+        "test_command": "comando_inexistente_cons_r2_xyz",
+    }))
+    home = os.path.realpath(str(tmp_path))
+    payload = {"tool_name": "Write", "cwd": str(tmp_path),
+               "tool_input": {"file_path": str(tmp_path / "soma.py")}}
+    proc = _run_hook("tdd_runner.py", payload, home)
+    assert proc.returncode == 0
+    assert proc.stderr == ""
+    saida = json.loads(proc.stdout)
+    assert "TDD runner" in saida["systemMessage"]
+    hso = saida["hookSpecificOutput"]
+    assert hso["hookEventName"] == "PostToolUse"
+    assert hso["additionalContext"] == saida["systemMessage"]
+
+
+def test_runner_erro_interno_avisa_em_json(tmp_path, monkeypatch, capsys):
+    import io
+    (tmp_path / ".claude").mkdir()
+    (tmp_path / ".claude" / "tdd-guard.json").write_text(
+        json.dumps({"preset": "python-pytest"}))
+    data = {"tool_input": {"file_path": str(tmp_path / "soma.py")}}
+    monkeypatch.setattr(sys, "stdin", io.StringIO(json.dumps(data)))
+    monkeypatch.setattr(r, "run_suite", lambda cfg, root, runner=None: {"ran": True, "has_red": True})
+
+    def boom(*a, **k):
+        raise OSError(28, "No space left on device")
+
+    monkeypatch.setattr(r.c, "write_state", boom)
+    assert r.main() == 0
+    saida = json.loads(capsys.readouterr().out)
+    assert "No space left" in saida["systemMessage"]
+    assert saida["hookSpecificOutput"]["hookEventName"] == "PostToolUse"
+
+
+# ---------------------------------------------------------------------------
+# CONS-R10 (N1): config invalida no runner sai em JSON no stdout (PostToolUse,
+# exit 0, stderr vazio), e a suite nao roda.
+# ---------------------------------------------------------------------------
+
+def _runner_config_invalida(tmp_path, conteudo):
+    (tmp_path / ".claude").mkdir()
+    (tmp_path / ".claude" / "tdd-guard.json").write_text(conteudo)
+    payload = {"tool_name": "Write", "cwd": str(tmp_path),
+               "tool_input": {"file_path": str(tmp_path / "soma.py")}}
+    proc = _run_hook("tdd_runner.py", payload, os.path.realpath(str(tmp_path)))
+    assert proc.returncode == 0
+    assert proc.stderr == ""
+    saida = json.loads(proc.stdout)
+    assert "tdd-guard.json" in saida["systemMessage"]
+    hso = saida["hookSpecificOutput"]
+    assert hso["hookEventName"] == "PostToolUse"
+    assert hso["additionalContext"] == saida["systemMessage"]
+    return saida
+
+
+def test_runner_config_json_invalida_avisa_em_json(tmp_path):
+    saida = _runner_config_invalida(tmp_path, "{ nao eh json")
+    assert "JSON invalido" in saida["systemMessage"]
+
+
+def test_runner_preset_desconhecido_avisa_em_json(tmp_path):
+    saida = _runner_config_invalida(tmp_path, json.dumps({"preset": "python_pytest"}))
+    assert "preset desconhecido" in saida["systemMessage"]

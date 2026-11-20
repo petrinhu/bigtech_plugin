@@ -6,10 +6,10 @@
 # pra pegar problema na maquina, sem gastar fila de runner.
 # Path CI: .github/workflows/ci.yml (BT-4 matrix multi-OS + containers + gitleaks).
 #
-# Gates (em ordem), sao 10 no total:
+# Gates (em ordem), sao 11 no total:
 #   1. Gate ZERO-ORFAOS (spec 4.1)   -> python3 scripts/validate_plugin.py
 #   2. Testes (hooks + scripts)      -> python3 -m pytest hooks/tests scripts/tests -q
-#   3. JSON valido (3 manifestos)    -> python3 -m json.tool em cada um
+#   3. JSON valido (4 manifestos)    -> python3 -m json.tool em cada um
 #   4. Paridade de versao            -> plugin.json == marketplace.json (plugins[0].version)
 #   5. Lint Python (se ruff existir) -> ruff check hooks/ scripts/   [degrada gracioso]
 #   6. Secret scan (se gitleaks)     -> gitleaks detect ... -c .gitleaks.toml [degrada]
@@ -17,7 +17,17 @@
 #   8. Drift semântico (BT-7)        -> python3 scripts/check_semantic_drift.py [obrigatório]
 #   9. Evals roteamento /bigtech     -> python3 evals/bigtech_routing/run_evals.py (BT-8)
 #  10. claude plugin validate (x2)   -> --strict no dir (marketplace); plugin.json
-#                                      sem --strict (CLAUDE.md de processo) [degrada]
+#                                      sem --strict [degrada]
+#  11. sync docs/house (CONS-10)     -> gate_sync_house.py --check; sem chave ou vault
+#                                      sai NAO CONFERIDO [nunca conta como PASS]
+#
+# Banner final: so diz "PRE-CI PASS" com os 11 gates passados e nenhum pulado
+# nem nao conferido. Gate pulado (SKIP) nunca conta como passado; o banner lista
+# quantos e quais foram pulados.
+#
+# Onde roda: no host (a suite de testes roda na maquina de quem chama). Para
+# isolamento mais forte, rode o preci dentro de um container; a opcao fica
+# aberta para quando as regras do usuario exigirem.
 #
 # Ferramentas opcionais (ruff, gitleaks, claude): se AUSENTES localmente, o gate
 # avisa que "rodara no CI" e segue (nao falha); paridade total e garantida no CI,
@@ -45,17 +55,25 @@ else
 fi
 
 GATE_NUM=0
-TOTAL_GATES=10
+TOTAL_GATES=11
+GATE_TITLE=""
+# Contadores do banner final: cada gate cai em exatamente uma destas listas.
+PASSED=()
+SKIPPED=()
+NAO_CONFERIDO=()
 
 # Cabecalho de um gate (numerado).
 gate() {
   GATE_NUM=$((GATE_NUM + 1))
+  GATE_TITLE="gate ${GATE_NUM}: $1"
   printf '\n%s==> [gate %d/%d] %s%s\n' \
     "${C_BOLD}${C_BLUE}" "${GATE_NUM}" "${TOTAL_GATES}" "$1" "${C_RESET}"
 }
 
-pass() { printf '%s[PASS]%s %s\n' "${C_GREEN}" "${C_RESET}" "$1"; }
-skip() { printf '%s[SKIP]%s %s\n' "${C_YELLOW}" "${C_RESET}" "$1"; }
+pass() { printf '%s[PASS]%s %s\n' "${C_GREEN}" "${C_RESET}" "$1"; PASSED+=("${GATE_TITLE}"); }
+skip() { printf '%s[SKIP]%s %s\n' "${C_YELLOW}" "${C_RESET}" "$1"; SKIPPED+=("${GATE_TITLE} (motivo: $1)"); }
+# nao_conferido(): gate rodou sem conferencia completa (ex.: sem chave). Nao e PASS.
+nao_conferido() { printf '%s[NAO CONFERIDO]%s %s\n' "${C_YELLOW}" "${C_RESET}" "$1"; NAO_CONFERIDO+=("${GATE_TITLE}"); }
 # fail(): imprime e encerra com exit 1 (set -e ja interrompe; isto da a mensagem).
 fail() { printf '%s[FAIL]%s %s\n' "${C_RED}" "${C_RESET}" "$1" >&2; exit 1; }
 
@@ -98,12 +116,13 @@ else
 fi
 
 # =================================================================================
-# Gate 3 — JSON valido (3 manifestos)
+# Gate 3 - JSON valido (4 manifestos: nucleo, marketplace, bundle, hooks)
 # =================================================================================
-gate "JSON valido: plugin.json, marketplace.json, hooks.json"
+gate "JSON valido: plugin.json, marketplace.json, bundle, hooks.json"
 JSON_FILES=(
   ".claude-plugin/plugin.json"
   ".claude-plugin/marketplace.json"
+  "bundles/bigtech-completo/.claude-plugin/plugin.json"
   "hooks/hooks.json"
 )
 json_ok=1
@@ -124,58 +143,23 @@ for jf in "${JSON_FILES[@]}"; do
   fi
 done
 if [[ "${json_ok}" -eq 1 ]]; then
-  pass "os 3 manifestos JSON sao validos."
+  pass "os 4 manifestos JSON sao validos."
 else
   fail "ao menos um manifesto JSON e invalido/ausente."
 fi
 
 # =================================================================================
-# Gate 4 - Paridade de versao (plugin.json == marketplace.json)
+# Gate 4 - Paridade de versao: nucleo, duas entradas do marketplace e bundle
 # =================================================================================
-# A versao do plugin vive em dois lugares (plugin.json::version e
-# marketplace.json::plugins[0].version). Divergencia gera um pacote inconsistente
-# e e facil de esquecer ao bumpar. Este gate FALHA se as duas nao baterem.
-# Python stdlib (json), sem dependencia externa.
-gate "Paridade de versao: plugin.json vs marketplace.json"
-if ${PY} - <<'PYEOF'
-import json
-import sys
-
-PLUGIN = ".claude-plugin/plugin.json"
-MARKET = ".claude-plugin/marketplace.json"
-
-try:
-    with open(PLUGIN, encoding="utf-8") as fh:
-        plugin_ver = json.load(fh).get("version")
-    with open(MARKET, encoding="utf-8") as fh:
-        market = json.load(fh)
-    plugins = market.get("plugins") or []
-    market_ver = plugins[0].get("version") if plugins else None
-except (OSError, ValueError, IndexError, AttributeError) as exc:
-    print(f"  erro ao ler as versoes: {exc}", file=sys.stderr)
-    sys.exit(2)
-
-if not plugin_ver:
-    print(f"  {PLUGIN}: campo 'version' ausente ou vazio.", file=sys.stderr)
-    sys.exit(2)
-if not market_ver:
-    print(f"  {MARKET}: 'plugins[0].version' ausente ou vazio.", file=sys.stderr)
-    sys.exit(2)
-if plugin_ver != market_ver:
-    print(
-        f"  divergencia: plugin.json={plugin_ver!r} != "
-        f"marketplace.json plugins[0].version={market_ver!r}",
-        file=sys.stderr,
-    )
-    sys.exit(1)
-
-print(f"  versao casada: {plugin_ver}")
-sys.exit(0)
-PYEOF
-then
-  pass "versao identica em plugin.json e marketplace.json."
+# A versao vive em quatro pontos (plugin.json, entrada bigtech, entrada
+# bigtech-completo e bundles/bigtech-completo/plugin.json). A checagem fica em
+# scripts/check_paridade_versao.py, com testes em scripts/tests. Saida 0 igual;
+# 1 divergente; 2 ausente ou ilegivel. Qualquer uma reprova.
+gate "Paridade de versao: nucleo, entradas do marketplace e bundle"
+if ${PY} scripts/check_paridade_versao.py; then
+  pass "versao identica nos quatro manifestos."
 else
-  fail "versao divergente entre plugin.json e marketplace.json; sincronize antes de seguir."
+  fail "versao divergente ou manifesto ausente; sincronize antes de seguir."
 fi
 
 # =================================================================================
@@ -201,8 +185,9 @@ if command -v gitleaks >/dev/null 2>&1; then
   if [[ -f ".gitleaks.toml" ]]; then
     GITLEAKS_ARGS+=(-c .gitleaks.toml)
   fi
-  # --no-git: varre a arvore de trabalho (nao so historico) — pega secret nao
-  # commitado ainda. Em repo git tambem cobre o que esta staged/working.
+  # Sem --no-git: em repo git o gitleaks roda em modo git e varre o historico de
+  # commits do --source (o padrao do detect). Arquivo nao commitado nao passa por
+  # este gate; a varredura da arvore de trabalho e outro comando.
   GITLEAKS_ARGS+=(--source ".")
   if gitleaks "${GITLEAKS_ARGS[@]}"; then
     pass "gitleaks: nenhum secret detectado."
@@ -226,7 +211,7 @@ fi
 # =================================================================================
 # Gate 8 - Drift semântico (BT-7): registry agents/skills/hooks + porte/host
 # =================================================================================
-# Obrigatório, stdlib. Detecta name≠stem, contagem ≠ 51, hook script ausente,
+# Obrigatório, stdlib. Detecta name≠stem, contagem fora de EXPECTED_AGENT_COUNT, hook script ausente,
 # porte legado "solo" como primário sem alias, e host legado Codeberg em produto.
 gate "Drift semântico (BT-7): check_semantic_drift.py"
 if ${PY} scripts/check_semantic_drift.py; then
@@ -254,11 +239,12 @@ fi
 # manifesto do plugin):
 #   a) no diretorio (.) --strict   -> marketplace.json (hard se CLI presente)
 #   b) em ./.claude-plugin/plugin.json (sem --strict)
-#       O repo de desenvolvimento traz CLAUDE.md na raiz (contexto de campanha /
-#       dual-host; nao e contexto de produto distribuido). A CLI avisa que esse
-#       CLAUDE.md nao e carregado como project context do plugin; com --strict
-#       o aviso vira FAIL. Mantemos validate sem --strict no manifesto do plugin
-#       para nao bloquear o pre-CI por material de processo do proprio repo.
+#       O CLAUDE.md de desenvolvimento mora em .claude/CLAUDE.md (contexto de
+#       campanha / dual-host; nao e contexto de produto distribuido). Desde o
+#       CONS-11A ele saiu da raiz, que era o que a CLI acusava como "not loaded
+#       as project context"; por isso o --strict do diretorio passa. O validate
+#       sem --strict no manifesto do plugin fica como esta: mudar isso e decisao
+#       do lider, nao de ajuste silencioso.
 # Se a CLI `claude` NAO estiver no runner, o gate faz SKIP avisando (degradacao
 # graciosa, igual ruff/gitleaks); nao falha o pre-CI por ausencia da CLI.
 gate "claude plugin validate (marketplace --strict + plugin.json)"
@@ -273,7 +259,7 @@ if command -v claude >/dev/null 2>&1; then
     validate_ok=0
   fi
   if claude plugin validate ./.claude-plugin/plugin.json; then
-    printf '  %s[ok]%s validate no plugin.json (warnings de CLAUDE.md de processo OK).\n' \
+    printf '  %s[ok]%s validate no plugin.json.\n' \
       "${C_GREEN}" "${C_RESET}"
   else
     printf '  %s[FAIL]%s validate reprovou no plugin.json.\n' \
@@ -290,9 +276,48 @@ else
 fi
 
 # =================================================================================
-# Resumo
+# Gate 11 — sync docs/house (CONS-10). Sem vault ou sem chave sai NAO CONFERIDO:
+# aparece como tal e nunca como PASS. Divergencia ou erro reprova.
+# =================================================================================
+gate "sync docs/house (CONS-10): gate_sync_house.py --check"
+if sync_out="$(${PY} scripts/gate_sync_house.py --check 2>&1)"; then
+  printf '%s\n' "${sync_out}"
+  if printf '%s\n' "${sync_out}" | grep -q '^NAO CONFERIDO'; then
+    nao_conferido "docs/house sem conferencia completa (sem vault ou chave): nao conta como PASS."
+  else
+    pass "docs/house conferido contra o vault (HMAC)."
+  fi
+else
+  printf '%s\n' "${sync_out}" >&2
+  fail "sync docs/house reprovou (divergencia ou erro de uso)."
+fi
+
+# =================================================================================
+# Resumo: PASS so com os 11 gates passados e nenhum pulado nem nao conferido.
 # =================================================================================
 printf '\n%s========================================%s\n' "${C_BOLD}" "${C_RESET}"
-printf '%s%s PRE-CI PASS %s — todos os gates obrigatorios verdes.\n' \
-  "${C_BOLD}" "${C_GREEN}" "${C_RESET}"
+N_PASS=${#PASSED[@]}
+N_SKIP=${#SKIPPED[@]}
+N_NAO=${#NAO_CONFERIDO[@]}
+if [[ "${N_PASS}" -eq "${TOTAL_GATES}" && "${N_SKIP}" -eq 0 && "${N_NAO}" -eq 0 ]]; then
+  printf '%s%s PRE-CI PASS%s: %d de %d gates passaram; nenhum pulado; nenhum nao conferido.\n' \
+    "${C_BOLD}" "${C_GREEN}" "${C_RESET}" "${N_PASS}" "${TOTAL_GATES}"
+else
+  printf '%s%s PRE-CI SEM REPROVACAO%s: %d de %d gates passaram; NAO e PASS.\n' \
+    "${C_BOLD}" "${C_YELLOW}" "${C_RESET}" "${N_PASS}" "${TOTAL_GATES}"
+  printf '  pulados (%d):' "${N_SKIP}"
+  if [[ "${N_SKIP}" -eq 0 ]]; then
+    printf ' nenhum\n'
+  else
+    printf '\n'
+    for s in "${SKIPPED[@]}"; do printf '    - %s\n' "${s}"; done
+  fi
+  printf '  nao conferidos (%d):' "${N_NAO}"
+  if [[ "${N_NAO}" -eq 0 ]]; then
+    printf ' nenhum\n'
+  else
+    printf '\n'
+    for s in "${NAO_CONFERIDO[@]}"; do printf '    - %s\n' "${s}"; done
+  fi
+fi
 printf '%s========================================%s\n' "${C_BOLD}" "${C_RESET}"

@@ -3,7 +3,7 @@
 > **Snapshot histórico PHASE 0 (freeze).** Estado medido no baseline; não é instrução operacional atual. Ordem 2026-08-16: GitHub único; purga host legado = BT-3.
 
 **Data da medição:** 2026-08-16  
-**Executor:** implementer (Grok, papel [sonnet]/[grok][modelo anterior ao mais recente])  
+**Executor:** implementer (segundo host, removido na 2.0.0, papel [sonnet]/[segundo-host][modelo anterior ao mais recente])  
 **Plano:** `PLANO-MELHORIA-BIGTECH-CLAUDE-CODE-2026-08-16.md` § PHASE 0  
 **Escopo:** só leitura de instalação viva + gravação de artefatos sob `docs/campanha/`  
 **Declaração:** nenhum arquivo vivo removido; sem push/merge/tag/release.
@@ -79,7 +79,7 @@ DUPLICATE_NAME_WITHIN_SCOPE=plugin:{} vault:{}
 |---|---:|---|
 | Plugin | 51 | bate com AGENTS.md / `plugin.json` 0.2.0 |
 | Vault `~/.claude/agents` | 71 | 51 ∩ plugin + 20 só-vault |
-| Grok `~/.grok/agents` (nota host) | 71 | contagem separada; não entra na interseção produto×vault Claude |
+| Segundo host (removido na 2.0.0) (nota host) | 71 | contagem separada; não entra na interseção produto×vault Claude |
 
 **Interseção idêntica byte-a-byte (sha256):** **0 / 51**  
 **Interseção divergente:** **51 / 51**
@@ -88,12 +88,12 @@ Amostra de divergência (bytes / sha12):
 
 | name | bytes plugin | bytes vault | sha plugin… | sha vault… |
 |---|---:|---:|---|---|
-| cosimo-chief-of-staff | 8691 | 7180 | eec9f0c36230 | 36bef6ec0709 |
-| caetano-cto | 6127 | 4617 | fa0cf2876de5 | bbbdbf6769f7 |
-| celso-ceo | 5729 | 4141 | 8193801e7904 | 2b9694d4e4d6 |
-| backend-engineer | 19961 | 18582 | 77754ce89138 | 67d37d8ccc60 |
-| qa-engineer | 21448 | 20049 | 20ca86a10604 | 27802798d35f |
-| visual-design-director | 23836 | 22847 | 942d3e04993f | 7e188dbd1e95 |
+| cosimo-chief-of-staff | 8691 | 7180 | eec9f0c36230 | `<removido por privacidade em 2026-11-20>` |
+| caetano-cto | 6127 | 4617 | fa0cf2876de5 | `<removido por privacidade em 2026-11-20>` |
+| celso-ceo | 5729 | 4141 | 8193801e7904 | `<removido por privacidade em 2026-11-20>` |
+| backend-engineer | 19961 | 18582 | 77754ce89138 | `<removido por privacidade em 2026-11-20>` |
+| qa-engineer | 21448 | 20049 | 20ca86a10604 | `<removido por privacidade em 2026-11-20>` |
+| visual-design-director | 23836 | 22847 | 942d3e04993f | `<removido por privacidade em 2026-11-20>` |
 
 Skills core também divergem (`SKILL.md`):
 

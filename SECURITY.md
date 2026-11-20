@@ -1,11 +1,12 @@
 # Segurança
 
-Política de segurança e modelo de confiança do plugin **bigtech**.
+Política de segurança e modelo de confiança do plugin **bigtech** (versão 2.0.0).
 
 Este documento existe para que você decida, com informação completa, se quer
 instalar e operar o plugin. O resumo em uma frase: **os hooks deste plugin
-executam código na sua máquina, e um deles pode rodar o comando de teste
-definido pelo projeto que você abrir**. Abaixo, o detalhe de cada ponto.
+executam código na sua máquina, um deles pode rodar o comando de teste
+definido pelo projeto que você abrir, e alguns skills são opt-in e sobem
+processos ou serviços locais.** Abaixo, o detalhe de cada ponto.
 
 ## Modelo de confiança em uma frase
 
@@ -16,37 +17,56 @@ acontece de forma automática durante a sessão, e não quando você digita o
 comando. Trate repositórios de terceiros com o mesmo cuidado que já teria
 antes de rodar a suíte de testes deles.
 
-## Os hooks rodam na sua máquina
+## Superfície do plugin
 
-Quando o plugin está instalado, o Claude Code registra seis hooks (ver
-`hooks/hooks.json`). Todos executam localmente, com o seu usuário, sob os
-seguintes eventos:
+O arquivo `hooks/hooks.json` registra **9 entradas** de hook, que usam **7
+scripts** distintos. Os hooks são executados localmente, com o seu usuário.
 
-| Hook | Evento | O que faz |
+| Script | Evento | O que faz |
 |---|---|---|
-| `bigtech_session_init.py` | SessionStart | Injeta o caminho dos manuais no contexto; avisa sobre conflito e dependências ausentes. |
-| `bigtech_porte_reminder.py` | SessionStart | Reavalia o porte do projeto; só age em projeto de código ainda não classificado. |
-| `tab_pendencias_reminder.py` | SessionStart, UserPromptSubmit | Lembra de gerar o `TODO.md` quando há `.bigtech-porte` sem a tabela e, com a tabela presente, mede a defasagem dela rodando `git` em modo somente-leitura; só lembra, nunca bloqueia. |
-| `bigtech_reinforce.py` | UserPromptSubmit | Reforça o modo de operação e roteia pedidos em linguagem natural. |
-| `tdd_guard.py` | PreToolUse (`Write`/`Edit`/`MultiEdit`) | Gate opt-in de TDD; pode bloquear a escrita de código de produção. |
-| `tdd_runner.py` | PostToolUse (`Write`/`Edit`/`MultiEdit`) | Roda a suíte de testes do projeto após a edição e grava o resultado. |
+| `hooks/bigtech_session_init.py` | SessionStart | Injeta o caminho dos manuais no contexto; avisa sobre conflito e sobre dependências recomendadas ausentes, lendo as configurações do Claude Code (`CLAUDE_CONFIG_DIR` ou `$HOME/.claude`). |
+| `hooks/bigtech_porte_reminder.py` | SessionStart | Lembra de classificar o porte do projeto; só age em projeto de código ainda não classificado. |
+| `hooks/tab_pendencias_reminder.py` | SessionStart, UserPromptSubmit | Carimba o início da sessão e lembra de revisar o `TODO.md` quando a sessão passa do tempo configurado. Ver "Estado gravado pelos hooks". |
+| `skills/tab_pendencias/tools/hooks/tab_pendencias_reminder.py` | SessionStart, UserPromptSubmit | Adaptador do motor de sinais de frescor da tabela de pendências: avisa quando o `TODO.md` falta ou está defasado. Lê o histórico do `git` em modo somente-leitura. |
+| `hooks/bigtech_reinforce.py` | UserPromptSubmit | Reforça o modo de operação e roteia pedidos em linguagem natural. |
+| `hooks/tdd_guard.py` | PreToolUse (`Write\|Edit`) | Gate opt-in de TDD; pode bloquear a escrita de código de produção. |
+| `hooks/tdd_runner.py` | PostToolUse (`Write\|Edit`) | Roda a suíte de testes do projeto após a edição e grava o resultado. |
 
-Nenhum desses hooks faz acesso de rede, telemetria ou envio de dados para
-fora da máquina. O estado do TDD é gravado apenas em
-`$HOME/.claude/state/tdd-guard/<hash>/last-run.json`, sob o seu `HOME`,
-resolvido em tempo de execução. Nenhum caminho é fixado no código.
+Os 9 registros se distribuem assim: quatro em SessionStart, três em
+UserPromptSubmit, um em PreToolUse e um em PostToolUse.
 
-## O `tab_pendencias_reminder` lê o histórico do `git`
+### Os hooks não usam a rede
 
-Para medir a defasagem da tabela de pendências, o `tab_pendencias_reminder.py`
-executa o `git` no projeto que você abriu **em modo somente-leitura**: comandos
-de consulta com argumentos fixos (como `git rev-list` e `git log`), sem
-interpolar entrada do projeto e **sem passar por um shell**. Ele só conta
-quantos commits e quantos dias se passaram desde o último toque no `TODO.md`;
-não escreve no repositório, não acessa a rede e não altera nenhum arquivo.
-É benigno e **fail-open**: qualquer erro (sem `git`, fora de um repositório,
-saída inesperada) faz o hook simplesmente não avisar, nunca interromper o
-turno.
+Nenhum dos 7 scripts abre conexão de rede, faz telemetria ou envia dados para
+fora da máquina. A única exceção é o próprio comando de teste do projeto,
+executado pelo `tdd_runner`, que pode fazer o que o projeto já faz quando você
+roda a suíte à mão.
+
+### Estado gravado pelos hooks
+
+- **TDD:** `$HOME/.claude/state/tdd-guard/<hash>/last-run.json`, resolvido em
+  tempo de execução. Nenhum caminho é fixado no código.
+- **`tab_pendencias` (cópia da skill):** diretório `$XDG_RUNTIME_DIR/tab_pendencias_hook_state`
+  ou, na falta dele, `$HOME/.cache/tab_pendencias_hook_state`, criado com
+  permissão `0700`. Guarda um arquivo por sessão e é podado por idade.
+- **Carimbo de sessão do hook da raiz (`hooks/tab_pendencias_reminder.py`):**
+  diretório `$XDG_RUNTIME_DIR/bigtech_tab_sessao` ou, na falta dele,
+  `$HOME/.cache/bigtech_tab_sessao`, criado com permissão `0700`. Nunca grava
+  no diretório temporário compartilhado (`/tmp`). Recusa symlink no diretório
+  e diretório de outro dono: nesse caso nada é gravado e a sessão segue
+  (fail-open). Os arquivos são podados por idade.
+
+## O `git` dentro do hook de pendências
+
+Para medir a defasagem da tabela de pendências, o hook da skill executa o `git`
+no projeto que você abriu **em modo somente-leitura**: apenas `git log` e
+`git rev-list`, com argumentos fixos, sem interpolar entrada do projeto e
+**sem passar por um shell** (a chamada usa lista de argumentos, com tempo
+limite de 15 segundos). Ele só conta quantos commits e quantos dias se
+passaram desde o último toque no `TODO.md`; não escreve no repositório, não
+acessa a rede e não altera nenhum arquivo. É benigno e **fail-open**: qualquer
+erro (sem `git`, fora de um repositório, saída inesperada) faz o hook
+simplesmente não avisar, nunca interromper o turno.
 
 ## Paridade de confiança do `tdd_runner`
 
@@ -91,12 +111,12 @@ fora da raiz do projeto não é avaliado.
 
 ## Comportamento dos hooks: silent-fail
 
-Todos os hooks são **silent-fail**: qualquer erro interno é capturado e o
-turno segue normalmente. Eles nunca interrompem o seu trabalho por falha
-própria. A única exceção intencional é o `tdd_guard`, que é o **gate de
-TDD** e pode recusar a escrita de código de produção quando não há um teste
-vermelho registrado. Esse gate também é opt-in (só atua com
-`.claude/tdd-guard.json`) e tem válvulas de escape descritas abaixo.
+Os hooks são **silent-fail**: qualquer erro interno é capturado e o turno
+segue normalmente. Eles nunca interrompem o seu trabalho por falha própria. A
+única exceção intencional é o `tdd_guard`, que é o **gate de TDD** e pode
+recusar a escrita de código de produção quando não há um teste vermelho
+registrado. Esse gate também é opt-in (só atua com `.claude/tdd-guard.json`) e
+tem válvulas de escape descritas abaixo.
 
 Em particular:
 
@@ -105,9 +125,55 @@ Em particular:
 - Se o runner não conseguir executar (comando ausente, timeout, binário não
   executável), o guard faz **fail-open**: avisa, mas permite a edição.
 
+## Skills com processos ou serviços locais
+
+Estes skills não são hooks. Rodam só quando você os invoca, e só no Linux com
+systemd. Nenhum deles é instalado como serviço permanente pelo plugin.
+
+### `watchcode`
+
+- Vigia o diário do sistema (`journalctl -f -o json`) e os coredumps, em busca
+  de falhas de GPU, falta de espaço, processos mortos pelo kernel e
+  `systemd-oomd`.
+- O daemon sobe como **unidade transitória** do `systemd --user`
+  (`systemd-run --user --collect`). Não há arquivo de unidade instalado nem
+  `enable`.
+- Estado em `${XDG_RUNTIME_DIR:-$HOME/.cache}/watchcode`; baseline local em
+  `$HOME/.config/bigtech/watchcode_baseline.txt`.
+- Para parar: a própria skill tem o comando `off`, que encerra a unidade.
+
+### `manter_ligado`
+
+- Mantém a máquina acordada com a tampa fechada, por meio de
+  `systemd-inhibit` na unidade transitória, e salva o estado das sessões
+  quando a bateria chega a 5%.
+- Enquanto está ativo, a suspensão automática fica bloqueada. Use `off` para
+  devolver o comportamento normal de energia.
+- Estado em `${XDG_RUNTIME_DIR:-$HOME/.cache}/manter_ligado`; snapshots em
+  `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/manter_ligado_snapshots`.
+
+## `github-gossips`: saiu do plugin
+
+O `github-gossips` saiu do plugin na versão 2.0.0 e continua disponível fora dele. Nenhum servidor, hook ou túnel dele vem com o plugin, então esta versão não tem essa superfície.
+
+## Dependências do bundle
+
+O bundle `bigtech-completo` declara como dependências:
+
+- `bigtech` (este plugin);
+- `playwright@claude-plugins-official`;
+- `superpowers@claude-plugins-official`;
+- `frontend-design@claude-plugins-official`.
+
+Esses são plugins de terceiros, com hooks, permissões e políticas próprios.
+Este plugin não os controla nem audita. O `bigtech_session_init.py` apenas
+avisa, no início da sessão, quais dependências recomendadas não estão
+habilitadas. O plugin também chama ferramentas do sistema: `python3` (hooks),
+`git` (pendências), `systemd` e `journalctl` (`watchcode` e `manter_ligado`).
+
 ## Como desativar
 
-Você tem três níveis de controle, do mais amplo ao mais específico:
+Você tem três níveis de controle para o TDD, do mais amplo ao mais específico:
 
 1. **Desligar o TDD no projeto inteiro.** Remova ou renomeie o arquivo
    `.claude/tdd-guard.json`. Sem ele, os hooks de TDD ficam inertes. Como
@@ -131,8 +197,12 @@ Você tem três níveis de controle, do mais amplo ao mais específico:
    estão verdes (`has_red=false`), útil para reorganizar código sem adicionar
    funcionalidade nova.
 
+Para os skills de processo local, use o comando `off` de cada um. 
+
 Para desinstalar o plugin por completo, use o gerenciador de plugins do
-Claude Code (`/plugin`), o que remove o registro de todos os hooks.
+Claude Code (`/plugin`), o que remove o registro de todos os hooks. A
+desinstalação não apaga o estado local listado acima; remova esses diretórios
+à mão se quiser um estado limpo.
 
 ## Boas práticas ao abrir código de terceiros
 

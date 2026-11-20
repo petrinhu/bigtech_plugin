@@ -1,14 +1,16 @@
 # Anti-patterns universais
+> As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário.
+
 
 Práticas a recusar em **todo projeto**. Valem para qualquer agent da constelação e para o operador.
 
-Princípios relacionados: [arquitetura e princípios](arquitetura-principios.md) · [metodologia ágil](agile-methodology.md). O fluxo de commits e o gate de qualidade estão em [CONTRACT](../manuals/CONTRACT.md).
+Princípios relacionados: [arquitetura e princípios](arquitetura-principios.md) · [metodologia ágil](agile-methodology.md). O fluxo de commits e o gate de qualidade estão em [CONTRACT](../house/CONTRACT.md).
 
 ## Git e versionamento
 
 - `--no-verify` em commits sem pedido explícito. Os hooks de pre-commit/pre-push existem por um motivo; pular o gate esconde regressões.
 - `git push --force` em `main`/`master` (recusar a menos que autorizado). Reescrever histórico publicado quebra o clone de todo mundo.
-- `git commit --amend` de commits já publicados (sempre criar um novo commit). Amend só é seguro enquanto o commit não saiu da máquina local.
+- Sem reescrever commit; correção em commit novo.
 
 ## Texto e estilo
 
@@ -36,4 +38,4 @@ Princípios relacionados: [arquitetura e princípios](arquitetura-principios.md)
 
 - Arquitetura, SOLID, DRY e TDD: [arquitetura e princípios](arquitetura-principios.md).
 - Metodologia ágil e backlog em `TODO.md`: [metodologia ágil](agile-methodology.md).
-- Fluxo de commits e gate de qualidade: [CONTRACT](../manuals/CONTRACT.md).
+- Fluxo de commits e gate de qualidade: [CONTRACT](../house/CONTRACT.md).

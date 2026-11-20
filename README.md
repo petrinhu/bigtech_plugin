@@ -2,10 +2,10 @@
 
 ![License](https://img.shields.io/badge/license-Apache--2.0-blue)
 ![Type](https://img.shields.io/badge/type-Claude%20Code%20Plugin-blue)
-![Grok](https://img.shields.io/badge/Grok-compatible-black)
 ![Status](https://img.shields.io/badge/status-stable-brightgreen)
 ![Language](https://img.shields.io/badge/lang-pt--br%20%2F%20en-lightgrey)
-![Agents](https://img.shields.io/badge/agents-51-yellow)
+![Agents](https://img.shields.io/badge/agents-71-yellow)
+![Skills](https://img.shields.io/badge/skills-16-yellow)
 ![CI](https://img.shields.io/github/actions/workflow/status/petrinhu/bigtech_plugin/ci.yml?label=CI)
 ![Release](https://img.shields.io/github/v/release/petrinhu/bigtech_plugin?label=release)
 
@@ -15,7 +15,7 @@
 
 ## English
 
-> Structure any project like a digital-product company: a constellation of 51 agents (12 C-level + 39 operational), 3 skills, and governance and TDD hooks. Scales from **early** through **scale** to **bigtech** (deprecated alias: `solo` → `early`).
+> Structure any project like a digital-product company: a constellation of 71 agents (12 C-level + 59 operational), 15 skills, and governance and TDD hooks. Scales from **early** through **scale** to **bigtech** (deprecated alias: `solo` → `early`).
 
 ### Welcome, supreme leader
 
@@ -27,17 +27,17 @@ High-stakes decisions (macro architecture, scope, stack, go/no-go, irreversible 
 
 `bigtech` packages a complete product-and-engineering organization as a plugin for Claude Code:
 
-- **51 agents.** 12 C-level (strategy, product, engineering, marketing, operations, security, data, AI, finance, revenue, legal, chief of staff) and 39 operational agents that do the work.
-- **3 skills.** 2 orchestration skills plus 1 agent shortcut. `/bigtech` assembles the constellation, `/proj_software` runs the software development life cycle (SDLC); `/visual-design-director` is a shortcut that delegates to the visual-design-director agent for rendered high-fidelity design. `/tab_pendencias` is not shipped by this plugin: it comes from the standalone product [tab_pendencias](https://github.com/petrinhu/tab_pendencias).
+- **71 agents.** 12 C-level (strategy, product, engineering, marketing, operations, security, data, AI, finance, revenue, legal, chief of staff) and 59 operational agents that do the work, including the game-development squad and the medical-expert agents.
+- **15 skills.** Orchestration skills (`/bigtech`, `/proj_software`, `/proj_jogo`, `/bigtech:tab_pendencias`), agent shortcuts (`/dr-advogado`, `/dr-medico-perito`, `/dr-medico-psiquiatra`, `/dr-medico-trabalho`, `/learning-designer`, `/suporte-linux`, `/visual-design-director`), the case orchestrator `/pericia-medica`, and three new skills: `/watchcode`, `/manter_ligado` and `/olhe_agentes`. `github-gossips` left the plugin and stays available outside it.
 - **Governance and TDD hooks.** Test guard-rail (red, green, refactor), project-size reassessment, operating-mode reinforcement, and bootstrap of the manuals into the session.
 
-The non-negotiable principle: **the process adapts to the size of the project, never the other way around.** A 200-line CLI does not summon the whole team. The Chief of Staff classifies the size and turns on only what is needed, preventing over-engineering.
+The core principle: **the process adapts to the size of the project, never the other way around.** A 200-line CLI does not summon the whole team. The Chief of Staff classifies the size and turns on only what is needed, preventing over-engineering.
 
 **Canonical project sizes (porte):** `early` | `scale` | `bigtech`. Headcount is an auxiliary note, not a size value. Legacy `--porte solo` and marker `porte=solo` normalize to `early` (floor is always at least early).
 
 ### Installation
 
-Install on **Claude Code** (native plugin) or **Grok** (compatible materialization). The two hosts do not share a plugin system.
+Install on **Claude Code** (native plugin). Each step below is a command you run in your terminal.
 
 #### Claude Code (native plugin)
 
@@ -47,77 +47,54 @@ Install on **Claude Code** (native plugin) or **Grok** (compatible materializati
 - **macOS:** `xcode-select --install` or `brew install python`.
 - **Windows (native):** Microsoft Store Python registers the `python3` alias (recommended). The python.org installer may only provide `python`/`py`; use the plugin's `bin/python3.cmd` shim on PATH, or **WSL**.
 
-Optional companions (install via Claude Code, same on every OS):
+#### Recommended dependencies
+
+**Warning: without the recommended dependencies, bigtech is heavily compromised.** Install the full bundle, `bigtech-completo`, which brings everything at once. If you decline the dependencies, know what stops working:
+
+- **Without `superpowers`:** `/bigtech:proj_software` and `visual-design-director`, when they run in the main conversation (not inside an agent), lose the brainstorming (a conversation to settle an unclear request), the written plan, and the test-first cycle (TDD). Engineering agents keep working, just without that reference.
+- **Without `playwright`:** the session cannot control a browser (open a page, click, take a screenshot). `accessibility-specialist` loses browser checks. `playwright` downloads the `@playwright/mcp` package from the internet every time its server starts.
+- **Without `frontend-design`:** interface design uses only the principles already built into the frontend and visual design agents. You lose the newer, canonical version of the skill. The impact is small.
+
+**How to install.** First add the marketplaces (the catalogs where plugins come from), then install the bundle. If a marketplace is already added, skip its line:
 
 ```
-/plugin install superpowers@claude-plugins-official
-/plugin marketplace add anthropics/skills
-/plugin install example-skills@anthropic-agent-skills
+claude plugin marketplace add anthropics/claude-plugins-official
+claude plugin marketplace add https://github.com/petrinhu/bigtech_plugin
+claude plugin install bigtech-completo@petrinhu
 ```
 
-`superpowers` pairs well with the constellation; `frontend-design` (in `example-skills`) helps UI agents avoid generic templates. `playwright` is also useful for browser automation.
-
-Install `bigtech`:
+**To decline the dependencies**, install only the core. No dependency comes with it:
 
 ```
-/plugin marketplace add https://github.com/petrinhu/bigtech_plugin
-# or a local clone:
-# /plugin marketplace add /path/to/bigtech_plugin
-/plugin install bigtech@petrinhu
+claude plugin install bigtech@petrinhu
 ```
 
-`bigtech@petrinhu` disambiguates the marketplace; if only this marketplace is registered, `/plugin install bigtech` also resolves.
+**Limits you should know:**
+
+- If the full bundle is installed without the marketplaces above, it stays installed but does not load. bigtech warns about this at the start of each session.
+- To decline ONE recommended plugin after installing the full bundle, you must uninstall the bundle: `claude plugin uninstall bigtech-completo@petrinhu`. The dependencies stay active after that.
+- `claude plugin prune` removes the leftover dependencies, but it also removes `bigtech`, which then has to be installed again.
+- `playwright` downloads the `@playwright/mcp` package from the internet at every start. Without network access, the session has no browser.
 
 **After install:** restart the Claude Code session so `bigtech_session_init` can inject manuals and mode reinforcement.
 
-**Name conflicts.** If global agents, skills, or hooks in `~/.claude/` already use the same names as this plugin, do **not** install over them. Prefer an isolated profile (`CLAUDE_CONFIG_DIR=...`) or retire only the colliding **bigtech core** names. Do **not** delete personal or unrelated agents (`dr-*`, `game-*`, etc.). Detail: [AGENTS.md](AGENTS.md) and the [Installation wiki page](https://github.com/petrinhu/bigtech_plugin/wiki/Installation).
+**Name conflicts.** If global agents, skills, or hooks in `~/.claude/` already use the same names as this plugin, do **not** install over them. Prefer an isolated profile (`CLAUDE_CONFIG_DIR=...`) or retire only the colliding **bigtech core** names. Do **not** delete personal or unrelated agents (`dr-*`, `game-*`, etc.). Detail: [LLM.md](LLM.md) and the [Installation wiki page](https://github.com/petrinhu/bigtech_plugin/wiki/Installation).
 
-If you are an AI agent installing on behalf of a user, follow [AGENTS.md](AGENTS.md).
+If you are an AI agent installing on behalf of a user, follow [LLM.md](LLM.md).
 
-#### Grok (compatible; no Claude plugin system)
+#### Optional: manter_ligado (Linux with systemd only)
 
-Grok does **not** load Claude Code marketplaces. **Grok-compatible** means you materialize this repo's agents, skills, and hooks on the Grok host. Example on Linux (paths are illustrative; use your clone path):
-
-```bash
-# 1) Clone (or use an existing checkout)
-git clone https://github.com/petrinhu/bigtech_plugin.git /path/to/bigtech_plugin
-CLONE=/path/to/bigtech_plugin
-
-# 2) Agents: copy the 51 product agents; keep Grok-only agents that are not in the plugin
-mkdir -p ~/.grok/agents
-cp "$CLONE"/agents/*.md ~/.grok/agents/
-
-# 3) Skills: symlink product skills into the Grok skills dir
-mkdir -p ~/.grok/skills
-ln -sfn "$CLONE"/skills/bigtech ~/.grok/skills/bigtech
-ln -sfn "$CLONE"/skills/proj_software ~/.grok/skills/proj_software
-ln -sfn "$CLONE"/skills/visual-design-director ~/.grok/skills/visual-design-director
-# tab_pendencias: use the standalone product repo (github.com/petrinhu/tab_pendencias); this plugin no longer ships a copy
-# ln -sfn /path/to/tab_pendencias ~/.grok/skills/tab_pendencias
-
-# 4) Hooks: copy relevant Python scripts (prefer real files, not symlinks into another host)
-mkdir -p ~/.grok/hooks/scripts
-cp "$CLONE"/hooks/bigtech_*.py "$CLONE"/hooks/tdd_*.py \
-   "$CLONE"/hooks/tab_pendencias_reminder.py \
-   ~/.grok/hooks/scripts/
-# Register events if your Grok host requires it. If Claude compat is on with
-# hooks=false, bigtech/TDD hooks will not double-fire via that path.
-
-# 5) Optional: ensure skills are discoverable
-# In ~/.grok/config.toml, include ~/.grok/skills under [skills].paths
-
-# 6) Restart Grok (/new or process restart) so agents and skills reload
-```
-
-Summary: **Claude** = install the marketplace plugin. **Grok** = copy/symlink agents, skills, and hooks from this repository onto the host. Runtime parity depends on the host; hooks and the subagent protocol are not identical across platforms.
+`manter_ligado` keeps the data connection alive with the lid closed and saves the state of the sessions at 5% battery, without shutting the machine down. It depends on systemd and runs only on Linux with systemd.
 
 ### Usage
 
-The 2 orchestration skills are the entry points. Invoke them with a slash or describe your intent in natural language; the mode reinforcement routes the request to the right skill. The 3rd skill, `/visual-design-director`, is an agent shortcut for design work.
+The user's instructions (the global CLAUDE.md and the project CLAUDE.md, and the rules they reference) take precedence over this plugin's manuals, agents, and reminders in any conflict. Where they diverge, follow the user's instructions.
+
+The 2 orchestration skills are the entry points. Invoke them with a slash or describe your intent in natural language; the mode reinforcement routes the request to the right skill. The other skills are agent shortcuts, a case orchestrator, or operational tools, listed under [Skills](#skills).
 
 #### `/bigtech`: assemble the constellation
 
-Business and leadership layer (product, marketing, sales, legal, finance, release). Invokes the Chief of Staff (Cósimo), who classifies the size, picks the pipeline variant, and returns the activation map: which C-levels and operational agents to turn on, and in which of the 12 phases.
+Business and leadership layer (product, marketing, sales, legal, finance, release). Invokes the Chief of Staff (Cósimo), who classifies the size, recommends the pipeline variant (the user confirms), and returns the activation map: which C-levels and operational agents to turn on, and in which of the 12 phases.
 
 ```
 /bigtech ./my-project
@@ -137,21 +114,41 @@ Orchestrates the software development life cycle across 5 macro-phases, allocati
 
 Use it when starting a new software project: "I'm going to build software", "new system", "build a feature", "which flow to follow".
 
-#### `/tab_pendencias`: WSJF planning table
-
-> Not shipped by this plugin. Install the standalone product: [tab_pendencias](https://github.com/petrinhu/tab_pendencias).
+#### `/bigtech:tab_pendencias`: WSJF planning table
 
 Creates and maintains a backlog table ordered top to bottom in the sequence that minimizes rework, combining topological ordering (dependency) with WSJF (value). The "Wave" column marks steps of equal value that run in parallel.
 
 ```
-/tab_pendencias --create
-/tab_pendencias --show
-/tab_pendencias --reorder
+/bigtech:tab_pendencias --create
+/bigtech:tab_pendencias --show
+/bigtech:tab_pendencias --reorder
 ```
 
 Use it to plan steps, order the backlog, or ask "what's left" and "in what order to do it".
 
-**Keeping the table fresh.** Marking a status is cheap and manual; reordering is expensive and rare. When you commit work that closes or advances a `TODO.md` item, cite the item ID in the commit message and touch the `Status` column in the same commit (delivered implementation → `🔍 Pendente verificação`; `✅` only after the test/audit wave). Reordering, by contrast, runs only through `--reorder`, and only when a prioritization input changes. See [docs/tabela-pendencias-frescor.md](docs/tabela-pendencias-frescor.md).
+**Keeping the table fresh.** Marking a status is cheap and manual; reordering is expensive and rare. When you commit work that closes or advances a `TODO.md` item, cite the item ID in the commit message and touch the `Status` column in the same commit (delivered implementation → `🔍 Pendente verificação`; `✅` only after the test/audit wave). Reordering, by contrast, runs only through `--reorder`, and only when a prioritization input changes and you decide to reorder. See [docs/tabela-pendencias-frescor.md](docs/tabela-pendencias-frescor.md).
+
+### Skills
+
+| Skill | Kind | Function |
+|---|---|---|
+| `bigtech` | orchestration | Assembles the constellation and classifies the project size. |
+| `proj_software` | orchestration | Runs the software life cycle (SDLC) in 5 macro-phases. |
+| `proj_jogo` | orchestration | Runs game development (game-dev SDLC) with the game squad, from game jam to AAA. |
+| `tab_pendencias` | orchestration | Creates and orders the WSJF backlog table (`TODO.md`). |
+| `visual-design-director` | agent shortcut | High-fidelity visual design, rendered and checked on screen. |
+| `dr-advogado` | agent shortcut | Brazilian legal work: case analysis, sourced research, legal drafts. |
+| `dr-medico-perito` | agent shortcut | Medical-expert work: reports, causal nexus, damage and incapacity. |
+| `dr-medico-psiquiatra` | agent shortcut | Forensic psychiatry: criminal responsibility, civil capacity, psychic damage. |
+| `dr-medico-trabalho` | agent shortcut | Occupational medicine: occupational nexus, insalubrity, hazard pay. |
+| `pericia-medica` | case orchestrator | Runs a medical-legal case with the quartet of medical-expert and legal agents. |
+| `learning-designer` | agent shortcut | Instructional design: lessons, activities, quizzes, and course outlines. |
+| `suporte-linux` | agent shortcut | Interactive Linux support: detects the distro first and asks before each command. |
+| `watchcode` | operational | Watches the journal and coredumps during agent work and captures real crashes. |
+| `manter_ligado` | operational | Keeps the connection alive with the lid closed and saves sessions at 5% battery (Linux with systemd only). |
+| `olhe_agentes` | operational | Turns the agent monitor on or off and reports idle agents on a 5-minute tick. |
+
+Shortcuts such as `/dr-advogado` and `/learning-designer` call the agent of the same name, with the `bigtech:` prefix (for example, `bigtech:dr-advogado`).
 
 ### Agents
 
@@ -172,19 +169,23 @@ Use it to plan steps, order the backlog, or ask "what's left" and "in what order
 | `claudio-clo` | CLO | Legal (general counsel) |
 | `cosimo-chief-of-staff` | Chief of Staff | Pipeline routing, anti-over-engineering |
 
-#### Operational (39)
+#### Operational (59)
 
-**Engineering (14):** `software-architect`, `tech-lead`, `backend-engineer`, `frontend-engineer`, `mobile-engineer`, `embedded-firmware-engineer`, `hardware-engineer`, `devops-sre`, `performance-engineer`, `network-engineer`, `network-security-engineer`, `security-engineer`, `qa-engineer`, `release-manager`.
+**Engineering (15):** `software-architect`, `tech-lead`, `backend-engineer`, `frontend-engineer`, `mobile-engineer`, `embedded-firmware-engineer`, `hardware-engineer`, `linux-diag`, `devops-sre`, `performance-engineer`, `network-engineer`, `network-security-engineer`, `security-engineer`, `qa-engineer`, `release-manager`.
 
 **Data and AI (4):** `data-engineer`, `data-scientist`, `ml-engineer`, `applied-ai-engineer`.
 
 **Product, UX, and Design (8):** `product-manager`, `business-analyst`, `ux-researcher`, `ux-ui-designer`, `visual-design-director`, `ux-writer`, `accessibility-specialist`, `art-director`.
 
-**Management and People (2):** `engineering-manager`, `scrum-master`.
+**Management and People (3):** `engineering-manager`, `scrum-master`, `engineering-coach`.
 
-**Marketing, Growth, and Revenue (6):** `content-seo`, `pr-comms`, `growth-engineer`, `community-manager`, `customer-success`, `revenue-ops`.
+**Marketing, Growth, and Revenue (7):** `content-seo`, `pr-comms`, `growth-engineer`, `community-manager`, `customer-success`, `revenue-ops`, `product-marketing-manager`.
 
-**Support, Docs, Legal, and i18n (5):** `support-engineer`, `technical-writer`, `compliance-legal`, `internal-auditor`, `i18n-l10n-specialist`.
+**Support, Docs, Legal, Education, and i18n (7):** `support-engineer`, `technical-writer`, `compliance-legal`, `internal-auditor`, `i18n-l10n-specialist`, `revisor-textual`, `learning-designer`.
+
+**Game development (11):** `game-producer`, `lead-game-designer`, `economy-designer`, `level-designer`, `narrative-designer`, `narrative-writer`, `gameplay-engineer`, `engine-graphics-programmer`, `game-animator`, `3d-artist-rigger`, `audio-designer-composer`.
+
+**Medical-expert and legal (4):** `dr-advogado`, `dr-medico-perito`, `dr-medico-psiquiatra`, `dr-medico-trabalho`.
 
 When invoked, every agent runs a pre-flight check on the backlog table (`TODO.md` at the root): the C-level agents require it as a precondition in the activation map; the operational agents flag it if missing and proceed with the task.
 
@@ -192,47 +193,47 @@ When invoked, every agent runs a pre-flight check on the backlog table (`TODO.md
 
 | Hook | Event | Function |
 |---|---|---|
-| `tdd_guard.py` | PreToolUse (Write/Edit) | TDD guard-rail: blocks code outside the red, green, refactor cycle. Opt-in per project. |
-| `tdd_runner.py` | PostToolUse (Write/Edit) | Runs the test suite after the edit and reports the result to the TDD cycle. |
-| `bigtech_session_init.py` | SessionStart | Injects the manuals' path into the context (docs-bootstrap), warns if `caveman` is active, and suggests the missing dependencies. |
+| `tdd_guard.py` | PreToolUse (Write\|Edit) | TDD guard-rail: blocks code outside the red, green, refactor cycle. Opt-in per project. |
+| `tdd_runner.py` | PostToolUse (Write\|Edit) | Runs the test suite after the edit and reports the result to the TDD cycle. |
+| `bigtech_session_init.py` | SessionStart | Injects the manuals' path into the context (docs-bootstrap), warns if `caveman` is active, and warns about recommended dependencies that are missing. |
 | `bigtech_porte_reminder.py` | SessionStart | Reassesses the project size (scales up or down); only fires on a code project not yet classified. |
-| `tab_pendencias_reminder.py` | SessionStart, UserPromptSubmit | Backlog-table staleness detector. Reminds you to generate the `TODO.md` via `/tab_pendencias` when the project is classified (`.bigtech-porte` marker) but has no table; once the table exists, measures its staleness via `git` (commits and days since the last touch to `TODO.md`) and, after a long session, nudges you to review and reorder it. Thresholds are tunable in an optional `.tab-staleness.json` at the project root. It only reminds, never blocks or reorders. |
-| `bigtech_reinforce.py` | UserPromptSubmit | Reinforces bigtech mode (anti-drift) and routes natural-language activation to `/bigtech`. Marker-scoped, noise-resistant. |
+| `tab_pendencias_reminder.py` | SessionStart, UserPromptSubmit | Backlog-table staleness detector. Reminds you to generate the `TODO.md` via `/bigtech:tab_pendencias` when the project is classified (`.bigtech-porte` marker) but has no table; once the table exists, measures its staleness via `git` (commits and days since the last touch to `TODO.md`) and, after a long session, nudges you to review and reorder it. Thresholds are tunable in an optional `.tab-staleness.json` at the project root. It only reminds, never blocks or reorders. |
+| `bigtech_reinforce.py` | UserPromptSubmit | Reinforces bigtech mode and routes natural-language activation to `/bigtech`. Marker-scoped, noise-resistant. |
+
+The plugin declares 9 hook entries across 5 events; the smoke test checks each one.
 
 ### Compatibility
 
 **Platform.** Works on Linux, macOS, and Windows (native or WSL). The hooks are pure Python and run cross-platform; the hard prerequisite on Claude Code is `python3` on the PATH (see [Claude Code (native plugin)](#claude-code-native-plugin), notably the Windows note). When the `tab_pendencias` skill plans tests or audits that need external tools, each tool is offered for installation with your confirmation, using the command that fits your OS (apt/dnf/brew/winget/choco/scoop) and preferring cross-platform managers (pip/uv, cargo, npm). Nothing is installed silently.
 
-**Built for Claude Code (Anthropic).** The official install path is the Claude Code plugin/marketplace format (life-cycle hooks, skills, subagent protocol). **Grok-compatible:** the same agents, skills, and hook scripts can be materialized on a Grok host (see [Grok (compatible)](#grok-compatible-no-claude-plugin-system)); that path is operational but not a second plugin system. Other assistants or code CLIs (Gemini CLI, GitHub Copilot CLI, OpenAI Codex, Cursor, Aider, etc.) are not supported without their own adaptation.
+**Built for Claude Code (Anthropic).** The official install path is the Claude Code plugin/marketplace format (life-cycle hooks, skills, subagent protocol). Other assistants or code CLIs (Gemini CLI, GitHub Copilot CLI, OpenAI Codex, Cursor, Aider, etc.) are not supported without their own adaptation.
 
-**Incompatible with the `caveman` plugin.** `caveman` compresses communication and conflicts with this plugin's mode reinforcement. Disable `caveman` before using `bigtech`; the session hook warns you if it detects both active at the same time.
+**Possible conflict with the `caveman` plugin.** `caveman` compresses communication and can interfere with this plugin's mode reinforcement and routing. The session hook warns you if it detects both active at the same time. Whether to keep `caveman` is your decision; if you keep both, make sure requests for the constellation still reach `/bigtech`.
 
-**Suggested dependencies:** `playwright` and `superpowers`. They are not required, but they enable the full experience (browser automation and advanced flows). Install them to get the most out of the plugin; the session hook suggests installing them when they are absent.
+### Model and effort
 
-### Orchestration model
+The agents ship with `model: inherit`: each one runs on the model of the thread that dispatches it, so the model choice follows your session and your own instructions. If your instructions define how models and effort are chosen, they take precedence over this plugin.
 
-By default, the agents use the **`opus`** model (always the latest Opus: the `model` field does not pin a version), and the **orchestration** (the Chief of Staff and the C-level assembling and coordinating the constellation) runs at **maximum effort**, for the deepest reasoning on the decisions that cut across the team. This is the recommended default.
-
-You can change it manually: edit the `model` field in the header of any agent in `agents/<slug>.md` (accepted values: `opus`, `sonnet`, `haiku`) and adjust your session's effort level with `/effort`.
+To pin a model for one agent, edit the `model` field in the header of `agents/<slug>.md` (accepted values: `inherit`, `opus`, `sonnet`, `haiku`) and adjust the effort level with `/effort`.
 
 ### Documentation
 
 **Wiki (beginner-friendly, didactic):** the [project Wiki](https://github.com/petrinhu/bigtech_plugin/wiki) has one page per agent, hook, and skill, plus a glossary, an installation guide, and a step-by-step usage guide.
 
-The governance manuals ship with the plugin in `docs/` and are injected into the session context:
+The governance manuals ship with the plugin in `docs/house/` and are injected into the session context:
 
-- `docs/ORG.md`: governance manual for the constellation (RACI, sizes, pipeline routing).
-- `docs/pipeline_release_1.0.md`: 12-phase release pipeline, from idea to 1.0.
-- `docs/lideranca_pipeline_release.md`: C-level leadership theory and the named constellation.
-- `docs/TOOLING.md`: catalog of free/open-source (FOSS) tools per agent.
-- `docs/manuals/`: quality contract, tests, agile, deploy checklist, and audits.
+- `docs/house/ORG.md`: governance manual for the constellation (RACI, sizes, pipeline routing).
+- `docs/house/pipeline_release_1.0.md`: 12-phase release pipeline, from idea to 1.0.
+- `docs/house/lideranca_pipeline_release.md`: C-level leadership theory and the named constellation.
+- `docs/house/TOOLING.md`: catalog of free/open-source (FOSS) tools per agent.
+- `docs/house/`: quality contract, tests, agile, deploy checklist, and audits.
 - `docs/principles/`: architecture principles, agile methodology, anti-patterns, and hardware limits.
 
 ### Security
 
 The hooks run code on your machine, and `tdd_runner` may run the test command declared by the project you open (trust parity with `make test`/`npm test`). Before using it with third-party repositories, read [SECURITY.md](./SECURITY.md): trust model, opt-in, and how to disable.
 
-> **TDD mode runs a project-defined command as a shell.** The PostToolUse hook `tdd_runner` is opt-in: it only activates when the project you open contains a `.claude/tdd-guard.json` file. When it is active, the `fast_command`/`test_command` declared in that file is executed as a shell command after each edit. Treat `.claude/tdd-guard.json` as trusted code (the same trust you give to a `make test`/`npm test` target), and do not turn on TDD mode in an untrusted third-party repository without first inspecting that command.
+> **TDD mode runs a project-defined command as a shell.** The PostToolUse hook `tdd_runner` is opt-in: it only activates when the project you open contains a `.claude/tdd-guard.json` file. When it is active, the `fast_command`/`test_command` declared in that file is executed as a shell command after each edit. Treat `.claude/tdd-guard.json` as trusted code (the same trust you give to a `make test`/`npm test` target), and do not turn on TDD mode in an untrusted third-party repository without first inspecting that command. Prefer pointing `test_command` at an isolated executor (container or sandbox) with a process limit; run it on the host only where your rules allow.
 
 ### License
 
@@ -242,7 +243,7 @@ Distributed under the [Apache-2.0](./LICENSE) license.
 
 ## Português
 
-> Estruture qualquer projeto como uma empresa de produto digital: uma constelação de 51 agents (12 C-level + 39 operacionais), 3 skills e hooks de governança e TDD. Dimensionável de **early** passando por **scale** até **bigtech** (alias depreciado: `solo` → `early`).
+> Estruture qualquer projeto como uma empresa de produto digital: uma constelação de 71 agents (12 C-level + 59 operacionais), 15 skills e hooks de governança e TDD. Dimensionável de **early** passando por **scale** até **bigtech** (alias depreciado: `solo` → `early`).
 
 ### Bem-vindo, líder supremo
 
@@ -254,17 +255,17 @@ Decisões de altíssimo valor (arquitetura macro, escopo, stack, go/no-go, deplo
 
 `bigtech` empacota uma organização completa de produto e engenharia em forma de plugin para o Claude Code:
 
-- **51 agents.** 12 C-level (estratégia, produto, engenharia, marketing, operações, segurança, dados, IA, finanças, receita, jurídico, chief of staff) e 39 operacionais que executam o trabalho.
-- **3 skills.** 2 de orquestração mais 1 atalho de agent. `/bigtech` monta a constelação, `/proj_software` toca o ciclo de vida de software (SDLC); `/visual-design-director` é um atalho que delega ao agent visual-design-director para design de alta fidelidade renderizado. `/tab_pendencias` não vem neste plugin: vem do produto standalone, [tab_pendencias](https://github.com/petrinhu/tab_pendencias).
+- **71 agents.** 12 C-level (estratégia, produto, engenharia, marketing, operações, segurança, dados, IA, finanças, receita, jurídico, chief of staff) e 59 operacionais que executam o trabalho, incluindo o time de desenvolvimento de jogos e os agents médico-periciais.
+- **15 skills.** Skills de orquestração (`/bigtech`, `/proj_software`, `/proj_jogo`, `/bigtech:tab_pendencias`), atalhos de agent (`/dr-advogado`, `/dr-medico-perito`, `/dr-medico-psiquiatra`, `/dr-medico-trabalho`, `/learning-designer`, `/suporte-linux`, `/visual-design-director`), o orquestrador de caso `/pericia-medica` e três skills novas: `/watchcode`, `/manter_ligado` e `/olhe_agentes`. `github-gossips` saiu do plugin e continua disponível fora dele.
 - **Hooks de governança e TDD.** Guard-rail de testes (red, green, refactor), reavaliação de porte do projeto, reforço do modo de operação e bootstrap dos manuais na sessão.
 
-O princípio inegociável: **o processo se adapta ao porte do projeto, nunca o contrário.** Um CLI de 200 linhas não chama o time inteiro. O Chief of Staff classifica o porte e liga só o necessário, prevenindo over-engineering.
+O princípio central: **o processo se adapta ao porte do projeto, nunca o contrário.** Um CLI de 200 linhas não chama o time inteiro. O Chief of Staff classifica o porte e liga só o necessário, prevenindo over-engineering.
 
 **Portes canônicos:** `early` | `scale` | `bigtech`. Headcount é nota auxiliar, não valor de porte. Legado `--porte solo` e marcador `porte=solo` normalizam para `early` (piso sempre early).
 
 ### Instalação
 
-Instale no **Claude Code** (plugin nativo) ou no **Grok** (materialização compatível). Os dois hosts não compartilham o mesmo sistema de plugins.
+Instale no **Claude Code** (plugin nativo). Cada passo abaixo é um comando que você roda no terminal.
 
 #### Claude Code (plugin nativo)
 
@@ -274,77 +275,54 @@ Instale no **Claude Code** (plugin nativo) ou no **Grok** (materialização comp
 - **macOS:** `xcode-select --install` ou `brew install python`.
 - **Windows (nativo):** o Python da Microsoft Store registra o alias `python3` (recomendado). O instalador do python.org pode oferecer só `python`/`py`; use o shim `bin/python3.cmd` do plugin no PATH, ou **WSL**.
 
-Companions opcionais (instalados pelo próprio Claude Code, iguais em todo SO):
+#### Dependências recomendadas
+
+**Aviso: sem as dependências recomendadas o bigtech fica muito comprometido.** Instale o pacote completo, `bigtech-completo`, que traz tudo de uma vez. Se você recusar as dependências, saiba o que deixa de funcionar:
+
+- **Sem `superpowers`:** o `/bigtech:proj_software` e o `visual-design-director`, quando rodam na conversa principal (não num agent), perdem o brainstorming (a conversa para fechar um pedido ambíguo), o plano escrito e o ciclo de testes antes do código (TDD). Os agents de engenharia continuam funcionando, só sem essa referência.
+- **Sem `playwright`:** a sessão não controla o navegador (abrir página, clicar, tirar captura de tela). O `accessibility-specialist` perde a verificação no navegador. O `playwright` baixa o pacote `@playwright/mcp` da internet toda vez que o servidor dele inicia.
+- **Sem `frontend-design`:** o design de interface usa só os princípios já embutidos nos agents de frontend e de design visual. Perde-se a versão atualizada da skill. O impacto é pequeno.
+
+**Como instalar.** Primeiro adicione os marketplaces (as lojas de onde os plugins vêm), depois instale o pacote. Se um marketplace já estiver adicionado, pule a linha dele:
 
 ```
-/plugin install superpowers@claude-plugins-official
-/plugin marketplace add anthropics/skills
-/plugin install example-skills@anthropic-agent-skills
+claude plugin marketplace add anthropics/claude-plugins-official
+claude plugin marketplace add https://github.com/petrinhu/bigtech_plugin
+claude plugin install bigtech-completo@petrinhu
 ```
 
-`superpowers` combina bem com a constelação; `frontend-design` (no `example-skills`) ajuda os agents de UI a evitar templates genéricos. `playwright` também é útil para automação de navegador.
-
-Instale o `bigtech`:
+**Para recusar as dependências**, instale só o núcleo. Nenhuma dependência vem junto:
 
 ```
-/plugin marketplace add https://github.com/petrinhu/bigtech_plugin
-# ou clone local:
-# /plugin marketplace add /path/to/bigtech_plugin
-/plugin install bigtech@petrinhu
+claude plugin install bigtech@petrinhu
 ```
 
-`bigtech@petrinhu` desambigua o marketplace; se só este marketplace estiver registrado, `/plugin install bigtech` também resolve.
+**Limites que você precisa conhecer:**
+
+- Se o pacote completo for instalado sem os marketplaces acima, ele fica instalado mas não carrega. O bigtech avisa isso no início de cada sessão.
+- Para recusar UM recomendado depois de instalar o pacote completo, é preciso desinstalar o pacote: `claude plugin uninstall bigtech-completo@petrinhu`. As dependências continuam ativas depois disso.
+- `claude plugin prune` remove as dependências que sobraram, mas também remove o `bigtech`, que então precisa ser instalado de novo.
+- O `playwright` baixa o pacote `@playwright/mcp` da internet a cada início. Se a rede não estiver disponível, a sessão fica sem navegador.
 
 **Depois de instalar:** reinicie a sessão do Claude Code para o `bigtech_session_init` injetar os manuais e o reforço de modo.
 
-**Conflito de nomes.** Se já houver agents, skills ou hooks globais em `~/.claude/` com os mesmos nomes deste plugin, **não** instale por cima. Prefira um perfil isolado (`CLAUDE_CONFIG_DIR=...`) ou aposente só os nomes do **núcleo bigtech** que colidem. **Não** apague agents pessoais ou de outros domínios (`dr-*`, `game-*`, etc.). Detalhe: [AGENTS.md](AGENTS.md) e a [página de Instalação da wiki](https://github.com/petrinhu/bigtech_plugin/wiki/Instalacao).
+**Conflito de nomes.** Se já houver agents, skills ou hooks globais em `~/.claude/` com os mesmos nomes deste plugin, **não** instale por cima. Prefira um perfil isolado (`CLAUDE_CONFIG_DIR=...`) ou aposente só os nomes do **núcleo bigtech** que colidem. **Não** apague agents pessoais ou de outros domínios (`dr-*`, `game-*`, etc.). Detalhe: [LLM.md](LLM.md) e a [página de Instalação da wiki](https://github.com/petrinhu/bigtech_plugin/wiki/Instalacao).
 
-Se você é um agente de IA instalando a pedido de um usuário, siga [AGENTS.md](AGENTS.md).
+Se você é um agente de IA instalando a pedido de um usuário, siga [LLM.md](LLM.md).
 
-#### Grok (compatível; sem o plugin system do Claude)
+#### Opcional: manter_ligado (só Linux com systemd)
 
-O Grok **não** carrega marketplaces do Claude Code. **Grok-compatible** significa materializar os agents, skills e hooks deste repositório no host Grok. Exemplo em Linux (caminhos ilustrativos; use o path do seu clone):
-
-```bash
-# 1) Clone (ou use um checkout já existente)
-git clone https://github.com/petrinhu/bigtech_plugin.git /path/to/bigtech_plugin
-CLONE=/path/to/bigtech_plugin
-
-# 2) Agents: copie os 51 agents do produto; preserve agents só-Grok que não estão no plugin
-mkdir -p ~/.grok/agents
-cp "$CLONE"/agents/*.md ~/.grok/agents/
-
-# 3) Skills: symlink das skills do produto no diretório de skills do Grok
-mkdir -p ~/.grok/skills
-ln -sfn "$CLONE"/skills/bigtech ~/.grok/skills/bigtech
-ln -sfn "$CLONE"/skills/proj_software ~/.grok/skills/proj_software
-ln -sfn "$CLONE"/skills/visual-design-director ~/.grok/skills/visual-design-director
-# tab_pendencias: use o repositório standalone (github.com/petrinhu/tab_pendencias); este plugin não traz mais cópia
-# ln -sfn /path/to/tab_pendencias ~/.grok/skills/tab_pendencias
-
-# 4) Hooks: copie os scripts Python relevantes (prefira arquivos reais, não symlink para outro host)
-mkdir -p ~/.grok/hooks/scripts
-cp "$CLONE"/hooks/bigtech_*.py "$CLONE"/hooks/tdd_*.py \
-   "$CLONE"/hooks/tab_pendencias_reminder.py \
-   ~/.grok/hooks/scripts/
-# Registre os eventos se o host Grok exigir. Se o compat Claude estiver com
-# hooks=false, os hooks bigtech/TDD não disparam em dobro por esse caminho.
-
-# 5) Opcional: garantir descoberta das skills
-# Em ~/.grok/config.toml, inclua ~/.grok/skills em [skills].paths
-
-# 6) Reinicie o Grok (/new ou restart do processo) para recarregar agents e skills
-```
-
-Resumo: **Claude** = instalar o plugin do marketplace. **Grok** = copiar/symlink de agents, skills e hooks deste repositório no host. A paridade de runtime depende do host; hooks e o protocolo de subagents não são idênticos entre plataformas.
+`manter_ligado` mantém a conexão de dados viva com a tampa fechada e salva o estado das sessões com 5% de bateria, sem desligar a máquina. Depende do systemd e roda só em Linux com systemd.
 
 ### Uso
 
-As 2 skills de orquestração são os pontos de entrada. Invoque por barra ou descreva a intenção em linguagem natural; o reforço de modo roteia o pedido para a skill certa. A 3ª skill, `/visual-design-director`, é um atalho de agent para trabalho de design.
+As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário.
+
+As 2 skills de orquestração são os pontos de entrada. Invoque por barra ou descreva a intenção em linguagem natural; o reforço de modo roteia o pedido para a skill certa. As demais skills são atalhos de agent, um orquestrador de caso ou ferramentas operacionais, listadas em [Skills](#skills).
 
 #### `/bigtech`: montar a constelação
 
-Camada de negócio e liderança (produto, marketing, vendas, jurídico, finanças, release). Invoca o Chief of Staff (Cósimo), que classifica o porte, escolhe a variante de pipeline e devolve o mapa de ativação: quais C-levels e operacionais ligar, em quais das 12 fases.
+Camada de negócio e liderança (produto, marketing, vendas, jurídico, finanças, release). Invoca o Chief of Staff (Cósimo), que classifica o porte, recomenda a variante de pipeline (o usuário confirma) e devolve o mapa de ativação: quais C-levels e operacionais ligar, em quais das 12 fases.
 
 ```
 /bigtech ./meu-projeto
@@ -364,21 +342,41 @@ Orquestra o ciclo de vida de software em 5 macrofases, alocando os agents de eng
 
 Use quando começar um projeto novo de software: "vou criar um software", "novo sistema", "construir feature", "qual fluxo seguir".
 
-#### `/tab_pendencias`: tabela de planejamento WSJF
-
-> Este plugin não traz essa skill. Instale o produto standalone: [tab_pendencias](https://github.com/petrinhu/tab_pendencias).
+#### `/bigtech:tab_pendencias`: tabela de planejamento WSJF
 
 Cria e mantém uma tabela de pendências ordenada de cima para baixo na sequência que minimiza retrabalho, combinando ordenação topológica (dependência) com WSJF (valor). A coluna "Onda" marca passos de igual valor que rodam em paralelo.
 
 ```
-/tab_pendencias --create
-/tab_pendencias --show
-/tab_pendencias --reorder
+/bigtech:tab_pendencias --create
+/bigtech:tab_pendencias --show
+/bigtech:tab_pendencias --reorder
 ```
 
 Use para planejar passos, ordenar backlog, ou perguntar "o que falta" e "em que ordem fazer".
 
-**Manter a tabela fresca.** Marcar status é barato e manual; reordenar é caro e raro. Ao commitar trabalho que fecha ou avança um item do `TODO.md`, cite o ID do item na mensagem do commit e toque a coluna `Status` no mesmo commit (implementação entregue → `🔍 Pendente verificação`; `✅` só após a onda de teste/auditoria). Reordenar, por outro lado, só roda pelo `--reorder`, e só quando um input de priorização muda. Veja [docs/tabela-pendencias-frescor.md](docs/tabela-pendencias-frescor.md).
+**Manter a tabela fresca.** Marcar status é barato e manual; reordenar é caro e raro. Ao commitar trabalho que fecha ou avança um item do `TODO.md`, cite o ID do item na mensagem do commit e toque a coluna `Status` no mesmo commit (implementação entregue → `🔍 Pendente verificação`; `✅` só após a onda de teste/auditoria). Reordenar, por outro lado, só roda pelo `--reorder`, e só quando um input de priorização muda e você decide reordenar. Veja [docs/tabela-pendencias-frescor.md](docs/tabela-pendencias-frescor.md).
+
+### Skills
+
+| Skill | Tipo | Função |
+|---|---|---|
+| `bigtech` | orquestração | Monta a constelação e classifica o porte do projeto. |
+| `proj_software` | orquestração | Toca o ciclo de vida de software (SDLC) em 5 macrofases. |
+| `proj_jogo` | orquestração | Toca o desenvolvimento de jogo com o time de game, de game jam a AAA. |
+| `tab_pendencias` | orquestração | Cria e ordena a tabela de backlog WSJF (`TODO.md`). |
+| `visual-design-director` | atalho de agent | Design visual de alta fidelidade, renderizado e conferido na tela. |
+| `dr-advogado` | atalho de agent | Trabalho jurídico brasileiro: análise de processo, pesquisa com fonte, peças. |
+| `dr-medico-perito` | atalho de agent | Perícia médica: laudos, nexo causal, dano e incapacidade. |
+| `dr-medico-psiquiatra` | atalho de agent | Psiquiatria forense: imputabilidade, capacidade civil, dano psíquico. |
+| `dr-medico-trabalho` | atalho de agent | Medicina do trabalho: nexo ocupacional, insalubridade, periculosidade. |
+| `pericia-medica` | orquestrador de caso | Conduz um caso médico-jurídico com o quarteto de agents médicos e jurídico. |
+| `learning-designer` | atalho de agent | Design instrucional: aulas, atividades, quizzes e planos de curso. |
+| `suporte-linux` | atalho de agent | Suporte Linux interativo: detecta a distro primeiro e pergunta antes de cada comando. |
+| `watchcode` | operacional | Vigia o journal e os coredumps durante o trabalho dos agents e captura crashes reais. |
+| `manter_ligado` | operacional | Mantém a conexão com a tampa fechada e salva as sessões com 5% de bateria (só Linux com systemd). |
+| `olhe_agentes` | operacional | Liga, desliga ou mostra o monitor de agents, com tick a cada 5 minutos. |
+
+Atalhos como `/dr-advogado` e `/learning-designer` chamam o agent de mesmo nome, com o prefixo `bigtech:` (por exemplo, `bigtech:dr-advogado`).
 
 ### Agents
 
@@ -399,19 +397,23 @@ Use para planejar passos, ordenar backlog, ou perguntar "o que falta" e "em que 
 | `claudio-clo` | CLO | Jurídico (general counsel) |
 | `cosimo-chief-of-staff` | Chief of Staff | Roteamento de pipeline, anti-over-engineering |
 
-#### Operacionais (39)
+#### Operacionais (59)
 
-**Engenharia (14):** `software-architect`, `tech-lead`, `backend-engineer`, `frontend-engineer`, `mobile-engineer`, `embedded-firmware-engineer`, `hardware-engineer`, `devops-sre`, `performance-engineer`, `network-engineer`, `network-security-engineer`, `security-engineer`, `qa-engineer`, `release-manager`.
+**Engenharia (15):** `software-architect`, `tech-lead`, `backend-engineer`, `frontend-engineer`, `mobile-engineer`, `embedded-firmware-engineer`, `hardware-engineer`, `linux-diag`, `devops-sre`, `performance-engineer`, `network-engineer`, `network-security-engineer`, `security-engineer`, `qa-engineer`, `release-manager`.
 
 **Dados e IA (4):** `data-engineer`, `data-scientist`, `ml-engineer`, `applied-ai-engineer`.
 
 **Produto, UX e Design (8):** `product-manager`, `business-analyst`, `ux-researcher`, `ux-ui-designer`, `visual-design-director`, `ux-writer`, `accessibility-specialist`, `art-director`.
 
-**Gestão e Pessoas (2):** `engineering-manager`, `scrum-master`.
+**Gestão e Pessoas (3):** `engineering-manager`, `scrum-master`, `engineering-coach`.
 
-**Marketing, Crescimento e Receita (6):** `content-seo`, `pr-comms`, `growth-engineer`, `community-manager`, `customer-success`, `revenue-ops`.
+**Marketing, Crescimento e Receita (7):** `content-seo`, `pr-comms`, `growth-engineer`, `community-manager`, `customer-success`, `revenue-ops`, `product-marketing-manager`.
 
-**Suporte, Docs, Legal e i18n (5):** `support-engineer`, `technical-writer`, `compliance-legal`, `internal-auditor`, `i18n-l10n-specialist`.
+**Suporte, Docs, Legal, Educação e i18n (7):** `support-engineer`, `technical-writer`, `compliance-legal`, `internal-auditor`, `i18n-l10n-specialist`, `revisor-textual`, `learning-designer`.
+
+**Desenvolvimento de jogos (11):** `game-producer`, `lead-game-designer`, `economy-designer`, `level-designer`, `narrative-designer`, `narrative-writer`, `gameplay-engineer`, `engine-graphics-programmer`, `game-animator`, `3d-artist-rigger`, `audio-designer-composer`.
+
+**Perícia médica e jurídico (4):** `dr-advogado`, `dr-medico-perito`, `dr-medico-psiquiatra`, `dr-medico-trabalho`.
 
 Ao serem acionados, todos os agents fazem um pre-flight da tabela de pendências (`TODO.md` na raiz): os C-level a exigem como pré-condição no mapa de ativação; os operacionais sinalizam caso falte e seguem com a tarefa.
 
@@ -419,47 +421,47 @@ Ao serem acionados, todos os agents fazem um pre-flight da tabela de pendências
 
 | Hook | Evento | Função |
 |---|---|---|
-| `tdd_guard.py` | PreToolUse (Write/Edit) | Guard-rail de TDD: bloqueia código fora do ciclo red, green, refactor. Opt-in por projeto. |
-| `tdd_runner.py` | PostToolUse (Write/Edit) | Roda a suíte de testes após a edição e reporta o resultado ao ciclo TDD. |
-| `bigtech_session_init.py` | SessionStart | Injeta o caminho dos manuais no contexto (docs-bootstrap), avisa se o `caveman` está ativo e sugere as dependências ausentes. |
+| `tdd_guard.py` | PreToolUse (Write\|Edit) | Guard-rail de TDD: bloqueia código fora do ciclo red, green, refactor. Opt-in por projeto. |
+| `tdd_runner.py` | PostToolUse (Write\|Edit) | Roda a suíte de testes após a edição e reporta o resultado ao ciclo TDD. |
+| `bigtech_session_init.py` | SessionStart | Injeta o caminho dos manuais no contexto (docs-bootstrap), avisa se o `caveman` está ativo e avisa das dependências recomendadas que faltam. |
 | `bigtech_porte_reminder.py` | SessionStart | Reavalia o porte do projeto (escala para cima ou para baixo); só dispara em projeto de código ainda não classificado. |
-| `tab_pendencias_reminder.py` | SessionStart, UserPromptSubmit | Detector de defasagem da tabela de pendências. Lembra de gerar o `TODO.md` via `/tab_pendencias` quando o projeto já foi classificado (marcador `.bigtech-porte`) mas ainda não tem a tabela; com a tabela presente, mede a defasagem dela via `git` (commits e dias desde o último toque no `TODO.md`) e, após uma sessão longa, dá um nudge para revisar e reordenar. Os limiares são ajustáveis num `.tab-staleness.json` opcional na raiz do projeto. Só lembra, nunca bloqueia nem reordena. |
-| `bigtech_reinforce.py` | UserPromptSubmit | Reforça o modo bigtech (anti-drift) e roteia ativação por linguagem natural para `/bigtech`. Escopado por marcador, anti-ruído. |
+| `tab_pendencias_reminder.py` | SessionStart, UserPromptSubmit | Detector de defasagem da tabela de pendências. Lembra de gerar o `TODO.md` via `/bigtech:tab_pendencias` quando o projeto já foi classificado (marcador `.bigtech-porte`) mas ainda não tem a tabela; com a tabela presente, mede a defasagem dela via `git` (commits e dias desde o último toque no `TODO.md`) e, após uma sessão longa, dá um lembrete para revisar e reordenar. Os limiares são ajustáveis num `.tab-staleness.json` opcional na raiz do projeto. Só lembra, nunca bloqueia nem reordena. |
+| `bigtech_reinforce.py` | UserPromptSubmit | Reforça o modo bigtech e roteia ativação por linguagem natural para `/bigtech`. Escopado por marcador, anti-ruído. |
+
+O plugin declara 9 entradas de hook em 5 eventos; o smoke test confere cada uma.
 
 ### Compatibilidade
 
 **Plataforma.** Funciona em Linux, macOS e Windows (nativo ou WSL). Os hooks são Python puro e rodam de forma cross-platform; o pré-requisito rígido no Claude Code é `python3` no PATH (veja [Claude Code (plugin nativo)](#claude-code-plugin-nativo), em especial a nota de Windows). Quando a skill `tab_pendencias` planeja testes ou auditorias que precisam de ferramentas externas, cada ferramenta é oferecida para instalação com a sua confirmação, no comando adequado ao seu SO (apt/dnf/brew/winget/choco/scoop) e preferindo gerenciadores cross-platform (pip/uv, cargo, npm). Nada é instalado em silêncio.
 
-**Feito para o Claude Code (Anthropic).** O caminho oficial de instalação é o formato de plugin/marketplace do Claude Code (hooks de ciclo de vida, skills, protocolo de subagents). **Grok-compatible:** os mesmos agents, skills e scripts de hook podem ser materializados num host Grok (veja [Grok (compatível)](#grok-compatível-sem-o-plugin-system-do-claude)); esse caminho é operacional, mas não é um segundo sistema de plugins. Outros assistentes ou CLIs de código (Gemini CLI, GitHub Copilot CLI, OpenAI Codex, Cursor, Aider, etc.) não são suportados sem adaptação própria.
+**Feito para o Claude Code (Anthropic).** O caminho oficial de instalação é o formato de plugin/marketplace do Claude Code (hooks de ciclo de vida, skills, protocolo de subagents). Outros assistentes ou CLIs de código (Gemini CLI, GitHub Copilot CLI, OpenAI Codex, Cursor, Aider, etc.) não são suportados sem adaptação própria.
 
-**Incompatível com o plugin `caveman`.** O `caveman` comprime a comunicação e conflita com o reforço de modo deste plugin. Desative o `caveman` antes de usar o `bigtech`; o hook de sessão avisa caso detecte os dois ativos ao mesmo tempo.
+**Possível conflito com o plugin `caveman`.** O `caveman` comprime a comunicação e pode interferir no reforço de modo e no roteamento deste plugin. O hook de sessão avisa caso detecte os dois ativos ao mesmo tempo. Manter ou desativar o `caveman` é decisão sua; se mantiver os dois, garanta que os pedidos da constelação ainda cheguem ao `/bigtech`.
 
-**Dependências sugeridas:** `playwright` e `superpowers`. Não são obrigatórias, mas habilitam a experiência completa (automação de navegador e fluxos avançados). Instale-as para tirar o máximo do plugin; o hook de sessão sugere a instalação quando estão ausentes.
+### Modelo e esforço
 
-### Modelo de orquestração
+Os agents vêm com `model: inherit`: cada um roda no modelo da thread que o despacha, então a escolha do modelo segue a sua sessão e as suas instruções. Se as suas instruções definirem como modelo e esforço são escolhidos, elas prevalecem sobre este plugin.
 
-Por padrão, os agents usam o modelo **`opus`** (sempre o Opus mais recente: o campo `model` não fixa versão), e a **orquestração** (o Chief of Staff e os C-level montando e coordenando a constelação) roda em **effort máximo**, para o raciocínio mais profundo nas decisões que cruzam o time. Esse é o default recomendado.
-
-Você pode mudar manualmente: edite o campo `model` no cabeçalho de qualquer agent em `agents/<slug>.md` (valores aceitos: `opus`, `sonnet`, `haiku`) e ajuste o nível de esforço da sua sessão com `/effort`.
+Para fixar um modelo em um agent, edite o campo `model` no cabeçalho de `agents/<slug>.md` (valores aceitos: `inherit`, `opus`, `sonnet`, `haiku`) e ajuste o nível de esforço com `/effort`.
 
 ### Documentação
 
 **Wiki (didática, para iniciantes):** a [Wiki do projeto](https://github.com/petrinhu/bigtech_plugin/wiki) tem uma página por agente, hook e skill, além de glossário, guia de instalação e de uso passo a passo.
 
-Os manuais de governança acompanham o plugin em `docs/` e são injetados no contexto da sessão:
+Os manuais de governança acompanham o plugin em `docs/house/` e são injetados no contexto da sessão:
 
-- `docs/ORG.md`: manual de governança da constelação (RACI, portes, roteamento de pipeline).
-- `docs/pipeline_release_1.0.md`: pipeline de release em 12 fases, da ideia ao 1.0.
-- `docs/lideranca_pipeline_release.md`: teoria de liderança C-level e a constelação nomeada.
-- `docs/TOOLING.md`: catálogo de ferramentas livres (FOSS) por agent.
-- `docs/manuals/`: contrato de qualidade, testes, agile, checklist de deploy e auditorias.
+- `docs/house/ORG.md`: manual de governança da constelação (RACI, portes, roteamento de pipeline).
+- `docs/house/pipeline_release_1.0.md`: pipeline de release em 12 fases, da ideia ao 1.0.
+- `docs/house/lideranca_pipeline_release.md`: teoria de liderança C-level e a constelação nomeada.
+- `docs/house/TOOLING.md`: catálogo de ferramentas livres (FOSS) por agent.
+- `docs/house/`: contrato de qualidade, testes, agile, checklist de deploy e auditorias.
 - `docs/principles/`: princípios de arquitetura, metodologia agile, anti-patterns e limites de hardware.
 
 ### Segurança
 
 Os hooks executam código na sua máquina e o `tdd_runner` pode rodar o comando de teste declarado pelo projeto que você abrir (paridade de confiança com `make test`/`npm test`). Antes de usar com repositórios de terceiros, leia [SECURITY.md](./SECURITY.md): modelo de confiança, opt-in e como desativar.
 
-> **O modo TDD roda como shell um comando definido pelo projeto.** O hook PostToolUse `tdd_runner` é opt-in: só liga quando o projeto que você abrir contém o arquivo `.claude/tdd-guard.json`. Quando está ligado, o `fast_command`/`test_command` declarado nesse arquivo é executado como comando de shell após cada edição. Trate o `.claude/tdd-guard.json` como código confiável (a mesma confiança que você dá a um alvo `make test`/`npm test`) e não ative o modo TDD em repositório de terceiro não-confiável sem antes inspecionar esse comando.
+> **O modo TDD roda como shell um comando definido pelo projeto.** O hook PostToolUse `tdd_runner` é opt-in: só liga quando o projeto que você abrir contém o arquivo `.claude/tdd-guard.json`. Quando está ligado, o `fast_command`/`test_command` declarado nesse arquivo é executado como comando de shell após cada edição. Trate o `.claude/tdd-guard.json` como código confiável (a mesma confiança que você dá a um alvo `make test`/`npm test`) e não ative o modo TDD em repositório de terceiro não-confiável sem antes inspecionar esse comando. Prefira apontar o `test_command` para um executor isolado (container ou sandbox) com limite de processos; rode no host só onde as suas regras permitirem.
 
 ### Licença
 

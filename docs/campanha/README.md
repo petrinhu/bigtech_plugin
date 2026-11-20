@@ -1,6 +1,6 @@
 # Campanha 2026-08-16 - índice
 
-Melhoria dual-host **Claude Code + Grok Build** do plugin `bigtech`.  
+Melhoria dual-host **Claude Code + segundo host (removido na 2.0.0)** do plugin `bigtech`.  
 **Status: FECHADA.**
 
 | | |
@@ -11,7 +11,7 @@ Melhoria dual-host **Claude Code + Grok Build** do plugin `bigtech`.
 | Versão package | **0.2.0** (sem bump; trabalho em `main` = post-0.2.0) |
 | Cutover `~/.claude` | **não** executado; plano de canário opcional abaixo |
 
-Runbook histórico da leva: [PLANO-MELHORIA-BIGTECH-CLAUDE-CODE-2026-08-16.md](../../PLANO-MELHORIA-BIGTECH-CLAUDE-CODE-2026-08-16.md) (raiz do repo).
+Runbook histórico da leva: [PLANO-MELHORIA-BIGTECH-CLAUDE-CODE-2026-08-16.md](./PLANO-MELHORIA-BIGTECH-CLAUDE-CODE-2026-08-16.md) (esta pasta).
 
 ## O que entrou
 

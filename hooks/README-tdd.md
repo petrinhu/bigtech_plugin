@@ -83,20 +83,25 @@ São 7 presets prontos para uso:
 
 ### tdd_guard.py (PreToolUse)
 
-Intercepta toda escrita de arquivo (ferramentas `Write`, `Edit`, `MultiEdit`) **antes** de ela acontecer.
+Intercepta toda escrita de arquivo (ferramentas `Write` e `Edit`) **antes** de ela acontecer.
 
 Fluxo de decisão:
 
-1. Se `TDD_GUARD=off`, permite sem verificação.
+1. Se o usuário desligou o guard (ver seção *Para o usuário*), permite sem verificação.
 2. Se o arquivo editado não pertence a um projeto com `.claude/tdd-guard.json`, permite (inerte).
 3. Classifica o arquivo pelo caminho relativo: `excluded` / `test` / `production` / `ignored`.
 4. Se não é `production`, permite. **Escrever ou editar teste nunca é bloqueado.**
-5. Se `TDD_PHASE=refactor`, permite (modo refatoração com suíte verde).
+5. Se o usuário ativou o modo refatoração (ver seção *Para o usuário*), permite editar produção com suíte verde.
 6. Lê o estado mais recente em `$HOME/.claude/state/tdd-guard/<hash>/last-run.json`:
    - Estado ausente: bloqueia com mensagem pedindo um teste vermelho.
    - `ran=false` (runner não executou): **fail-open** com aviso; não bloqueia.
    - `has_red=true`: permite (há teste vermelho, produção pode avançar).
-   - `has_red=false` (tudo verde): bloqueia pedindo um novo teste que falhe, ou `TDD_PHASE=refactor`.
+   - `has_red=false` (tudo verde): bloqueia pedindo um novo teste que falhe; para sair do ciclo, peça ao usuário.
+
+Avisos com exit 0 (fail-open, runner que não rodou, erro interno) saem em JSON no stdout,
+não em stderr: a doc de hooks diz que o Claude nunca vê stderr de hook com exit 0. O JSON
+tem `systemMessage` (mostrado ao usuário) e `hookSpecificOutput.additionalContext` (lido pelo
+Claude, junto do resultado da ferramenta). O bloqueio (exit 2) continua em stderr, que o Claude lê.
 
 ### tdd_runner.py (PostToolUse)
 
@@ -137,9 +142,11 @@ Quando o runner não consegue executar:
 
 ---
 
-## Válvulas de escape
+## Para o usuário (não para o modelo)
 
-### Desligar na sessão atual
+Esta seção é para quem opera o projeto. Desligar o guard ou mudar de fase é decisão do usuário, feita no ambiente da sessão ou no `.claude/tdd-guard.json`.
+
+### Desligar o guard na sessão atual
 
 ```bash
 export TDD_GUARD=off
@@ -182,6 +189,33 @@ A precedência é: `excluded` > `test` > `production` > `ignored`.
 Um arquivo `pkg/test_x.py` casa tanto com `test_globs` (`**/test_*.py`) quanto com `production_globs` (`**/*.py`), mas é classificado como `test` porque teste tem precedência sobre produção.
 
 ---
+
+## Executor isolado e limite de processos
+
+O `tdd_runner` roda `test_command` (ou `fast_command`) com `shell=True` e
+`cwd` na raiz do projeto. O `timeout_sec` (120 s por padrão) corta a execução,
+mas não há limite de processos nem de memória. Por isso, teste que abre janela,
+usa o foco ou o input, ou roda binário sob teste **não deve rodar na sessão viva
+do usuário**. Aponte `test_command` para um executor isolado com limite de
+processos e de memória.
+
+Exemplo com Docker (Podman aceita as mesmas opções):
+
+```json
+{
+  "test_command": "docker run --rm --pids-limit 256 --memory 2g --cpus 2 -v \"$(pwd):/work\" -w /work <imagem-de-teste> pytest -x -q",
+  "timeout_sec": 300
+}
+```
+
+- `<imagem-de-teste>`: imagem com as dependências do projeto.
+- `--pids-limit` limita o número de processos (corta laço que cria processo sem fim);
+  `--memory` e `--cpus` limitam recursos.
+- O `timeout_sec` continua valendo: estourou o prazo, o runner registra `ran: false`
+  e o guard permite a edição com aviso.
+- Sem executor isolado disponível, a suíte roda no host. Quem decide aceitar isso
+  é o usuário; as regras do usuário sobre isolamento prevalecem.
+- Desligar o guard ou entrar em modo refatoração é decisão do usuário (ver seção *Para o usuário*).
 
 ## Limitações conhecidas
 

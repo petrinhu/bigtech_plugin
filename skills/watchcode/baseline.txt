@@ -1,0 +1,14 @@
+# baseline do watchcode - EXEMPLO GENERICO de padroes de EXE (glob) / comm a IGNORAR.
+# Um padrao por linha; linhas iniciadas por # sao comentario.
+#
+# A baseline REAL de cada usuario NAO mora nesta pasta. Ela fica LOCAL, nao
+# versionada, em ~/.config/bigtech/watchcode_baseline.txt (ou no caminho que
+# WATCHCODE_BASELINE_FILE apontar). Se o arquivo local existir, ele vence este.
+#
+# Estenda a lista local para os seus falsos-positivos (sondas de sanitizer,
+# death-tests, scratch de auditoria). Nunca alargue para /var/tmp/builds/* inteiro:
+# isso cegaria o vigia para crash de verdade.
+/var/tmp/*_probes/*
+*death*test*
+*death_test*
+/var/tmp/builds/*/*/audit/scratch/*

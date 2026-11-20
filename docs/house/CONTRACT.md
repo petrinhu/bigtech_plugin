@@ -1,9 +1,10 @@
 <!--
   docs/house sync
   origem: vault claudebrain / CONTRACT.md
-  path_vault: /home/petrus/IDrive/Documentos/projetos_claudebrain/CONTRACT.md
-  sync_date: 2026-08-16
-  regra: se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
+  sync_date: 2026-11-20
+  hmac_vault_sha256: 0037f7a1fd787488f3cce7a00078c101baeb575693b7efad273ca884a2a562ed
+  transformacoes: T1=4 T2=0 T3a=0 T3=0 T4=0 T5=0
+  regra: As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário. Se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
   sem segredos: não incluir tokens/credenciais
 -->
 # AI Coder Contract  -  Best Practices, Architecture & Standards
@@ -14,10 +15,6 @@
 
 - Manuais irmãos: [[AGILE]] · [[TESTES]] · [[AUDITORIAS]] · [[DEPLOY_CHECKLIST]]
 - Hub: [[Standards]] · [[CLAUDE]]
-- Exemplos C++23/Qt: [[Projects/astrometrica]] · [[Projects/PokemonTCGViewer]] · [[Projects/transcritor]]
-- Exemplos Python: [[Projects/rag_maker]] · [[Projects/orcamento-pessoal]] · [[Projects/transcritor]]
-- Exemplos Web/PHP: [[Projects/site_consultorio]] · [[Projects/my_comp]]
-- Embedded/driver: [[Projects/ESP32]] · [[Projects/driver_brother_hl_l1222]] · [[Projects/bcklight]]
 
 ---
 
@@ -68,13 +65,13 @@ New task received
 Read existing code before modifying ──► Understand context fully
       │
       ▼
-Identify layer (Frontend / Middleware / Backend)
+Identify layer (Front / Mid / Back / Foundation; the user's layering rules prevail)
       │
       ▼
 Apply SOLID + Design Pattern rules
       │
       ▼
-Write code → Build → No errors/warnings?
+Write a failing test → see it fail → write minimal code → see it pass → refactor
       │
       ▼
 Run applicable tests from TESTES.md
@@ -356,7 +353,7 @@ public:
 └─────────────────────────────────────────┘
 ```
 
-**Dependency direction:** Frontend → Middleware → Backend ← Infrastructure
+**Dependency direction:** Frontend → Middleware → Backend ← Infrastructure (the user's layering rules prevail).
 
 **Violations the AI MUST detect and refuse to introduce:**
 - HTTP client import in a widget/view file.
@@ -389,9 +386,9 @@ public:
 ### 6.2 Functions
 
 - MUST do one thing. If you can extract a sub-function with a meaningful name, do it.
-- MUST NOT exceed 40 lines. If longer, decompose.
-- MUST NOT take more than 4 parameters. Wrap in struct if needed.
-- Return early to avoid deep nesting. MUST NOT exceed 3 levels of nesting.
+- SHOULD stay short (around 40 lines is a hint). A longer function is reviewed for more than one reason to change; split only when a sub-part has an honest name of its own.
+- SHOULD take no more than about 4 parameters (a hint). If there are more, check whether they form a group with its own name; wrap them in a struct only then.
+- Return early to avoid deep nesting. SHOULD stay within about 3 levels (a hint); a deeper function is reviewed, not split automatically.
 
 ```cpp
 // INCORRECT  -  deep nesting
@@ -629,8 +626,10 @@ const QString apiKey = gerenciadorChaves.recuperar("limitless_api_key");
 # MUST: read current state of files to be modified
 # MUST: understand existing patterns before introducing new ones
 # MUST: check if a build passes before starting
-cmake --build build -j$(nproc) 2>&1 | grep -E "error:|warning:"
+cmake --build build --parallel "${THREADS:?set THREADS from your hardware limits}" 2>&1 | grep -E "error:|warning:"
 ```
+
+Valor de THREADS por SO, conforme os limites de hardware do usuário (medidos, nunca estimados): Linux, `$(nproc)`; macOS, `$(sysctl -n hw.logicalcpu)`; Windows, `%NUMBER_OF_PROCESSORS%`. Sem THREADS definido, o comando falha alto em vez de usar paralelismo solto.
 
 ### 10.2 Conventional Commits (MANDATORY)
 
@@ -744,13 +743,13 @@ test/modulo-testado
 [ ] A10 Audit report generated and reviewed
 ```
 
-### Post-Release Cleanup Prompt (MANDATORY)
+### Post-Release Cleanup (per the user's rules)
 
-Após uma release ser efetivamente lançada (tag publicada + artefatos anexados + CI verde no remoto), o agente DEVE perguntar ao usuário se deseja apagar pastas desnecessárias geradas durante o ciclo de build/test.
+Após uma release ser efetivamente lançada (tag publicada + artefatos anexados + CI verde no remoto), limpe os builds e temporários do próprio trabalho conforme as regras do usuário; na falta delas, pergunte antes.
 
-**Quando perguntar:** somente após confirmação de release publicada (não após push comum, não após build local de teste, não antes de CI verde).
+**Quando perguntar:** só quando as regras do usuário não definirem a limpeza, e somente após confirmação de release publicada (não após push comum, não após build local de teste, não antes de CI verde).
 
-**Pergunta padrão:**
+**Pergunta padrão, só sem regras do usuário:**
 
 > "Release lançada. Quer apagar pastas desnecessárias geradas pelo ciclo de build/test (ex.: `build/`, `dist/`, `.venv/`, `target/`, `node_modules/`, caches)?"
 
@@ -775,7 +774,7 @@ Após uma release ser efetivamente lançada (tag publicada + artefatos anexados 
 
 - NUNCA apagar pasta versionada (`src/`, `tests/`, `docs/`, etc.).
 - NUNCA apagar `dist/` se a release ainda não anexou os artefatos no servidor.
-- NUNCA apagar `.git/`, `.github/` (config persistente).
+- NUNCA apagar `.git/`, `.github/` nem a configuração de CI (`.github/workflows/`) ou outra config persistente.
 - Sempre listar antes, confirmar depois.
 
 ---
@@ -784,7 +783,9 @@ Após uma release ser efetivamente lançada (tag publicada + artefatos anexados 
 
 ### 12.1 C++ / Qt *(Mandatory)*
 
-**Version:** C++20 minimum. Qt 6.x.
+> Exemplo de stack do projeto (configurável). Os mandatos de memória, RAII e thread-safety abaixo valem como referência mesmo quando a stack for outra.
+
+**Version:** defined by the project or the user's instructions; this manual does not fix a minimum version. Example: Qt 6.x.
 
 **Memory:**
 ```cpp
@@ -812,7 +813,7 @@ delete raw;                         // manual delete = leak risk
 - MUST handle all `QFile::open()` failures.
 - Theme/style: MUST use QSS via central theme system, NEVER `setStyleSheet()` in individual widgets with hardcoded colors.
 
-**Modern C++20 MUST-use features:**
+**Modern C++ MUST-use features (those available in the project's standard version):**
 ```cpp
 std::optional<Item>     // instead of nullptr checks
 std::variant<Ok, Erro>   // instead of error codes

@@ -29,11 +29,17 @@ def _minimal_plugin(
     *,
     n_agents: int | None = None,
     agent_names: list[tuple[str, str]] | None = None,
-    skill_name: str | None = "demo",
+    n_skills: int | None = None,
+    skill_name: str = "demo",
     hook_script_exists: bool = True,
     extra_files: dict[str, str] | None = None,
 ) -> Path:
-    """Monta um plugin mínimo sob root."""
+    """Monta um plugin mínimo sob root.
+
+    n_skills: quantas skills criar (default = EXPECTED_SKILL_COUNT). A primeira
+    leva `skill_name` (pode ser "" para o caso de name ausente); as demais
+    recebem name igual à pasta.
+    """
     n = n_agents if n_agents is not None else drift.EXPECTED_AGENT_COUNT
     if agent_names is None:
         agent_names = [(f"agent-{i:02d}", f"agent-{i:02d}") for i in range(n)]
@@ -50,22 +56,26 @@ def _minimal_plugin(
             """,
         )
 
-    if skill_name is not None:
-        body = f"""\
-        ---
-        name: {skill_name}
-        description: skill test
-        ---
-        # skill
-        """
-        if skill_name == "":
+    n_sk = n_skills if n_skills is not None else drift.EXPECTED_SKILL_COUNT
+    for i in range(n_sk):
+        folder = "demo" if i == 0 else f"skill-{i:02d}"
+        name = skill_name if i == 0 else folder
+        if name == "":
             body = """\
             ---
             description: sem name
             ---
             # skill
             """
-        _write(root / "skills" / "demo" / "SKILL.md", body)
+        else:
+            body = f"""\
+            ---
+            name: {name}
+            description: skill test
+            ---
+            # skill
+            """
+        _write(root / "skills" / folder / "SKILL.md", body)
 
     hook_py = root / "hooks" / "dummy_hook.py"
     if hook_script_exists:
@@ -124,6 +134,42 @@ def test_agent_count_mismatch_fails(tmp_path: Path) -> None:
     root = _minimal_plugin(tmp_path, n_agents=3)
     report = drift.run(root)
     assert any(f.check == "agent-count" for f in report.findings)
+
+
+def test_agent_count_one_below_expected_fails_only_on_count(tmp_path: Path) -> None:
+    root = _minimal_plugin(tmp_path, n_agents=drift.EXPECTED_AGENT_COUNT - 1)
+    report = drift.run(root)
+    assert [f.check for f in report.findings] == ["agent-count"]
+
+
+def test_agent_count_one_above_expected_fails_only_on_count(tmp_path: Path) -> None:
+    root = _minimal_plugin(tmp_path, n_agents=drift.EXPECTED_AGENT_COUNT + 1)
+    report = drift.run(root)
+    assert [f.check for f in report.findings] == ["agent-count"]
+
+
+def test_agent_count_exact_expected_passes(tmp_path: Path) -> None:
+    root = _minimal_plugin(tmp_path, n_agents=drift.EXPECTED_AGENT_COUNT)
+    report = drift.run(root)
+    assert report.ok, [f.message for f in report.findings]
+
+
+def test_skill_count_one_below_expected_fails_only_on_count(tmp_path: Path) -> None:
+    root = _minimal_plugin(tmp_path, n_skills=drift.EXPECTED_SKILL_COUNT - 1)
+    report = drift.run(root)
+    assert [f.check for f in report.findings] == ["skill-count"]
+
+
+def test_skill_count_one_above_expected_fails_only_on_count(tmp_path: Path) -> None:
+    root = _minimal_plugin(tmp_path, n_skills=drift.EXPECTED_SKILL_COUNT + 1)
+    report = drift.run(root)
+    assert [f.check for f in report.findings] == ["skill-count"]
+
+
+def test_skill_count_exact_expected_passes(tmp_path: Path) -> None:
+    root = _minimal_plugin(tmp_path, n_skills=drift.EXPECTED_SKILL_COUNT)
+    report = drift.run(root)
+    assert report.ok, [f.message for f in report.findings]
 
 
 def test_skill_missing_name_fails(tmp_path: Path) -> None:

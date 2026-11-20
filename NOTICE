@@ -22,3 +22,5 @@ adapted and generalized for public distribution: personal identity,
 local environment paths, and private infrastructure references were removed.
 The concept of the "supreme leader / CEO" is intentionally transferred to
 whoever installs and operates the plugin.
+
+Componente tab_pendencias (skills/tab_pendencias/): derivado do projeto standalone tab_pendencias, do mesmo autor (petrinhu), originalmente GPL-3.0-or-later, relicenciado sob Apache-2.0 nesta copia do plugin.

@@ -1,9 +1,10 @@
 <!--
   docs/house sync
   origem: vault claudebrain / AGILE.md
-  path_vault: /home/petrus/IDrive/Documentos/projetos_claudebrain/AGILE.md
-  sync_date: 2026-08-16
-  regra: se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
+  sync_date: 2026-11-20
+  hmac_vault_sha256: 2655cfc9058e35eb0a0baa040fcf3d0e52df4433a7f073d1dc11bb7a51fd95d7
+  transformacoes: T1=2 T2=0 T3a=0 T3=0 T4=0 T5=0
+  regra: As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário. Se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
   sem segredos: não incluir tokens/credenciais
 -->
 # AGILE.md  -  Diretiva de Sistema: Metodologia Ágil
@@ -15,8 +16,6 @@
 - Manuais irmãos: [[CONTRACT]] · [[TESTES]] · [[AUDITORIAS]] · [[DEPLOY_CHECKLIST]]
 - Hub: [[Standards]] · [[CLAUDE]]
 - Captura de demandas novas: [[Inbox]]
-- Backlog vivo (exemplos): [[Projects/PokemonTCGViewer/TODO]] · [[Projects/rag_maker/TODO]]
-- Projetos sob este contrato: [[Projects/PokemonTCGViewer]] · [[Projects/rag_maker]] · [[Projects/site_consultorio]] · [[Projects/astrometrica]]
 
 ---
 
@@ -65,7 +64,7 @@ A LLM deve **sempre** decompor o trabalho nesta hierarquia ao planejar, estimar 
 ```
 TEMA / OBJETIVO ESTRATÉGICO
 └── ÉPICO (Epic)
-    └── HISTÓRIA DE USUÁUSER STORY (User Story)
+    └── HISTÓRIA DE USUÁRIO (User Story)
         └── TAREFA (Task)
             └── SUBTAREFA (Sub-task)
 ```
@@ -232,7 +231,7 @@ A LLM deve sugerir priorização baseada em:
 
 ### Princípios de Qualidade Ágil
 
-- **TDD (Test-Driven Development):** Escrever o teste antes da implementação quando aplicável.
+- **TDD (Test-Driven Development):** Escrever o teste antes da implementação, em todo código de comportamento. Exceções (protótipo descartável, script ad-hoc) são declaradas explicitamente.
 - **CI/CD:** Integração contínua e entrega contínua devem ser metas arquiteturais desde o início.
 - **Refatoração contínua:** Parte do trabalho de cada sprint, não um projeto separado.
 - **Pair programming / Code review:** Mínimo de uma revisão por pull request.
@@ -271,7 +270,7 @@ A LLM deve, quando solicitado ou quando pertinente, calcular e apresentar as seg
 | **Lead Time** | Tempo do item entrar no backlog até ser entregue | Menor possível |
 | **Cycle Time** | Tempo do item começar até ser entregue | Menor possível |
 | **Taxa de defeitos** | Bugs encontrados em produção por sprint | Decrescente |
-| **Cobertura de testes** | % do código coberto por testes | ≥ 80% |
+| **Cobertura de testes** | % do código coberto por testes | Consequência do TDD; não perseguir número |
 | **Satisfação do time** | NPS ou survey simples na retrospectiva | ≥ 7/10 |
 
 ---
@@ -280,7 +279,7 @@ A LLM deve, quando solicitado ou quando pertinente, calcular e apresentar as seg
 
 > Estas são regras comportamentais que a LLM deve seguir em **todo projeto que incluir este arquivo no contexto**:
 
-1. **Ao receber uma demanda nova:** Sempre perguntar se ela corresponde a uma história de usuário existente ou se deve ser adicionada ao backlog.
+1. **Ao receber uma demanda nova de feature ou épico:** perguntar se ela corresponde a uma história de usuário existente ou se deve ser adicionada ao backlog. Edição pontual óbvia (bug, typo, uma linha) não exige essa pergunta.
 
 2. **Ao planejar:** Estruturar sempre em épicos → histórias → tarefas. Nunca propor trabalho não decomposto.
 
@@ -292,7 +291,7 @@ A LLM deve, quando solicitado ou quando pertinente, calcular e apresentar as seg
 
 6. **Ao finalizar uma história:** Verificar a Definition of Done antes de declarar conclusão.
 
-7. **Ao reportar progresso:** Usar métricas concretas (velocidade, burndown), não percepções subjetivas.
+7. **Ao reportar progresso:** o delta real da métrica que o usuário definiu; sem métrica definida, métricas concretas do fluxo, não percepções subjetivas.
 
 8. **Ao sugerir melhorias de processo:** Formular como item de retrospectiva com: problema identificado → impacto → solução proposta → métrica de sucesso.
 

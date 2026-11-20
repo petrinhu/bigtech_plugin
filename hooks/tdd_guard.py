@@ -20,19 +20,23 @@ import tdd_common as c
 MSG_NO_STATE = (
     "TDD guard: nenhuma execucao de teste registrada para este projeto.\n"
     "Voce esta tentando escrever codigo de producao ({rel}) sem um teste "
-    "vermelho.\nEscreva primeiro um teste que falhe (red). Para refatorar com "
-    "tudo verde, exporte TDD_PHASE=refactor. Para desligar, TDD_GUARD=off."
+    "vermelho.\nEscreva primeiro um teste que falhe (red). Para refatorar ou "
+    "desligar o guard, peça ao usuário."
 )
 MSG_ALL_GREEN = (
     "TDD guard: a suite esta toda verde.\n"
     "Nao ha teste vermelho que justifique escrever producao ({rel}).\n"
-    "Escreva um teste que falhe primeiro (red), ou exporte TDD_PHASE=refactor "
-    "para refatorar, ou TDD_GUARD=off para desligar."
+    "Escreva um teste que falhe primeiro (red). Para refatorar ou desligar o "
+    "guard, peça ao usuário."
 )
 WARN_BROKEN = (
     "TDD guard: a ultima execucao de teste nao rodou (motivo: {reason}). "
     "Permitindo a edicao (fail-open). Verifique .claude/tdd-guard.json "
     "(test_command, timeout_sec) ou o ambiente de teste."
+)
+MSG_CONFIG_INVALIDA = (
+    "TDD guard: a config do projeto foi ignorada ({motivo}). O guard nao esta "
+    "ativo neste projeto ate a config ser corrigida."
 )
 WARN_STATE_IO = (
     "TDD guard: falha de I/O ao ler o estado de teste ({err}). "
@@ -51,8 +55,12 @@ def evaluate(data: dict, env: dict):
         return 0, ""
 
     start = os.path.dirname(os.path.realpath(fp)) or os.getcwd()
-    root, cfg = c.load_config(start)
+    root, cfg, motivo = c.load_config(start)
     if cfg is None:
+        if motivo:
+            # Config existe e esta invalida: o guard NAO esta ativo. Avisa (JSON,
+            # exit 0) em vez de desligar em silencio.
+            return 0, MSG_CONFIG_INVALIDA.format(motivo=motivo)
         return 0, ""          # projeto sem opt-in: inerte
 
     try:
@@ -88,6 +96,20 @@ def evaluate(data: dict, env: dict):
     return 2, MSG_ALL_GREEN.format(rel=rel)
 
 
+def emite_aviso(msg: str) -> None:
+    """Aviso com exit 0: JSON no stdout. A doc de hooks diz: "Claude never sees
+    stderr from a hook that exits 0". `systemMessage` mostra ao usuario;
+    `hookSpecificOutput.additionalContext` chega ao Claude, junto do resultado
+    da ferramenta (PreToolUse aceita o campo)."""
+    print(json.dumps({
+        "systemMessage": msg,
+        "hookSpecificOutput": {
+            "hookEventName": "PreToolUse",
+            "additionalContext": msg,
+        },
+    }))
+
+
 def main() -> int:
     try:
         data = json.load(sys.stdin)
@@ -96,10 +118,13 @@ def main() -> int:
     try:
         code, msg = evaluate(data, os.environ)
     except Exception as e:
-        print(f"TDD guard: erro interno, permitindo ({e}).", file=sys.stderr)
+        emite_aviso(f"TDD guard: erro interno, permitindo ({e}).")
         return 0   # qualquer erro: fail-open
-    if msg:
+    if msg and code != 0:
+        # Bloqueio (exit 2): o Claude le o stderr.
         print(msg, file=sys.stderr)
+    elif msg:
+        emite_aviso(msg)
     return code
 
 

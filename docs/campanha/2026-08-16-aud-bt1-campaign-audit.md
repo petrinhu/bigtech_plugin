@@ -2,7 +2,7 @@
 
 **Data da auditoria:** 2026-08-17  
 **Hora local (medida):** `17/08/26 - 00:40:17` (`date '+%d/%m/%y - %H:%M:%S'`)  
-**Papel:** `internal-auditor` — host Grok, papel teto **[grok][mais recente]**  
+**Papel:** `internal-auditor` — segundo host (removido na 2.0.0), papel teto **[segundo-host][mais recente]**  
 **Item:** `AUD-BT-1` (auditoria ponta-a-ponta da campanha: SoT, dual-authority, porte, CI matrix, host legado, drift+evals, proteção de `main`, residual do `TODO.md`)  
 **Runbook:** `PLANO-MELHORIA-BIGTECH-CLAUDE-CODE-2026-08-16.md` + `AUDITORIAS.md` § Campanha 2026-08-16  
 **Pré-reqs medidos na tabela (antes desta fatia):** `TST-BT-1` ✅✓ · `BT-0`..`BT-9` ✅✓ · `N9`/`OS-*`/`TOOL-*` 💡 cancelados (não reabertos)

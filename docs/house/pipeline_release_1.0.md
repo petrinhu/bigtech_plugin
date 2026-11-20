@@ -1,9 +1,10 @@
 <!--
   docs/house sync
   origem: vault claudebrain / pipeline_release_1.0.md
-  path_vault: /home/petrus/IDrive/Documentos/projetos_claudebrain/pipeline_release_1.0.md
-  sync_date: 2026-08-16
-  regra: se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
+  sync_date: 2026-11-20
+  hmac_vault_sha256: 19a5c3aad4cbe5d3a32890e9d324e01780d30f9044c5b54c1309bf7f8591008d
+  transformacoes: T1=0 T2=0 T3a=0 T3=0 T4=0 T5=0
+  regra: As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário. Se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
   sem segredos: não incluir tokens/credenciais
 -->
 # Pipeline Completo: Da Ideia ao Release 1.0 de um Aplicativo
@@ -34,18 +35,20 @@ flowchart TD
     F12 -. aprendizado .-> F1
 ```
 
+**Alternativa textual do fluxo** (equivalente ao diagrama acima, para leitor de tela): o pipeline avança em sequência pelas fases 0. Ideação, 1. Discovery, 2. Definição, 3. Design, 4. Arquitetura e 5. Setup Eng. A partir do Setup, o desenvolvimento se ramifica em três trilhas paralelas (6a. Frontend, 6b. Backend e 6c. Mobile), que convergem para duas fases simultâneas: 7. QA e 8. SecOps. Ambas alimentam a 9. Beta, seguida por 10. GTM, 11. Release 1.0 e 12. Pós. O aprendizado da fase 12 realimenta a 1. Discovery, fechando o ciclo.
+
 Cada fase tem loops internos (uma descoberta volta ao Discovery, um bug volta ao Dev). O pipeline é **iterativo dentro de cada fase, sequencial entre macro-fases**.
 
 ### Mapa fase, C-level e agent
 
-Quem lidera cada fase (detalhe e RACI completo em [[ORG]] secao 4):
+Quem lidera cada fase (detalhe e RACI completo em [[ORG]] seção 4):
 
 | Fase | C-level (agent) | Agents operacionais |
 |---|---|---|
 | 0. Ideação | Celso (CEO) | product-manager |
 | 1. Discovery | Capitolino (CPO) | product-manager, ux-ui-designer |
 | 2. Definição | Capitolino (CPO) | product-manager |
-| 3. Design | Capitolino (CPO) | ux-ui-designer, ux-writer, accessibility-specialist |
+| 3. Design | Capitolino (CPO) | ux-ui-designer, visual-design-director, ux-writer, accessibility-specialist |
 | 4. Arquitetura | Caetano (CTO) | software-architect, security-engineer |
 | 5. Setup Eng | Caetano (CTO) | devops-sre, tech-lead |
 | 6. Desenvolvimento | Caetano (CTO) + Cosmo (COO) | frontend/backend/mobile-engineer, devops-sre |
@@ -56,7 +59,7 @@ Quem lidera cada fase (detalhe e RACI completo em [[ORG]] secao 4):
 | 11. Release 1.0 | Celso (CEO) coordena | release-manager, devops-sre, tech-lead, qa-engineer |
 | 12. Pós | Capitolino (CPO) | data-scientist, product-manager, customer-success, support-engineer |
 
-Antes de iniciar, **Cósimo (Chief of Staff)** define o porte e a variante de pipeline (secao final). Em projeto pequeno, fases colapsam e a maioria dos agents fica dormente.
+Antes de iniciar, **Cósimo (Chief of Staff)** classifica o porte e recomenda a variante de pipeline (seção final); o usuário confirma. Em projeto pequeno, fases colapsam e a maioria dos agents fica dormente.
 
 Quando IA é capability do produto, **Caio (CAIO)** entra (Fases 2, 4, 6-8, 12) e delega `applied-ai-engineer` (feature LLM: prompt, agente, RAG-app, eval-app, guardrail) e `ml-engineer` (infra/MLOps), em paralelo a Cândido (CDO) no lado do dado. Fronteira: CDO governa o dado, CAIO governa o modelo e o uso de IA. Uma integração Claude pontual NÃO acorda o CAIO (usa só a skill `claude-api` + `applied-ai-engineer`).
 
@@ -71,14 +74,14 @@ Origem da ideia: dor própria, observação de mercado, job to be done mal resol
 - **Valor**: usuários vão querer e usar.
 - **Crescimento**: existe canal de aquisição economicamente viável.
 
-### 0.3. Validação ultrarrápida (1 a 2 semanas)
+### 0.3. Validação ultrarrápida (ciclo curto)
 Entrevistas exploratórias (5 a 10 pessoas do público-alvo), análise de soluções existentes (busca, app stores, Reddit, fóruns nichados), smoke test (landing page com formulário de interesse + tráfego pago baixo). Decisão **go / no-go / pivot**.
 
 ### 0.4. Entregáveis
 One-pager da ideia, lista de hipóteses, resumo das entrevistas (3 a 5 insights).
 
 ### 0.5. Liderança
-Celso (CEO) decide go/no-go. Apoio: Capitolino (CPO) via `product-manager`. Papéis humanos: Founder, PM, UX Researcher, Domain Expert.
+Celso (CEO) prepara a recomendação de go/no-go; a decisão é do usuário. Apoio: Capitolino (CPO) via `product-manager`. Papéis humanos: Founder, PM, UX Researcher, Domain Expert.
 
 ---
 
@@ -345,7 +348,7 @@ Camilo (CMO), via `product-marketing-manager`, `growth-engineer`, `content-seo`,
 ### 11.1. Release readiness checklist
 - [ ] Bugs S0/S1 resolvidos.
 - [ ] Crash < 0,5% das sessões.
-- [ ] Cobertura em paths críticos > 80%.
+- [ ] Paths críticos cobertos por testes escritos antes do código (o número de cobertura é consequência, não meta).
 - [ ] Pentest passado, P0/P1 fechados.
 - [ ] Documentos legais publicados e revisados por advogado.
 - [ ] Documentação de usuário completa.
@@ -376,13 +379,13 @@ Dashboard com taxa de erro, latência p50/p95/p99, throughput, conversão, sign-
 O que foi bem, o que falhou, surpresas, action items. Blameless.
 
 ### 11.7. Liderança
-Celso (CEO) coordena o war room e dá o go/no-go; Caetano (CTO) e Camilo (CMO) executam; Cosmo (COO) no ritmo. Coordenação operacional via `release-manager`, com `devops-sre`, `tech-lead`, `qa-engineer`, `support-engineer`, `pr-comms`. Papéis humanos: Release Manager, SRE on-call, Tech Lead, PM, Suporte, PR.
+Celso (CEO) coordena o war room e leva a recomendação de go/no-go ao usuário, que decide; Caetano (CTO) e Camilo (CMO) executam; Cosmo (COO) no ritmo. Coordenação operacional via `release-manager`, com `devops-sre`, `tech-lead`, `qa-engineer`, `support-engineer`, `pr-comms`. Papéis humanos: Release Manager, SRE on-call, Tech Lead, PM, Suporte, PR.
 
 ---
 
 ## Fase 12: Pós-Lançamento
 
-### 12.1. Estabilização (2 a 4 semanas)
+### 12.1. Estabilização (hypercare)
 Foco em bugs reportados, performance, suporte. Hypercare: equipe atenta, releases pequenas e frequentes.
 
 ### 12.2. Análise de métricas
@@ -407,16 +410,16 @@ Capitolino (CPO) no roadmap, via `product-manager`, `data-scientist`, `customer-
 
 ## Variantes de pipeline por porte (anti over-engineering)
 
-Quem decide e re-avalia: **Cósimo (Chief of Staff)** (agent `cosimo-chief-of-staff`). Critérios em [[lideranca_pipeline_release]] secao 5. Detalhe em [[ORG]] secao 5.
+Quem classifica, re-avalia e recomenda: **Cósimo (Chief of Staff)** (agent `cosimo-chief-of-staff`); o usuário decide. Critérios em [[lideranca_pipeline_release]] seção 5. Detalhe em [[ORG]] seção 5.
 
 | Variante | Porte | Como o pipeline muda |
 |---|---|---|
-| **Pipeline-Sprint** | early minimalista / projeto pequeno | Fases 0-2 viram um one-pager; 3 vira wireframe; 4 vira 3 ADRs; 6-8 contínuos; 9-12 enxutos. Só Celso e Caetano ativos. Sem cerimônia. |
-| **Pipeline-Lean** | early (2-20) | Fases 0-3 leves mas explícitas (PMF importa). Capitolino, Camilo (light) e Narciso (se dado sensível) entram. Kanban/Shape Up. |
-| **Pipeline-Padrão** | scale-up (50-500) | 12 fases completas. Constelação núcleo + Cosmo. Cadência ágil formal. RACI ativo. |
-| **Pipeline-Completo** | bigtech (500+) | Constelação inteira (+ Cândido, Caio se IA é capability, Confúcio, Cícero, Cláudio). Multi-produto, cada um com sub-pipeline. |
+| **Pipeline-Early** | early (minimalista ou projeto pequeno) | Fases 0-2 viram um one-pager; 3 vira wireframe; 4 vira 3 ADRs; 6-8 contínuos; 9-12 enxutos. Só Celso e Caetano ativos. Sem cerimônia. |
+| **Pipeline-Lean** | early (early-stage, 2-20 pessoas) | Fases 0-3 leves mas explícitas (PMF importa). Capitolino, Camilo (light) e Narciso (se dado sensível) entram. Kanban/Shape Up. |
+| **Pipeline-Padrão** | scale (50-500 pessoas) | 12 fases completas. Constelação núcleo + Cosmo. Cadência ágil formal. RACI ativo. |
+| **Pipeline-Completo** | bigtech (500+ pessoas) | Constelação inteira (+ Cândido, Caio se IA é capability, Confúcio, Cícero, Cláudio). Multi-produto, cada um com sub-pipeline. |
 
-Criticidade sobrepõe headcount: projeto pequeno que toca prontuário médico, dinheiro ou PII mantém Narciso (CISO) e Cláudio (CLO) ativos mesmo no Pipeline-Sprint.
+Criticidade sobrepõe headcount: projeto pequeno que toca prontuário médico, dinheiro ou PII mantém Narciso (CISO) e Cláudio (CLO) ativos mesmo no Pipeline-Early.
 
 ---
 
@@ -425,7 +428,7 @@ Criticidade sobrepõe headcount: projeto pequeno que toca prontuário médico, d
 | Área | Papéis humanos | Agents |
 |---|---|---|
 | Liderança/Produto | CEO, CTO, CPO, PM, PMM, Product Owner, Business Analyst | celso-ceo, caetano-cto, capitolino-cpo, product-manager, business-analyst |
-| Design | UX Researcher, UX/UI Designer, UX Writer, Design System Eng, Acessibilidade, Motion | ux-researcher, ux-ui-designer, ux-writer, accessibility-specialist |
+| Design | UX Researcher, UX/UI Designer, UX Writer, Design System Eng, Acessibilidade, Motion | ux-researcher, ux-ui-designer, visual-design-director, ux-writer, accessibility-specialist |
 | Engenharia | Tech Lead, Frontend, Backend, Mobile, Full-stack, Data Eng, ML Eng, AI Eng (LLM app), DBA, Solution Architect | software-architect, tech-lead, frontend/backend/mobile-engineer, data-engineer, ml-engineer, applied-ai-engineer |
 | Plataforma/Op | DevOps, SRE, Platform Eng, Network Eng, Security Eng, Pentester | devops-sre, network-engineer, security-engineer, network-security-engineer |
 | Qualidade | QA, SDET, Performance Eng | qa-engineer, performance-engineer |
@@ -472,24 +475,9 @@ Criticidade sobrepõe headcount: projeto pequeno que toca prontuário médico, d
 
 ---
 
-## Anexo D: Cronograma indicativo (produto pequeno, 1 a 5 pessoas)
+## Anexo D: Porte por fase (produto pequeno, 1 a 5 pessoas)
 
-| Fase | Duração típica |
-|---|---|
-| 0. Ideação | 2 a 4 semanas |
-| 1. Discovery | 3 a 6 semanas |
-| 2. Definição | 2 a 3 semanas |
-| 3. Design | 4 a 8 semanas (sobrepõe 4 e 5) |
-| 4. Arquitetura | 2 a 4 semanas |
-| 5. Setup | 1 a 2 semanas |
-| 6. Desenvolvimento | 3 a 9 meses |
-| 7. QA / 8. Sec | contínuos durante 6, intensifica no fim |
-| 9. Beta | 1 a 3 meses |
-| 10. GTM prep | 1 a 2 meses (paralelo a 9) |
-| 11. Release 1.0 | evento de 1 dia + 1 semana hypercare |
-| 12. Pós | contínuo |
-
-**Total típico para SaaS pequeno: 6 a 14 meses** da ideia ao 1.0. No Pipeline-Sprint (early minimalista), pode cair para semanas.
+O que cada fase produz está na seção da fase (0 a 12). Use o porte, isto é, a quantidade de entregáveis e de decisões de cada fase, para calibrar o processo. Este anexo não estima prazo: não use duração para planejar nem para comunicar ao usuário.
 
 ---
 

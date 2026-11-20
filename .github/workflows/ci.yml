@@ -57,6 +57,11 @@ jobs:
       - name: validate_plugin (ZERO-ORFAOS)
         run: python scripts/validate_plugin.py
 
+      # CONS-10: sem vault na CI, o gate sai com NAO CONFERIDO (aviso, nunca PASS).
+      # So reprova divergencia ou erro de uso (gate_sync_house.py mapeia 0/1/2/3).
+      - name: "sync docs/house (CONS-10, sem vault: 3 = nao conferido)"
+        run: python scripts/gate_sync_house.py --check
+
       - name: smoke_offline
         run: python scripts/smoke_offline.py
 

@@ -5,20 +5,22 @@ bigtech_session_init.py
 Hook SessionStart do plugin bigtech. Tres funcoes, todas best-effort e
 silent-fail (sempre exit 0; nunca bloqueia o turno):
 
-(a) DOCS-BOOTSTRAP — resolve o caminho absoluto de `docs/` via
+(a) DOCS-BOOTSTRAP: resolve o caminho absoluto de `docs/house/` via
     os.environ["CLAUDE_PLUGIN_ROOT"] e injeta no contexto da sessao um bloco
     curto listando os manuais empacotados + a regra imperativa de leitura.
-    Cobre a thread principal e as skills; subagents recebem o path repassado
-    pela orquestracao (ver §4.3 do design).
+    Subagents recebem o path repassado pela orquestracao.
 
-(b) AVISO DE INCOMPATIBILIDADE COM caveman — o caveman comprime a comunicacao e
-    conflita com o reforco de modo bigtech. Best-effort: le o mapa
-    `enabledPlugins` de settings.json (CLAUDE_CONFIG_DIR ou $HOME/.claude). Se
-    detecta caveman habilitado, escala o aviso; caso contrario, ainda inclui um
-    aviso curto generico.
+(b) AVISO DE INCOMPATIBILIDADE COM caveman: o caveman comprime a comunicacao e
+    conflita com o reforco de modo bigtech. Le `enabledPlugins` de
+    settings.json (CLAUDE_CONFIG_DIR ou $HOME/.claude).
 
-(c) SUGESTAO DE DEPENDENCIAS — sugere instalar `playwright` e `superpowers` se
-    nao aparecerem habilitados (nao sao hard deps).
+(c) AVISO DE DEPENDENCIAS RECOMENDADAS AUSENTES (CONS-14, texto de CONS-12A):
+    confere playwright, superpowers e frontend-design nos escopos que
+    a sessao le (settings.json e settings.local.json do usuario; settings.json
+    e settings.local.json do projeto, a partir do `cwd` do payload). Se alguma
+    faltar, emite a forma curta aprovada nomeando as que faltam. frontend-design
+    tambem conta via example-skills. Se um settings existir e nao puder ser
+    lido, diz que nao conseguiu conferir (nao afirma ausencia).
 
 Saida: JSON com hookSpecificOutput.additionalContext. Sempre exit 0.
 """
@@ -27,90 +29,126 @@ import os
 import sys
 from pathlib import Path
 
-# Manuais empacotados (relativos a docs/). So texto; nao tocamos o disco para
-# listar (o conteudo pode ainda nao ter sido populado, e o hook so precisa
-# anunciar os caminhos canonicos).
-MANUALS_TOP = [
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from bigtech_hook_io import nome_evento
+
+# Manuais empacotados em docs/house/ (copia unica, CONS-13).
+MANUALS = [
     "ORG.md",
     "pipeline_release_1.0.md",
     "lideranca_pipeline_release.md",
     "TOOLING.md",
+    "CONTRACT.md",
+    "TESTES.md",
+    "AGILE.md",
+    "DEPLOY_CHECKLIST.md",
+    "AUDITORIAS.md",
 ]
-MANUALS_SUB = [
-    "manuals/CONTRACT.md",
-    "manuals/TESTES.md",
-    "manuals/AGILE.md",
-    "manuals/DEPLOY_CHECKLIST.md",
-    "manuals/AUDITORIAS.md",
-]
-PRINCIPLES = "principles/*.md"
 
-# Plugins sugeridos / incompativeis, no formato curto que aparece como sufixo
-# da chave name@marketplace em enabledPlugins.
-SUGGESTED = ("playwright", "superpowers")
+# Precedência das instruções do usuário sobre o plugin (forma longa, CONS-04A).
+PRECEDENCIA_LONGA = (
+    "As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras "
+    "que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste "
+    "plugin em qualquer conflito. Onde divergirem, siga as do usuário."
+)
+
+# Forma curta aprovada (CONS-12A, seção 3). {faltando} recebe os nomes.
+FORMA_CURTA = (
+    "Falta {faltando}. Sem as dependências recomendadas o bigtech fica muito "
+    "comprometido. Instale o pacote bigtech-completo."
+)
+
+# Dependências recomendadas: rotulo -> nomes-curtos que a satisfazem.
+DEPENDENCIAS = (
+    ("playwright", ("playwright",)),
+    ("superpowers", ("superpowers",)),
+    ("frontend-design", ("frontend-design", "example-skills")),
+)
+
 INCOMPATIBLE = ("caveman",)
+
+# Arquivos de settings lidos por escopo, na ordem de leitura.
+SETTINGS_USUARIO = ("settings.json", "settings.local.json")
+SETTINGS_PROJETO = (".claude/settings.json", ".claude/settings.local.json")
 
 
 def _config_dir() -> Path:
-    """Diretorio de config do Claude Code (CLAUDE_CONFIG_DIR ou $HOME/.claude).
-
-    Resolvido em runtime contra o HOME de quem instalou o plugin; nenhum
-    caminho e fixado no codigo.
-    """
+    """Diretorio de config do Claude Code (CLAUDE_CONFIG_DIR ou $HOME/.claude)."""
     env = os.environ.get("CLAUDE_CONFIG_DIR", "").strip()
     if env:
         return Path(env)
     return Path(os.path.expanduser("~")) / ".claude"
 
 
-def _enabled_plugin_names() -> set:
-    """Conjunto de nomes-curtos de plugins habilitados (best-effort).
+def _ler_enabled(caminho: Path, ilegiveis: list) -> set:
+    """Nomes-curtos habilitados em `caminho`. Ausente -> vazio.
 
-    Le settings.json -> enabledPlugins (mapa "name@marketplace": bool) e
-    devolve o conjunto de `name` cujo valor e truthy. Em qualquer falha
-    devolve conjunto vazio (e o chamador degrada para aviso generico).
+    Arquivo que existe e nao le (JSON invalido, sem permissao) vai para
+    `ilegiveis` e devolve vazio.
     """
+    if not caminho.is_file():
+        return set()
     try:
-        settings = _config_dir() / "settings.json"
-        with open(settings, "r", encoding="utf-8") as fh:
+        with open(caminho, "r", encoding="utf-8") as fh:
             data = json.load(fh)
         enabled = data.get("enabledPlugins") or {}
-        names = set()
-        for key, val in enabled.items():
-            if val:
-                names.add(str(key).split("@", 1)[0].strip().lower())
-        return names
+        if not isinstance(enabled, dict):
+            raise TypeError("enabledPlugins nao e um objeto")
+        return {
+            str(chave).split("@", 1)[0].strip().lower()
+            for chave, val in enabled.items()
+            if val
+        }
     except Exception:
+        ilegiveis.append(str(caminho))
         return set()
 
 
-def _docs_block() -> str:
-    """Bloco de docs-bootstrap. Se CLAUDE_PLUGIN_ROOT estiver ausente, ainda
-    emite a regra imperativa + caminhos relativos (fallback util)."""
-    root = os.environ.get("CLAUDE_PLUGIN_ROOT", "").strip()
-    docs_abs = ""
-    if root:
-        docs_abs = str(Path(root) / "docs")
+def coletar_habilitados(cwd, config_dir):
+    """(nomes habilitados em todos os escopos lidos, caminhos ilegiveis)."""
+    ilegiveis: list = []
+    nomes: set = set()
+    for nome in SETTINGS_USUARIO:
+        nomes |= _ler_enabled(Path(config_dir) / nome, ilegiveis)
+    if cwd:
+        for relativo in SETTINGS_PROJETO:
+            nomes |= _ler_enabled(Path(cwd) / relativo, ilegiveis)
+    return nomes, ilegiveis
 
-    manuals = ", ".join(MANUALS_TOP + MANUALS_SUB + [PRINCIPLES])
-    if docs_abs:
+
+def dependencias_faltando(names: set) -> list:
+    """Rotulos das dependencias recomendadas sem nenhum nome habilitado."""
+    return [rotulo for rotulo, aceitos in DEPENDENCIAS
+            if not any(a in names for a in aceitos)]
+
+
+def _docs_block() -> str:
+    """Bloco de docs-bootstrap. Sem CLAUDE_PLUGIN_ROOT, ainda emite a regra e
+    os nomes dos manuais (fallback util)."""
+    root = os.environ.get("CLAUDE_PLUGIN_ROOT", "").strip()
+    nomes = ", ".join(MANUALS)
+    if root:
         head = (
-            "[bigtech] DOCS-BOOTSTRAP — manuais do plugin em `" + docs_abs + "/`: "
-            + manuals + ". "
+            "[bigtech] DOCS-BOOTSTRAP: manuais do plugin em `"
+            + str(Path(root) / "docs" / "house")
+            + "/`: " + nomes + ". Principios em `"
+            + str(Path(root) / "docs" / "principles")
+            + "/*.md`. "
         )
     else:
         head = (
-            "[bigtech] DOCS-BOOTSTRAP — CLAUDE_PLUGIN_ROOT ausente; localize os "
-            "manuais via Glob `**/bigtech/docs/**/<NOME>.md`. Manuais: "
-            + manuals + ". "
+            "[bigtech] DOCS-BOOTSTRAP: CLAUDE_PLUGIN_ROOT ausente; localize os "
+            "manuais via Glob `**/bigtech/docs/house/<NOME>.md`. Manuais: "
+            + nomes + ". "
         )
     rule = (
         "REGRA: ao aplicar governanca/codigo/teste/deploy/auditoria, LEIA o "
         "manual relevante (Read) ANTES de decidir. Ao despachar um subagent "
-        "(Agent tool), inclua o caminho absoluto de docs/ no prompt da task — "
+        "(Agent tool), inclua o caminho absoluto de docs/house/ no prompt da task: "
         "subagents nao herdam este contexto."
     )
-    return head + rule
+    return head + rule + " " + PRECEDENCIA_LONGA
 
 
 def _compat_block(enabled: set) -> str:
@@ -118,50 +156,58 @@ def _compat_block(enabled: set) -> str:
     if caveman_on:
         return (
             " [bigtech] INCOMPATIBILIDADE DETECTADA: o plugin `caveman` parece "
-            "ATIVO. Ele comprime a comunicacao e conflita com o reforco de modo "
-            "bigtech. DESATIVE o caveman (/plugin) antes de operar a constelacao."
+            "ATIVO. Ele comprime a comunicacao e pode interferir no reforco de "
+            "modo bigtech. Informe o usuario; manter ou desativar plugins e "
+            "decisao dele."
         )
     return (
-        " [bigtech] Compatibilidade: se o plugin `caveman` estiver ativo, "
-        "desative-o — ele conflita com o reforco de modo bigtech."
+        " [bigtech] Compatibilidade: se o plugin `caveman` estiver ativo, ele "
+        "pode interferir no reforco de modo bigtech; a decisao de mante-lo e do "
+        "usuario."
     )
 
 
-def _deps_block(enabled: set) -> str:
-    # Se nao conseguimos ler enabledPlugins (conjunto vazio), nao afirmamos que
-    # estao ausentes; apenas recomendamos de forma generica.
-    if not enabled:
+def deps_block(cwd, config_dir) -> str:
+    """Aviso de dependencias recomendadas. Vazio quando nada falta."""
+    names, ilegiveis = coletar_habilitados(cwd, config_dir)
+    if ilegiveis:
         return (
-            " [bigtech] Dependencias sugeridas (nao obrigatorias): `superpowers` "
-            "e `playwright` enriquecem o fluxo; instale via /plugin se desejar."
+            " [bigtech] Não consegui conferir as dependências recomendadas: "
+            + ", ".join(ilegiveis) + " não pode ser lido. Verifique o arquivo; "
+            "até lá não afirmo quais dependências faltam."
         )
-    missing = [p for p in SUGGESTED if p not in enabled]
-    if not missing:
+    faltando = dependencias_faltando(names)
+    if not faltando:
         return ""
-    return (
-        " [bigtech] Dependencias sugeridas ausentes (nao obrigatorias): "
-        + ", ".join("`" + m + "`" for m in missing)
-        + ". Considere instalar via /plugin."
-    )
+    return " " + FORMA_CURTA.format(faltando=", ".join(faltando))
 
 
-def build_context() -> str:
-    enabled = _enabled_plugin_names()
-    parts = [_docs_block(), _compat_block(enabled), _deps_block(enabled)]
+def build_context(cwd=None) -> str:
+    cwd = cwd or os.getcwd()
+    names, _ = coletar_habilitados(cwd, _config_dir())
+    parts = [_docs_block(), _compat_block(names), deps_block(cwd, _config_dir())]
     return "".join(p for p in parts if p)
 
 
+def _cwd_do_payload(payload) -> str:
+    if isinstance(payload, dict):
+        cwd = str(payload.get("cwd") or "").strip()
+        if cwd and os.path.isdir(cwd):
+            return cwd
+    return os.getcwd()
+
+
 def main() -> int:
-    # Consumir stdin (payload SessionStart) sem depender dele.
+    payload = None
     try:
-        json.load(sys.stdin)
+        payload = json.load(sys.stdin)
     except Exception:
         pass
     try:
         out = {
             "hookSpecificOutput": {
-                "hookEventName": "SessionStart",
-                "additionalContext": build_context(),
+                "hookEventName": nome_evento(payload, "SessionStart"),
+                "additionalContext": build_context(_cwd_do_payload(payload)),
             }
         }
         print(json.dumps(out))

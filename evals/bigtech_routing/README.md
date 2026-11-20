@@ -49,6 +49,18 @@ Opcional: `python3 evals/bigtech_routing/run_evals.py /caminho/cases.json`.
 | `FORBID-SOLO-ALIAS` | `legacy_porte_hint=solo` | `early` (nunca `solo`) |
 | `CRIT-MONEY` | Pagamentos em escopo pequeno | `early` + CISO |
 | `IA-CENTRAL` | IA como capability central | `early` + CAIO + applied-ai-engineer |
+| `ROUTE-JOGO` | Desenvolvimento de jogo | skill `proj_jogo` + `lead-game-designer`, `gameplay-engineer` |
+| `ROUTE-PERICIA` | Caso médico-jurídico | skill `pericia-medica` + quarteto dr-* |
+| `ROUTE-DR-TRABALHO` | Perícia ocupacional | skill `dr-medico-trabalho` |
+| `ROUTE-DR-PSIQUIATRA` | Perícia psiquiátrica | skill `dr-medico-psiquiatra` |
+| `ROUTE-DR-ADVOGADO` | Análise jurídica de autos | skill `dr-advogado` |
+| `ROUTE-PEDAGOGIA` | Aula e plano de aula | skill `learning-designer` + `learning-designer` |
+| `ROUTE-LINUX` | Diagnóstico Linux | skill `suporte-linux` + `linux-diag` |
+| `ROUTE-PENDENCIAS` | Tabela de pendências | skill `tab_pendencias` (sem agent fixo) |
+
+Os `ROUTE-*` (CONS-12) checam a **skill roteada** (`expected_skill`, prefixo `bigtech:` opcional) e os agents de apoio. O mapa `domain -> skill + agents` é a tabela `FRENTES` de `run_evals.py`; o runner falha se algum nome dela não existir em `agents/` ou `skills/`.
+
+Contagem atual (CONS-R7): 21 cases; 10 de porte e 11 de frente (as 3 skills novas do CONS-12C: watchcode, manter_ligado, olhe_agentes; o github-gossips saiu do plugin em D4).
 
 Origem narrativa: `PLANO-MELHORIA-BIGTECH-CLAUDE-CODE-2026-08-16.md` §2.6 (CASE-A..D), traduzida para a taxonomia **pós-BT-5** (`early|scale|bigtech`, não `lean|standard|critical` da rubrica futura de Phase 2).
 

@@ -6,32 +6,36 @@
 
 ## English
 
-**Effective date:** 2026-06-14
+**Effective date:** 2026-11-20
 
 This Privacy Policy describes how the **bigtech** plugin for Claude Code handles
-data. The summary in one sentence: **the plugin does not collect, store, or
-transmit any personal data; everything runs locally on your machine.**
+data. The summary in one sentence: **the plugin does not collect, store on any
+server, or transmit personal data to its author; its hooks run locally and make
+no network calls, and the only feature that talks to the network is an opt-in
+GitHub channel that you register yourself.**
 
 ### What the plugin is
 
 `bigtech` is a local plugin for Claude Code, made up of Markdown files (agents,
-skills, and documentation) and six hooks written in Python. It has no server and
-no backend. It does not create an account, it does not require a login, and it
-makes no network calls of its own.
+skills, and documentation), seven Python hook scripts (registered nine times in
+`hooks/hooks.json`), and a few optional skills. It has no server and no backend
+operated by the author. It does not create an account and does not require a
+login.
 
-### No data collection
+### No data collection by the author
 
-The plugin does not collect, store, or transmit personal data. It runs no
-telemetry, no analytics, and no usage tracking. It does not send any data off
-your machine.
+The plugin does not send data to its author. It runs no telemetry, no
+analytics, and no usage tracking. Nothing you do in a session is reported to
+the maintainer.
 
 ### What the hooks do
 
 The hooks run locally on your machine, under your own user account, in response
-to Claude Code session events (such as SessionStart, UserPromptSubmit,
-PreToolUse, and PostToolUse). They read only the local session context, for
-example the files of the project you have open and the `.bigtech-porte` marker
-that records the project size. They make no network connections.
+to Claude Code session events (SessionStart, UserPromptSubmit, PreToolUse, and
+PostToolUse). They read the local session context: the files of the project you
+have open, the `.bigtech-porte` marker that records the project size, and the
+Claude Code settings files of your machine. **None of the hooks makes a network
+connection.**
 
 The hooks are fail-safe: an internal error is caught and the session continues
 normally. The only intentional exception is the TDD guard, an opt-in test
@@ -42,18 +46,29 @@ project. This is the same kind of trust as running `make test` or `npm test` in
 a repository. For the full trust model and how to disable it, see
 [SECURITY.md](./SECURITY.md).
 
-The plugin writes only local state on your own machine, under your home
-directory, to support the TDD cycle. No path is hard-coded; it is resolved at
-run time from your environment.
+### Local state written by the plugin
+
+The plugin writes local state only on your own machine, under your home
+directory or the runtime directory of your user. No path is hard-coded; each is
+resolved at run time from your environment:
+
+- TDD cycle results: `$HOME/.claude/state/tdd-guard/`.
+- Pendências hook: a per-session file in `$XDG_RUNTIME_DIR` or `$HOME/.cache`.
+  The copy of that hook inside `hooks/` writes its session timestamp to the
+  system temporary directory instead; this is a known limitation, recorded in
+  [SECURITY.md](./SECURITY.md).
+- Optional skills (`watchcode`, `manter_ligado`): state under
+  the runtime directory, `$HOME/.cache`, and `$HOME/.config/bigtech/`.
 
 ### Scope and responsibility
 
 This policy covers the **bigtech plugin only.** The plugin operates inside Claude
 Code, which is a product of Anthropic. Your use of Claude Code itself, and of any
 artificial-intelligence model it relies on, is governed by Anthropic's own
-policies, not by this policy. This document does not control, and cannot speak
-for, how Anthropic or any third party handles your data. Please review
-Anthropic's policies for those terms.
+policies, not by this policy. The optional plugins listed as dependencies of the
+`bigtech-completo` bundle, and the third-party services named above, have their
+own policies. This document does not control, and cannot speak for, how
+Anthropic, GitHub, Cloudflare, or any third party handles your data.
 
 ### Changes to this policy
 
@@ -72,33 +87,35 @@ Maintainer handle: `petrinhu`.
 
 ## Português
 
-**Data de vigência:** 2026-06-14
+**Data de vigência:** 2026-11-20
 
 Esta Política de Privacidade descreve como o plugin **bigtech** para o Claude
-Code lida com dados. O resumo em uma frase: **o plugin não coleta, não armazena
-e não transmite nenhum dado pessoal; tudo é executado localmente na sua
-máquina.**
+Code lida com dados. O resumo em uma frase: **o plugin não envia dados pessoais
+ao seu autor; os hooks rodam localmente e não fazem chamada de rede; a única
+função que usa a rede é um canal opcional do GitHub, que você registra por conta
+própria.**
 
 ### O que é o plugin
 
 O `bigtech` é um plugin local do Claude Code, composto por arquivos Markdown
-(agents, skills e documentação) e seis hooks escritos em Python. Ele não tem
-servidor e não tem backend. Ele não cria conta, não exige login e não faz
-chamadas de rede próprias.
+(agents, skills e documentação), sete scripts Python de hook (registrados nove
+vezes em `hooks/hooks.json`) e alguns skills opcionais. Ele não tem servidor
+nem backend operado pelo autor. Ele não cria conta e não exige login.
 
-### Nenhuma coleta de dados
+### Nenhuma coleta de dados pelo autor
 
-O plugin não coleta, não armazena e não transmite dados pessoais. Ele não roda
-telemetria, não roda analytics e não faz rastreamento de uso. Ele não envia
-nenhum dado para fora da sua máquina.
+O plugin não envia dados ao seu autor. Ele não roda telemetria, não roda
+analytics e não faz rastreamento de uso. Nada do que você faz numa sessão é
+reportado ao mantenedor.
 
 ### O que os hooks fazem
 
-Os hooks são executados localmente na sua máquina, sob o seu próprio usuário, em
-resposta a eventos de sessão do Claude Code (como SessionStart, UserPromptSubmit,
-PreToolUse e PostToolUse). Eles leem apenas o contexto local da sessão, por
-exemplo os arquivos do projeto que você abriu e o marcador `.bigtech-porte`, que
-registra o porte do projeto. Eles não realizam nenhuma conexão de rede.
+Os hooks são executados localmente na sua máquina, sob o seu próprio usuário,
+em resposta a eventos de sessão do Claude Code (SessionStart,
+UserPromptSubmit, PreToolUse e PostToolUse). Eles leem o contexto local da
+sessão: os arquivos do projeto que você abriu, o marcador `.bigtech-porte`, que
+registra o porte do projeto, e os arquivos de configuração do Claude Code da sua
+máquina. **Nenhum dos hooks faz conexão de rede.**
 
 Os hooks são fail-safe: um erro interno é capturado e a sessão segue
 normalmente. A única exceção intencional é o guard de TDD, um guard-rail de
@@ -109,18 +126,30 @@ comando de teste declarado por aquele projeto. Isso tem a mesma natureza de
 confiança de rodar `make test` ou `npm test` em um repositório. Para o modelo de
 confiança completo e como desativar, consulte o [SECURITY.md](./SECURITY.md).
 
-O plugin grava apenas estado local na sua própria máquina, sob o seu diretório
-pessoal, para apoiar o ciclo de TDD. Nenhum caminho é fixado no código; ele é
-resolvido em tempo de execução a partir do seu ambiente.
+### Estado local gravado pelo plugin
+
+O plugin grava estado local apenas na sua máquina, sob o seu diretório pessoal
+ou o diretório de execução do seu usuário. Nenhum caminho é fixado no código;
+cada um é resolvido em tempo de execução a partir do seu ambiente:
+
+- Resultados do ciclo de TDD: `$HOME/.claude/state/tdd-guard/`.
+- Hook de pendências: um arquivo por sessão em `$XDG_RUNTIME_DIR` ou
+  `$HOME/.cache`. A cópia desse hook dentro de `hooks/` grava o carimbo de
+  sessão no diretório temporário do sistema; essa é uma limitação conhecida,
+  registrada no [SECURITY.md](./SECURITY.md).
+- Skills opcionais (`watchcode`, `manter_ligado`): estado no
+  diretório de execução, em `$HOME/.cache` e em `$HOME/.config/bigtech/`.
 
 ### Escopo e responsabilidade
 
 Esta política cobre **apenas o plugin bigtech.** O plugin opera dentro do Claude
 Code, que é um produto da Anthropic. O uso do próprio Claude Code, e de qualquer
 modelo de inteligência artificial do qual ele dependa, é regido pelas políticas
-da própria Anthropic, e não por esta política. Este documento não controla, e
-não pode responder por, como a Anthropic ou qualquer terceiro lida com os seus
-dados. Consulte as políticas da Anthropic para esses termos.
+da própria Anthropic, e não por esta política. Os plugins opcionais listados
+como dependências do bundle `bigtech-completo` e os serviços de terceiros
+citados acima têm políticas próprias. Este documento não controla, e não pode
+responder por, como a Anthropic, o GitHub, a Cloudflare ou qualquer terceiro
+lida com os seus dados.
 
 ### Mudanças nesta política
 

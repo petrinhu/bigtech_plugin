@@ -73,6 +73,31 @@ BASE_AGENTS: dict[str, list[str]] = {
 }
 
 
+# Frentes novas (CONS-12, 2026-11-20): domain -> skill roteada + agents de apoio.
+# Nomes sem prefixo `bigtech:`. `run()` confere em disco que cada nome existe
+# (agents/<nome>.md, skills/<nome>/SKILL.md), então um nome errado fica vermelho.
+# pendencias não tem agent fixo: o time sai da própria skill (Cósimo/Cosmo).
+FRENTES: dict[str, dict[str, Any]] = {
+    "game-dev": {
+        "skill": "proj_jogo",
+        "agents": ["lead-game-designer", "gameplay-engineer"],
+    },
+    "forense-medica": {
+        "skill": "pericia-medica",
+        "agents": ["dr-medico-perito", "dr-medico-trabalho", "dr-medico-psiquiatra", "dr-advogado"],
+    },
+    "forense-ocupacional": {"skill": "dr-medico-trabalho", "agents": ["dr-medico-trabalho"]},
+    "forense-psiquiatrica": {"skill": "dr-medico-psiquiatra", "agents": ["dr-medico-psiquiatra"]},
+    "forense-juridica": {"skill": "dr-advogado", "agents": ["dr-advogado"]},
+    "pedagogia": {"skill": "learning-designer", "agents": ["learning-designer"]},
+    "linux-diagnostico": {"skill": "suporte-linux", "agents": ["linux-diag"]},
+    "pendencias": {"skill": "tab_pendencias", "agents": []},
+    # CONS-12C (2026-11-20): as 4 skills novas entram no plugin, sem agent fixo.
+    "vigia-crash": {"skill": "watchcode", "agents": []},
+    "conexao-viva": {"skill": "manter_ligado", "agents": []},
+    "monitor-agentes": {"skill": "olhe_agentes", "agents": []},
+}
+
 def _clamp_dim(value: Any) -> int:
     try:
         n = int(value)
@@ -164,6 +189,12 @@ def classify(signals: dict[str, Any]) -> dict[str, Any]:
 
     agents = list(BASE_AGENTS[profile])
 
+    frente = FRENTES.get(domain)
+    if frente is not None:
+        for a in frente["agents"]:
+            if a not in agents:
+                agents.append(a)
+
     # Early-stage com usuarios reais (distribution>=2): Pipeline-Lean + CPO.
     if profile == "early" and distribution >= 2 and "capitolino-cpo" not in agents:
         agents.append("capitolino-cpo")
@@ -212,11 +243,32 @@ def classify(signals: dict[str, Any]) -> dict[str, Any]:
         "risk_score": risk,
         "pipeline": pipeline,
         "agents": agents,
+        "skill": frente["skill"] if frente is not None else None,
         "legacy_normalized": legacy,
         # Exposto para auditoria do harness: headcount lido e IGNORADO.
         "headcount_ignored": signals.get("headcount"),
         "capacity_ignored": signals.get("capacity"),
     }
+
+
+def _strip_bigtech_prefix(name: str) -> str:
+    """'bigtech:proj_jogo' -> 'proj_jogo' (o plugin prefixa os nomes no despacho)."""
+    return name.removeprefix("bigtech:")
+
+
+PLUGIN_ROOT = HERE.parent.parent
+
+
+def _names_missing_on_disk(root: Path = PLUGIN_ROOT) -> list[str]:
+    """Agents e skills citados em FRENTES que não existem no plugin."""
+    missing: list[str] = []
+    for domain, frente in FRENTES.items():
+        if not (root / "skills" / frente["skill"] / "SKILL.md").is_file():
+            missing.append(f"{domain}: skills/{frente['skill']}/SKILL.md")
+        for a in frente["agents"]:
+            if not (root / "agents" / f"{a}.md").is_file():
+                missing.append(f"{domain}: agents/{a}.md")
+    return missing
 
 
 def _check_case(case: dict[str, Any]) -> tuple[bool, str, dict[str, Any]]:
@@ -240,6 +292,13 @@ def _check_case(case: dict[str, Any]) -> tuple[bool, str, dict[str, Any]]:
         reasons.append(f"profile={profile} fora de allowed={allowed}")
     elif expected is not None and profile != expected:
         reasons.append(f"profile={profile} != expected={expected}")
+
+    # Frente: skill roteada (prefixo bigtech: é opcional no case)
+    expected_skill = case.get("expected_skill")
+    if expected_skill is not None:
+        want = _strip_bigtech_prefix(str(expected_skill))
+        if result.get("skill") != want:
+            reasons.append(f"skill={result.get('skill')!r} != expected_skill={want!r}")
 
     # Min agents (hints)
     min_agents = case.get("expected_min_agents") or []
@@ -275,6 +334,11 @@ def run(path: Path = CASES_PATH) -> int:
         print("Nenhum case em", path, file=sys.stderr)
         return 1
 
+    missing = _names_missing_on_disk()
+    if missing:
+        print("Nomes de frente sem arquivo em disco:", missing, file=sys.stderr)
+        return 1
+
     # Colunas da tabela
     rows: list[tuple[str, str, str, str, str]] = []
     failed = 0
@@ -288,7 +352,7 @@ def run(path: Path = CASES_PATH) -> int:
                 str(case.get("id", "?")),
                 status,
                 str(result.get("profile")),
-                str(case.get("expected_profile") or case.get("allowed_profiles")),
+                str(case.get("expected_profile") or case.get("allowed_profiles") or case.get("expected_skill")),
                 msg,
             )
         )

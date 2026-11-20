@@ -1,0 +1,291 @@
+#!/usr/bin/env python3
+# tools/todo_health.py -- relatorio de saude/frescor da TODO.md
+# SPDX-License-Identifier: Apache-2.0
+# Licença: Apache-2.0 (ver NOTICE na raiz do plugin).
+# Derivado do projeto standalone tab_pendencias, do mesmo autor, relicenciado sob Apache-2.0.
+"""
+tools/todo_health.py
+
+--health: relatorio LOCAL de saude da TODO.md (offline, sem LLM, sem rede).
+Da o dado para "medir antes de escalar":
+  - itens presos em 🔍 Pendente verificação (falso-done residual: entregue mas a
+    onda TST-*/AUD-* nunca rodou)
+  - tamanho da INBOX (descobertas nao priorizadas)
+  - adesao a citar ID nos commits (do $GIT_DIR/todo-freshness.log)
+  - sinais TAB_* via session_signals (Fase 6)
+
+Uso: python3 todo_health.py
+
+ENC-1: falha de leitura do TODO.md (encoding invalido, permissao, etc.) vira
+mensagem CLARA em stderr + exit 1 (erro de execucao, D-6/CLI-1) -- nunca
+traceback cru. --verbose acrescenta o traceback completo.
+"""
+import argparse
+import datetime
+import os
+import sys
+import traceback
+
+import todo_lib as L
+import session_signals as SS
+
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
+
+
+class _Parser(argparse.ArgumentParser):
+    """Contrato de exit code (D-6/CLI-1): erro de parsing sai 1 ('erro de
+    execucao'), NAO 2 (reservado a 'ha item(ns) preso(s) em verificacao')."""
+
+    def error(self, message):
+        self.print_usage(sys.stderr)
+        self.exit(1, f"{self.prog}: error: {message}\n")
+
+
+def _build_parser():
+    p = _Parser(
+        prog="todo_health.py",
+        description=(
+            "Relatorio local de saude/frescor da TODO.md (offline, sem LLM, "
+            "sem rede): itens presos em 🔍 Pendente verificacao (falso-done "
+            "residual), tamanho da INBOX, e adesao a citar ID nos commits."
+        ),
+        epilog=(
+            "Exit codes: 0 = ok, nenhum item preso em verificacao; 1 = erro "
+            "de execucao (nao e repositorio git); 2 = ha item(ns) preso(s) "
+            "em 🔍 Pendente verificacao."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    p.add_argument(
+        "-v", "--verbose", action="store_true",
+        help="Se a leitura do TODO.md falhar, acrescenta o traceback "
+             "completo em stderr (default: so tipo + mensagem da excecao).")
+    return p
+
+
+def _adesao(root):
+    gd = L.git_dir(root)
+    if not gd:
+        return None
+    p = os.path.join(gd, "todo-freshness.log")
+    try:
+        with open(p, encoding="utf-8") as fh:
+            linhas = fh.read().splitlines()
+    except Exception:
+        return None
+    code = [l for l in linhas if "code=1" in l]
+    if not code:
+        return None
+    citaram = [l for l in code if "cited=0" not in l]
+    pct = round(100 * len(citaram) / len(code))
+    return f"{len(citaram)}/{len(code)} commits de codigo citaram ID ({pct}%)"
+
+
+def _residual_summary(entries, now=None):
+    """Entre as entradas residuais (NAO classificaveis, ADR-0002 secao f),
+    acha a de 'since' mais antigo -- e mede a idade em dias (contra
+    `now` ou datetime.date.today()) e o 'cycles' dela (default 0
+    quando o campo nao veio, per o proprio ADR). Devolve None quando nao
+    ha residual algum (INBOX vazia ou 100% classificavel) -- distinto de
+    um dict com zeros, para run()/main() nunca confundir "sem residual"
+    com "residual do dia 0"."""
+    if now is None:
+        now = datetime.date.today()
+    oldest_entry = oldest_date = None
+    for e in entries:
+        if e["classifiable"]:
+            continue
+        since = e["triage"]["fields"].get("since")
+        if since is None:
+            continue
+        try:
+            d = datetime.date.fromisoformat(since)
+        except ValueError:
+            continue
+        if oldest_date is None or d < oldest_date:
+            oldest_date, oldest_entry = d, e
+    if oldest_entry is None:
+        return None
+    cycles_raw = oldest_entry["triage"]["fields"].get("cycles", "0")
+    cycles = int(cycles_raw) if cycles_raw.isdigit() else 0
+    return {
+        "id": oldest_entry["id"],
+        "since": oldest_entry["triage"]["fields"]["since"],
+        "age_days": (now - oldest_date).days,
+        "cycles": cycles,
+    }
+
+
+# ENC-1: sentinela DISTINTO de None -- `run()` ja devolve None para dois
+# estados VALIDOS ("nao e repo git", "sem TODO.md"/"sem tabela": nada a
+# reportar, main() os desambigua via L.repo_root()). Uma leitura que FALHOU
+# (erro de execucao, D-6) nao pode reusar esse mesmo None generico: main()
+# precisaria adivinhar a causa, e um falso "sem TODO.md" sairia exit 0
+# quando deveria ser 1. `is ERRO_LEITURA` (identidade de objeto, nunca
+# confundido com um dict de sucesso nem com None) resolve isso sem mudar o
+# contrato dos dois `None` ja existentes.
+ERRO_LEITURA = object()
+
+
+def run(root=None, verbose=False, now=None):
+    """Nucleo testavel. Retorna um dict com as metricas, None (estado valido
+    sem dado: nao e repo git / sem TODO.md / sem tabela) ou ERRO_LEITURA
+    (leitura do TODO.md falhou -- erro de execucao, D-6/ENC-1).
+
+    `now` (datetime.date) e injetavel para predicados de aging (Fase 6).
+    """
+    if now is None:
+        now = datetime.date.today()
+    root = root or L.repo_root()
+    if not root:
+        print("Nao e um repositorio git.")
+        return None
+    todo = L.find_todo(root)
+    if not todo:
+        # Sinal CREATE (se git) sem inventar contagens de tabela.
+        report = SS.collect_signals(root, now=now)
+        machine = SS.format_machine(report)
+        if machine:
+            print(machine)
+        print("Sem TODO.md na raiz.")
+        return None
+    try:
+        with open(todo, encoding="utf-8") as fh:
+            text = fh.read()
+    except Exception as exc:
+        print(f"Falha ao ler TODO.md ({type(exc).__name__}): {exc}",
+              file=sys.stderr)
+        if verbose:
+            traceback.print_exc(file=sys.stderr)
+        return ERRO_LEITURA
+    tbl = L.parse_table(text)
+    if not tbl:
+        print("Sem tabela no TODO.md.")
+        return None
+
+    items = tbl["items"]
+    pend = [it for it in items if L.is_pending(it["status"])]
+    verif = [it for it in items if L.is_awaiting_verification(it["status"])]
+    done = [it for it in items if L.is_done(it["status"])]
+    inbox = L.inbox_items(text)
+    entries = L.inbox_entries(text)
+    classifiable = [e for e in entries if e["classifiable"]]
+    residual = [e for e in entries if not e["classifiable"]]
+    residual_summary = _residual_summary(entries, now=now)
+
+    cfg = L.load_signals_config(todo)
+    report = SS.collect_signals(root, now=now, cfg=cfg)
+    m = report.metrics
+
+    # LAYOUT-1: layout legado (INBOX depois da tabela, ou texto depois dela)
+    # e VALIDO para leitura -- so avisa, nunca falha nem muda contagem.
+    aviso_layout = L.legacy_layout_warning(text, table=tbl)
+    if aviso_layout:
+        print(aviso_layout)
+
+    print(f"Saude da TODO.md ({len(items)} itens):")
+    print(f"  ✅ concluidos: {len(done)}")
+    print(f"  ⏳/🔄 pendentes (nao entregues): {len(pend)}")
+    print(f"  🔍 aguardando verificacao (entregue, falta teste/auditoria): "
+          f"{len(verif)}")
+    for it in verif[:10]:
+        print(f"       presos em 🔍 -> {it['id']}")
+    if len(verif) > 10:
+        print(f"       ... (+{len(verif) - 10})")
+    print(f"  INBOX (descobertas nao priorizadas): {len(inbox)}")
+    # TAB-ADR-004/ADR-0002 secao f: classifiable_inbox_count e o numero que
+    # torna o criterio de sucesso da campanha MENSURAVEL -- linha sem
+    # metadado [triage ...] valido e classificavel POR DEFINICAO (drena no
+    # proximo intake), nunca por uma lista de motivos proibidos a policiar.
+    print(f"       classificaveis (sem 'reason' de triagem valida -- "
+          f"drenam no proximo intake): {len(classifiable)}")
+    if residual:
+        print(f"       residuais (reason valida, aguardando saida "
+              f"controlada): {len(residual)}")
+    needs_leader = m.get("needs_leader_count", 0)
+    if needs_leader:
+        # contagem separada -- NAO polui TAB_TRIAGE_REQUIRED sozinha (sem age)
+        print(f"       needs-leader-decision (aguardando lider, "
+              f"sem poluir triagem se frescos): {needs_leader}")
+    high_cycle = []
+    max_cycles = int(cfg.get("triage_max_cycles", 2))
+    for e in residual:
+        raw_c = (e.get("triage") or {}).get("fields", {}).get("cycles", "0")
+        try:
+            cyc = int(raw_c) if str(raw_c).isdigit() else 0
+        except (TypeError, ValueError):
+            cyc = 0
+        if cyc >= max_cycles:
+            high_cycle.append(e)
+    if residual_summary:
+        print(f"       residual mais antigo -> "
+              f"{residual_summary['id'] or '(sem ID)'} "
+              f"(since={residual_summary['since']}, "
+              f"idade={residual_summary['age_days']}d, "
+              f"cycles={residual_summary['cycles']})")
+
+    # Linhas TAB_* (machine format) -- fonte unica: session_signals.
+    machine = SS.format_machine(report)
+    if machine:
+        for line in machine.splitlines():
+            print(f"  {line}")
+
+    ad = _adesao(root)
+    print(f"  adesao a citar ID: {ad}" if ad
+          else "  adesao a citar ID: (sem dados ainda no todo-freshness.log)")
+    if pend:
+        print("Dica: rode todo_sync.py para sincronizar status entregue->🔍 "
+              "(determinístico); /bigtech:tab_pendencias --reorder para re-priorizar.")
+
+    flags = report.to_flags()
+    concurrent_count = m.get("concurrent_inbox_count", 0)
+    triage_required = report.is_active("TAB_TRIAGE_REQUIRED")
+    return {
+        "itens": len(items),
+        "concluidos": len(done),
+        "pendentes": len(pend),
+        "aguardando_verificacao": len(verif),
+        "layout": L.layout(text, table=tbl)["order"],
+        "layout_legacy": bool(aviso_layout),
+        "inbox": len(inbox),
+        "classifiable_inbox_count": len(classifiable),
+        "residual_inbox_count": len(residual),
+        "needs_leader_decision_count": needs_leader,
+        "high_cycle_residual_count": len(high_cycle),
+        "aged_residual_count": m.get("aged_residual_count", 0),
+        "concurrent_inbox_count": concurrent_count,
+        "tab_concurrent_inbox_present": concurrent_count > 0,
+        "tab_triage_required": triage_required,
+        "oldest_residual_since":
+            residual_summary["since"] if residual_summary else None,
+        "oldest_residual_age_days":
+            residual_summary["age_days"] if residual_summary else None,
+        "oldest_residual_cycles":
+            residual_summary["cycles"] if residual_summary else None,
+        **flags,
+    }
+
+
+def main(argv):
+    """CLI (D-6/CLI-1). run() devolve dict (sucesso), None (estado valido
+    sem dado) ou ERRO_LEITURA (ENC-1: leitura falhou); aqui e decidido o
+    exit code visivel: 'nao e repo git' e falha de leitura sao erro de
+    execucao (1), mas 'sem TODO.md'/'sem tabela' e estado valido (0, nada a
+    reportar) -- consistente com todo_sync.py, que ja faz essa mesma
+    distincao. Chama L.repo_root() de novo (2o subprocess git) so para
+    desambiguar a causa da falha sem mudar a assinatura/contrato ja
+    existente de run()."""
+    args = _build_parser().parse_args(argv)
+    res = run(verbose=args.verbose)
+    if res is ERRO_LEITURA:
+        return 1
+    if res is not None:
+        return 2 if res["aguardando_verificacao"] > 0 else 0
+    return 1 if L.repo_root() is None else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

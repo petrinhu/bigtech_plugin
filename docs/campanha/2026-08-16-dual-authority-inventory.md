@@ -2,7 +2,7 @@
 
 **Item:** BT-6 (W3). Status alvo nesta fatia: **🔍 Pendente verificação** (não ✅).  
 **Data da medição:** 2026-08-16 / 2026-08-17 00:02 (hora local).  
-**Autor:** `software-architect` / auditor (host Grok, papel teto desta fatia).  
+**Autor:** `software-architect` / auditor (segundo host (removido na 2.0.0), papel teto desta fatia).  
 **Taxonomia:** [`docs/adr/ADR-source-of-truth.md`](../adr/ADR-source-of-truth.md) D8.  
 **Histórico PHASE 0 (não é estado operacional):** [`phase0-agents-inventory.csv`](phase0-agents-inventory.csv), [`2026-08-16-phase0-baseline.md`](2026-08-16-phase0-baseline.md).  
 **CSV desta fatia:** [`2026-08-16-dual-authority-inventory.csv`](2026-08-16-dual-authority-inventory.csv).  
@@ -10,7 +10,7 @@
 
 ## 0. Decisão autônoma (confirmar retroativamente)
 
-**Não apagar, mover, renomear nem desativar arquivo em `~/.claude/` (nem `~/.grok/`) nesta fatia.**  
+**Não apagar, mover, renomear nem desativar arquivo em `~/.claude/` (nem `segundo host (removido na 2.0.0)`) nesta fatia.**  
 O inventário classifica. O cutover é PHASE 11, depois de canário verde. Dual authority homônima **permanece** até lá (ADR D2 / D6).
 
 Sem push, sem merge, sem tag remota, sem release. Sem implementar BT-7 nem BT-8.
@@ -25,7 +25,7 @@ Parser: `name:` no frontmatter YAML de `*.md` (não o filename). Árvores lidas:
 | Vault Claude (instalação viva) | `~/.claude/agents/` | `claude-memory` `5b19b524a7409d5b60ea3a3912b2761877c6c7b8` (agents limpos; working tree só tem memória de projeto) |
 | PHASE 0 freeze (prova histórica) | mesmo CSV | plugin `61c3ea4d9b5fcd75fb4feb9af7bbb020399d1eb6` |
 | Produto `tab_pendencias` | (D5; não é agent) | `0546c53ef5f97dc03975832842c8a73ef3c99e1f` |
-| Grok (overlay de host, **não** 3ª SoT) | `~/.grok/agents/` | 71 ficheiros; **0** idênticos ao plugin e **0** idênticos ao vault |
+| Segundo host (removido na 2.0.0) (overlay de host, **não** 3ª SoT) | `segundo host (removido na 2.0.0)` | 71 ficheiros; **0** idênticos ao plugin e **0** idênticos ao vault |
 
 `PLUGIN_ONLY` = 0. Todo agent do pacote 0.2.0 tem homônimo ativo no vault.
 
@@ -162,9 +162,9 @@ Confirmado contra spec 2026-06-13 §2.2 e heurística ADR D8. Nenhuma destas ent
 
 Jogo (10) + `narrative-writer` + `learning-designer` = 12 exclusões. Perícia (4) + host/coach/PMM/revisor = 8 overlay.
 
-## 6. Grok (`~/.grok/agents/`) - residual de host
+## 6. Segundo host (removido na 2.0.0) - residual de host
 
-71 ficheiros, mesmos `name:` que o vault. **Nenhum** sha256 igual ao plugin ou ao vault (cópia adaptada: `model:` omitido na amostra C-level). ADR D2: Grok não é terceira fonte de verdade do produto. Cutover futuro não pode deixar 51 homônimos ativos no segundo host. Fora desta fatia (ver plano).
+71 ficheiros, mesmos `name:` que o vault. **Nenhum** sha256 igual ao plugin ou ao vault (cópia adaptada: `model:` omitido na amostra C-level). ADR D2: o segundo host (removido na 2.0.0) não é terceira fonte de verdade do produto. Cutover futuro não pode deixar 51 homônimos ativos no segundo host. Fora desta fatia (ver plano).
 
 ## 7. Skills e hooks (contexto; inventário de agent é o DoD de BT-6)
 
@@ -172,7 +172,7 @@ Não é BT-7 (drift gate) nem implementação. Medição pontual para o plano:
 
 | Superfície | Plugin | `~/.claude` | Nota |
 |---|---|---|---|
-| Skills core | 4 (`bigtech`, `proj_software`, `visual-design-director`, `tab_pendencias` embutida) | 46; as 4 core **divergem** (sha distinto) | Grok: symlink das 3 primeiras → Claude; `tab_pendencias` → produto (D5 correto no Grok) |
+| Skills core | 4 (`bigtech`, `proj_software`, `visual-design-director`, `tab_pendencias` embutida) | 46; as 4 core **divergem** (sha distinto) | Segundo host (removido na 2.0.0): symlink das 3 primeiras → Claude; `tab_pendencias` → produto (D5 correto no segundo host) |
 | Hooks `*.py` | 7 (6 core + shim `tab_pendencias_reminder`) | 13 (os 6/7 core + pessoais) | Homônimos TDD/bigtech = risco ALTO de execução dupla se o plugin ligar **com** os globais |
 
 Classificação de superfície (não ficheiro a ficheiro de hook):
@@ -184,7 +184,7 @@ Classificação de superfície (não ficheiro a ficheiro de hook):
 
 ## 8. O que este inventário **não** faz
 
-- Não remove globais. Não edita `~/.claude` / `~/.grok`.
+- Não remove globais. Não edita `~/.claude` / `segundo host (removido na 2.0.0)`.
 - Não altera `agents/` do plugin (nenhum port nesta fatia: gap `CORE-GENERIC` = 0).
 - Não implementa gate de drift (BT-7) nem evals `/bigtech` (BT-8).
 - Não promove ✅ (falta TST/AUD de campanha).

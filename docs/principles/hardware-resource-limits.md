@@ -4,8 +4,10 @@ description: Como rodar workloads pesados (ML, RAG, build, transcoding, render, 
 ---
 
 # Limites de recursos de hardware
+> As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário.
 
-> Regra para todos os agents: ao disparar qualquer workload pesado, **respeite os limites
+
+> Orientação para os agents: ao disparar qualquer workload pesado, **respeite os limites
 > de hardware da máquina onde o plugin roda**. Não sature CPU, RAM nem GPU a ponto de
 > travar o desktop, o IO ou outras tarefas do usuário. Quando um workload puder estourar
 > esses limites, **avise antes** e, em dúvida, peça confirmação (opção recomendada primeiro).
@@ -263,14 +265,17 @@ Padrões de incidente reais que estes caps evitam (use-os como sinal de alerta):
 
 ## 10. Procedimento antes de disparar trabalho pesado
 
+Se as regras do usuário definirem travas de trabalho pesado ou de GPU, elas prevalecem
+sobre os passos abaixo.
+
 1. **Meça** o hardware (§1) se ainda não conhece os números da máquina.
 2. **Exporte** as env vars de threads (§4) e, se houver GPU, as de GPU (§5).
 3. **Envolva** o comando em `nice` e, se ele saturar GPU/RAM, em `flock` (§6); ou use um
    wrapper "safe" (§7).
-4. **Avise o usuário antes** de qualquer lote que possa estourar os limites: **≥3 processos
-   pesados em paralelo** ou **um novo processo de GPU** numa máquina de VRAM apertada.
-5. **Em dúvida, peça confirmação** ao usuário antes de executar, apresentando a opção
-   recomendada primeiro. A palavra final sobre disparar uma carga arriscada é sempre dele.
+4. **Na falta de travas definidas pelo usuário, avise antes de paralelizar** cargas pesadas
+   ou de qualquer lote que possa estourar os limites.
+5. **Peça autorização antes de usar a GPU.** Em dúvida, peça confirmação, apresentando a
+   opção recomendada primeiro. A decisão de disparar uma carga arriscada é do usuário.
 
 ---
 
@@ -282,4 +287,4 @@ Padrões de incidente reais que estes caps evitam (use-os como sinal de alerta):
 - [ ] Workload não depende de swap para caber.
 - [ ] Env de GPU exportada; fallback CPU no OOM; **sem** `ulimit -v` rígido.
 - [ ] `nice` em comando pesado; `flock` quando satura GPU/RAM (1 instância por vez).
-- [ ] Usuário avisado antes de lote arriscado; confirmação pedida em caso de dúvida.
+- [ ] Usuário avisado antes de lote arriscado; autorização pedida antes de qualquer processo de GPU.

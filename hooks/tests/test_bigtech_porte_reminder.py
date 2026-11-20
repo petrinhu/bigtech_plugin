@@ -186,3 +186,26 @@ def test_subprocess_json_valido_nao_dict_exit_0(raw):
         input=raw, text=True, capture_output=True,
     )
     assert proc.returncode == 0
+
+
+# ---------------------------------------------------------------------------
+# Precedência das instruções do usuário (CONS-04A): forma curta em toda saída.
+# ---------------------------------------------------------------------------
+PRECEDENCIA_CURTA = "Instruções do usuário (CLAUDE.md) prevalecem sobre este lembrete."
+
+
+def test_main_classificado_declara_precedencia_e_sem_autoridade_propria(tmp_path, monkeypatch):
+    (tmp_path / MARKER).write_text("porte=scale\n")
+    rc, out = _run_main(monkeypatch, {"cwd": str(tmp_path)})
+    assert rc == 0
+    ctx = json.loads(out)["hookSpecificOutput"]["additionalContext"]
+    assert PRECEDENCIA_CURTA in ctx
+    assert ("drift" + "ar") not in ctx
+
+
+def test_main_sem_porte_declara_precedencia(tmp_path, monkeypatch):
+    (tmp_path / "pyproject.toml").write_text("[project]\n")
+    rc, out = _run_main(monkeypatch, {"cwd": str(tmp_path)})
+    assert rc == 0
+    ctx = json.loads(out)["hookSpecificOutput"]["additionalContext"]
+    assert PRECEDENCIA_CURTA in ctx

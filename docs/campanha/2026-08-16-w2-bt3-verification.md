@@ -2,7 +2,7 @@
 
 **Data da verificação:** 2026-08-16  
 **Hora local (medida):** `16/08/26 - 23:50:37` (`date '+%d/%m/%y - %H:%M:%S'`)  
-**Papel:** auditor de campanha — host Grok, papel [grok][mais recente]  
+**Papel:** auditor de campanha — segundo host (removido na 2.0.0), papel [segundo-host][mais recente]  
 **Item:** `BT-3` (remote GitHub canônico + purge CI/host legado + 0 refs operacionais em paths de produto)  
 **DoD desta fatia (ordem de serviço W2):**
 

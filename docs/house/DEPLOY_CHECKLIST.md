@@ -1,9 +1,10 @@
 <!--
   docs/house sync
   origem: vault claudebrain / DEPLOY_CHECKLIST.md
-  path_vault: /home/petrus/IDrive/Documentos/projetos_claudebrain/DEPLOY_CHECKLIST.md
-  sync_date: 2026-08-16
-  regra: se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
+  sync_date: 2026-11-20
+  hmac_vault_sha256: ed548f1da52830cd85e39bd184d16f9686f70427019cd70f1ce50309b0f728ba
+  transformacoes: T1=1 T2=0 T3a=0 T3=0 T4=0 T5=0
+  regra: As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário. Se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
   sem segredos: não incluir tokens/credenciais
 -->
 # DEPLOY CHECKLIST  -  Alterações Irreversíveis em Produção
@@ -14,19 +15,21 @@
 
 - Manuais irmãos: [[CONTRACT]] · [[TESTES]] · [[AUDITORIAS]] · [[AGILE]]
 - Hub: [[Standards]] · [[CLAUDE]]
-- Projetos com migrations/produção: [[Projects/site_consultorio]] (migrations/ + public_html/ + cron/) · [[Projects/PokemonTCGViewer]] · [[Projects/rag_maker]]
 - Pré-deploy obrigatório: rodar [[TESTES]] T8 (gitleaks/secrets) + T10 (SQL Injection) + T12 (CVEs)
 
 ---
 
 > Antes de executar qualquer operação marcada como irreversível percorra **todos** os itens abaixo.
+>
+> Cada item recebe `[PASSOU]`, `[FALHOU]` ou `[BLOQUEADO]`. Qualquer `[FALHOU]` ou `[BLOQUEADO]` aborta o deploy imediatamente, e o deploy só é autorizado com as 7 fases `[PASSOU]`. Se as instruções do usuário definem um processo próprio de deploy irreversível, ele prevalece por inteiro.
 
 ---
 
 ## FASE 0  -  Classificação da Mudança
 - Migração ou alteração de schema de banco de dados
 - Implementação ou modificação de autenticação (2FA, OAuth, SSO)
-- Rotação de chaves criptográficas
+- Rotação ou geração de chave criptográfica em produção
+- Alteração de RBAC/ACL
 - Operação DROP, TRUNCATE ou ALTER TABLE sem rollback trivial
 
 ---

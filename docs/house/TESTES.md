@@ -1,9 +1,10 @@
 <!--
   docs/house sync
   origem: vault claudebrain / TESTES.md
-  path_vault: /home/petrus/IDrive/Documentos/projetos_claudebrain/TESTES.md
-  sync_date: 2026-08-16
-  regra: se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
+  sync_date: 2026-11-20
+  hmac_vault_sha256: 66b094fc2ae4d97252c8edb1a6476c8dd49349b2123184345098a30179dead5e
+  transformacoes: T1=4 T2=0 T3a=0 T3=0 T4=0 T5=0
+  regra: As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário. Se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
   sem segredos: não incluir tokens/credenciais
 -->
 # Guia Completo de Testes, Qualidade e Auditoria
@@ -14,10 +15,6 @@
 
 - Manuais irmãos: [[CONTRACT]] · [[AGILE]] · [[AUDITORIAS]] · [[DEPLOY_CHECKLIST]]
 - Hub: [[Standards]] · [[CLAUDE]]
-- Suítes C++/Qt em uso: [[Projects/PokemonTCGViewer]] (tests/ + Testing/) · [[Projects/astrometrica]] (tests/) · [[Projects/transcritor]] (tests/ + fuzz/) · [[Projects/driver_brother_hl_l1222]] (tests/)
-- Suítes Python em uso: [[Projects/rag_maker]] (pyproject + tests/) · [[Projects/my_comp]] (tests/) · [[Projects/orcamento-pessoal]] (tests/)
-- Suítes Web em uso: [[Projects/site_consultorio]] (tests/)
-- Reports gerados: [[Projects/PokemonTCGViewer/reports]] · [[Projects/transcritor/reports]] · [[Projects/my_comp/reports]]
 
 ---
 
@@ -25,6 +22,10 @@
 > completa de verificação em projetos **C · C++ · Python · Rust · Node.js/TypeScript**.
 > As seções T1-T12 e A1-A10 cobrem C/C++/Qt. As seções T13-T15 e A11-A13 cobrem os demais stacks.
 > Adapte os caminhos e nomes de módulos conforme o projeto alvo.
+
+> **Portabilidade dos comandos (agnóstico de SO).** Os comandos de instalação usam `dnf` (Fedora/RHEL) e `apt` (Debian/Ubuntu) como exemplos. Adapte ao gerenciador do sistema: `apt`, `dnf`, `pacman` ou `zypper` no Linux; `brew` no macOS; `winget`, `choco` ou `scoop` no Windows. Prefira gerenciadores cross-platform quando houver: `pip`/`uv`, `cargo` e `npm`/`pnpm` valem igual em Windows, macOS e Linux. Para detectar uma ferramenta, use `command -v <ferramenta>` no Unix ou no WSL, e `Get-Command <ferramenta>` ou `where <ferramenta>` no Windows. No Windows, rodar o Claude Code via WSL torna válidos os comandos Unix deste manual.
+
+> **Ferramenta ausente.** Siga a regra de [[TOOLING]] (legenda de status): ferramenta de linha de comando de uso geral pode ser instalada com aviso; biblioteca, dependência de projeto, modelo, extensão, navegador e serviço só com permissão do usuário; nunca falhar calado.
 
 ---
 
@@ -43,18 +44,20 @@
 11. [T10  -  SQL Injection](#t10--sql-injection)
 12. [T11  -  Fuzzing de Protocolos de Rede](#t11--fuzzing-de-protocolos-de-rede)
 13. [T12  -  Busca de CVEs nas Dependências](#t12--busca-de-cves-nas-dependências)
-14. [A1  -  Descoberta e Modelagem](#a1--descoberta-e-modelagem)
-15. [A2  -  Auditoria de Arquitetura e Camadas](#a2--auditoria-de-arquitetura-e-camadas)
-16. [A3  -  UI/UX e Acessibilidade](#a3--uiux-e-acessibilidade)
-17. [A4  -  QA Geral C++](#a4--qa-geral-c)
-18. [A5  -  Análise Estática e Dinâmica C/C++](#a5--análise-estática-e-dinâmica-cc)
-19. [A6  -  Cobertura de Testes](#a6--cobertura-de-testes)
-20. [A7  -  Dependências e Acoplamento](#a7--dependências-e-acoplamento)
-21. [A8  -  Consistência .h vs .cpp](#a8--consistência-h-vs-cpp)
-22. [A9  -  Análise Arquitetural Geral](#a9--análise-arquitetural-geral)
-23. [A10  -  Relatório Final de Auditoria](#a10--relatório-final-de-auditoria)
-24. [Classificação de Problemas](#classificação-de-problemas)
-25. [Formato de Patch](#formato-de-patch)
+14. [T14  -  Integração (Sandbox)](#t14--integração-sandbox)
+15. [T15  -  Pré-CI · Espelhar CI Localmente](#t15--pré-ci--espelhar-ci-localmente) (instalação de ferramentas em T15.0)
+16. [A1  -  Descoberta e Modelagem](#a1--descoberta-e-modelagem)
+17. [A2  -  Auditoria de Arquitetura e Camadas](#a2--auditoria-de-arquitetura-e-camadas)
+18. [A3  -  UI/UX e Acessibilidade](#a3--uiux-e-acessibilidade)
+19. [A4  -  QA Geral C++](#a4--qa-geral-c)
+20. [A5  -  Análise Estática e Dinâmica C/C++](#a5--análise-estática-e-dinâmica-cc)
+21. [A6  -  Cobertura de Testes](#a6--cobertura-de-testes)
+22. [A7  -  Dependências e Acoplamento](#a7--dependências-e-acoplamento)
+23. [A8  -  Consistência .h vs .cpp](#a8--consistência-h-vs-cpp)
+24. [A9  -  Análise Arquitetural Geral](#a9--análise-arquitetural-geral)
+25. [A10  -  Relatório Final de Auditoria](#a10--relatório-final-de-auditoria)
+26. [Classificação de Problemas](#classificação-de-problemas)
+27. [Formato de Patch](#formato-de-patch)
 
 ---
 
@@ -64,7 +67,7 @@
 
 **Ferramenta:** QtTest (embutido no Qt6) ou Google Test.
 
-**Critério de aprovação:** 0 falhas. Cobertura mínima de 70% nos módulos críticos.
+**Critério de aprovação:** 0 falhas; todo comportamento novo nasce de um teste visto falhando antes.
 
 ---
 
@@ -123,7 +126,9 @@
 ### T15.0  Instalar ferramentas necessárias
 
 Cada stack exige um conjunto de ferramentas para os testes T15.X. Instale antes do primeiro uso; depois apenas atualizar quando precisar.
-Crie o próprio container de CI capado em [8? - adapte à máquina atual]GB RAM e -j2. Crie um gate para CI local pesado como o primeiro step do job pesado: lê MemAvailable, espera com sleep até ≥[12? - adapte à máquina atual]GB RAM GiB livres (config por env), com timeout de [minutos adequados]min pra não travar a fila. Se o projeto precisar de conteiner maior ou menor ou de outra especificação como "Selftest sem esperar 45 minutos: um gate cuja única prova é rodar em produção não tem prova. Ele injeta um MemAvailable falso e demonstra os três caminhos: limiar já satisfeito (sai na hora), nunca satisfeito (estoura e falha), satisfeito depois de N leituras (reporta quanto esperou)." ou "Progresso legível a cada leitura. Um step mudo por 40 minutos parece travado, e alguém mata a fila achando que enguiçou. Defaults funcionam sem env nenhum. Se os números vivessem só no YAML, rodar o script à mão daria comportamento diferente do CI — e aí a ferramenta mente sobre si mesma.", pergunte ao líder usando AskUserQuestion sem painel lateral que adaptação você precisa fazer a essas configs do conteiner para caber ao seu projeto específico, dando a primeira opção como a mais recomendada, coloque "(Recomendada)" no final da opcao.
+
+> **No Windows.** Os gerenciadores cross-platform já cobrem Windows: `uv`/`pip` (Python), `cargo` (Rust) e `npm`/`pnpm` (Node) instalam igual em Windows, macOS e Linux. Equivalentes nativos quando precisar: Python, instalador do `uv` (`powershell -c "irm https://astral.sh/uv/install.ps1 | iex"`) ou `pip`; Rust, `rustup-init.exe` ou `winget install Rustlang.Rustup`; Node, `winget install OpenJS.NodeJS` ou nvm-windows; ferramentas de sistema (cmake, clang, cppcheck), `winget`, `choco` ou msys2. Alternativa: rodar o Claude Code via WSL torna válidos os blocos `apt` e `dnf` deste T15.0 sem tradução.
+Crie o próprio container de CI com RAM e número de jobs (`-j`) medidos na máquina atual, nunca estimados. Crie um gate para CI local pesado como o primeiro step do job pesado: lê MemAvailable, espera com sleep até o mínimo de RAM livre medido na máquina (config por env), com timeout medido no próprio job (config por env), para não travar a fila. O gate precisa de um selftest que não espera 45 minutos: um gate cuja única prova é rodar em produção não tem prova. O selftest injeta um MemAvailable falso e demonstra os três caminhos: limiar já satisfeito (sai na hora), nunca satisfeito (estoura e falha), satisfeito depois de N leituras (reporta quanto esperou). O gate também precisa de progresso legível a cada leitura, porque um step mudo por 40 minutos parece travado e alguém mata a fila achando que enguiçou. Defaults funcionam sem env nenhum. Se os números vivessem só no YAML, rodar o script à mão daria comportamento diferente do CI, e aí a ferramenta mente sobre si mesma. Se o projeto precisar de container maior, menor ou de outra especificação, meça a máquina e pergunte ao usuário, por AskUserQuestion sem painel lateral, qual adaptação fazer nessas configs, com a primeira opção como a recomendada e "(Recomendada)" no final da opção.
 
 **Python (uv):**
 ```bash
@@ -164,7 +169,7 @@ npm install -g pnpm
 pnpm install
 ```
 
-**Container-level (qualquer stack):**
+**Container-level (qualquer stack).** Comandos com privilégio: siga as regras do usuário para elevação e mostre a transação antes de executar.
 ```bash
 # Fedora
 sudo dnf install docker
@@ -176,8 +181,8 @@ sudo apt install docker.io
 
 **Dois níveis de espelhamento:**
 
-1. **Host-level (rápido).** Executar binário a binário no host. Idêntico ao CI exceto pelo OS subjacente (libs do sistema). Cobre 90 % das falhas de CI: lint, type-check, testes, contratos, security scan, build.
-2. **Container-level (lento, idêntico).** Rodar a imagem Docker que o CI usa via `act` (GitHub Actions) ou `docker run` direto. Necessário quando se suspeita de deps de SO (ex.: PySide6 + libGL).
+1. **Host-level (rápido, só onde as instruções do usuário permitirem).** Executar binário a binário no host. Idêntico ao CI exceto pelo OS subjacente (libs do sistema). Cobre 90 % das falhas de CI: lint, type-check, testes, contratos, security scan, build.
+2. **Container-level (lento, idêntico; nível padrão quando as instruções do usuário exigirem isolamento).** Rodar a imagem Docker que o CI usa via `act` (GitHub Actions) ou `docker run` direto. Necessário quando se suspeita de deps de SO (ex.: PySide6 + libGL).
 
 ### T15.1  Python (uv + pyproject)
 
@@ -237,6 +242,7 @@ docker run --rm -v "$PWD":/work:Z -w /work -e QT_QPA_PLATFORM=offscreen \
 #!/usr/bin/env bash
 set -euo pipefail
 BUILD=build/preci
+THREADS="${THREADS:?defina THREADS conforme os limites de hardware do usuário}"
 
 echo "== clang-format check =="
 find src/ tests/ -name '*.cpp' -o -name '*.h' | xargs clang-format --dry-run -Werror
@@ -247,10 +253,10 @@ cmake -S . -B "$BUILD" -G Ninja \
   -DCMAKE_CXX_FLAGS="-Wall -Wextra -Wpedantic -Werror -Wshadow -Wnull-dereference"
 
 echo "== compile =="
-cmake --build "$BUILD" --parallel
+cmake --build "$BUILD" --parallel "$THREADS"
 
 echo "== clang-tidy =="
-find src/ -name '*.cpp' -exec clang-tidy {} -p "$BUILD" \;
+find src/ -name '*.cpp' -exec clang-tidy -p "$BUILD" {} +
 
 echo "== cppcheck =="
 cppcheck --enable=all --inline-suppr --error-exitcode=1 --suppress=missingIncludeSystem src/
@@ -301,6 +307,7 @@ Adicionar `.git/hooks/pre-push`:
 
 ```bash
 #!/usr/bin/env bash
+# Se as regras do usuário exigirem isolamento, rode o preci dentro do container.
 exec scripts/preci.sh
 ```
 

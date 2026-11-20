@@ -1,9 +1,10 @@
 <!--
   docs/house sync
   origem: vault claudebrain / lideranca_pipeline_release.md
-  path_vault: /home/petrus/IDrive/Documentos/projetos_claudebrain/lideranca_pipeline_release.md
-  sync_date: 2026-08-16
-  regra: se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
+  sync_date: 2026-11-20
+  hmac_vault_sha256: 6fa88b4477e725fe51d666387e05572eabebf28223e1819e31f6a53efbe9257d
+  transformacoes: T1=0 T2=0 T3a=0 T3=0 T4=0 T5=0
+  regra: As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário. Se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
   sem segredos: não incluir tokens/credenciais
 -->
 # Quem Lidera o Pipeline de Release? Mapa de C-Levels e a Constelação de Agents
@@ -54,7 +55,9 @@ graph TD
     CMO --> P3["Fases 10-11"]
 ```
 
-C-levels complementares (Narciso/CISO, Cândido/CDO, Confúcio/CFO, Cícero/CRO, Cláudio/CLO) entram conforme o porte e o tipo de produto. Mapa completo em [[ORG]] secao 2.
+**Alternativa textual do organograma** (equivalente ao diagrama acima, para leitor de tela): no topo está **Celso (CEO)**, com **Cósimo (Chief of Staff)** ao lado como par de roteamento. O CEO supervisiona os quatro C-levels do diagrama: **Capitolino (CPO)**, **Caetano (CTO)**, **Camilo (CMO)** e **Cosmo (COO)**. Cada um dos três primeiros lidera um bloco de fases: o CPO toca as fases 0 a 3 e a 12; o CTO toca as fases 4 a 9; o CMO toca a fase 10 e parte da 11. O COO coordena a execução cross-funcional, sobretudo nas fases 6 a 11.
+
+C-levels complementares (Narciso/CISO, Cândido/CDO, Confúcio/CFO, Cícero/CRO, Cláudio/CLO) entram conforme o porte e o tipo de produto. Mapa completo em [[ORG]] seção 2.
 
 ---
 
@@ -95,27 +98,27 @@ Em estruturas grandes, VPs ficam abaixo dos C-levels (VP de Engenharia sob CTO, 
 
 ## 5. Configurações reais por estágio (porte do projeto)
 
-Quem aplica isso na prática é **Cósimo (Chief of Staff)**, selecionando a variante de pipeline. Ver [[ORG]] secao 5 e [[pipeline_release_1.0]] secao final.
+Quem recomenda isso na prática é **Cósimo (Chief of Staff)**, que propõe a variante de pipeline; o usuário decide. Ver [[ORG]] seção 5 e [[pipeline_release_1.0]] seção final.
 
-### 5.1. Early minimalista / projeto pequeno -> Pipeline-Sprint
+### 5.1. Porte early, projeto pequeno (minimalista) -> Pipeline-Early
 O projeto e pequeno (complexidade/criticidade/escala baixas), independentemente de quantas pessoas o lideram. A constelacao de agents cobre todos os papeis (CEO, CPO, CTO, CISO, CMO); o headcount humano (1 ou mais) nao define o porte. Agents ativos por padrao: Celso e Caetano; os demais dormentes, ativados por criticidade (dado de saude mantém Narciso e Cláudio) ou por aumento de complexidade. Comum em fundador tecnico-dominio (medico-dev, advogado-dev) e em projetos internos de escopo reduzido.
 
-### 5.2. Early-stage startup (2 a 20 pessoas) -> Pipeline-Lean
+### 5.2. Porte early, early-stage (2 a 20 pessoas) -> Pipeline-Lean
 - **a) Fundador único técnico**: CEO + CTO na mesma pessoa; primeira contratação sênior costuma ser PM ou Marketing.
 - **b) Dupla fundadora (mais comum)**: CEO toca produto/mercado/negócio, CTO toca engenharia/infra. Funciona até ~50 pessoas.
 - **c) Trio fundador**: CEO + CTO + (CPO ou CMO). Robusto quando os três domínios são igualmente críticos.
 
-### 5.3. Scale-up (50 a 500 pessoas) -> Pipeline-Padrão
+### 5.3. Porte scale (50 a 500 pessoas) -> Pipeline-Padrão
 CEO + CPO + CTO + CMO consolidados. COO entra quando a operação cross-funcional fica complexa. CISO surge com preocupação regulatória.
 
-### 5.4. Big tech / enterprise (500+ pessoas) -> Pipeline-Completo
+### 5.4. Porte bigtech (500+ pessoas) -> Pipeline-Completo
 Constelação inteira: CEO, COO, CFO, CTO, CPO, CMO, CISO, CDO, CHRO, CLO. Cada um com VPs e diretores. Pipeline ramificado em múltiplos produtos, cada um com seu PM e Eng Manager.
 
 ---
 
 ## 6. RACI: quem responde por cada fase
 
-R = Responsável, A = Aprovador, C = Consultado, I = Informado. Matriz completa em [[ORG]] secao 4.
+R = Responsável, A = Aprovador, C = Consultado, I = Informado. Matriz completa em [[ORG]] seção 4.
 
 | Fase | Responsável principal | Apoio |
 |---|---|---|
@@ -154,7 +157,7 @@ R = Responsável, A = Aprovador, C = Consultado, I = Informado. Matriz completa 
 >
 > 1. **Estrategicamente**: Celso (CEO), que alinha produto, tecnologia e mercado.
 > 2. **Operacionalmente**: o trio Capitolino (CPO), Caetano (CTO), Camilo (CMO), cada um liderando seu bloco de fases.
-> 3. **Em projeto pequeno ou early-stage**: os papeis sao cobertos pela constelacao de agents; o que muda e quais C-levels ativar e onde delegar primeiro quando a complexidade crescer, decidido por Cósimo (Chief of Staff).
+> 3. **Em projeto pequeno ou early-stage**: os papeis sao cobertos pela constelacao de agents; o que muda e quais C-levels ativar e onde delegar primeiro quando a complexidade crescer, recomendado por Cósimo (Chief of Staff) e decidido pelo usuário.
 >
 > **CIO não é a resposta** para produto digital: cuida de TI corporativa interna, não do produto vendido.
 

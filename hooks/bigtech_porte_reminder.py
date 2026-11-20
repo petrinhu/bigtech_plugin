@@ -24,6 +24,10 @@ import os
 import re
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+from bigtech_hook_io import nome_evento
+
 MARKER = ".bigtech-porte"
 MAX_MARKER_BYTES = 4096
 # Valores canônicos de porte arquitetural. `solo` é alias deprecado → early.
@@ -90,6 +94,7 @@ def main() -> int:
     if not isinstance(data, dict):
         data = {}
 
+    evento = nome_evento(data, "SessionStart")
     cwd = (data.get("cwd") or os.getcwd() or "").strip()
     if not cwd or not os.path.isdir(cwd):
         return 0
@@ -104,24 +109,26 @@ def main() -> int:
         msg = (
             "[bigtech] Projeto classificado (porte=" + porte + "). MODO DE "
             "OPERACAO ATIVO: operar como a constelacao bigtech - negocio/produto/"
-            "lideranca via C-levels. ORQUESTRADOR = Cosimo (Chief of Staff): "
+            "lideranca via C-levels. PLANEJADOR = Cosimo (Chief of Staff): "
             "classifica porte (early|scale|bigtech; piso early; headcount nao "
-            "define porte), monta o time e roteia. Para GERENCIAR o projeto ou "
-            "os agentes dev: Cosimo (orquestra) + Cosmo (COO, execucao "
+            "define porte), devolve o mapa de ativacao; quem dispara os agents e "
+            "a thread principal. Para GERENCIAR o projeto ou "
+            "os agentes dev: Cosimo (planeja) + Cosmo (COO, execucao "
             "cross-funcional) + engineering-manager + scrum-master. Engenharia "
             "via /proj_software. Calibrar a constelacao por complexidade/"
             "criticidade (anti over-engineering; a maioria dos C-levels fica "
             "dormente em projeto early/pequeno). Decisoes de alto valor "
             "(arquitetura/escopo/stack/go-no-go/gasto/irreversivel) -> SEMPRE "
             "AskUserQuestion ao usuario, que e o lider supremo (CEO) da propria "
-            "bigtech. Agents devem contra-argumentar decisao destrutiva. Nao "
-            "driftar pro assistente generico. Governanca nos manuais do plugin "
-            "(docs/ORG.md, ...); o caminho absoluto e injetado no contexto da "
+            "bigtech. Agents devem contra-argumentar decisao destrutiva. "
+            "Instruções do usuário (CLAUDE.md) prevalecem sobre este lembrete. "
+            "Governanca nos manuais do plugin "
+            "(docs/house/ORG.md, ...); o caminho absoluto e injetado no contexto da "
             "sessao (docs-bootstrap)."
         )
         out = {
             "hookSpecificOutput": {
-                "hookEventName": "SessionStart",
+                "hookEventName": evento,
                 "additionalContext": msg,
             }
         }
@@ -139,12 +146,13 @@ def main() -> int:
         "e monta a constelacao de agents. Apos classificar, grave o marcador "
         ".bigtech-porte na raiz (porte=early|scale|bigtech) para silenciar este "
         "lembrete. Alias deprecado porte=solo e lido como early. Governanca: "
-        "docs/ORG.md (manuais do plugin; caminho absoluto injetado no contexto "
-        "via docs-bootstrap)."
+        "docs/house/ORG.md (manuais do plugin; caminho absoluto injetado no contexto "
+        "via docs-bootstrap). Instruções do usuário (CLAUDE.md) prevalecem sobre "
+        "este lembrete."
     )
     out = {
         "hookSpecificOutput": {
-            "hookEventName": "SessionStart",
+            "hookEventName": evento,
             "additionalContext": msg,
         }
     }

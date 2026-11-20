@@ -9,7 +9,7 @@ useDefault = true
 [allowlist]
 description = "Exemplos didaticos de anti-pattern nos manuais (placeholders, nao secrets reais)"
 paths = [
-  '''docs/manuals/CONTRACT\.md''',
+  '''docs/house/CONTRACT\.md''',
 ]
 regexes = [
   '''sk-live-abc123xyz789''',

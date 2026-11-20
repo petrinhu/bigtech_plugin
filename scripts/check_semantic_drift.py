@@ -10,6 +10,7 @@ Checks (hard fail):
   2. skills/*/SKILL.md: `name:` presente no frontmatter.
   3. hooks/hooks.json: scripts referenciados em args existem no disco.
   4. Contagem de agents == EXPECTED_AGENT_COUNT (bump intencional se inventário mudar).
+  4b. Contagem de skills == EXPECTED_SKILL_COUNT (CONS-12, 2026-11-20; 15 desde CONS-R7).
   5. valor legado "solo" não é porte primário (peer de early/scale/bigtech) sem alias/deprec.
   6. Zero referências ao host legado Codeberg em paths de produto.
 
@@ -32,8 +33,16 @@ from pathlib import Path
 # Inventário e política
 # ---------------------------------------------------------------------------
 
-# Bump quando o inventário público de agents mudar de propósito (README/AGENTS).
-EXPECTED_AGENT_COUNT = 51
+# Bump quando o inventário público de agents mudar de propósito (README/LLM.md).
+# 2026-11-20, CONS-12: 51 -> 71 (20 agents novos das ondas CONS-06/07 e os 51 de antes).
+EXPECTED_AGENT_COUNT = 71
+
+# Bump quando o inventário público de skills mudar de propósito.
+# 2026-11-20, CONS-12: antes da consolidação eram 12 (bigtech, dr-*, learning-designer, pericia-medica,
+# proj_jogo, proj_software, suporte-linux, tab_pendencias, visual-design-director).
+# 2026-11-20, CONS-12C: 12 -> 16 (+ watchcode, manter_ligado, olhe_agentes, github-gossips).
+# 2026-11-20, CONS-R7 (D4): 16 -> 15; github-gossips volta a ser skill só global (fora do plugin).
+EXPECTED_SKILL_COUNT = 15
 
 # stem -> name permitido se diferente do stem. Vazio = sem exceções.
 NAME_STEM_EXCEPTIONS: dict[str, str] = {}
@@ -42,7 +51,7 @@ NAME_STEM_EXCEPTIONS: dict[str, str] = {}
 # docs/campanha = prova histórica (antes/depois); docs/house = espelho vault.
 PRODUCT_FILE_GLOBS = (
     "README.md",
-    "AGENTS.md",
+    "LLM.md",
     "SECURITY.md",
     "PRIVACY.md",
     "DEVELOPMENT.md",
@@ -262,10 +271,18 @@ def check_skills(root: Path, report: Report) -> None:
         return
 
     skill_files = sorted(skills_dir.glob("*/SKILL.md"))
-    report.notes.append(f"skills encontradas: {len(skill_files)}")
+    count = len(skill_files)
+    report.notes.append(f"skills encontradas: {count} (esperado {EXPECTED_SKILL_COUNT})")
     if not skill_files:
         report.fail("skills", "nenhum skills/*/SKILL.md encontrado")
         return
+
+    if count != EXPECTED_SKILL_COUNT:
+        report.fail(
+            "skill-count",
+            f"contagem de skills={count}, esperado EXPECTED_SKILL_COUNT={EXPECTED_SKILL_COUNT} "
+            f"(atualize a constante se o inventário mudou de propósito)",
+        )
 
     for path in skill_files:
         rel = _rel(root, path)

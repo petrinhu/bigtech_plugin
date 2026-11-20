@@ -9,8 +9,8 @@ Dois modos, mutuamente exclusivos:
 
 1) REFORCO (projeto ja classificado): se existe `.bigtech-porte` na raiz do
    projeto (cwd), injeta a cada turno um lembrete curto do MODO DE OPERACAO
-   bigtech, para o modelo nao driftar de volta pro assistente generico quando
-   outros plugins/skills injetam instrucoes concorrentes.
+   bigtech, para manter esse modo quando outros plugins/skills injetam
+   instrucoes concorrentes.
 
 2) ROTEAMENTO (projeto ainda nao classificado): se o prompt do usuario pede a
    constelacao C-level ("c-level", "bigtech", "montar o time", ...), injeta um
@@ -28,6 +28,10 @@ import json
 import os
 import re
 import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+from bigtech_hook_io import nome_evento
 
 MARKER = ".bigtech-porte"
 MAX_MARKER_BYTES = 4096
@@ -132,10 +136,10 @@ def read_porte(marker_path: str) -> str:
     return normalize_porte(m.group(1))
 
 
-def emit(msg: str) -> None:
+def emit(msg: str, evento: str = "UserPromptSubmit") -> None:
     print(json.dumps({
         "hookSpecificOutput": {
-            "hookEventName": "UserPromptSubmit",
+            "hookEventName": evento,
             "additionalContext": msg,
         }
     }))
@@ -151,6 +155,7 @@ def main() -> int:
     if not isinstance(data, dict):
         data = {}
 
+    evento = nome_evento(data, "UserPromptSubmit")
     cwd = (data.get("cwd") or os.getcwd() or "").strip()
     prompt = (data.get("prompt") or "")
 
@@ -165,10 +170,11 @@ def main() -> int:
         porte = read_porte(marker_path)
         emit(
             "BIGTECH ATIVO (porte=" + porte + "). Operar como a constelacao: "
-            "negocio/produto/lideranca via C-levels. ORQUESTRADOR = Cosimo "
+            "negocio/produto/lideranca via C-levels. PLANEJADOR = Cosimo "
             "(Chief of Staff): classifica porte (early|scale|bigtech; piso "
-            "early; headcount nao define porte), monta o time, roteia (skill "
-            "/bigtech). Para GERENCIAR projeto ou agentes dev: Cosimo (orquestra) "
+            "early; headcount nao define porte), devolve o mapa de ativacao "
+            "(skill /bigtech); quem dispara os agents e a thread principal. "
+            "Para GERENCIAR projeto ou agentes dev: Cosimo (planeja) "
             "+ Cosmo (COO, execucao cross-funcional) + engineering-manager "
             "(gestao de pessoas/eng) + scrum-master (cadencia/impedimentos). "
             "Engenharia via /proj_software. Calibrar a constelacao por "
@@ -176,8 +182,9 @@ def main() -> int:
             "valor (arquitetura/escopo/stack/go-no-go/gasto/irreversivel) -> "
             "SEMPRE AskUserQuestion ao usuario, que e o lider supremo (CEO) da "
             "propria bigtech. Dever de contra-argumentar decisao destrutiva "
-            "(problema -> risco -> alternativa -> decisao do usuario). Nao "
-            "driftar pro assistente generico."
+            "(problema -> risco -> alternativa -> decisao do usuario). "
+            "Instruções do usuário (CLAUDE.md) prevalecem sobre este lembrete.",
+            evento,
         )
         return 0
 
@@ -186,17 +193,20 @@ def main() -> int:
     if prompt and TRIGGER_RE.search(prompt):
         emit(
             "[bigtech] O usuario quer a constelacao C-level / gerenciar projeto "
-            "ou agentes dev. ROTEAR para /bigtech, que invoca o AGENTE "
-            "ORQUESTRADOR = Cosimo (Chief of Staff): classifica o porte "
+            "ou agentes dev. ROTEAR para /bigtech, que aciona o AGENTE "
+            "PLANEJADOR = Cosimo (Chief of Staff): classifica o porte "
             "(early|scale|bigtech; piso early; anti over-engineering; headcount "
-            "nao define porte), seleciona a variante de pipeline e monta o time "
-            "de C-levels + agents operacionais. Para GERENCIAR projeto/agentes "
-            "dev, os agentes sao: Cosimo (Chief of Staff, orquestrador) + Cosmo "
+            "nao define porte), seleciona a variante de pipeline e devolve o "
+            "mapa de ativacao de C-levels + agents operacionais; a thread "
+            "principal dispara os agents. Para GERENCIAR projeto/agentes "
+            "dev, os agentes sao: Cosimo (Chief of Staff, planejador) + Cosmo "
             "(COO, execucao cross-funcional) + engineering-manager (gestao de "
             "eng/pessoas) + scrum-master (cadencia/impedimentos) + "
-            "product-manager. Engenharia pura -> /proj_software. NAO responder "
-            "como assistente generico; usar a skill /bigtech. Apos classificar, "
-            "gravar .bigtech-porte na raiz (porte=early|scale|bigtech)."
+            "product-manager. Engenharia pura -> /proj_software. Para essa "
+            "demanda, use a skill /bigtech. Apos classificar, "
+            "gravar .bigtech-porte na raiz (porte=early|scale|bigtech). "
+            "Instruções do usuário (CLAUDE.md) prevalecem sobre este lembrete.",
+            evento,
         )
         return 0
 

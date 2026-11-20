@@ -110,6 +110,8 @@ print(f"  skills: {len(skills)}")
 #    e elimina a dependencia de um shell. Aqui validamos a estrutura dos 7 hooks
 #    e coletamos a invocacao DECLARADA de cada um (command + args expandidos),
 #    para a secao [5] exercitar exatamente o que o Claude Code rodaria.
+#    Desde a CONS-14 o hook do produto tab_pendencias e registrado direto no
+#    hooks.json (SessionStart e UserPromptSubmit): 9 blocos.
 print("[4] hooks.json (scripts resolviveis + forma exec)")
 hj = json.loads((ROOT / "hooks/hooks.json").read_text(encoding="utf-8"))
 
@@ -122,6 +124,10 @@ def _expand(token: str) -> str:
 # Percorre TODOS os hooks de TODOS os eventos e coleta os blocos type=command.
 # declared[script_basename] = [command, *args_expandidos]  (a invocacao real).
 declared: dict[str, list[str]] = {}
+# declared_all: todas as invocacoes (eventos e caminhos), para o 5e. Dois hooks
+# tem o mesmo nome de arquivo (plugin e produto tab_pendencias), por isso o
+# mapa por nome guarda a primeira ocorrencia (a do plugin).
+declared_all: list[tuple[str, list[str]]] = []
 exec_blocks = 0
 for event, groups in (hj.get("hooks") or {}).items():
     for group in groups:
@@ -146,9 +152,10 @@ for event, groups in (hj.get("hooks") or {}).items():
             script_path = Path(expanded[-1])
             if not script_path.exists():
                 fail(f"hook script ausente: {script_path}")
-            declared[script_path.name] = expanded
+            declared.setdefault(script_path.name, expanded)
+            declared_all.append((event, expanded))
 
-EXPECTED_HOOKS = 7
+EXPECTED_HOOKS = 9
 if exec_blocks != EXPECTED_HOOKS:
     fail(f"esperados {EXPECTED_HOOKS} hooks type=command, encontrados {exec_blocks}")
 print(f"  hooks type=command: {exec_blocks} (todos forma exec: command=python3 + args[])")
@@ -229,19 +236,46 @@ if rc not in (0,):
 else:
     print("  tdd_guard: fail-open sem config OK")
 
-# 5e. tab_pendencias_reminder: projeto classificado (.bigtech-porte) sem TODO.md
-#     deve disparar o lembrete de /tab_pendencias (exit 0 + cita a skill).
-#     Usa um diretorio temporario isolado (portável; não assume /tmp).
+# 5e. lembrete unico da tabela de pendencias, pela invocacao declarada no
+#     hooks.json: repo git com .bigtech-porte e sem TODO.md. Os hooks de
+#     SessionStart que tocam tab_pendencias (plugin + produto) devem emitir
+#     UMA mensagem de criacao, citando /bigtech:tab_pendencias, e nenhuma
+#     mensagem pode citar o comando sem o prefixo bigtech:.
 with tempfile.TemporaryDirectory(prefix="bigtech-smoke-") as tmp:
-    (Path(tmp) / ".bigtech-porte").write_text("porte=early\n", encoding="utf-8")
+    repo = Path(tmp)
+    (repo / ".bigtech-porte").write_text("porte=early\n", encoding="utf-8")
     # NAO criamos TODO.md de proposito: e a condicao que arma o gatilho.
-    rc, out = run_hook("tab_pendencias_reminder.py", {"cwd": tmp})
-    if rc != 0:
-        fail(f"tab_pendencias_reminder exit {rc} (deveria ser 0)")
-    elif "/tab_pendencias" not in out:
-        fail("tab_pendencias_reminder: nao citou /tab_pendencias com porte sem TODO.md")
+    # Repo git: o CRIAR do produto exige git (is_git).
+    git_env = {**os.environ, "GIT_AUTHOR_NAME": "smoke", "GIT_AUTHOR_EMAIL": "s@s",
+               "GIT_COMMITTER_NAME": "smoke", "GIT_COMMITTER_EMAIL": "s@s"}
+    subprocess.run(["git", "init", "-q"], cwd=repo, env=git_env, check=True)
+    subprocess.run(["git", "add", "-A"], cwd=repo, env=git_env, check=True)
+    subprocess.run(["git", "commit", "-qm", "boot", "--allow-empty"], cwd=repo,
+                   env=git_env, check=True)
+    criacoes = 0
+    sem_prefixo = False
+    for event, invocation in declared_all:
+        if event != "SessionStart" or "tab_pendencias" not in " ".join(invocation):
+            continue
+        proc = subprocess.run(
+            invocation,
+            input=json.dumps({"hook_event_name": "SessionStart", "cwd": str(repo),
+                              "session_id": "smoke-5e"}),
+            capture_output=True, text=True, env=env, timeout=30, cwd=str(repo),
+        )
+        if proc.returncode != 0:
+            fail(f"tab_pendencias ({invocation[-1]}) exit {proc.returncode} (deveria ser 0)")
+        for m in re.findall(r'"additionalContext": "((?:[^"\\]|\\.)*)"', proc.stdout):
+            if "--create" in m:
+                criacoes += 1
+            if re.search(r"(?<!bigtech:)/tab_pendencias(?![\w/])", m):
+                sem_prefixo = True
+    if criacoes != 1:
+        fail(f"lembrete de criacao: {criacoes} mensagens com --create (esperada 1)")
+    elif sem_prefixo:
+        fail("lembrete de tab_pendencias cita o comando sem o prefixo bigtech:")
     else:
-        print("  tab_pendencias_reminder: lembrete /tab_pendencias OK")
+        print("  tab_pendencias: lembrete de criacao unico, com prefixo bigtech: OK")
 
 # 5f. tdd_runner: payload minimo, projeto sem .claude/tdd-guard.json -> nao roda
 #     a suite e nunca quebra o fluxo (exit 0).

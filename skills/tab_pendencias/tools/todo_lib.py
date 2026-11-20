@@ -1,0 +1,1080 @@
+#!/usr/bin/env python3
+# tools/todo_lib.py -- parser/lib compartilhada do toolkit de frescor da TODO.md
+# SPDX-License-Identifier: Apache-2.0
+# Licença: Apache-2.0 (ver NOTICE na raiz do plugin).
+# Derivado do projeto standalone tab_pendencias, do mesmo autor, relicenciado sob Apache-2.0.
+"""
+tools/todo_lib.py
+
+Lib compartilhada do toolkit de frescor da TODO.md (so stdlib, offline,
+zero dependencia externa). Usada por todo_freshness.py (git hook), todo_sync.py
+(--sync) e todo_health.py (--health).
+
+Cross-platform e byte-preserving: usa split("\\n")/join("\\n") (NAO splitlines,
+que quebraria em separadores Unicode) e set_status_cell preserva o terminador
+(CRLF/LF) e tolera BOM. Parser robusto a tabelas de 8 ou 9 colunas: localiza ID
+e Status pelo NOME no cabecalho, divide a linha so nos pipes NAO escapados (no
+GFM "\\|" e pipe literal da celula, nao separador -- vale dentro de code span),
+exige que a linha tenha o MESMO nº de colunas do cabecalho (rejeita linha
+malformada em vez de escrever no lugar errado), e para no 2º cabecalho (tabela
+unica canonica).
+
+Vocabulario de status da skill tab_pendencias (10, D-1 + ordem do lider
+2026-08-24):
+  ✅ Concluído | 🔄 Em andamento | 🟡 Parcial | ⏳ Pendente | 💡 Decisão tomada
+  | 🎨 Pendente design | 🔍 Pendente verificação | ⛔ Bloqueado
+  | ❌ Reprovado | 🚫 Cancelado
+"""
+import configparser
+import datetime
+import os
+import re
+import subprocess
+
+BOM = "﻿"
+
+# Defaults da secao [signals] em .tab_pendencias.ini (Fase 6 / INTAKE-AGE-1).
+# Idade em dias e o eixo que avanca sem drain -- cycles so sobem no drain.
+SIGNALS_DEFAULTS = {
+    "triage_max_cycles": 2,
+    "triage_max_age_days": 1,
+    "verification_aging_min_count": 5,
+    "verification_aging_min_days": 7,
+    "status_sync_min_commits": 5,
+    "status_sync_min_days": 3,
+}
+
+
+def git(args, cwd=None):
+    try:
+        r = subprocess.run(["git", *args], cwd=cwd, capture_output=True,
+                           text=True, encoding="utf-8", errors="replace",
+                           timeout=15)
+    except Exception:
+        return ""
+    return r.stdout if r.returncode == 0 else ""
+
+
+def repo_root(cwd=None):
+    return (git(["rev-parse", "--show-toplevel"], cwd).strip() or None)
+
+
+def git_dir(root):
+    gd = git(["rev-parse", "--git-dir"], cwd=root).strip()
+    if not gd:
+        return None
+    return gd if os.path.isabs(gd) else os.path.join(root, gd)
+
+
+def touched_code(files):
+    """Tocou trabalho substantivo (algo alem de bookkeeping da tabela/INBOX)?
+
+    Mora aqui porque DOIS consumidores dependem dela: o todo_freshness.py
+    (avisa quando codigo muda sem citar ID) e o todo_sync.py (commit que so
+    mexe na tabela CITA o ID sem ter entregado nada -- criar item, reordenar,
+    aprovar escopo --, logo nao e evidencia de entrega).
+
+    So o `inbox/` do TOPO do repo e bookkeeping (INBOX da TODO.md, D-6). Um
+    diretorio de CODIGO chamado `inbox` em qualquer nivel (ex.:
+    `src/inbox/parser.py`) e trabalho substantivo -- TCH-1 corrigido: a
+    checagem antiga (`"/inbox/" in f`) casava esse caso por substring de
+    path e nunca flipava o ID citado. Caminho vem do git (diff/status), que
+    sempre usa "/" independente de SO -- ADR-0001 (e).1."""
+    for f in files:
+        if os.path.basename(f) == "TODO.md":
+            continue
+        if f.startswith("inbox/"):
+            continue
+        return True
+    return False
+
+
+def find_todo(root):
+    p = os.path.join(root, "TODO.md")
+    return p if os.path.isfile(p) else None
+
+
+# Separador de celula = pipe NAO escapado. No GFM, "\|" dentro de uma celula e
+# um pipe literal (vale inclusive dentro de code span: `a \| b`), nao um
+# separador -- um split("|") cru contaria celula demais e a guarda de ncols
+# descartaria a linha inteira, em silencio.
+_SEP = re.compile(r"(?<!\\)\|")
+
+
+def _split_row(s):
+    """Pedacos crus da linha, divididos so nos pipes NAO escapados.
+
+    Round-trip byte-exato com "|".join (os "\\|" ficam intactos dentro dos
+    pedacos). Numa linha de tabela bem formada ("| a | b |") o pedaco 0 e a
+    borda vazia da esquerda -- por isso a celula de dados k mora em [1 + k],
+    contrato que _cells e set_status_cell compartilham."""
+    return _SEP.split(s)
+
+
+def _cells(s):
+    parts = _split_row(s.strip())
+    if parts and parts[0].strip() == "":       # borda vazia da esquerda
+        parts = parts[1:]
+    if parts and parts[-1].strip() == "":      # borda vazia da direita
+        parts = parts[:-1]
+    return [c.strip() for c in parts]
+
+
+def _is_separator(cells):
+    return bool(cells) and set("".join(cells)) <= set("-: ")
+
+
+_STATUS_WORD = re.compile(r"(?<![\w-])status\b")
+
+
+def _is_header(cells):
+    """Cabecalho canonico: celula exata "id" + alguma celula com a palavra
+    "status" (nao substring crua). HDR-1: uma celula que so CONTEM "status"
+    grudado por hifen ou underscore (ex.: "Sub-status" de tabela alheia) nao
+    conta -- o lookbehind negativo exige que "status" comece em fronteira de
+    palavra de verdade (inicio da celula, espaco ou pontuacao como "(", nunca
+    "-"/"_"/letra colada), preservando "Status" e "Estado Auditado (Status)"."""
+    low = [c.lower() for c in cells]
+    return ("id" in low) and any(_STATUS_WORD.search(c) for c in low)
+
+
+def _starts_foreign_table(lines, n, row_ncols):
+    """SPRAWL-1/D-12: a linha `n` (que ja sabemos NAO ser separador nem
+    cabecalho ID+Status) comeca uma tabela de OUTRO schema quando a linha
+    SEGUINTE e um separador GFM valido (":-"/"-"/" ") com o MESMO numero de
+    celulas dela -- esse e o padrao estrutural cabecalho+separador de
+    qualquer tabela Markdown, e so ele (nunca so a contagem de colunas
+    bater, o que aconteceria toda vez que uma linha de DADO da propria
+    canonica for lida) distingue "comeco de tabela alheia" de "mais uma
+    linha de dado da tabela em curso"."""
+    if n + 1 >= len(lines):
+        return False
+    nxt = lines[n + 1].lstrip(BOM).strip()
+    if not nxt.startswith("|"):
+        return False
+    sep_cells = _cells(nxt)
+    return _is_separator(sep_cells) and len(sep_cells) == row_ncols
+
+
+def parse_table(text):
+    """Retorna {'id_idx','status_idx','ncols','items':[{id,status,line_no}],
+    'lines':[..],'duplicate_ids':{id:[{line_no,status},...]},
+    'headings_crossed':[{line_no,text},...],
+    'malformed':[{line_no,raw,expected_ncols,got_ncols},...]} ou None se nao
+    houver tabela com colunas ID e Status.
+
+    'lines' = text.split("\\n") (round-trip byte-exato com "\\n".join). So a 1a
+    tabela e considerada. Linhas cujo nº de celulas != nº de colunas do
+    cabecalho sao IGNORADAS -- defende escrita no lugar errado, mas deixam
+    rastro ADITIVO em 'malformed' (ADR-0001 b.5): nenhum consumidor que so
+    le id_idx/status_idx/ncols/items/lines muda de comportamento; e
+    --audit/CHK-02 que consome 'malformed' para diagnosticar a causa
+    provavel (pipe cru? celula faltando? fragmento truncado?).
+
+    SPRAWL-1, revisado por D-12 (decisoes_lider.md, 2026-07-28): a D-6
+    original ("encerra no PROXIMO heading markdown, qualquer nivel")
+    destruia 201 dos 215 itens de um consumidor real que organiza a MESMA
+    tabela canonica sob ~20 subtitulos de organizacao visual -- recriando o
+    incidente fundador do projeto por outro caminho. A regra correta: um
+    heading NUNCA encerra a tabela por si so (por isso so e registrado em
+    'headings_crossed', para o futuro --audit/CHK-03 relatar o span mesmo
+    quando o parser decide atravessar); quem encerra e a ESTRUTURA que
+    aparece em qualquer ponto da varredura: (i) uma 2a linha de cabecalho
+    ID+Status (comportamento pre-existente, mantido), ou (ii) o comeco de
+    uma tabela de OUTRO schema -- via `_starts_foreign_table` -- mesmo
+    quando o nº de colunas dela COINCIDE por acaso com o da canonica (o
+    SPRAWL-1 original de verdade: uma tabela alheia contada como itens
+    fantasmas so porque o nº de celulas batia). Uma tabela alheia com nº de
+    colunas DIFERENTE nunca precisou de deteccao especial: suas linhas ja
+    sao ignoradas pela guarda de ncols de sempre, sem encerrar nada -- e
+    isso e o que permite atravessar secoes inteiras de organizacao visual
+    (consumidor B) sem reabrir a porta do bug.
+
+    BUG-1': ID duplicado NAO trava o nucleo (ADR-0001 b.5, mesma politica do
+    'malformed' -- descarte/ambiguidade nunca e fatal aqui). 'items' preserva
+    TODAS as ocorrencias, sem filtrar nem decidir qual "vence" -- quem decide
+    e o consumidor (`parse_status_map` mantem o comportamento pre-existente
+    de ultima linha vence) ou o `--audit`/CHK-01 (via a chave aditiva
+    'duplicate_ids', so com os IDs que aparecem 2+ vezes -- vazio quando nao
+    ha duplicata). Chave ADITIVA: nenhum consumidor que so le
+    id_idx/status_idx/ncols/items/lines muda de comportamento."""
+    lines = text.split("\n")
+    id_idx = status_idx = ncols = None
+    items = []
+    headings_crossed = []
+    malformed = []
+    for n, line in enumerate(lines):
+        s = line.lstrip(BOM).strip()       # tolera BOM (so na 1a linha) e \r
+        if id_idx is not None and s.startswith("#"):
+            headings_crossed.append({"line_no": n, "text": s})
+            continue
+        if not s.startswith("|"):
+            continue
+        cells = _cells(s)
+        if id_idx is None:
+            if _is_header(cells):
+                id_idx = next(i for i, c in enumerate(cells)
+                              if c.lower() == "id")
+                status_idx = next(i for i, c in enumerate(cells)
+                                  if "status" in c.lower())
+                ncols = len(cells)
+            continue
+        if _is_separator(cells):
+            continue
+        if _is_header(cells):              # 2a tabela ID+Status: encerra
+            break
+        if len(cells) == ncols and _starts_foreign_table(lines, n, len(cells)):
+            break                           # D-12: tabela alheia, ncols colide
+        if len(cells) != ncols:            # linha malformada: ignora (seguro),
+            # mas ADR-0001 (b).5 exige rastro -- chave ADITIVA 'malformed'
+            # (nenhum consumidor que so le id_idx/status_idx/ncols/items/
+            # lines muda de comportamento; --audit/CHK-02 e quem consome
+            # isto para diagnosticar a causa provavel).
+            malformed.append({"line_no": n, "raw": line,
+                              "expected_ncols": ncols, "got_ncols": len(cells)})
+            continue
+        iid = cells[id_idx]
+        if not iid or iid in ("-", "—"):
+            continue
+        items.append({"id": iid, "status": cells[status_idx], "line_no": n})
+    if id_idx is None:
+        return None
+    occurrences_by_id = {}
+    for it in items:
+        occurrences_by_id.setdefault(it["id"], []).append(
+            {"line_no": it["line_no"], "status": it["status"]})
+    duplicate_ids = {iid: occs for iid, occs in occurrences_by_id.items()
+                      if len(occs) > 1}
+    return {"id_idx": id_idx, "status_idx": status_idx, "ncols": ncols,
+            "headings_crossed": headings_crossed, "malformed": malformed,
+            "items": items, "lines": lines, "duplicate_ids": duplicate_ids}
+
+
+def parse_status_map(text):
+    """{id: status_text} (conveniencia p/ o git hook)."""
+    tbl = parse_table(text)
+    return {it["id"]: it["status"] for it in tbl["items"]} if tbl else {}
+
+
+# Vocabulario de status (D-1, decisoes_lider.md; + 3 kinds da ordem do lider
+# 2026-08-24): a celula pertence a exatamente um dos 10 kinds abaixo,
+# decidido pelo PRIMEIRO caractere nao-espaco da celula (o emoji-prefixo) --
+# nunca por procura de substring no texto livre que vem depois do emoji
+# (esse texto e do usuario: pode conter "verificar", "pendente", "concluido"
+# como parte de qualquer frase, sem que isso mude a classificacao). Corrige a
+# classe de bug BUG-5/SUB-1/SUB-2:
+# "✅ Concluído ... VERIFICADO ..." classificado como preso em verificacao,
+# "🔴 Bloqueado (dependente de X)" classificado como pendente (substring de
+# "pendente" dentro de "dependente"), e "⏳ Pendente (verificar
+# disponibilidade)" barrado de um flip legitimo (substring de "verifica").
+#
+# ⛔/❌/🚫 (2026-08-24): "bloqueado" = parou por causa externa, nao avanca ate
+# a causa sair; "reprovado" = foi entregue, passou por revisao adversarial e
+# FALHOU, volta pra fila com o motivo na Descricao (!= 🔍, que e "entregue,
+# ninguem olhou ainda"; != ⏳, que apagaria a informacao de que houve entrega
+# e falha); "cancelado" = decidiu-se NAO fazer, nada foi entregue e nao esta
+# na fila (!= ✅, que entregou algo; != ⏳, que esta na fila; != ⛔, que
+# destrava; != ❌, que teve tentativa). O emoji de cancelado e 🚫, NUNCA ❌
+# -- ❌ ja e reprovado, e como o casamento e por emoji-prefixo, os dois
+# usando ❌ faria "❌ Cancelado" ser lido em silencio como kind=reprovado.
+_EMOJI_KIND = {
+    "✅": "done",
+    "🔄": "andamento",
+    "🟡": "parcial",
+    "⏳": "pendente",
+    "💡": "decisao",
+    "🎨": "design",
+    "🔍": "verificacao",
+    "⛔": "bloqueado",
+    "❌": "reprovado",
+    "🚫": "cancelado",
+}
+
+
+def _status_kind(status):
+    """Kind do vocabulario fechado (D-1) pelo emoji-prefixo, ou None quando a
+    celula nao comeca com nenhum dos 10 -- o UNICO caso em que os predicados
+    abaixo caem no fallback substring/word-boundary (ADR-0001 secao (d)):
+    tabela legada sem emoji, ou emoji fora do vocabulario controlado (ex.:
+    🔴 de um esquema proprio do usuario, tratado como 'sem emoji
+    reconhecido', nao como um 11o kind)."""
+    s = status.lstrip(BOM).strip()
+    for emoji, kind in _EMOJI_KIND.items():
+        if s.startswith(emoji):
+            return kind
+    return None
+
+
+def status_classification_via(status):
+    """Como a celula foi classificada -- gancho informativo para CHK-08:
+    "emoji" (contrato D-1), "fallback" (legado sem emoji, mas
+    `_classify_legacy` reconheceu vocabulario canonico) ou "unknown"
+    (nem emoji nem fallback -- achado IMPORTANTE de CHK-08). Fonte unica:
+    mesmos predicados que is_pending/is_done/...; VERB-STATUS-2 proibe
+    classificar so-verbo ("Verificar disponibilidade") como fallback."""
+    if _status_kind(status) is not None:
+        return "emoji"
+    if _classify_legacy(status) is not None:
+        return "fallback"
+    return "unknown"
+
+
+# PRED-FALLBACK (2026-07-29, prompt_fallback_legado.md): compostos que sao
+# status CANONICOS de duas palavras, nao "pendente" com anotacao livre --
+# tem de vencer independente da posicao, senao 'Pendente design' venceria
+# por 'pendente'@0 e viraria flipavel, ressuscitando o caso grave do BUG-5
+# dentro do proprio fallback que o corrigiu.
+#
+# GEMEO-DESIGN (2026-08-16): a 1a versao deste composto so casava a forma
+# adjacente exata "pendente\s+design" (radical fixo "pendente", separador
+# so espaco) -- hifen ("Pendente-design"), palavra intercalada ("Pendente
+# depois design") e o radical "andamento" ("andamento design") escapavam em
+# silencio e voltavam a ser flip-eligible. D-1 nao fala de FORMA, fala de
+# CATEGORIA: qualquer celula legada que junte um radical (pendente/
+# andamento) com o qualificador "design" descreve o composto "🎨 Pendente
+# design", nao "pendente" com anotacao -- por isso a deteccao e por
+# CO-OCORRENCIA (radical E qualificador em qualquer posicao/ordem/
+# separador), nao por adjacencia regex.
+#
+# "verifica" preserva a exclusao do infinitivo "verificar" (verbo em nota
+# livre -- 'Pendente (verificar disponibilidade)' e 'Em andamento (verificar
+# com o time)' continuam SEM ser o composto, caindo na regra de posicao
+# abaixo, como os 2 testes W15 exigem): o lookahead nega especificamente
+# "r" + fronteira de palavra (o infinitivo), preservando
+# "verificação"/"verificado"/"verifica" (substantivo/participio -- o status
+# composto de fato).
+_LEGACY_RADICAL = re.compile(r"\b(?:pendente|andamento)\b")
+_LEGACY_QUALIFIER = (
+    (re.compile(r"\bverifica(?!r\b)"), "verificacao"),
+    (re.compile(r"\bdesign\b"), "design"),
+)
+
+# Vocabulario simples do fallback e o kind que cada radical decide quando
+# vence por posicao (7 dos 10 kinds de _EMOJI_KIND: fica de fora
+# parcial/decisao, que nunca tiveram forma textual pura reconhecida
+# historicamente pelo fallback, e -- decisao explicita de 2026-08-24 --
+# bloqueado/reprovado/cancelado tambem NAO ganham radical aqui. Motivo:
+# "bloqueado" e "cancelado" sao palavras correntes de nota livre dentro de
+# OUTRA celula de status (ex.: "⏳ Pendente (bloqueado ate o lider
+# responder)"), a mesma classe de falso-positivo que VERB-STATUS-2 ja
+# corrigiu para o infinitivo "verificar"; sem emoji, essas 3 celulas ficam
+# "unknown" (CHK-08 aponta, IMPORTANTE) em vez de arriscar casar substring
+# de anotacao livre. Padroes compilados: "verifica" NUNCA casa o infinitivo
+# "verificar" (VERB-STATUS-2 -- so-verbo sem vocabulo canonico nao
+# classifica; o audit/CHK-08 aponta "unknown"). "verificacao"/"verificado"/
+# "verifica " continuam casando.
+_LEGACY_WORD_PATTERNS = (
+    (re.compile(r"\bpendente"), "pendente"),
+    (re.compile(r"\bandamento"), "andamento"),
+    (re.compile(r"\bconclu"), "done"),
+    (re.compile(r"\bverifica(?!r\b)"), "verificacao"),
+    (re.compile(r"\bdesign\b"), "design"),
+)
+
+
+def _classify_legacy(status):
+    """Fallback de tabela legada sem emoji (ADR-0001 secao (d)): decide UMA
+    UNICA categoria por celula, nunca duas -- e o que torna is_done() e
+    is_awaiting_verification() mutuamente exclusivos POR CONSTRUCAO (a
+    incoerencia medida em 'Concluído e verificado', que saia com os dois em
+    True no fallback antigo por-predicado). Precedencia por POSICAO: entre
+    as ocorrencias do vocabulario canonico com \\b na frente, a de MENOR
+    indice na celula decide (empate nao existe, posicoes sao distintas) --
+    o mesmo principio que a camada de emoji ja usa (o emoji ABRE a celula,
+    o resto e anotacao).
+
+    Compostos sao decididos ANTES da regra de posicao, por CO-OCORRENCIA
+    (ver _LEGACY_RADICAL/_LEGACY_QUALIFIER, GEMEO-DESIGN): so disparam
+    quando um radical (pendente/andamento) E um qualificador (design/
+    verifica-nao-infinitivo) aparecem os DOIS na celula, em qualquer
+    posicao/ordem/separador -- 'Concluído e verificado' nao tem radical
+    (so 'conclu'), entao nunca entra aqui, e 'conclu'@0 continua vencendo
+    por posicao abaixo, como o teste W15 exige. Devolve a mesma categoria
+    de _status_kind, ou None quando nenhum vocabulo do fallback foi
+    reconhecido.
+
+    VERB-STATUS-2: celula so com o infinitivo ("Verificar disponibilidade",
+    "A verificar", "verificar") devolve None -- nao e vocabulario canonico
+    de status; CHK-08 aponta, e nenhum predicado (is_awaiting_verification
+    etc.) classifica em silencio."""
+    s = status.lower()
+    if _LEGACY_RADICAL.search(s):
+        for pattern, kind in _LEGACY_QUALIFIER:
+            if pattern.search(s):
+                return kind
+    best_pos, best_kind = None, None
+    for pattern, kind in _LEGACY_WORD_PATTERNS:
+        m = pattern.search(s)
+        if m is not None and (best_pos is None or m.start() < best_pos):
+            best_pos, best_kind = m.start(), kind
+    return best_kind
+
+
+def is_pending(status):
+    """⏳/🔄/🎨 = ainda nao concluido nem em verificacao. Usado em warnings/
+    contagem (onde 'nao entregue' inclui 'pendente design').
+
+    DECISAO 2026-08-24 (fatia dos 3 status novos): ⛔/❌/🚫 ficam DE FORA
+    desta lista nesta fatia, deliberadamente. ⛔ Bloqueado e, por natureza,
+    uma pendencia (ha trabalho que falta, so que travado por causa
+    externa) -- mas is_pending() e lido por ~20 projetos consumidores em
+    contagem ja publicada, e mudar o que ela conta e uma mudanca de
+    contrato observavel de fora desta skill, nao uma decisao de
+    implementacao. Fica registrado como achado para o lider decidir com
+    julgamento de produto, nao decidido aqui por default."""
+    kind = _status_kind(status)
+    if kind is None:
+        kind = _classify_legacy(status)
+    return kind in ("pendente", "andamento", "design")
+
+
+def is_flip_eligible(status):
+    """Elegivel a avancar para 🔍 num sync mecanico: SO ⏳ Pendente e
+    🔄 Em andamento. Exclui 🎨 Pendente design (design nem existe), 🔍 (ja
+    entregue), 🟡 Parcial, 💡, ✅ (ambiguos/ja resolvidos -> nao auto-flipar),
+    e (2026-08-24) ⛔ Bloqueado, ❌ Reprovado, 🚫 Cancelado -- nenhum dos tres
+    pode ser auto-avancado por sync mecanico: bloqueado nao anda sozinho ate
+    a causa externa sair, reprovado precisa de retrabalho humano/agente antes
+    de voltar a fila (nao so re-entregar o que ja falhou), e cancelado nem
+    esta na fila."""
+    kind = _status_kind(status)
+    if kind is None:
+        kind = _classify_legacy(status)
+    return kind in ("pendente", "andamento")
+
+
+def is_awaiting_verification(status):
+    kind = _status_kind(status)
+    if kind is None:
+        kind = _classify_legacy(status)
+    return kind == "verificacao"
+
+
+def is_done(status):
+    kind = _status_kind(status)
+    if kind is None:
+        kind = _classify_legacy(status)
+    return kind == "done"
+
+
+def cited_ids(message, ids):
+    """IDs conhecidos citados na mensagem, com fronteira (V-1 nao casa em V-12,
+    F1.4 nao casa em F1.45). re.escape protege ID com metachar. Funciona p/
+    qualquer esquema de ID.
+
+    CIT-1: o lookahead proibia QUALQUER "." logo apos o ID, inclusive o ponto
+    final de frase ("fechei V-12." nunca casava) -- uso comum em prosa de
+    commit. O "." so precisa continuar proibido quando e continuacao
+    NUMERICA do proprio ID (ex.: "F1.4.5" nao pode confirmar "F1.4", pois
+    seria citar um ID mais especifico); ponto seguido de nao-digito (fim de
+    frase, ou nada) e permitido."""
+    out = []
+    for i in ids:
+        pat = r"(?<![\w-])" + re.escape(i) + r"(?![\w-])(?!\.\d)"
+        if re.search(pat, message):
+            out.append(i)
+    return out
+
+
+def set_status_cell(line, status_idx, new_status):
+    """Substitui SO a celula de Status, preservando o resto da linha E o
+    terminador original (CRLF/LF/none). Re-padroniza a propria celula-alvo para
+    1 espaco de cada lado."""
+    stripped = line.rstrip("\r\n")
+    tail = line[len(stripped):]            # "\r\n", "\n", "\r" ou ""
+    parts = _split_row(stripped)           # linha comeca com '|' -> parts[0]==''
+    target = 1 + status_idx                # celula de dados k <-> parts[1+k]
+    if target >= len(parts):
+        return line                        # estrutura inesperada: nao mexe
+    parts[target] = f" {new_status} "
+    return "|".join(parts) + tail
+
+
+# HEADING-1 (ADR-0002, defeito medido no nucleo): a deteccao de secao da
+# INBOX de planejamento exigia so `"inbox" in s.lower()` -- substring, em
+# qualquer caixa, em qualquer heading. Isso engolia headings ALHEIOS que
+# so contem a palavra comum "inbox" em prosa, como um heading de bus/
+# mensageria ("## Inbox do bus (mensagens recebidas)", TAB-BUS-003:
+# transporte de mensagens, NAO e a exception queue de planejamento). A
+# palavra em si nao basta como sinal: "Inbox do bus" tambem comeca com a
+# palavra "inbox" (case-insensitive), entao nem "\\bpalavra\\b" resolveria.
+# O que distingue e a CAIXA: o contrato normativo
+# (references/frescor-da-tabela.md SS5.1) usa literalmente o token "INBOX"
+# em MAIUSCULA -- mesmo principio de "ID"/"Status" como tokens de
+# cabecalho de tabela que nunca sao traduzidos (ADR-0001 secao d), so que
+# aqui a caixa exata (nao so a palavra) e o sinal estrutural que separa o
+# identificador de contrato do substantivo comum de prosa.
+_INBOX_HEADING = re.compile(r"(?<![\w-])INBOX(?![\w-])")
+
+
+def _is_inbox_heading(s):
+    """Heading e a INBOX de planejamento (ADR-0002 secao f)? Exige o token
+    'INBOX' maiusculo exato, como palavra isolada -- nunca substring solta
+    'em qualquer caixa' (ver HEADING-1 acima)."""
+    return bool(_INBOX_HEADING.search(s))
+
+
+def inbox_items(text):
+    """Linhas da secao '## INBOX ...' (ate o proximo heading OU o comeco de
+    uma tabela). Ver HEADING-1: a deteccao de secao usa _is_inbox_heading,
+    nao mais substring case-insensitive.
+
+    LAYOUT-1 (2026-08-19): com a INBOX ANTES da tabela (ordem canonica
+    nova, ver `layout()`), a secao pode terminar sem heading nenhum entre
+    ela e a tabela -- basta a 1a linha de tabela. Uma linha que comeca com
+    '|' encerra a regiao aqui pelo mesmo motivo que encerra em
+    `inbox_region`: bullet de INBOX nunca comeca com '|', entao fechar ali
+    nunca perde item e evita que a regiao engula a tabela inteira."""
+    out = []
+    in_inbox = False
+    for line in text.split("\n"):
+        s = line.lstrip(BOM).strip()
+        if s.startswith("#"):
+            in_inbox = _is_inbox_heading(s)
+            continue
+        if in_inbox and s.startswith("|"):
+            in_inbox = False
+            continue
+        if in_inbox and s.startswith("- "):
+            out.append(s[2:].strip())
+    return out
+
+
+# ---------------------------------------------------------------------------
+# LAYOUT-1 (2026-08-19): ordem canonica do arquivo -- INBOX ANTES da tabela
+# ---------------------------------------------------------------------------
+#
+# Ordem canonica de um TODO.md de projeto (contrato de FORMA, nao de
+# conteudo -- ver references/frescor-da-tabela.md SS5):
+#
+#   1. linha 1: titulo H1 do arquivo
+#   2. preambulo livre (prosa, blockquote, legenda, notas de montagem)
+#   3. secao `## INBOX (...)` -- exception queue, com seus bullets
+#   4. (opcional) mais prosa/secoes livres
+#   5. A TABELA canonica (cabecalho ID+Status, separador, linhas de dados)
+#   6. EOF logo apos a ultima linha da tabela (so linha em branco final)
+#
+# A INBOX passou a vir ANTES da tabela porque a tabela precisa ser a
+# ULTIMA coisa do arquivo: guards de consumidor (e a propria leitura
+# humana) tratam "fim da tabela == fim do arquivo" como invariante, e uma
+# secao depois da tabela contradizia isso por construcao.
+#
+# COMPATIBILIDADE: o formato LEGADO (INBOX depois da tabela) continua
+# valido para LEITURA -- nenhum parser deste toolkit recusa arquivo legado.
+# ESCRITA e CRIACAO usam sempre a ordem nova. `legacy_layout_warning()` da
+# o aviso; `tools/todo_migrate_inbox.py` faz a conversao.
+
+LAYOUT_INBOX_FIRST = "inbox-first"      # ordem canonica nova
+LAYOUT_INBOX_AFTER_TABLE = "inbox-after-table"   # legado (aceito na leitura)
+LAYOUT_NO_INBOX = "no-inbox"            # sem secao INBOX (valido)
+LAYOUT_NO_TABLE = "no-table"            # sem tabela canonica
+
+
+def table_span(table):
+    """(start, end) 0-based INCLUSIVE das linhas da tabela canonica, ou
+    None quando `table` e None/sem cabecalho.
+
+    `start` = linha do cabecalho ID+Status. `end` = linha do ULTIMO item
+    (nunca de um 'malformed' distante: uma linha com '|' perdida na prosa
+    do fim do arquivo entra em `malformed` e esticaria o span por cima de
+    texto que nao e tabela), estendido para frente enquanto as linhas
+    seguintes forem CONTIGUAS e comecarem com '|' -- e assim que uma linha
+    malformada que de fato pertence ao rodape da tabela entra no span sem
+    que uma malformada distante entre.
+
+    Tabela vazia (so cabecalho + separador) devolve o span dos dois."""
+    if not table:
+        return None
+    lines = table["lines"]
+    start = None
+    for n, line in enumerate(lines):
+        s = line.lstrip(BOM).strip()
+        if not s.startswith("|"):
+            continue
+        if _is_header(_cells(s)):
+            start = n
+            break
+    if start is None:
+        return None
+    item_lines = [it["line_no"] for it in table["items"]]
+    end = max(item_lines) if item_lines else start
+    while end + 1 < len(lines):
+        nxt = lines[end + 1].lstrip(BOM).strip()
+        if not nxt.startswith("|"):
+            break
+        end += 1
+    return (start, end)
+
+
+# --------------------------------------------------------------------------
+# UNIQ-1 -- tabela unica DE TRABALHO (contrato, references/frescor-da-tabela.md
+# SS5). O parser (`parse_table`) sempre leu SO a 1a tabela e sempre parou no 2o
+# cabecalho repetido; o que faltava era um jeito de PERGUNTAR quantas tabelas de
+# trabalho o arquivo tem, para o --audit acusar e o migrador recusar em vez de
+# adivinhar qual e a canonica.
+# --------------------------------------------------------------------------
+
+# Coluna de identificador: celula que COMECA com "id" em fronteira de palavra
+# ("ID", "ID (AUD-*)", "id do item"), nunca "identificador" (sem fronteira
+# depois do "id") nem "id" no meio de outra palavra. Deliberadamente mais larga
+# que `_is_header` (que exige a celula EXATA "id", porque ali a decisao e sobre
+# QUAL tabela o nucleo vai ler/escrever): aqui a pergunta e outra -- "um humano
+# leria isto como tabela de trabalho?" --, e uma tabela com "ID (AUD-*)" +
+# Status e material de trabalho mesmo que o nucleo nao consiga eleger.
+_ID_COLUMN = re.compile(r"^id\b")
+
+
+def _is_work_header(cells):
+    """Cabecalho de tabela DE TRABALHO: tem coluna Status E coluna de
+    identificador.
+
+    "De trabalho" = tem coluna `Status` (o que se marca; o que a ferramenta le
+    e escreve) -- e o criterio do contrato. A exigencia ADICIONAL de uma coluna
+    de identificador nao esta no contrato por preciosismo: sem ela, a LEGENDA
+    de status (`| Status | Significado |`, padrao comum no cabecalho de um
+    TODO.md real) seria contada como 2a tabela de trabalho e viraria um achado
+    CRITICO falso. Uma legenda nao tem como ser eleita pelo nucleo (`_is_header`
+    exige uma celula ID), entao nao e ela que causa o incidente que a regra
+    combate. Tabela de referencia SEM `Status` nunca conta, com ou sem ID."""
+    if not cells:
+        return False
+    low = [c.lower() for c in cells]
+    return (any(_STATUS_WORD.search(c) for c in low)
+            and any(_ID_COLUMN.match(c) for c in low))
+
+
+def table_blocks(text):
+    """Blocos CONTIGUOS de linhas de tabela markdown, na ordem do arquivo:
+    [{'start','end','rows':[line_no,...]}] (0-based, `end` INCLUSIVO).
+
+    Linha dentro de bloco de codigo cercado (``` ou ~~~) e ignorada (FENCE-1).
+
+    Um bloco e uma sequencia de linhas que comecam com "|" sem NENHUMA linha de
+    outro tipo no meio -- e exatamente o que o Markdown renderiza como UMA
+    tabela: linha em branco, heading ou prosa encerram o bloco ali. E por isso
+    que este helper enxerga o que `parse_table` (que atravessa linha em branco
+    e heading, por D-12) nao enxerga."""
+    lines = text.split("\n")
+    blocos = []
+    cur = None
+    cerca = None
+    for n, line in enumerate(lines):
+        s = line.lstrip(BOM).strip()
+        # FENCE-1: tabela DENTRO de bloco de codigo cercado (``` ou ~~~) e
+        # EXEMPLO, nao tabela -- o Markdown a renderiza como texto literal.
+        # Sem isto, um TODO.md que mostre o schema num bloco de codigo no
+        # cabecalho (uso legitimo e comum) seria acusado de ter 2 tabelas.
+        if cerca is None:
+            if s.startswith("```") or s.startswith("~~~"):
+                cerca = s[:3]
+                if cur is not None:
+                    blocos.append(cur)
+                    cur = None
+                continue
+        else:
+            if s.startswith(cerca):
+                cerca = None
+            continue
+        if s.startswith("|"):
+            if cur is None:
+                cur = {"start": n, "end": n, "rows": [n]}
+            else:
+                cur["end"] = n
+                cur["rows"].append(n)
+        elif cur is not None:
+            blocos.append(cur)
+            cur = None
+    if cur is not None:
+        blocos.append(cur)
+    return blocos
+
+
+def work_tables(text):
+    """Tabelas DE TRABALHO do arquivo (o contrato exige exatamente UMA):
+    [{'line_no','start','end','ncols','cells','n_rows'}], na ordem do arquivo.
+
+    Uma tabela de trabalho e um BLOCO (`table_blocks`) cuja PRIMEIRA linha e um
+    cabecalho de trabalho (`_is_work_header`). Blocos que comecam por linha de
+    DADO nao contam: e o caso da metade de baixo de uma tabela partida por
+    linha em branco (ainda e a MESMA tabela, um so cabecalho -- quem acusa isso
+    e o check de linha em branco) e o das secoes de organizacao visual sob
+    subtitulo (D-12), que nunca repetem o cabecalho.
+
+    Lista vazia = nenhuma tabela de trabalho (arquivo so de prosa/referencia).
+    Nunca levanta excecao."""
+    lines = text.split("\n")
+    out = []
+    for b in table_blocks(text):
+        cells = _cells(lines[b["start"]].lstrip(BOM).strip())
+        if not _is_work_header(cells):
+            continue
+        n_rows = sum(
+            1 for n in b["rows"][1:]
+            if not _is_separator(_cells(lines[n].lstrip(BOM).strip())))
+        out.append({"line_no": b["start"], "start": b["start"],
+                    "end": b["end"], "ncols": len(cells), "cells": cells,
+                    "n_rows": n_rows})
+    return out
+
+
+def checklist_tables(text):
+    """Tabelas que sao FILA DE TRABALHO desta skill (nao qualquer tabela com
+    Status): [{'line_no','ncols','n_rows','n_status_canonicos'}].
+
+    Discriminante (os TRES criterios juntos, deliberadamente estreito porque
+    falso positivo aqui e caro -- acusar o indice de ADR de um projeto seria
+    ruido que faz o usuario ignorar o audit):
+
+      1. coluna de identificador no cabecalho (`^id\b`);
+      2. coluna `Status` no cabecalho;
+      3. pelo menos UMA linha de dado cujo Status comeca com um dos 10 emojis
+         do vocabulario fechado (D-1) -- `_status_kind(...) is not None`.
+
+    E o criterio (3) que separa fila de trabalho de documentacao de produto:
+    uma tabela de ADRs com `Status = Aceito`, uma matriz de rotas ou uma
+    contagem de auditoria tem coluna Status e ID, mas nao fala o vocabulario
+    desta skill. Em compensacao, LIMITACAO DECLARADA: um checklist paralelo
+    escrito sem emoji (so "Pendente"/"Concluido" em texto) NAO e detectado --
+    falso negativo aceito de proposito, para nao acusar documento alheio."""
+    lines = text.split("\n")
+    out = []
+    for w in work_tables(text):
+        cells = w["cells"]
+        status_idx = next((i for i, c in enumerate(cells)
+                           if _STATUS_WORD.search(c.lower())), None)
+        if status_idx is None:
+            continue
+        canonicos = 0
+        for n in range(w["start"] + 1, w["end"] + 1):
+            cel = _cells(lines[n].lstrip(BOM).strip())
+            if len(cel) != w["ncols"] or _is_separator(cel):
+                continue
+            if _status_kind(cel[status_idx]) is not None:
+                canonicos += 1
+        if canonicos:
+            out.append({"line_no": w["line_no"], "ncols": w["ncols"],
+                        "n_rows": w["n_rows"],
+                        "n_status_canonicos": canonicos})
+    return out
+
+
+def blank_gaps_in_table(text, table=None):
+    """Interrupcoes POR LINHA EM BRANCO dentro do span da tabela canonica:
+    [{'line_no','start','end','blanks','prose'}] (0-based; `line_no` = 1a linha
+    em branco do buraco; `end` INCLUSIVO).
+
+    Em Markdown a linha em branco ENCERRA a tabela: a metade de baixo vira uma
+    segunda tabela (se algum cabecalho for repetido ali depois) ou prosa solta.
+    O parser deste toolkit atravessa a linha em branco -- por isso o defeito e
+    SILENCIOSO: os itens continuam sendo lidos aqui enquanto a renderizacao (e
+    o proximo editor) ja veem duas tabelas.
+
+    Buraco que contem um HEADING nao entra: e o padrao de organizacao visual em
+    subtitulos, explicitamente legitimo por D-12 e ja relatado por CHK-03 como
+    informativo. Buraco so com prosa (sem nenhuma linha em branco) tambem nao
+    entra -- nao existe: prosa dentro do span vem sempre cercada de linha em
+    branco, e e essa linha que quebra a tabela."""
+    if table is None:
+        table = parse_table(text)
+    span = table_span(table)
+    if span is None:
+        return []
+    lines = text.split("\n")
+    start, end = span
+    buracos = []
+    cur = None
+    for n in range(start, min(end, len(lines) - 1) + 1):
+        s = lines[n].lstrip(BOM).strip()
+        if s.startswith("|"):
+            if cur is not None:
+                buracos.append(cur)
+                cur = None
+            continue
+        if cur is None:
+            cur = {"start": n, "end": n, "blanks": [], "headings": [],
+                   "prose": []}
+        cur["end"] = n
+        if not s:
+            cur["blanks"].append(n)
+        elif s.startswith("#"):
+            cur["headings"].append(n)
+        else:
+            cur["prose"].append(n)
+    if cur is not None:
+        buracos.append(cur)
+    return [{"line_no": g["blanks"][0], "start": g["start"], "end": g["end"],
+             "blanks": g["blanks"], "prose": g["prose"]}
+            for g in buracos if g["blanks"] and not g["headings"]]
+
+
+def inbox_region(text):
+    """(heading, end) 0-based da secao INBOX: `heading` e a linha do
+    heading; `end` e EXCLUSIVO (1a linha que ja nao pertence a secao).
+    (None, None) quando nao ha secao INBOX.
+
+    A secao termina no proximo heading markdown OU na 1a linha que comeca
+    com '|' (LAYOUT-1: com a INBOX antes da tabela, nem sempre existe um
+    heading entre as duas)."""
+    lines = text.split("\n")
+    heading = None
+    for i, line in enumerate(lines):
+        s = line.lstrip(BOM).strip()
+        if s.startswith("#") and _is_inbox_heading(s):
+            heading = i
+            break
+    if heading is None:
+        return (None, None)
+    end = len(lines)
+    for j in range(heading + 1, len(lines)):
+        s = lines[j].lstrip(BOM).strip()
+        if s.startswith("#") or s.startswith("|"):
+            end = j
+            break
+    return (heading, end)
+
+
+def layout(text, table=None):
+    """Diagnostico da ordem do arquivo (LAYOUT-1). Devolve dict:
+
+      order        um dos LAYOUT_* acima
+      legacy       True so quando order == LAYOUT_INBOX_AFTER_TABLE
+      canonical    True quando a ordem E a nova E nao ha conteudo
+                   nao-branco depois do fim da tabela
+      inbox_line   linha do heading da INBOX (None se nao ha)
+      table_span   (start, end) inclusivo da tabela (None se nao ha)
+      trailing     [(line_no, texto)] das linhas NAO-brancas depois do fim
+                   da tabela (vazio quando o arquivo termina na tabela)
+
+    Nunca levanta excecao: arquivo sem tabela devolve LAYOUT_NO_TABLE.
+    `table` opcional evita reparsear quem ja tem o resultado."""
+    if table is None:
+        table = parse_table(text)
+    lines = text.split("\n")
+    span = table_span(table)
+    inbox_line, _end = inbox_region(text)
+    if span is None:
+        order = LAYOUT_NO_TABLE
+    elif inbox_line is None:
+        order = LAYOUT_NO_INBOX
+    elif inbox_line < span[0]:
+        order = LAYOUT_INBOX_FIRST
+    else:
+        order = LAYOUT_INBOX_AFTER_TABLE
+    trailing = []
+    if span is not None:
+        for n in range(span[1] + 1, len(lines)):
+            if lines[n].strip():
+                trailing.append((n, lines[n]))
+    return {
+        "order": order,
+        "legacy": order == LAYOUT_INBOX_AFTER_TABLE,
+        "canonical": (order in (LAYOUT_INBOX_FIRST, LAYOUT_NO_INBOX)
+                      and not trailing),
+        "inbox_line": inbox_line,
+        "table_span": span,
+        "trailing": trailing,
+    }
+
+
+def legacy_layout_warning(text, table=None):
+    """Mensagem de aviso quando o arquivo NAO esta na ordem canonica nova,
+    ou None quando esta (ou quando nao ha tabela para julgar).
+
+    Aviso, nunca erro: LEITURA de arquivo legado continua valida (ver o
+    bloco LAYOUT-1 acima). Quem ESCREVE usa sempre a ordem nova."""
+    lay = layout(text, table=table)
+    if lay["order"] == LAYOUT_NO_TABLE or lay["canonical"]:
+        return None
+    if lay["legacy"]:
+        return ("AVISO: formato LEGADO -- a secao INBOX esta DEPOIS da "
+                "tabela (linha {}); a ordem canonica poe a INBOX ANTES e "
+                "termina o arquivo na tabela. Leitura continua valida; "
+                "converta com `python3 tools/todo_migrate_inbox.py "
+                "--apply`.".format(lay["inbox_line"] + 1))
+    n, _txt = lay["trailing"][0]
+    return ("AVISO: ha texto DEPOIS do fim da tabela (linha {}); a ordem "
+            "canonica termina o arquivo na tabela. Leitura continua "
+            "valida; converta com `python3 tools/todo_migrate_inbox.py "
+            "--apply`.".format(n + 1))
+
+
+# ADR-0002 secao (f): vocabulario fechado de motivos residuais e origens
+# permitidas no metadado do item residual da INBOX.
+TRIAGE_REASONS = frozenset({
+    "missing-info", "conflicting-evidence", "dependency-conflict",
+    "needs-leader-decision", "ownership-unavailable", "blocked-external",
+})
+TRIAGE_SOURCES = frozenset({"user", "bus", "agent", "audit", "test"})
+_TRIAGE_KNOWN_KEYS = frozenset({"since", "reason", "source", "cycles", "ref"})
+_TRIAGE_REQUIRED_KEYS = frozenset({"since", "reason"})
+
+# Gramatica literal do ADR-0002 (f): "[triage" + 1+ pares " chave=valor" +
+# "] " + descricao livre remanescente. Chaves em [a-z_], valores sao tokens
+# sem espaco nem "]" (parseaveis por regex simples, sem YAML).
+_TRIAGE_BLOCK = re.compile(
+    r"^\[triage((?: [a-z_]+=[A-Za-z0-9._:\-]+)+)\] (.*)$", re.DOTALL)
+_TRIAGE_PAIR = re.compile(r" ([a-z_]+)=([A-Za-z0-9._:\-]+)")
+_ISO_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+def format_triage_metadata(since, reason, source=None, cycles=None, ref=None):
+    """Serializa o bloco '[triage ...] ' (ADR-0002 secao f) para prefixar a
+    descricao livre de um item residual da INBOX -- ex.:
+    `format_triage_metadata(since="2026-08-16", reason="needs-leader-decision")
+    + "decisao pendente do lider"`. Nao valida os valores (quem chama e
+    responsavel por 'reason' em TRIAGE_REASONS e 'since' em ISO
+    'YYYY-MM-DD'); parse_triage_metadata sobre o resultado e a prova de
+    round-trip (formatar -> analisar -> mesmos campos)."""
+    pairs = [f"since={since}", f"reason={reason}"]
+    if source is not None:
+        pairs.append(f"source={source}")
+    if cycles is not None:
+        pairs.append(f"cycles={cycles}")
+    if ref is not None:
+        pairs.append(f"ref={ref}")
+    return "[triage " + " ".join(pairs) + "] "
+
+
+def parse_triage_metadata(description):
+    """Analisa o prefixo '[triage ...] ' de uma descricao de item da INBOX
+    (ADR-0002 secao f). Devolve dict:
+      present      bloco '[triage ...]' detectado no INICIO da descricao?
+      valid        bloco presente E sem nenhum erro (ver 'errors')?
+      fields       {chave: valor} bruto (str), {} quando ausente
+      errors       lista de motivos de invalidade (vazia quando valid)
+      description  texto livre remanescente (a descricao inteira quando
+                   'present' e False)
+
+    'valid' e SEMPRE False quando 'present' e False -- e o mecanismo
+    central do ADR: ausencia de token de triagem valido = classificavel
+    por definicao (secao f), nunca uma lista de motivos INVALIDOS a
+    policiar -- a unica lista fechada e a de motivos VALIDOS
+    (TRIAGE_REASONS). Metadado malformado (chave desconhecida, reason fora
+    do vocabulario, since fora do formato ISO, cycles nao inteiro, source
+    fora do vocabulario) tambem nunca e descartado em silencio: 'present'
+    continua True e 'errors' relata a causa (para o futuro --audit)."""
+    m = _TRIAGE_BLOCK.match(description)
+    if not m:
+        return {"present": False, "valid": False, "fields": {},
+                "errors": [], "description": description}
+    fields = {}
+    errors = []
+    for k, v in _TRIAGE_PAIR.findall(m.group(1)):
+        if k in fields:
+            errors.append(f"chave repetida: {k!r}")
+            continue
+        fields[k] = v
+    for k in fields:
+        if k not in _TRIAGE_KNOWN_KEYS:
+            errors.append(f"chave desconhecida: {k!r}")
+    for k in sorted(_TRIAGE_REQUIRED_KEYS - fields.keys()):
+        errors.append(f"chave obrigatoria ausente: {k!r}")
+    if "since" in fields and not _ISO_DATE.match(fields["since"]):
+        errors.append(f"since fora do formato ISO YYYY-MM-DD: {fields['since']!r}")
+    if "reason" in fields and fields["reason"] not in TRIAGE_REASONS:
+        errors.append(f"reason fora do vocabulario fechado: {fields['reason']!r}")
+    if "source" in fields and fields["source"] not in TRIAGE_SOURCES:
+        errors.append(f"source fora do vocabulario fechado: {fields['source']!r}")
+    if "cycles" in fields and not fields["cycles"].isdigit():
+        errors.append(f"cycles nao e inteiro >= 0: {fields['cycles']!r}")
+    return {"present": True, "valid": not errors, "fields": fields,
+            "errors": errors, "description": m.group(2)}
+
+
+def inbox_entries(text):
+    """inbox_items() decomposto (ADR-0002 secao f): cada entrada ganha o
+    ID tentativo, a descricao livre e a classificacao de triagem. Formato
+    de linha esperado (compat com o legado, references/frescor-da-tabela.md
+    SS5.1): '<ID-ou-travessao>: descricao livre [com ou sem [triage ...]]'.
+
+    Cada item do retorno:
+      raw           texto integral da linha (== o que inbox_items ja
+                    devolve, preservado 1:1 para round-trip/compat)
+      id            parte antes do 1o ':' (None se a linha nao tem ':' --
+                    formato ainda mais degradado que o legado sem
+                    metadado, ja classificavel por definicao)
+      description   parte livre apos o ':' (com ou sem bloco '[triage]';
+                    == 'raw' quando nao ha ':')
+      triage        dict de parse_triage_metadata sobre 'description'
+      classifiable  True quando NAO ha bloco '[triage ...]' VALIDO -- o
+                    mecanismo central do ADR-0002 (f): falta de token
+                    valido drena no proximo intake, por definicao, nunca
+                    por uma lista de motivos proibidos a policiar."""
+    out = []
+    for raw in inbox_items(text):
+        head, sep, rest = raw.partition(":")
+        if sep:
+            iid, desc = head.strip(), rest.strip()
+        else:
+            iid, desc = None, raw
+        triage = parse_triage_metadata(desc)
+        out.append({"raw": raw, "id": iid, "description": desc,
+                    "triage": triage, "classifiable": not triage["valid"]})
+    return out
+
+
+def residual_is_aged(entry, *, now, max_cycles=2, max_age_days=1):
+    """Predicado de envelhecimento da INBOX residual (INTAKE-AGE-1 / ADR-0002).
+
+    Um residual envelhece por **OU** (liveness sem depender de drain):
+      - cycles >= max_cycles (default 2), contador que o drain incrementa; ou
+      - idade em dias desde `since` >= max_age_days (default 1), eixo de
+        calendario que avanca mesmo quando ninguem roda --drain.
+
+    `entry` e um item de `inbox_entries` (precisa de triage valido). Entrada
+    classificavel / sem triage valido / sem since parseavel e cycles baixo
+    devolve False. `now` e `datetime.date` injetavel (testes).
+    """
+    if now is None:
+        now = datetime.date.today()
+    triage = (entry or {}).get("triage") or {}
+    if not triage.get("valid"):
+        return False
+    fields = triage.get("fields") or {}
+    raw_c = fields.get("cycles", "0")
+    try:
+        cycles = int(raw_c) if str(raw_c).isdigit() else 0
+    except (TypeError, ValueError):
+        cycles = 0
+    if cycles >= int(max_cycles):
+        return True
+    since = fields.get("since")
+    if not since:
+        return False
+    try:
+        d = datetime.date.fromisoformat(str(since))
+    except (TypeError, ValueError):
+        return False
+    age_days = (now - d).days
+    return age_days >= int(max_age_days)
+
+
+def load_signals_config(todo_path=None):
+    """Le `[signals]` de `.tab_pendencias.ini` ao lado do TODO.md.
+
+    `todo_path` None ou ausente -> defaults embutidos. INI ausente, secao
+    ausente ou chave invalida: devolve defaults (fail-open, nunca explode).
+    """
+    cfg = dict(SIGNALS_DEFAULTS)
+    if not todo_path:
+        return cfg
+    root = os.path.dirname(os.path.abspath(todo_path))
+    ini_path = os.path.join(root, ".tab_pendencias.ini")
+    if not os.path.isfile(ini_path):
+        return cfg
+    try:
+        cp = configparser.ConfigParser()
+        cp.read(ini_path, encoding="utf-8")
+        if not cp.has_section("signals"):
+            return cfg
+        for key in SIGNALS_DEFAULTS:
+            if not cp.has_option("signals", key):
+                continue
+            raw = cp.get("signals", key).strip()
+            try:
+                cfg[key] = int(raw)
+            except (TypeError, ValueError):
+                pass
+    except (configparser.Error, OSError):
+        return dict(SIGNALS_DEFAULTS)
+    return cfg
