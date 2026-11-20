@@ -15,12 +15,21 @@ import io
 import json
 import os
 import stat
+import sys
 import tempfile
 
 import pytest
 import tab_pendencias_reminder as t
 
 NOME_DIR = "bigtech_tab_sessao"  # diretorio dedicado, diferente do da skill
+
+# CONS-R11: modo POSIX (0o700, 0o755) e dono (getuid) nao existem no Windows.
+# Ali o produto nao distingue dono nem recusa por modo: o diretorio fica no
+# perfil do usuario, protegido pelo ACL. Pular com motivo, sem esconder defeito.
+SO_POSIX = pytest.mark.skipif(
+    sys.platform == "win32",
+    reason="modo POSIX e dono (getuid) nao existem no Windows; o ACL do perfil faz o papel",
+)
 
 
 @pytest.fixture(autouse=True)
@@ -38,6 +47,8 @@ def ambiente(tmp_path, monkeypatch):
     compartilhado = tmp_path / "tmp_compartilhado"
     compartilhado.mkdir()
     monkeypatch.setenv("HOME", str(home))
+    # Windows: expanduser("~") le USERPROFILE, nao HOME (CONS-R11).
+    monkeypatch.setenv("USERPROFILE", str(home))
     monkeypatch.setenv("XDG_RUNTIME_DIR", str(run))
     monkeypatch.setattr(tempfile, "gettempdir", lambda: str(compartilhado))
     return {"home": home, "run": run, "compartilhado": compartilhado}
@@ -67,12 +78,14 @@ def test_sem_xdg_cai_em_home_cache(ambiente, monkeypatch):
     assert _vazio(ambiente["compartilhado"])
 
 
+@SO_POSIX
 def test_diretorio_criado_com_modo_0700(ambiente):
     t.carimbar_sessao("s3", 1.0)
     d = os.path.dirname(t.caminho_sessao("s3"))
     assert stat.S_IMODE(os.stat(d).st_mode) == 0o700
 
 
+@SO_POSIX
 def test_diretorio_frouxo_do_proprio_usuario_e_fechado(ambiente):
     d = ambiente["run"] / NOME_DIR
     d.mkdir(mode=0o755)
@@ -93,6 +106,7 @@ def test_symlink_no_diretorio_e_recusado_sem_gravar(ambiente, tmp_path):
     assert t.ler_sessao("s5") is None
 
 
+@SO_POSIX
 def test_diretorio_de_outro_dono_e_recusado_sem_gravar(ambiente, monkeypatch):
     d = ambiente["run"] / NOME_DIR
     d.mkdir(mode=0o700)

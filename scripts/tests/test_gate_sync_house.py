@@ -58,6 +58,8 @@ def _rodar(tmp_path: Path, args: list[str], chave: Path, ci: bool = False) -> su
         "BIGTECH_SYNC_KEY_FILE": str(chave),
         # HOME descartavel: sem ele o gate leria ~/.config/bigtech/vault_path da maquina (CONS-10A).
         "HOME": str(tmp_path / "home_descartavel"),
+        # Windows: o perfil sai de USERPROFILE; sem ele Path.home() falha (CONS-R11).
+        "USERPROFILE": str(tmp_path / "home_descartavel"),
     }
     if ci:
         env["GITHUB_ACTIONS"] = "true"

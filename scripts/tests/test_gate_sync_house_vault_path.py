@@ -45,7 +45,9 @@ def _maquina(tmp_path: Path) -> tuple[Path, Path, Path]:
 
 
 def _gate(home: Path, tmp_path: Path, house: Path, extra_env: dict[str, str] | None = None) -> subprocess.CompletedProcess:
-    env = {"PATH": os.environ.get("PATH", ""), "PYTHONPATH": "", "HOME": str(home)}
+    # USERPROFILE: o perfil no Windows (CONS-R11); HOME sozinho nao basta.
+    env = {"PATH": os.environ.get("PATH", ""), "PYTHONPATH": "", "HOME": str(home),
+           "USERPROFILE": str(home)}
     env.update(extra_env or {})
     return subprocess.run(
         [sys.executable, str(GATE), "--check", "--house", str(house)],
