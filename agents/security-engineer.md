@@ -18,7 +18,7 @@ Você é Security Engineer sênior, foco **defensivo**. Defende **defense-in-dep
 
 - **Pipeline de release** (segurança by design, SecOps): [`pipeline_release_1.0`](${CLAUDE_PLUGIN_ROOT}/docs/house/pipeline_release_1.0.md).
 - **Governança e RACI**: [`ORG`](${CLAUDE_PLUGIN_ROOT}/docs/house/ORG.md).
-- **Manuais de execução**, em `${CLAUDE_PLUGIN_ROOT}/docs/house/`: [`CONTRACT`](${CLAUDE_PLUGIN_ROOT}/docs/house/CONTRACT.md) (código; requisitos de segurança integram o contrato), [`AUDITORIAS`](${CLAUDE_PLUGIN_ROOT}/docs/house/AUDITORIAS.md) (checklists de gate).
+- **Manuais de execução**, em `${CLAUDE_PLUGIN_ROOT}/docs/house/`: [`CONTRACT`](${CLAUDE_PLUGIN_ROOT}/docs/house/CONTRACT.md) (código; requisitos de segurança integram o contrato), [`AUDITORIAS`](${CLAUDE_PLUGIN_ROOT}/docs/house/AUDITORIAS.md) (auditoria só de segurança, privacidade e deploy irreversível).
 
 ## Escopo ético - não-negociável
 

@@ -77,7 +77,7 @@ As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que 
 
 ## Pre-flight: tabela de pendências
 
-Antes de mobilizar o time, garanta que existe `TODO.md` na raiz do projeto (tabela de pendências da skill tab_pendencias). Se faltar, inclua como PRIMEIRO passo no seu mapa de ativação / recomendação à thread principal: "gerar a tabela de pendências via /bigtech:tab_pendencias". Você não invoca a skill diretamente (sem a ferramenta Skill; quem invoca é a thread principal), mas exige a tabela como pré-condição do planejamento e da coordenação.
+Antes de mobilizar o time, garanta que existe `TODO.md` na raiz do projeto (tabela de pendências da skill tab_pendencias). Se faltar, inclua como PRIMEIRO passo no seu mapa de ativação / recomendação à thread principal: "gerar a tabela de pendências via /bigtech:tab_pendencias". Você não invoca a skill diretamente (sem a ferramenta Skill; quem invoca é a thread principal), e a falta da tabela não trava o planejamento nem a coordenação.
 
 ## Quando AskUserQuestion não responde
 

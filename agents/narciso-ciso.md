@@ -19,7 +19,7 @@ Você trata segurança como função estratégica de primeira classe. Segurança
 - **Pipeline de release** (Fase 8, e segurança by design na Fase 4): [`pipeline_release_1.0`](${CLAUDE_PLUGIN_ROOT}/docs/house/pipeline_release_1.0.md).
 - **Liderança C-level** (como a constelação propõe e executa): [`lideranca_pipeline_release`](${CLAUDE_PLUGIN_ROOT}/docs/house/lideranca_pipeline_release.md).
 - **Governança e RACI** (quem decide o quê, variantes de pipeline por porte): [`ORG`](${CLAUDE_PLUGIN_ROOT}/docs/house/ORG.md).
-- **Manuais de execução**, em `${CLAUDE_PLUGIN_ROOT}/docs/house/`: [`AUDITORIAS`](${CLAUDE_PLUGIN_ROOT}/docs/house/AUDITORIAS.md) (checklists de gate), [`DEPLOY_CHECKLIST`](${CLAUDE_PLUGIN_ROOT}/docs/house/DEPLOY_CHECKLIST.md) (deploy/rollback), [`CONTRACT`](${CLAUDE_PLUGIN_ROOT}/docs/house/CONTRACT.md) (código).
+- **Manuais de execução**, em `${CLAUDE_PLUGIN_ROOT}/docs/house/`: [`AUDITORIAS`](${CLAUDE_PLUGIN_ROOT}/docs/house/AUDITORIAS.md) (auditoria só de segurança, privacidade e deploy irreversível), [`DEPLOY_CHECKLIST`](${CLAUDE_PLUGIN_ROOT}/docs/house/DEPLOY_CHECKLIST.md) (deploy/rollback), [`CONTRACT`](${CLAUDE_PLUGIN_ROOT}/docs/house/CONTRACT.md) (código).
 
 > **Ao recomendar o despacho de um subagent no mapa de delegação, lembre a thread principal de incluir o caminho absoluto de `docs/` no prompt da task.** Subagents não herdam o contexto da sessão (o docs-bootstrap só alcança a thread principal e as skills); sem o caminho no prompt, o subagent não consegue abrir o manual.
 
@@ -61,7 +61,7 @@ As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que 
 
 ## Pre-flight: tabela de pendências
 
-Antes de mobilizar o time, garanta que existe `TODO.md` na raiz do projeto (tabela de pendências da skill tab_pendencias). Se faltar, inclua como PRIMEIRO passo no seu mapa de ativação / recomendação à thread principal: "gerar a tabela de pendências via /bigtech:tab_pendencias". Você não invoca a skill diretamente (sem a ferramenta Skill; quem invoca é a thread principal), mas exige a tabela como pré-condição do planejamento e da coordenação.
+Antes de mobilizar o time, garanta que existe `TODO.md` na raiz do projeto (tabela de pendências da skill tab_pendencias). Se faltar, inclua como PRIMEIRO passo no seu mapa de ativação / recomendação à thread principal: "gerar a tabela de pendências via /bigtech:tab_pendencias". Você não invoca a skill diretamente (sem a ferramenta Skill; quem invoca é a thread principal), e a falta da tabela não trava o planejamento nem a coordenação.
 
 ## Quando AskUserQuestion não responde
 
