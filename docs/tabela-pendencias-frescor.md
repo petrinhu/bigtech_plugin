@@ -54,10 +54,10 @@ Ao fechar trabalho, **toque a coluna `Status` do item no MESMO commit/PR** que e
 - **Cite o ID do item na mensagem do commit** (corpo ou footer do Conventional Commit). Use o ID que o projeto **já tem** (`V-NN`, `ORG-NN`, `Fx.y`, etc.). Não inventar esquema novo, não renumerar.
 - **Use o glyph correto** do vocabulário da skill `/bigtech:tab_pendencias`:
   - Implementação entregue → `🔍 Pendente verificação`. **NUNCA `✅` direto.**
-  - `✅ Concluído` **só** após rodar a onda de teste/auditoria correspondente (`TST-*` / `AUD-*`).
+  - `✅ Concluído` **só** quando o CI do ramo fecha verde com o item. O CI é o único portão: teste só da lógica de produto, e auditoria só na exceção de segurança, privacidade ou deploy irreversível.
 - **Marcar status NUNCA dispara o time de agents.** É edição mecânica de uma célula, feita à mão no commit que fecha o item. Não exige a skill `/bigtech:tab_pendencias`.
 
-Isso evita o **"falso-done"**: o board dizer `✅ Concluído` enquanto o teste ou a auditoria ainda não rodou. O estado intermediário `🔍 Pendente verificação` torna visível o trabalho entregue-mas-não-validado.
+Isso evita o **"falso-done"**: o board dizer `✅ Concluído` antes de o CI do ramo fechar verde. O estado intermediário `🔍 Pendente verificação` torna visível o trabalho entregue-mas-não-validado.
 
 > **Por que citar o ID importa.** Como os commits do projeto saem quase sempre pela própria IA (thread principal ou agents, via `git commit`), citar o ID no commit que fecha ou avança um item é o que torna a defasagem rastreável: liga o trabalho entregue à linha da tabela. Por isso a convenção está embarcada nos agents de implementação.
 
@@ -122,7 +122,7 @@ A metade **mecânica** do frescor (sincronizar status, drenar INBOX) é determin
 
 ## Riscos residuais
 
-- **Falso-done residual** - se a onda de teste/auditoria nunca roda, o item fica eterno `🔍 Pendente verificação`. Mitigação: garantir que `TST-*`/`AUD-*` entrem no plano da onda.
+- **Falso-done residual** - se ninguém confere o CI do ramo, o item fica eterno `🔍 Pendente verificação`. Mitigação: fechar com `✅` o que o CI deixou verde, no mesmo passo em que se olha o CI.
 - **Dependência de disciplina humana** - a DoD de status (Camada 0) ainda depende de quem abre o PR lembrar de tocar a célula e citar o ID. **Medir adesão** (quantos PRs que fecham trabalho também tocam status).
 - **INBOX vira lixeira** - se não for drenada com regularidade, acumula. A drenagem no `--create`/`--reorder` é a válvula; INBOX gigante é sinal de re-planejamento atrasado.
 - **Fadiga de alerta:** os hooks podem incomodar. **Medir a taxa de disparo**; se subir, recuar a sensibilidade. Os limiares dos sinais de frescor ficam na seção `[signals]` do `.tab_pendencias.ini`, ao lado do `TODO.md`; o lembrete de tempo de sessão tem o limite (`horas_sessao`) e o desligamento (`off`) próprios no `.tab-staleness.json`, na raiz do projeto.
@@ -134,7 +134,7 @@ A metade **mecânica** do frescor (sincronizar status, drenar INBOX) é determin
 
 - Skill `/bigtech:tab_pendencias` (seção "Frescor: manter a tabela viva no sprint") - a convenção operacional resumida.
 - [manuals/AGILE.md](house/AGILE.md) - WSJF, fluxo e WIP.
-- [manuals/TESTES.md](house/TESTES.md) e [manuals/AUDITORIAS.md](house/AUDITORIAS.md) - as ondas `TST-*`/`AUD-*` que liberam o `✅`.
+- [manuals/TESTES.md](house/TESTES.md) e [manuals/AUDITORIAS.md](house/AUDITORIAS.md) - o piso de testes e a auditoria da exceção.
 
 ## Fontes
 
