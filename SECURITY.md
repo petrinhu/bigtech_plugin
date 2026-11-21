@@ -25,7 +25,7 @@ scripts** distintos. Os hooks são executados localmente, com o seu usuário.
 | Script | Evento | O que faz |
 |---|---|---|
 | `hooks/bigtech_session_init.py` | SessionStart | Injeta o caminho dos manuais no contexto; avisa sobre conflito e sobre dependências recomendadas ausentes, lendo as configurações do Claude Code (`CLAUDE_CONFIG_DIR` ou `$HOME/.claude`). |
-| `hooks/bigtech_porte_reminder.py` | SessionStart | Lembra de classificar o porte do projeto; só age em projeto de código ainda não classificado. |
+| `hooks/bigtech_porte_reminder.py` | SessionStart | Com o marcador `.bigtech-porte` na raiz do projeto, ancora o modo de operação e cita o porte registrado; sem o marcador, em projeto de código, lembra de classificar o porte. Só lê o marcador e confere se há arquivo de build ou manifesto na raiz. |
 | `hooks/tab_pendencias_reminder.py` | SessionStart, UserPromptSubmit | Carimba o início da sessão e lembra de revisar o `TODO.md` quando a sessão passa do tempo configurado. Ver "Estado gravado pelos hooks". |
 | `skills/tab_pendencias/tools/hooks/tab_pendencias_reminder.py` | SessionStart, UserPromptSubmit | Adaptador do motor de sinais de frescor da tabela de pendências: avisa quando o `TODO.md` falta ou está defasado. Lê o histórico do `git` em modo somente-leitura. |
 | `hooks/bigtech_reinforce.py` | UserPromptSubmit | Reforça o modo de operação e roteia pedidos em linguagem natural. |

@@ -101,7 +101,7 @@ Cada C-level devolve decisões + mapa de delegação aos seus operacionais; a th
 
 ## 4. Gravar o marcador de porte
 
-Após classificar, grave (ou devolva o texto ao usuário, se as regras dele reservarem a escrita no repositório) o marcador `.bigtech-porte` na raiz do projeto (uma linha: `porte=<early|scale|bigtech>` + data + variante). **Nunca** grave `porte=solo` (alias deprecado; se um marcador legado tiver `solo`, os hooks normalizam a leitura para `early`). Isso silencia o lembrete do hook SessionStart (`bigtech_porte_reminder.py`). Reescreva o marcador quando o porte mudar no re-roteamento.
+Após classificar, grave (ou devolva o texto ao usuário, se as regras dele reservarem a escrita no repositório) o marcador `.bigtech-porte` na raiz do projeto (uma linha: `porte=<early|scale|bigtech>` + data + variante). **Nunca** grave `porte=solo` (alias deprecado; se um marcador legado tiver `solo`, os hooks normalizam a leitura para `early`). Com o marcador, o hook SessionStart (`bigtech_porte_reminder.py`) para de lembrar a classificação e passa a ancorar o modo de operação, citando o porte gravado. Reescreva o marcador quando o porte mudar no re-roteamento.
 
 ## 5. Re-roteamento
 

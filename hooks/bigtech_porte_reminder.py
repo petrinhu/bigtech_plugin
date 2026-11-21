@@ -2,19 +2,24 @@
 """
 bigtech_porte_reminder.py
 
-Hook SessionStart. Lembrete leve, anti-ruido, para classificar o PORTE de um
-projeto de codigo via /bigtech:bigtech (que invoca o Cosimo / Chief of Staff) e
-dimensionar a constelacao de agents.
+Hook SessionStart. Em projeto ja classificado, ancora o MODO DE OPERACAO
+bigtech no inicio da sessao. Em projeto de codigo sem classificacao, da um
+lembrete leve, anti-ruido, para classificar o PORTE via /bigtech:bigtech (que
+invoca o Cosimo / Chief of Staff) e dimensionar a constelacao de agents.
 
 Logica:
-- So dispara em diretorio que parece PROJETO DE CODIGO (tem marcador de build
-  ou manifesto: CMakeLists.txt, package.json, pyproject.toml, go.mod,
-  Cargo.toml, composer.json, build.gradle, *.csproj, *.pro). CLAUDE.md ou .git
-  sozinhos NAO contam (amplo demais, pegaria pastas de doc).
-- So dispara se NAO existe o marcador `.bigtech-porte` na raiz do projeto.
-  O marcador e relativo ao PROJETO do usuario (cwd), nao ao plugin.
-- Quando /bigtech:bigtech classifica o porte, grava `.bigtech-porte` e o
-  lembrete para.
+- Com o marcador `.bigtech-porte` na raiz do projeto, ANCORA o modo de
+  operacao e cita o porte gravado no marcador. Vale em qualquer diretorio com
+  o marcador, de codigo ou nao. O marcador e relativo ao PROJETO do usuario
+  (cwd), nao ao plugin.
+- Sem o marcador, so dispara em diretorio que parece PROJETO DE CODIGO (tem
+  marcador de build ou manifesto, como CMakeLists.txt, package.json,
+  pyproject.toml, go.mod, Cargo.toml, Makefile ou *.csproj; lista completa em
+  CODE_MARKERS e CODE_GLOBS). CLAUDE.md ou .git sozinhos NAO contam (amplo
+  demais, pegaria pastas de doc). Ai lembra de classificar o porte.
+- Fora disso, fica em silencio.
+- Quando /bigtech:bigtech classifica o porte, grava `.bigtech-porte`: o
+  lembrete de classificar para e o hook passa a ancorar o modo.
 
 Saida: JSON com hookSpecificOutput.additionalContext quando dispara; nada caso
 contrario. Sempre exit 0 (lembrete, nunca bloqueia).
