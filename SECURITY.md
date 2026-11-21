@@ -40,7 +40,8 @@ UserPromptSubmit, um em PreToolUse e um em PostToolUse.
 Nenhum dos 7 scripts abre conexão de rede, faz telemetria ou envia dados para
 fora da máquina. A única exceção é o próprio comando de teste do projeto,
 executado pelo `tdd_runner`, que pode fazer o que o projeto já faz quando você
-roda a suíte à mão.
+roda a suíte à mão. Os caminhos de rede das skills estão em "Rede fora dos
+hooks", mais abaixo.
 
 ### Estado gravado pelos hooks
 
@@ -67,6 +68,9 @@ passaram desde o último toque no `TODO.md`; não escreve no repositório, não
 acessa a rede e não altera nenhum arquivo. É benigno e **fail-open**: qualquer
 erro (sem `git`, fora de um repositório, saída inesperada) faz o hook
 simplesmente não avisar, nunca interromper o turno.
+
+O comando `--audit` da skill, que só roda quando é chamado, é outro caso: ele
+consulta o remoto do projeto com `git ls-remote` (ver "Rede fora dos hooks").
 
 ## Paridade de confiança do `tdd_runner`
 
@@ -125,6 +129,47 @@ Em particular:
 - Se o runner não conseguir executar (comando ausente, timeout, binário não
   executável), o guard faz **fail-open**: avisa, mas permite a edição.
 
+## Rede fora dos hooks
+
+Fora dos hooks, estes são os únicos caminhos de rede do plugin, e cada um
+depende de um recurso que você liga ou de um comando que você roda:
+
+- **`manter_ligado`:** com 20% e com 5% de bateria, envia um aviso curto de
+  bateria a um celular já pareado com o computador pelo KDE Connect, se houver
+  um. Sem celular pareado, mostra uma notificação local (`notify-send`).
+- **`manter_ligado` com `MEMO_HEADLESS=1`:** com 5% de bateria, abre também
+  uma sessão do Claude Code sem interface (`claude -p`) para cada sessão
+  registrada. Essa sessão fala com a Anthropic como qualquer outra sessão do
+  Claude Code. Ela pede a skill `/memo_persistente`, que não vem no plugin e
+  só funciona se existir na sua configuração; a saída e o erro dessa chamada
+  são descartados.
+- **`tab_pendencias`, comando `--audit`:** para conferir afirmações da tabela
+  como "não pushado" ou "na branch X", consulta o remoto git do projeto com
+  `git ls-remote`, que só lê o remoto e não altera nada, nem local nem remoto.
+- **Dependências do `bigtech-completo`:** são plugins de terceiros, com
+  comportamento próprio. Por exemplo, o `playwright` baixa o pacote
+  `@playwright/mcp` da internet toda vez que o servidor dele inicia.
+
+Agents e skills também podem pedir ao Claude Code que use as ferramentas dele
+durante a sessão, como a busca na web. Essas ferramentas fazem parte do Claude
+Code e seguem as políticas da Anthropic.
+
+## Estado gravado pelas skills
+
+As skills não são hooks: gravam só quando rodam.
+
+- **`bigtech`:** depois que o porte é classificado, o marcador
+  `.bigtech-porte` na raiz do projeto.
+- **`tab_pendencias`:** o `TODO.md` do projeto; o `TESTES.md` e o
+  `AUDITORIAS.md` do projeto, quando faltam; e, quando precisa, uma pasta
+  `inbox/` ao lado do `TODO.md` e, dentro da pasta `.git` do repositório, um
+  journal de intake e uma trava de escrita (fora de repositório git, a trava
+  fica ao lado do `TODO.md`).
+- **`olhe_agentes`:** o prazo do monitor, a parada que você ordenou (se
+  houver) e o último trabalho anunciado como concluído, em
+  `$HOME/.config/olhe_agentes/<pasta do projeto>/`.
+- **`watchcode` e `manter_ligado`:** na seção seguinte.
+
 ## Skills com processos ou serviços locais
 
 Estes skills não são hooks. Rodam só quando você os invoca, e só no Linux com
@@ -149,8 +194,13 @@ systemd. Nenhum deles é instalado como serviço permanente pelo plugin.
   quando a bateria chega a 5%.
 - Enquanto está ativo, a suspensão automática fica bloqueada. Use `off` para
   devolver o comportamento normal de energia.
-- Estado em `${XDG_RUNTIME_DIR:-$HOME/.cache}/manter_ligado`; snapshots em
-  `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/manter_ligado_snapshots`.
+- Estado em `${XDG_RUNTIME_DIR:-$HOME/.cache}/manter_ligado`.
+- Com 5% de bateria, copia os transcripts das sessões registradas, isto é, as
+  conversas inteiras, para
+  `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/manter_ligado_snapshots` e guarda só a
+  cópia mais recente. O comando `limpar` apaga essas cópias.
+- Os avisos de bateria pelo KDE Connect e o `claude -p` opcional estão em
+  "Rede fora dos hooks".
 
 ## `github-gossips`: saiu do plugin
 
@@ -169,7 +219,9 @@ Esses são plugins de terceiros, com hooks, permissões e políticas próprios.
 Este plugin não os controla nem audita. O `bigtech_session_init.py` apenas
 avisa, no início da sessão, quais dependências recomendadas não estão
 habilitadas. O plugin também chama ferramentas do sistema: `python3` (hooks),
-`git` (pendências), `systemd` e `journalctl` (`watchcode` e `manter_ligado`).
+`git` (pendências), `systemd` e `journalctl` (`watchcode` e `manter_ligado`),
+`kdeconnect-cli` e `notify-send` (avisos do `manter_ligado`) e `claude`
+(`manter_ligado` com `MEMO_HEADLESS=1`).
 
 ## Como desativar
 

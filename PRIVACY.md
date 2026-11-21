@@ -60,7 +60,9 @@ you run:
 - **`manter_ligado` with `MEMO_HEADLESS=1`.** At 5% battery, it also starts a
   headless Claude Code session (`claude -p`) for each registered session, to
   save its memories. That session talks to Anthropic like any other Claude Code
-  session.
+  session. It asks for the `/memo_persistente` skill, which does not ship with
+  the plugin and only works if it exists in your configuration; the output and
+  errors of that call are discarded.
 - **`tab_pendencias` skill, `--audit` command.** To check claims in the table
   such as "not pushed yet" or "on branch X", it queries the git remote of your
   project with `git ls-remote`, which only reads the remote and changes nothing,
@@ -89,9 +91,11 @@ is hard-coded; each is resolved at run time from your environment:
   [SECURITY.md](./SECURITY.md).
 - `bigtech` skill: once the project size is classified, the `.bigtech-porte`
   marker at the root of the project.
-- `tab_pendencias` skill: when you run it, it writes `TODO.md` in your project
-  and, when it needs them, an `inbox/` folder next to it and an intake journal
-  inside the `.git` folder of the repository.
+- `tab_pendencias` skill: when you run it, it writes `TODO.md` in your project,
+  the project's `TESTES.md` and `AUDITORIAS.md` when they are missing, and,
+  when it needs them, an `inbox/` folder next to `TODO.md` and, inside the
+  `.git` folder of the repository, an intake journal and a write lock (outside
+  a git repository, the lock sits next to `TODO.md`).
 - `watchcode` skill: state in `${XDG_RUNTIME_DIR:-$HOME/.cache}/watchcode`, and
   an optional baseline that you create in
   `$HOME/.config/bigtech/watchcode_baseline.txt`.
@@ -187,7 +191,9 @@ comando que você roda:
 - **`manter_ligado` com `MEMO_HEADLESS=1`.** Com 5% de bateria, ela também abre
   uma sessão do Claude Code sem interface (`claude -p`) para cada sessão
   registrada, para salvar as memórias dela. Essa sessão fala com a Anthropic
-  como qualquer outra sessão do Claude Code.
+  como qualquer outra sessão do Claude Code. Ela pede a skill
+  `/memo_persistente`, que não vem no plugin e só funciona se existir na sua
+  configuração; a saída e o erro dessa chamada são descartados.
 - **Skill `tab_pendencias`, comando `--audit`.** Para conferir afirmações da
   tabela como "não pushado" ou "na branch X", ela consulta o remoto git do seu
   projeto com `git ls-remote`, que só lê o remoto e não altera nada, nem local
@@ -219,8 +225,10 @@ do seu ambiente:
 - Skill `bigtech`: depois que o porte do projeto é classificado, o marcador
   `.bigtech-porte` na raiz do projeto.
 - Skill `tab_pendencias`: quando você a roda, ela grava o `TODO.md` no seu
-  projeto e, quando precisa, uma pasta `inbox/` ao lado dele e um journal de
-  intake dentro da pasta `.git` do repositório.
+  projeto, o `TESTES.md` e o `AUDITORIAS.md` do projeto quando faltam e,
+  quando precisa, uma pasta `inbox/` ao lado do `TODO.md` e, dentro da pasta
+  `.git` do repositório, um journal de intake e uma trava de escrita (fora de
+  repositório git, a trava fica ao lado do `TODO.md`).
 - Skill `watchcode`: estado em `${XDG_RUNTIME_DIR:-$HOME/.cache}/watchcode` e
   uma baseline opcional, criada por você, em
   `$HOME/.config/bigtech/watchcode_baseline.txt`.
