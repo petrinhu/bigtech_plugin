@@ -53,7 +53,7 @@ Caminho do vault para o `--check` local: `--vault`, depois a variável `BIGTECH_
 <!-- sync:tabela inicio -->
 | Arquivo | hmac_vault_sha256 (chave local) | sha256_corpo_transformado | Transformações aplicadas |
 |---|---|---|---|
-| CONTRACT.md | `cd796361c89da56f898a409bd0817859a731d07e4a9f24bf3d1ecffdb74b266a` | `a76434673b855cd886db0f980749d581c06976e5fe6bb8057ec05a90a2404671` | T1 |
+| CONTRACT.md | `28ee64d1fafe9b5f11ccc25cab9943a5426c73a8fcdab86e22fe28b347d99755` | `854a01933d1789b21175e4e821f15b8e9ce2c7ae1b77b1c98a73c0b31b5a0fa8` | T1 |
 | TESTES.md | `8ee8d00d09465be7eae74830aa03435ab353afa9ee6babd1a6597373578cfa42` | `efcd310ad99e1abba95caca52995bf6321646c9b83e55a0dc197f45dbf29f8ca` | T1 |
 | TOOLING.md | `93d7abb6f16fbc61827f7131dd0a72c6d04d9a470302c439f5625c9885e050f1` | `412fc1c4c647ea10d0435a4dcc7c6dd998e2413386edfdc3e8a45360cfa225e6` | nenhuma |
 | pipeline_release_1.0.md | `19a5c3aad4cbe5d3a32890e9d324e01780d30f9044c5b54c1309bf7f8591008d` | `6839afdf80fece62d7593be3978c0120d9e4ea348ceb581ac8921ef2b52dcd20` | nenhuma |

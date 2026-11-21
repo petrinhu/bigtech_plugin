@@ -2,7 +2,7 @@
   docs/house sync
   origem: vault claudebrain / CONTRACT.md
   sync_date: 2026-11-21
-  hmac_vault_sha256: cd796361c89da56f898a409bd0817859a731d07e4a9f24bf3d1ecffdb74b266a
+  hmac_vault_sha256: 28ee64d1fafe9b5f11ccc25cab9943a5426c73a8fcdab86e22fe28b347d99755
   transformacoes: T1=4 T2=0 T3a=0 T3=0 T4=0 T5=0
   regra: As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário. Se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
   sem segredos: não incluir tokens/credenciais
@@ -87,7 +87,7 @@ Done
 - Write code without reading existing files first.
 - Add features beyond what was requested.
 - Introduce hardcoded secrets, credentials, or API keys.
-- Skip the build step before committing.
+- Push code that breaks the CI build (the CI is the only gate).
 - Use deprecated APIs, unsafe functions, or patterns marked ANTI-PATTERN below.
 - Ignore compiler warnings.
 
@@ -361,7 +361,7 @@ public:
 - Business rule calculation inside a repository.
 - UI framework import inside a service or domain class.
 
-### 5.2 Layer Checklist Before Committing
+### 5.2 Layer Rules (quick reference)
 
 ```
 [ ] Class belongs to exactly one layer?
@@ -671,11 +671,11 @@ chore/ferramenta-ou-dep
 test/modulo-testado
 ```
 
-### 10.4 Commit Checklist (MUST complete before every commit)
+### 10.4 Commit Checklist
+
+Build, warnings and product-logic tests are checked by the CI, the only gate; they are not a local step before the commit.
 
 ```
-[ ] Build passes with zero errors
-[ ] Zero new compiler warnings introduced
 [ ] No hardcoded secrets, tokens, or credentials
 [ ] .gitignore excludes build artifacts, IDE files, .env files
 [ ] Commit message follows Conventional Commits format
