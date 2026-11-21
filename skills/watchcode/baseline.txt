@@ -11,4 +11,4 @@
 /var/tmp/*_probes/*
 *death*test*
 *death_test*
-/var/tmp/builds/*/*/audit/scratch/*
+*/audit/scratch/*

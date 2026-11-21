@@ -173,8 +173,8 @@ wc_stream_position() {
 # builtin direto, sem subshell intermediario -- secao 2.2). E o UNICO ponto
 # do regime permanente que forka (1 processo).
 #
-# Achado da revisao adversarial (nao coberto pela spec, medido nesta
-# maquina, bash 5.3.9): `coproc` fecha os PROPRIOS fds (WCJ[0]/WCJ[1]) assim
+# Achado da revisao adversarial (nao coberto pela spec, medido na maquina de
+# desenvolvimento, com bash 5.3.9): `coproc` fecha os PROPRIOS fds (WCJ[0]/WCJ[1]) assim
 # que o bash percebe que o processo filho morreu (reap por SIGCHLD), mesmo
 # que ainda haja bytes bufferizados e nao lidos no pipe -- perde linhas em
 # corrida, medido repetidas vezes com um filho de vida curta (`cat` de 3
@@ -185,7 +185,8 @@ wc_stream_position() {
 # curta. Correcao: mover o fd de leitura para fora do rastreamento interno
 # do coproc logo apos abrir (`exec {WC_STREAM_FD}<&${WCJ[0]}-` -- aloca um
 # fd novo, copia e FECHA o original), o que o desanexa do coproc e elimina a
-# corrida (reproduzido 100/100 sem a correcao, 0/100 com ela nesta maquina).
+# corrida (reproduzido 100/100 sem a correcao e 0/100 com ela, na maquina de
+# desenvolvimento).
 # O laco do daemon le de $WC_STREAM_FD, nunca de ${WCJ[0]} diretamente.
 wc_stream_open() {
   local pos="${1:-}"

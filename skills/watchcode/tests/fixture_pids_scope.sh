@@ -3,7 +3,7 @@
 # scope systemd isolado (TasksMax=64), lancado por test_watchcode.sh apos o
 # guarda-corpo de folga. NUNCA chamar direto na sessao viva do
 # usuário: sobe processos de verdade, mesmo que o teto do scope os confine a
-# no maximo 64 tasks (1,6% do teto real de 4000 desta maquina).
+# no maximo 64 tasks (1,6% de um teto de 4000 processos, o da maquina de desenvolvimento).
 set -u
 FAILS=0
 ENCONTRADOS=0

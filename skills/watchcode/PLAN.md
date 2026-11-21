@@ -6,7 +6,7 @@
 
 **Architecture:** Daemon "burro" (`systemd --user` transitorio, singleton) detecta e anexa achados crus a `findings.jsonl`; a tick do Claude le, classifica (this/other/system) contra o scope da sessao e roteia. Refcount de sessoes com adocao de orfao. Logica pura em `lib.sh` com costuras injetaveis por env.
 
-**Tech Stack:** Bash, `coredumpctl --json=short` + `jq`, `journalctl`, `systemd-run --user`, ScheduleWakeup (tick Claude). Fedora 44 + KDE + systemd 259.
+**Tech Stack:** Bash, `coredumpctl --json=short` + `jq`, `journalctl`, `systemd-run --user`, ScheduleWakeup (tick Claude). Linux com systemd --user e journald.
 
 ## Global Constraints
 
@@ -170,16 +170,16 @@ Append em `tests/test_watchcode.sh` (antes do bloco `echo "---"`):
 ```bash
 # --- Task 2: deteccao ---
 cat > "$SANDBOX/cores.json" <<'JSON'
-[{"time":1784454486651229,"pid":155526,"uid":1000,"gid":1000,"sig":6,"corefile":"present","exe":"/opt/exemplo/Projects/loucura_c_asm/build/bin/libcore_consumer","size":53578},
+[{"time":1784454486651229,"pid":155526,"uid":1000,"gid":1000,"sig":6,"corefile":"present","exe":"/opt/exemplo/Projects/meu_produto/build/bin/app_consumer","size":53578},
 {"time":1784454635763262,"pid":160737,"uid":1000,"gid":1000,"sig":11,"corefile":"present","exe":"/var/tmp/aud_sec_probes/probe_alloc","size":39000}]
 JSON
 export WATCHCODE_COREDUMP_CMD="cat $SANDBOX/cores.json"
 got_cd="$(wc_detect_coredumps 0 | tr '\t' ':' | tr '\n' '|')"
-assert_eq "$got_cd" "1784454486651229:6:/opt/exemplo/Projects/loucura_c_asm/build/bin/libcore_consumer|1784454635763262:11:/var/tmp/aud_sec_probes/probe_alloc|" "detect coredumps TSV"
+assert_eq "$got_cd" "1784454486651229:6:/opt/exemplo/Projects/meu_produto/build/bin/app_consumer|1784454635763262:11:/var/tmp/aud_sec_probes/probe_alloc|" "detect coredumps TSV"
 
 cat > "$SANDBOX/journal.txt" <<'JRN'
-jul 16 21:49:55 fedora kernel: Memory cgroup out of memory: Killed process 917642 (python) total-vm:20400964kB, anon-rss:8356648kB
-jul 16 21:50:01 fedora systemd[1]: something unrelated
+jul 16 21:49:55 meuhost kernel: Memory cgroup out of memory: Killed process 917642 (python) total-vm:20400964kB, anon-rss:8356648kB
+jul 16 21:50:01 meuhost systemd[1]: something unrelated
 JRN
 export WATCHCODE_JOURNAL_CMD="cat $SANDBOX/journal.txt"
 assert_eq "$(wc_detect_oom 0)" "$(printf '917642\tpython')" "detect OOM pid+comm"
@@ -255,12 +255,12 @@ Append em `tests/test_watchcode.sh`:
 cat > "$WATCHCODE_BASELINE_FILE" <<'BL'
 # baseline de teste
 /var/tmp/*_probes/*
-/var/tmp/glsym_review/*
+*/audit/scratch/*
 *death*test*
 BL
 wc_baseline_match "/var/tmp/aud_sec_probes/probe_alloc" && r=sim || r=nao
 assert_eq "$r" "sim" "baseline casa sonda de sanitizer"
-wc_baseline_match "/opt/exemplo/Projects/loucura_c_asm/build/bin/libcore_consumer" && r=sim || r=nao
+wc_baseline_match "/opt/exemplo/Projects/meu_produto/build/bin/app_consumer" && r=sim || r=nao
 assert_eq "$r" "nao" "baseline NAO casa binario de produto"
 
 SCOPE="/opt/exemplo/Projects/appatual"; PROOT="/opt/exemplo/Projects"
@@ -547,7 +547,7 @@ Create `skills/watchcode/baseline.txt`:
 # baseline do watchcode - padroes de EXE (glob) / comm a IGNORAR (um por linha).
 # Linhas iniciadas por # sao comentario. Estenda a vontade.
 /var/tmp/*_probes/*
-/var/tmp/glsym_review/*
+*/audit/scratch/*
 *death*test*
 *death_test*
 ```
@@ -726,7 +726,7 @@ Precedencia: se ha QUALQUER achado desta sessao -> VERMELHO; senao se ha achado 
 
 ## Baseline
 
-Ignora ruido conhecido via `skills/watchcode/baseline.txt` (sondas de sanitizer, death-tests, glsym_review). Estenda esse arquivo para novos falsos-positivos. Ruido de journal (NVRM/drkonqi/forgejo-503) nao casa OOM/coredump, entao ja e ignorado naturalmente.
+Ignora ruido conhecido via `skills/watchcode/baseline.txt` (sondas de sanitizer, death-tests, scratch de auditoria). Estenda esse arquivo para novos falsos-positivos. Ruido de journal (NVRM, drkonqi, servico local que responde 503) nao casa OOM/coredump, entao ja e ignorado naturalmente.
 
 ## Nota cross-platform (nao implementado)
 

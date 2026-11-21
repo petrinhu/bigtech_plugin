@@ -1,6 +1,6 @@
 # DESIGN - skill `watchcode`
 
-> Spec validado em brainstorm. Data: 2026-07-19. Porte: solo/pessoal (sem constelação bigtech). Escopo: fase única, user-space (systemd --user), Fedora 44 + KDE + systemd/journald.
+> Spec validado em brainstorm. Data: 2026-07-19. Porte: solo/pessoal (sem constelação bigtech). Escopo: fase única, user-space (systemd --user), Linux com systemd/journald.
 
 ## Propósito
 
@@ -34,9 +34,9 @@ Duas fontes, a cada ciclo, na janela desde o último scan (default 130s de sobre
 
 **Baseline ignorado** (`baseline.txt`, defaults):
 - `/var/tmp/*_probes/*` (sondas de sanitizer que abortam de propósito)
-- `/var/tmp/glsym_review/*` (sondas de review)
+- `*/audit/scratch/*` (binários de scratch de auditoria)
 - `*death*test*` (death-tests que abortam de propósito)
-- ramo journal: linhas `NVRM`, `drkonqi`, `forgejo-runner` 503
+- ramo journal: linhas `NVRM`, `drkonqi` e de um serviço local que responde 503
 
 Regra: só **OOM / coredump de produto inesperado / SIGSEGV fora do baseline** vira achado.
 

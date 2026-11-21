@@ -111,8 +111,8 @@ while :; do
     continue    # timeout do read: so volta e faz o tick
   fi
 
-  # rc=1 (nao timeout): fim de fluxo. Fato do manual do bash (medido nesta
-  # maquina): o `read` builtin POPULA a variavel mesmo retornando falha
+  # rc=1 (nao timeout): fim de fluxo. Fato do manual do bash (medido na
+  # maquina de desenvolvimento): o `read` builtin POPULA a variavel mesmo retornando falha
   # quando o produtor fecha o fluxo logo apos escrever um JSON completo,
   # ANTES do byte de nova linha -- essa e a 3a forma de descarte silencioso
   # do parser (as outras duas, campo nulo e campo em array de bytes, estao

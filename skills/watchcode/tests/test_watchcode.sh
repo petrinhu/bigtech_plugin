@@ -287,7 +287,7 @@ import json, sys
 msg = 'No space left on device: path "weird", back\\slash, tab\tthere, açúcar'
 with open(sys.argv[1], "w") as f:
     # journalctl -o json nao usa espaco depois de ":"/"," (formato compacto,
-    # confirmado nesta maquina); json.dumps por padrao usa ": "/", ", que
+    # confirmado na maquina de desenvolvimento); json.dumps por padrao usa ": "/", ", que
     # wc_json_str (regex sem espaco, igual ao formato real) nao casaria.
     f.write(json.dumps({"__CURSOR": "t2-1", "_TRANSPORT": "kernel", "MESSAGE": msg},
                         separators=(",", ":")) + "\n")
@@ -446,7 +446,7 @@ assert_eq "$n_invoc_t8b" "1" "TESTE 8b: sob crit persistente (pids nunca sai de 
 
 # --- TESTE 9 (F1, achado da revisao adversarial 01/09/2026): fluxo que
 # fecha SEM nova linha final apos a ultima entrada nao pode perder o
-# registro. O `read` builtin (fato do manual do bash, medido nesta maquina)
+# registro. O `read` builtin (fato do manual do bash, medido na maquina de desenvolvimento)
 # POPULA a variavel mesmo retornando rc=1 quando o produtor termina logo
 # apos escrever um JSON completo mas ANTES do '\n' -- essa e a 3a forma de
 # descarte silencioso do parser (as outras duas, campo nulo e campo em
