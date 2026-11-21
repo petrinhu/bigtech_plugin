@@ -1,4 +1,4 @@
-"""Gate 11 do preci com o caminho do vault em arquivo local (CONS-10A).
+"""Gate do sync de docs/house no preci, com o caminho do vault em arquivo local (CONS-10A).
 
 Reproduz a maquina do dono sem tocar nela: HOME descartavel com
 `.config/bigtech/sync_house.key` (modo 600) e `.config/bigtech/vault_path`
