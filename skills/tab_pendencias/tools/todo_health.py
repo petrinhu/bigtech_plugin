@@ -8,8 +8,8 @@ tools/todo_health.py
 
 --health: relatorio LOCAL de saude da TODO.md (offline, sem LLM, sem rede).
 Da o dado para "medir antes de escalar":
-  - itens presos em 🔍 Pendente verificação (falso-done residual: entregue mas a
-    onda TST-*/AUD-* nunca rodou)
+  - itens presos em 🔍 Pendente verificação (entregue, mas ninguem fechou com o
+    CI do ramo verde)
   - tamanho da INBOX (descobertas nao priorizadas)
   - adesao a citar ID nos commits (do $GIT_DIR/todo-freshness.log)
   - sinais TAB_* via session_signals (Fase 6)

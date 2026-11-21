@@ -9,6 +9,8 @@ Aplica o **macrofluxo de game-dev em 5 fases** delegando aos agentes globais de 
 
 > **Regra de ouro:** game jam de 48h não precisa de ADR, art bible de 200 páginas, nem CI/CD k8s. Calibrar SEMPRE pela matriz de tamanho.
 
+> **Piso de testes.** Teste só para lógica de produto. O CI é o único portão. Nada de teste de mutação, sabotagem, auditoria, reauditoria, varredura de gêmeos, checklist de perguntas do revisor, script de verificação extra nem portão local novo. Exceção: segurança, privacidade e deploy irreversível. Os gates de fase abaixo seguem este piso; playtest é validação de design, não portão de teste.
+
 ---
 
 ## 0. Calibragem inicial (obrigatório)
@@ -166,14 +168,14 @@ Use o **mínimo viável**.
 ### Fase 4: Qualidade, Segurança, Compliance, Docs
 
 **Agentes:**
-- `bigtech:qa-engineer`: playtests estruturados, regression, balance verification, performance test
+- `bigtech:qa-engineer`: playtests estruturados e teste da lógica de jogo (regressão, balance) no CI; performance test só a pedido
 - `bigtech:security-engineer` (**gatekeeper formal**): pentest, cert prep, IAP security, save protection, anti-cheat
 - `bigtech:compliance-legal`: ESRB/PEGI/IARC age rating, loot box laws (BE/NL/CN), GDPR/LGPD, console TRC/TCR, OSS licenses
 - `bigtech:technical-writer`: manual + tutorial + release notes + dev docs internos
 
 **Gates:**
 - Playtests N≥30 com hipóteses validadas
-- Regression suite verde
+- CI verde com o teste da lógica de jogo (o CI é o único portão)
 - Cert submitted + passed
 - Age rating obtido (IARC/ESRB/PEGI)
 - Loot box compliance verificada por mercado

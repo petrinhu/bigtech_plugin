@@ -9,7 +9,7 @@ tools/todo_sync.py
 --sync DETERMINISTICO da TODO.md (offline, sem LLM, sem rede). A "metade barata"
 do frescor, executavel: le os commits desde o ultimo sync, acha os IDs citados,
 e para cada item ainda ⏳/🔄 propoe avancar para 🔍 Pendente verificação.
-NUNCA seta ✅ (so apos a onda de teste/auditoria) e NUNCA reordena (julgamento).
+NUNCA seta ✅ (isso so com o CI do ramo verde) e NUNCA reordena (julgamento).
 
 Evidencia de ENTREGA = commit que citou o ID **e** tocou trabalho substantivo
 (L.touched_code). Commit que so mexe na TODO.md/inbox cita o ID sem ter

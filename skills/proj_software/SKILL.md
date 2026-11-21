@@ -9,15 +9,17 @@ Aplica o **macrofluxo de engenharia em 5 fases** delegando aos agentes corretos.
 
 > **Regra de ouro:** projeto pequeno usa poucos agentes em fases simples. Não invocar o squad inteiro pra um CLI de 200 linhas. Calibrar SEMPRE pela matriz de tamanho.
 
+> **Piso de testes.** Teste só para lógica de produto. O CI é o único portão. Nada de teste de mutação, sabotagem, auditoria, reauditoria, varredura de gêmeos, checklist de perguntas do revisor, script de verificação extra nem portão local novo. Exceção: segurança, privacidade e deploy irreversível. Os gates de fase abaixo seguem este piso.
+
 ## Leitura obrigatória antes de alocar o squad
 
 **Antes de definir o nível (S0-S4) e disparar qualquer agente, leia os manuais que acompanham o plugin.** O caminho absoluto de `docs/` é injetado no contexto da sessão pelo docs-bootstrap (hook `SessionStart`) e, como esta skill é carregada de diretório conhecido, o Read relativo também funciona. Se o caminho não estiver no contexto, localize os arquivos via Glob `**/bigtech:bigtech/docs/**/<NOME>.md`. Leia o manual relevante ao tipo de decisão **antes** de fechá-la:
 
 - **Padrão de código** (estrutura, SOLID, convenções de commit): `CONTRACT` (`${CLAUDE_PLUGIN_ROOT}/docs/house/CONTRACT.md`).
-- **Qualidade e testes** (pirâmide, cobertura do crítico, TDD): `TESTES` (`${CLAUDE_PLUGIN_ROOT}/docs/house/TESTES.md`).
+- **Qualidade e testes** (piso de testes, TDD): `TESTES` (`${CLAUDE_PLUGIN_ROOT}/docs/house/TESTES.md`).
 - **Cadência ágil** (sprint, INVEST, métricas de fluxo): `AGILE` (`${CLAUDE_PLUGIN_ROOT}/docs/house/AGILE.md`).
 - **Deploy e rollback** (gates da Fase 5): `DEPLOY_CHECKLIST` (`${CLAUDE_PLUGIN_ROOT}/docs/house/DEPLOY_CHECKLIST.md`).
-- **Checklists de gate por fase**: `AUDITORIAS` (`${CLAUDE_PLUGIN_ROOT}/docs/house/AUDITORIAS.md`).
+- **Auditoria** (só segurança, privacidade e deploy irreversível): `AUDITORIAS` (`${CLAUDE_PLUGIN_ROOT}/docs/house/AUDITORIAS.md`).
 - **Princípios de arquitetura** (4 camadas, anti-over-engineering): [`arquitetura-principios`](../../docs/principles/arquitetura-principios.md).
 - **Métodos ágeis** (Scrum + Kanban + escalonamento): [`agile-methodology`](../../docs/principles/agile-methodology.md).
 - **Anti-padrões proibidos** (commit publicado, force-push, etc.): [`anti-patterns`](../../docs/principles/anti-patterns.md).
@@ -75,7 +77,7 @@ Use o **mínimo viável**. Cada agente adiciona overhead de comunicação e proc
 - `bigtech:software-architect` (decisões one-way door)
 - `bigtech:ux-ui-designer` se há interface
 - `bigtech:frontend-engineer` + `bigtech:backend-engineer` (implementação)
-- `bigtech:qa-engineer` (test pyramid básica)
+- `bigtech:qa-engineer` (teste da lógica de produto)
 - `bigtech:devops-sre` (CI/CD básico, monitoring básico)
 - `bigtech:security-engineer` (threat model leve + SAST/SCA em CI + checklist OWASP)
 - `bigtech:technical-writer` opcional (README + docs API)
@@ -141,9 +143,9 @@ Use o **mínimo viável**. Cada agente adiciona overhead de comunicação e proc
 - `bigtech:security-engineer` (**transversal**): SAST/SCA em CI, code review crítico em autenticação/sessão/crypto
 
 **Gates:**
-- Branch protection + PR review obrigatório
+- Branch protection com o CI como portão de merge; review aponta só o que quebra o critério de pronto
 - SAST/SCA limpos
-- Test coverage do crítico (não 100% por vaidade): siga a pirâmide de `TESTES` (`${CLAUDE_PLUGIN_ROOT}/docs/house/TESTES.md`)
+- Teste da lógica de produto passando no CI (TDD), conforme `TESTES` (`${CLAUDE_PLUGIN_ROOT}/docs/house/TESTES.md`)
 
 ### Fase 3: Dados, IA, MLOps
 
@@ -160,13 +162,13 @@ Use o **mínimo viável**. Cada agente adiciona overhead de comunicação e proc
 ### Fase 4: Qualidade, Segurança, Compliance, Docs
 
 **Agentes:**
-- `bigtech:qa-engineer`: pirâmide de testes proporcional
+- `bigtech:qa-engineer`: teste da lógica de produto (piso de testes)
 - `bigtech:security-engineer` (**gatekeeper formal**): DAST + pentest controlado + relatório
 - `bigtech:compliance-legal`: LGPD/GDPR/app store/OSS license (proporcional)
 - `bigtech:technical-writer`: docs API + how-to + reference
 
 **Gates:**
-- Test pyramid validada (não só unit; não só e2e)
+- CI do ramo verde com o teste da lógica de produto
 - Pentest report zerado de critical/high
 - Compliance: política privacidade publicada, OSS licenses limpas
 - Docs mínimas: README + getting-started + reference
@@ -282,7 +284,7 @@ Projetos crescem. Reconheça **sinais** e migre **incrementalmente**, não big-b
 - **Monolito modular** bem fatorado escala muito mais do que se imagina. Extrair serviço só quando dor real aparece (escala independente, time independente, stack incompatível).
 - **Postgres + extensões** (Citus, TimescaleDB) sustenta startup inteiro até centenas de GB.
 - **Self-host VPS → managed cloud → k8s** é progressão natural; pular k8s pra app de 100 usuários é over.
-- **Test pyramid** cresce com produto. Começa com unit de todo comportamento novo (TDD); adiciona integration; e2e por último.
+- **Teste** cresce com a lógica de produto. Começa com unit de todo comportamento novo (TDD); adiciona integration; e2e por último, no caminho crítico.
 - **Observability**: logs estruturados desde D1; métricas RED quando deploy frequente; traces quando distribuído.
 
 ---

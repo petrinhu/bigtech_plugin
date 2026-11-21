@@ -1,6 +1,6 @@
 ---
 name: tab_pendencias
-description: 'Cria e gerencia tabela de pendências/planejamento ORDENADA para minimizar retrabalho. No --create (e --reorder) orquestra um time de agents (Cosmo/COO coordena bigtech:software-architect + bigtech:tech-lead + bigtech:product-manager + bigtech:engineering-manager + bigtech:scrum-master) para sequenciar por dependência (topological) e valor (WSJF), com coluna "Onda" sinalizando passos de igual valor paralelizáveis. Use sempre que o usuário pedir criar/mostrar/atualizar tabela de pendências, planejar passos, ordenar backlog, "o que falta", "em que ordem fazer", auditar a tabela (--audit), aplicar auto-fix mecânico (--fix), capturar item novo (--add), drenar INBOX residual (--drain), ou invocar /bigtech:tab_pendencias. Em qualquer comando, garante (com dupla-confirmacao) testes nao-unitarios e auditorias aplicaveis ao stack como itens de fechamento; cria ./TESTES.md e ./AUDITORIAS.md do projeto quando faltam. Argumentos: --create, --reorder, --show, --main, --add_tests_audit, --audit, --fix, --add, --drain.'
+description: 'Cria e gerencia tabela de pendências/planejamento ORDENADA para minimizar retrabalho. No --create (e --reorder) orquestra um time de agents (Cosmo/COO coordena bigtech:software-architect + bigtech:tech-lead + bigtech:product-manager + bigtech:engineering-manager + bigtech:scrum-master) para sequenciar por dependência (topological) e valor (WSJF), com coluna "Onda" sinalizando passos de igual valor paralelizáveis. Use sempre que o usuário pedir criar/mostrar/atualizar tabela de pendências, planejar passos, ordenar backlog, "o que falta", "em que ordem fazer", auditar a tabela (--audit), aplicar auto-fix mecânico (--fix), capturar item novo (--add), drenar INBOX residual (--drain), ou invocar /bigtech:tab_pendencias. Por padrão não injeta teste nem auditoria: só sugere teste de lógica de produto e, com segurança, privacidade ou deploy irreversível, auditoria de segurança; --add_tests_audit acrescenta a pedido. Argumentos: --create, --reorder, --show, --main, --add_tests_audit, --audit, --fix, --add, --drain.'
 argument-hint: --reorder | --create | --show | --main | --add_tests_audit | --audit | --fix | --add | --drain
 allowed-tools: [Read, Write, Edit, Glob, Grep, Agent, TodoWrite, AskUserQuestion, "Bash(python3 ${CLAUDE_SKILL_DIR}/tools/*)"]
 ---
@@ -102,7 +102,7 @@ anotação livre.
 
 Para a tabela não apodrecer durante o sprint, separe SEMPRE duas operações de naturezas opostas (detalhe canônico em `references/frescor-da-tabela.md`):
 
-- **Sincronizar status** (barato, frequente, no commit): ao fechar trabalho, toque a coluna `Status` do item no MESMO PR, com o ID que o projeto JÁ tem (não renumerar). Implementação entregue vira `🔍 Pendente verificação` (NUNCA `✅` direto); `✅ Concluído` só após a onda `TST-*`/`AUD-*` correspondente. **Marcar status nunca dispara o time de agents.**
+- **Sincronizar status** (barato, frequente, no commit): ao fechar trabalho, toque a coluna `Status` do item no MESMO PR, com o ID que o projeto JÁ tem (não renumerar). Implementação entregue vira `🔍 Pendente verificação` (NUNCA `✅` direto); `✅ Concluído` quando o CI do ramo fecha verde (o CI é o único portão). **Marcar status nunca dispara o time de agents.**
 - **Reordenar** (caro, raro, julgamento): só via `--reorder`, e só quando um input de priorização muda (nova dependência, item ficou urgente, INBOX não-vazia). Nunca por passagem de tempo, loop ou monitor contínuo.
 
 A parte mecânica (sincronizar status) tem executores LOCAIS e determinísticos, **offline, sem agents/LLM** (rodam fora desta skill, no próprio repo do projeto que usa a skill): `python3 ${CLAUDE_SKILL_DIR}/tools/todo_sync.py [--apply]` avança itens entregues `⏳`/`🔄` → `🔍` a partir dos IDs citados nos commits (nunca `✅`, nunca reordena); `python3 ${CLAUDE_SKILL_DIR}/tools/todo_health.py` reporta presos em `🔍`, INBOX e adesão. Esta skill cobre o **planejamento** (`--reorder`, julgamento); a sincronização mecânica vive nesses scripts. Ver `tools/README.md`.
@@ -157,11 +157,13 @@ Em contexto SAFe (porte scale-up/bigtech, definido por Cósimo), NÃO apresentar
 
 `CoD = Valor + Criticidade + Redução de Risco`; `WSJF = CoD / Job Size`. Rank = ordem decrescente de WSJF **dentro do nível topológico** (dependência sempre vence). A régua do motor é a Fibonacci modificada `(1,2,3,5,8,13,20)` -- o intervalo "1-20" antigo era só o min/max, não escala linear. Em early o motor aceita rótulos Alta/Média/Baixa só como atalho para fib 8/5/2 no candidato; peers só entram com ints explícitos. Remetente `bus` nunca pontua por rótulo. Em projeto pequeno (early), o WSJF pode ser qualitativo (sem a tabela completa de cerimônia SAFe), respeitando o anti-OE.
 
-### Testes e auditoria: ordem inviolavel (TDD + shift-left)
+### Testes e auditoria: piso e ordem
+
+**Piso de testes.** Teste só para lógica de produto. O CI é o único portão. Nada de teste de mutação, sabotagem, auditoria, reauditoria, varredura de gêmeos, checklist de perguntas do revisor, script de verificação extra nem portão local novo. Exceção: segurança, privacidade e deploy irreversível.
 
 - **Teste unitario (T1) = TDD:** ride COM o item de implementacao (escrito antes/junto do codigo), garantido pelo hook de TDD (tdd_guard/tdd_runner). **NAO vira item** na tabela; nao criar "escrever testes unitarios" como passo solto.
-- **Demais testes (T2-T15) sao downstream:** estatica, integracao, e2e, seguranca (secrets, SQLi, CVE), memoria, pre-CI. Nao existem antes do sistema; entram como itens de fechamento (`TST-*`) numa onda APOS a implementacao. Sao injetados pelo fluxo "Injecao automatica de testes e auditorias".
-- **Auditoria e downstream de codigo+teste:** todo item `AUD-*` tem `Pre-requisito` = os itens de codigo+teste que audita; cai numa Onda POSTERIOR aos testes.
+- **Demais testes (T2-T15) e auditorias nao sao injetados por padrao.** Entram so quando o usuario pede (`--add_tests_audit`) ou, na excecao, como a auditoria de seguranca da secao "Sugestão de testes e auditoria".
+- **Quando existem, ficam depois do que cobrem:** `TST-*` numa Onda apos a implementacao; `AUD-*` com `Pre-requisito` = os itens de codigo+teste que audita, numa Onda posterior. Cada auditoria roda uma vez; a correcao de um achado se confere no CI, sem reauditoria.
 - **Invariante:** nunca agendar teste/auditoria antes do que ele cobre. Se a ordenacao produzir isso, a dependencia esta errada (corrigir o `Pre-requisito`).
 
 ---
@@ -216,49 +218,31 @@ Regra de ouro: o custo de reordenar deve ser menor que o retrabalho que ele evit
 
 ---
 
-## Injecao automatica de testes e auditorias
+## Sugestão de testes e auditoria (piso de testes)
 
-Executa no INICIO de TODO comando (--create, --reorder, --show, --main), antes de
-exibir/escrever a tabela. Garante que os testes nao-unitarios e auditorias aplicaveis
-estejam planejados. Catalogo e regras: `references/catalogo-testes-auditorias.md`.
+Por padrão, nenhum comando (`--create`, `--reorder`, `--show`, `--main`) injeta item de
+teste ou de auditoria, cria `./TESTES.md` ou `./AUDITORIAS.md`, ou abre pergunta de
+confirmação. Catálogo de referência: `references/catalogo-testes-auditorias.md`.
 
-### Passos
+### O que a skill sugere
 
-1. **Detectar stack + caracteristicas**: Glob na raiz para sinais de arquivo; Grep/Read de deps e imports para sinais de conteudo (rede/API, protocolo, framework). Ver o reference.
-2. **Calcular itens aplicaveis**: TST-* (T2-T15 podados; T1 SEMPRE fora) + AUD-* (podados).
-3. **Garantir manuais do projeto**: se `./TESTES.md` ou `./AUDITORIAS.md` faltam, marca-los para criacao (do reference, podados). Nunca sobrescrever manual existente.
-4. **Conferir a tabela** `TODO.md`: quais TST-*/AUD- ja existem (por ID).
-5. Se **nada falta** (itens presentes e manuais existem): idempotente, NAO pergunta, NAO escreve. Segue o comando.
-6. Se **falta algo**: rodar o fluxo de confirmacao abaixo.
+No fim do `--create` e do `--reorder`, no máximo uma linha de sugestão, sem escrever nada
+na tabela:
 
-### Fluxo de confirmacao (nunca silencioso)
+1. **Teste de lógica de produto:** item de implementação com regra de produto e sem teste
+   previsto recebe a sugestão de testar essa regra junto do próprio item (TDD). O teste
+   não vira item separado.
+2. **Auditoria de segurança, só na exceção:** quando o projeto toca segurança, privacidade
+   (dado pessoal) ou deploy irreversível, sugere um item `AUD-SEC` numa Onda depois do
+   código que ele cobre. Deploy irreversível segue também o `DEPLOY_CHECKLIST`.
 
-PERGUNTA 1 (AskUserQuestion, recomendacao ALTA a favor):
-> "Faltam testes/auditorias no planejamento deste projeto. Acrescentar agora?"
-> Opcoes: [Acrescentar (fortemente recomendado)] | [Nao acrescentar]
-
-- Acrescentar -> aplicar (secao "Aplicar") + avisar o que mudou. Segue o comando.
-- Nao -> PERGUNTA 2 (reforco):
-  > "Testes e auditoria sao Definition of Done: previnem retrabalho, vulnerabilidades
-  >  (secrets, SQLi, CVE) e regressoes. Seguir mesmo assim sem eles?"
-  > Opcoes: [Acrescentar agora (recomendado)] | [Seguir sem testes]
-  - Acrescentar -> aplicar + avisar. Segue o comando.
-  - Seguir sem -> executa o comando SEM testes; avisar:
-    "OK. Pode acrescentar depois com: /bigtech:tab_pendencias --add_tests_audit"
-
-### Aplicar (criar manuais + injetar itens)
-
-- Criar `./TESTES.md` e/ou `./AUDITORIAS.md` se faltarem (podados pro stack).
-- Injetar na tabela apenas os IDs AUSENTES (idempotente):
-  - **TST-*** -> `Grupo` = `Testes`; `Onda` = uma apos a ultima de implementacao; `Pre-requisito` = itens de implementacao cobertos (na pratica, a ultima onda funcional); `Status` = ⏳; `Estado Auditado` = `—`; `Descricao` referencia `TESTES.md`.
-  - **AUD-*** -> `Grupo` = `Auditoria`; `Onda` = final, apos os testes; `Pre-requisito` = os TST-* + ultima onda de implementacao; `Status` = ⏳; `Estado Auditado` = `—`; `Descricao` referencia `AUDITORIAS.md`.
-- Reaplicar a ordenacao (topological + WSJF + ondas) para encaixar os novos itens respeitando a ordem inviolavel.
-- Avisar: "criei <arquivos>; injetei N testes + M auditorias nas ondas <...>".
+Fora desses dois casos, a skill não sugere teste nem auditoria.
 
 ### --add_tests_audit
 
-Comando dedicado: pula as PERGUNTAS (o usuario ja pediu); roda "Aplicar" direto;
-idempotente; avisa o que fez (ou "nada a fazer" se ja completo).
+Comando dedicado, só quando o usuário pede: injeta os `TST-*`/`AUD-*` que ele escolher do
+catálogo (podados pelo stack), cria `./TESTES.md` e `./AUDITORIAS.md` se faltarem (nunca
+sobrescreve) e reaplica a ordenação. Idempotente; avisa o que fez (ou "nada a fazer").
 
 ### Hook de TDD ausente
 
@@ -266,11 +250,10 @@ T1 sempre fora. Se o projeto NAO tem `.claude/tdd-guard.json`, avisar uma vez:
 "TDD nao esta sob hook neste projeto; ative o hook ou inclua testes unitarios
 manualmente." (nao bloqueia).
 
-### Modo nao-interativo
+### Modo não-interativo
 
-Sem humano para responder o AskUserQuestion (ex.: invocacao por workflow/agente):
-NAO injeta (respeita "nao silencioso"); executa o comando e emite aviso proeminente
-recomendando `/bigtech:tab_pendencias --add_tests_audit`.
+Sem humano para responder (ex.: invocação por workflow/agente): executa o comando, não
+injeta nada e deixa a sugestão em uma linha.
 
 ---
 
@@ -333,8 +316,8 @@ apply verde: `classifiable_inbox_count == 0`.
 ## `--audit`
 
 Auditoria estrutural do proprio `TODO.md` (`tools/todo_audit.py`): offline, sem
-LLM/rede, sem orquestrar agent; **nao** faz parte da Injecao automatica de testes
-e auditorias acima. **Sempre read-only** -- nenhum caminho abre o `TODO.md` para
+LLM/rede, sem orquestrar agent; **nao** faz parte da Sugestão de testes e
+auditoria acima. **Sempre read-only** -- nenhum caminho abre o `TODO.md` para
 escrita nem muta estado de git; `--output` e a unica escrita possivel e e
 **bloqueada (`exit 1`) se resolver para dentro do repositorio auditado**.
 
