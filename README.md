@@ -5,7 +5,7 @@
 ![Status](https://img.shields.io/badge/status-stable-brightgreen)
 ![Language](https://img.shields.io/badge/lang-pt--br%20%2F%20en-lightgrey)
 ![Agents](https://img.shields.io/badge/agents-71-yellow)
-![Skills](https://img.shields.io/badge/skills-16-yellow)
+![Skills](https://img.shields.io/badge/skills-15-yellow)
 ![CI](https://img.shields.io/github/actions/workflow/status/petrinhu/bigtech_plugin/ci.yml?label=CI)
 ![Release](https://img.shields.io/github/v/release/petrinhu/bigtech_plugin?label=release)
 
@@ -78,7 +78,7 @@ claude plugin install bigtech@petrinhu
 
 **After install:** restart the Claude Code session so `bigtech_session_init` can inject manuals and mode reinforcement.
 
-**Name conflicts.** If global agents, skills, or hooks in `~/.claude/` already use the same names as this plugin, do **not** install over them. Prefer an isolated profile (`CLAUDE_CONFIG_DIR=...`) or retire only the colliding **bigtech core** names. Do **not** delete personal or unrelated agents (`dr-*`, `game-*`, etc.). Detail: [LLM.md](LLM.md) and the [Installation wiki page](https://github.com/petrinhu/bigtech_plugin/wiki/Installation).
+**Name conflicts.** If global agents, skills, or hooks in `~/.claude/` already use the same names as this plugin, do **not** install over them. Prefer an isolated profile (`CLAUDE_CONFIG_DIR=...`) or retire only the global copies whose names this plugin ships (listed under Agents and Skills below). Since 2.0.0 that list includes the `dr-*` agents and the game-development squad, so global copies of them collide too. Do **not** delete personal agents whose names are not in this plugin. Detail: [LLM.md](LLM.md) and the [Installation wiki page](https://github.com/petrinhu/bigtech_plugin/wiki/Instalacao).
 
 If you are an AI agent installing on behalf of a user, follow [LLM.md](LLM.md).
 
@@ -187,7 +187,7 @@ Shortcuts such as `/dr-advogado` and `/learning-designer` call the agent of the 
 
 **Medical-expert and legal (4):** `dr-advogado`, `dr-medico-perito`, `dr-medico-psiquiatra`, `dr-medico-trabalho`.
 
-When invoked, every agent runs a pre-flight check on the backlog table (`TODO.md` at the root): the C-level agents require it as a precondition in the activation map; the operational agents flag it if missing and proceed with the task.
+When invoked, 63 of the 71 agents run a pre-flight check on the backlog table (`TODO.md` at the root): the 12 C-level agents require it as a precondition in the activation map; 51 operational agents flag it if missing and proceed with the task. The other 8 skip this check: `dr-advogado`, `dr-medico-perito`, `dr-medico-psiquiatra`, `dr-medico-trabalho`, `learning-designer`, `linux-diag`, `narrative-writer`, and `revisor-textual`.
 
 ### Hooks
 
@@ -197,10 +197,11 @@ When invoked, every agent runs a pre-flight check on the backlog table (`TODO.md
 | `tdd_runner.py` | PostToolUse (Write\|Edit) | Runs the test suite after the edit and reports the result to the TDD cycle. |
 | `bigtech_session_init.py` | SessionStart | Injects the manuals' path into the context (docs-bootstrap), warns if `caveman` is active, and warns about recommended dependencies that are missing. |
 | `bigtech_porte_reminder.py` | SessionStart | Reassesses the project size (scales up or down); only fires on a code project not yet classified. |
-| `tab_pendencias_reminder.py` | SessionStart, UserPromptSubmit | Backlog-table staleness detector. Reminds you to generate the `TODO.md` via `/bigtech:tab_pendencias` when the project is classified (`.bigtech-porte` marker) but has no table; once the table exists, measures its staleness via `git` (commits and days since the last touch to `TODO.md`) and, after a long session, nudges you to review and reorder it. Thresholds are tunable in an optional `.tab-staleness.json` at the project root. It only reminds, never blocks or reorders. |
+| `tab_pendencias_reminder.py` | SessionStart, UserPromptSubmit | Session-length reminder for the backlog table. On SessionStart it records when the session started; on UserPromptSubmit, once per session, if the project has the `.bigtech-porte` marker and a `TODO.md` and the session has run for more than 2 hours, it reminds you to mark delivered items in the `Status` column and to reorder through `/bigtech:tab_pendencias --reorder` only when priorities change. The time limit, or turning the reminder off, goes in an optional `.tab-staleness.json` at the project root. It only reminds, never blocks or reorders. |
+| `skills/tab_pendencias/tools/hooks/tab_pendencias_reminder.py` | SessionStart, UserPromptSubmit | Freshness signals of the backlog table, from the `tab_pendencias` skill. On SessionStart: a `git` repository without `TODO.md` (suggests `/bigtech:tab_pendencias --create`), a table with pending or in-progress items that has not been touched for several commits or days (measured with read-only `git`), an INBOX that needs triage, items piling up while waiting for verification, decisions waiting for you that have aged, and unfinished intake-journal entries. On UserPromptSubmit: new notes in `inbox/` written by another session. Thresholds go in the `[signals]` section of an optional `.tab_pendencias.ini` next to `TODO.md`. It only reminds, never blocks or reorders. |
 | `bigtech_reinforce.py` | UserPromptSubmit | Reinforces bigtech mode and routes natural-language activation to `/bigtech`. Marker-scoped, noise-resistant. |
 
-The plugin declares 9 hook entries across 5 events; the smoke test checks each one.
+The plugin declares 9 hook entries across 4 events (SessionStart, UserPromptSubmit, PreToolUse, and PostToolUse); the smoke test checks each one.
 
 ### Compatibility
 
@@ -306,7 +307,7 @@ claude plugin install bigtech@petrinhu
 
 **Depois de instalar:** reinicie a sessão do Claude Code para o `bigtech_session_init` injetar os manuais e o reforço de modo.
 
-**Conflito de nomes.** Se já houver agents, skills ou hooks globais em `~/.claude/` com os mesmos nomes deste plugin, **não** instale por cima. Prefira um perfil isolado (`CLAUDE_CONFIG_DIR=...`) ou aposente só os nomes do **núcleo bigtech** que colidem. **Não** apague agents pessoais ou de outros domínios (`dr-*`, `game-*`, etc.). Detalhe: [LLM.md](LLM.md) e a [página de Instalação da wiki](https://github.com/petrinhu/bigtech_plugin/wiki/Instalacao).
+**Conflito de nomes.** Se já houver agents, skills ou hooks globais em `~/.claude/` com os mesmos nomes deste plugin, **não** instale por cima. Prefira um perfil isolado (`CLAUDE_CONFIG_DIR=...`) ou aposente só as cópias globais cujos nomes este plugin traz (listados nas seções Agents e Skills abaixo). Desde a 2.0.0 essa lista inclui os agents `dr-*` e o time de desenvolvimento de jogos, então cópias globais deles também colidem. **Não** apague agents pessoais cujos nomes não estão neste plugin. Detalhe: [LLM.md](LLM.md) e a [página de Instalação da wiki](https://github.com/petrinhu/bigtech_plugin/wiki/Instalacao).
 
 Se você é um agente de IA instalando a pedido de um usuário, siga [LLM.md](LLM.md).
 
@@ -415,7 +416,7 @@ Atalhos como `/dr-advogado` e `/learning-designer` chamam o agent de mesmo nome,
 
 **Perícia médica e jurídico (4):** `dr-advogado`, `dr-medico-perito`, `dr-medico-psiquiatra`, `dr-medico-trabalho`.
 
-Ao serem acionados, todos os agents fazem um pre-flight da tabela de pendências (`TODO.md` na raiz): os C-level a exigem como pré-condição no mapa de ativação; os operacionais sinalizam caso falte e seguem com a tarefa.
+Ao serem acionados, 63 dos 71 agents fazem um pre-flight da tabela de pendências (`TODO.md` na raiz): os 12 C-level a exigem como pré-condição no mapa de ativação; 51 operacionais sinalizam caso falte e seguem com a tarefa. Os outros 8 não fazem essa checagem: `dr-advogado`, `dr-medico-perito`, `dr-medico-psiquiatra`, `dr-medico-trabalho`, `learning-designer`, `linux-diag`, `narrative-writer` e `revisor-textual`.
 
 ### Hooks
 
@@ -425,10 +426,11 @@ Ao serem acionados, todos os agents fazem um pre-flight da tabela de pendências
 | `tdd_runner.py` | PostToolUse (Write\|Edit) | Roda a suíte de testes após a edição e reporta o resultado ao ciclo TDD. |
 | `bigtech_session_init.py` | SessionStart | Injeta o caminho dos manuais no contexto (docs-bootstrap), avisa se o `caveman` está ativo e avisa das dependências recomendadas que faltam. |
 | `bigtech_porte_reminder.py` | SessionStart | Reavalia o porte do projeto (escala para cima ou para baixo); só dispara em projeto de código ainda não classificado. |
-| `tab_pendencias_reminder.py` | SessionStart, UserPromptSubmit | Detector de defasagem da tabela de pendências. Lembra de gerar o `TODO.md` via `/bigtech:tab_pendencias` quando o projeto já foi classificado (marcador `.bigtech-porte`) mas ainda não tem a tabela; com a tabela presente, mede a defasagem dela via `git` (commits e dias desde o último toque no `TODO.md`) e, após uma sessão longa, dá um lembrete para revisar e reordenar. Os limiares são ajustáveis num `.tab-staleness.json` opcional na raiz do projeto. Só lembra, nunca bloqueia nem reordena. |
+| `tab_pendencias_reminder.py` | SessionStart, UserPromptSubmit | Lembrete de tempo de sessão da tabela de pendências. No SessionStart, registra a hora de início da sessão; no UserPromptSubmit, uma vez por sessão, se o projeto tem o marcador `.bigtech-porte` e um `TODO.md` e a sessão já passou de 2 horas, lembra de marcar no `Status` os itens entregues e de reordenar pelo `/bigtech:tab_pendencias --reorder` só quando a prioridade mudar. O limite de tempo, ou o desligamento do lembrete, fica num `.tab-staleness.json` opcional na raiz do projeto. Só lembra, nunca bloqueia nem reordena. |
+| `skills/tab_pendencias/tools/hooks/tab_pendencias_reminder.py` | SessionStart, UserPromptSubmit | Sinais de frescor da tabela de pendências, da skill `tab_pendencias`. No SessionStart: repositório `git` sem `TODO.md` (sugere `/bigtech:tab_pendencias --create`), tabela com itens pendentes ou em andamento sem toque há vários commits ou dias (medido com `git` só para leitura), INBOX que precisa de triagem, itens acumulados à espera de verificação, decisões à sua espera que envelheceram e entradas inacabadas no journal de intake. No UserPromptSubmit: notas novas em `inbox/`, escritas por outra sessão. Os limiares ficam na seção `[signals]` de um `.tab_pendencias.ini` opcional ao lado do `TODO.md`. Só lembra, nunca bloqueia nem reordena. |
 | `bigtech_reinforce.py` | UserPromptSubmit | Reforça o modo bigtech e roteia ativação por linguagem natural para `/bigtech`. Escopado por marcador, anti-ruído. |
 
-O plugin declara 9 entradas de hook em 5 eventos; o smoke test confere cada uma.
+O plugin declara 9 entradas de hook em 4 eventos (SessionStart, UserPromptSubmit, PreToolUse e PostToolUse); o smoke test confere cada uma.
 
 ### Compatibilidade
 
