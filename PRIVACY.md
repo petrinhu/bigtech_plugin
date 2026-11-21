@@ -11,7 +11,7 @@
 This Privacy Policy describes how the **bigtech** plugin for Claude Code handles
 data. The summary in one sentence: **the plugin does not collect personal data,
 does not store it on any server, and does not send it to its author; its hooks
-run locally and make no network connection.**
+run locally and open no network connection themselves.**
 
 ### What the plugin is
 
@@ -35,30 +35,36 @@ PostToolUse). They read the local session context: the files of the project you
 have open, the `.bigtech-porte` marker that records the project size, the
 Claude Code settings files of your machine, and, for the backlog-table
 reminders, the `git` history of the project, read-only. **None of the hooks
-makes a network connection.**
+opens a network connection itself.**
 
 The hooks are fail-safe: an internal error is caught and the session continues
 normally. The only intentional exception is the TDD guard, an opt-in test
 guard-rail that may decline a code edit when the test cycle requires it. The TDD
 feature acts only in projects that include a `.claude/tdd-guard.json` file; with
 that file present, the test runner executes the test command declared by that
-project. This is the same kind of trust as running `make test` or `npm test` in
-a repository. For the full trust model and how to disable it, see
-[SECURITY.md](./SECURITY.md).
+project. That command can do anything the project's test suite does when you
+run it by hand, network access included. This is the same kind of trust as
+running `make test` or `npm test` in a repository. For the full trust model and
+how to disable it, see [SECURITY.md](./SECURITY.md).
 
 ### What can leave your machine
 
-The hooks send nothing off your machine. Outside the hooks, these are the only
-paths, and each one depends on a feature you turn on:
+The code of the hooks sends nothing off your machine; the project's test
+command, which the TDD hook runs, is covered above. Outside the hooks, these
+are the only paths, and each one depends on a feature you turn on or a command
+you run:
 
 - **`manter_ligado` skill.** At 20% and at 5% battery, it sends a short battery
   notice to a phone already paired with your computer through KDE Connect, if
-  there is one (or through the command you set in `MANTER_NOTIFY_CMD`). Without
-  a paired phone, it shows a desktop notification.
+  there is one. Without a paired phone, it shows a desktop notification.
 - **`manter_ligado` with `MEMO_HEADLESS=1`.** At 5% battery, it also starts a
   headless Claude Code session (`claude -p`) for each registered session, to
   save its memories. That session talks to Anthropic like any other Claude Code
   session.
+- **`tab_pendencias` skill, `--audit` command.** To check claims in the table
+  such as "not pushed yet" or "on branch X", it queries the git remote of your
+  project with `git ls-remote`, which only reads the remote and changes nothing,
+  locally or remotely.
 - **Dependencies of the `bigtech-completo` bundle.** They are third-party
   plugins with their own behavior. For example, `playwright` downloads the
   `@playwright/mcp` package from the internet every time its server starts.
@@ -130,7 +136,7 @@ Maintainer handle: `petrinhu`.
 Esta Política de Privacidade descreve como o plugin **bigtech** para o Claude
 Code lida com dados. O resumo em uma frase: **o plugin não coleta dados
 pessoais, não os guarda em servidor nenhum e não os envia ao seu autor; os
-hooks rodam localmente e não fazem conexão de rede.**
+hooks rodam localmente e não abrem conexão de rede por conta própria.**
 
 ### O que é o plugin
 
@@ -154,30 +160,38 @@ UserPromptSubmit, PreToolUse e PostToolUse). Eles leem o contexto local da
 sessão: os arquivos do projeto que você abriu, o marcador `.bigtech-porte`, que
 registra o porte do projeto, os arquivos de configuração do Claude Code da sua
 máquina e, nos lembretes da tabela de pendências, o histórico `git` do projeto,
-só para leitura. **Nenhum dos hooks faz conexão de rede.**
+só para leitura. **Nenhum dos hooks abre conexão de rede por conta própria.**
 
 Os hooks são fail-safe: um erro interno é capturado e a sessão segue
 normalmente. A única exceção intencional é o guard de TDD, um guard-rail de
 testes opt-in que pode recusar uma edição de código quando o ciclo de testes
 exige. O recurso de TDD só atua em projetos que contêm um arquivo
 `.claude/tdd-guard.json`; com esse arquivo presente, o executor de testes roda o
-comando de teste declarado por aquele projeto. Isso tem a mesma natureza de
-confiança de rodar `make test` ou `npm test` em um repositório. Para o modelo de
-confiança completo e como desativar, consulte o [SECURITY.md](./SECURITY.md).
+comando de teste declarado por aquele projeto. Esse comando pode fazer tudo o
+que a suíte de testes do projeto faz quando você a roda à mão, inclusive
+acessar a rede. Isso tem a mesma natureza de confiança de rodar `make test` ou
+`npm test` em um repositório. Para o modelo de confiança completo e como
+desativar, consulte o [SECURITY.md](./SECURITY.md).
 
 ### O que pode sair da sua máquina
 
-Os hooks não enviam nada para fora da sua máquina. Fora dos hooks, estes são os
-únicos caminhos, e cada um depende de um recurso que você liga:
+O código dos hooks não envia nada para fora da sua máquina; o comando de teste
+do projeto, que o hook de TDD roda, está descrito acima. Fora dos hooks, estes
+são os únicos caminhos, e cada um depende de um recurso que você liga ou de um
+comando que você roda:
 
 - **Skill `manter_ligado`.** Com 20% e com 5% de bateria, ela envia um aviso
   curto de bateria a um celular já pareado com o computador pelo KDE Connect,
-  se houver um (ou pelo comando que você definir em `MANTER_NOTIFY_CMD`). Sem
-  celular pareado, ela mostra uma notificação na área de trabalho.
+  se houver um. Sem celular pareado, ela mostra uma notificação na área de
+  trabalho.
 - **`manter_ligado` com `MEMO_HEADLESS=1`.** Com 5% de bateria, ela também abre
   uma sessão do Claude Code sem interface (`claude -p`) para cada sessão
   registrada, para salvar as memórias dela. Essa sessão fala com a Anthropic
   como qualquer outra sessão do Claude Code.
+- **Skill `tab_pendencias`, comando `--audit`.** Para conferir afirmações da
+  tabela como "não pushado" ou "na branch X", ela consulta o remoto git do seu
+  projeto com `git ls-remote`, que só lê o remoto e não altera nada, nem local
+  nem remoto.
 - **Dependências do pacote `bigtech-completo`.** São plugins de terceiros, com
   comportamento próprio. Por exemplo, o `playwright` baixa o pacote
   `@playwright/mcp` da internet toda vez que o servidor dele inicia.
