@@ -3,7 +3,7 @@
 bigtech_porte_reminder.py
 
 Hook SessionStart. Lembrete leve, anti-ruido, para classificar o PORTE de um
-projeto de codigo via /bigtech (que invoca o Cosimo / Chief of Staff) e
+projeto de codigo via /bigtech:bigtech (que invoca o Cosimo / Chief of Staff) e
 dimensionar a constelacao de agents.
 
 Logica:
@@ -13,7 +13,8 @@ Logica:
   sozinhos NAO contam (amplo demais, pegaria pastas de doc).
 - So dispara se NAO existe o marcador `.bigtech-porte` na raiz do projeto.
   O marcador e relativo ao PROJETO do usuario (cwd), nao ao plugin.
-- Quando /bigtech classifica o porte, grava `.bigtech-porte` e o lembrete para.
+- Quando /bigtech:bigtech classifica o porte, grava `.bigtech-porte` e o
+  lembrete para.
 
 Saida: JSON com hookSpecificOutput.additionalContext quando dispara; nada caso
 contrario. Sempre exit 0 (lembrete, nunca bloqueia).
@@ -115,7 +116,7 @@ def main() -> int:
             "a thread principal. Para GERENCIAR o projeto ou "
             "os agentes dev: Cosimo (planeja) + Cosmo (COO, execucao "
             "cross-funcional) + engineering-manager + scrum-master. Engenharia "
-            "via /proj_software. Calibrar a constelacao por complexidade/"
+            "via /bigtech:proj_software. Calibrar a constelacao por complexidade/"
             "criticidade (anti over-engineering; a maioria dos C-levels fica "
             "dormente em projeto early/pequeno). Decisoes de alto valor "
             "(arquitetura/escopo/stack/go-no-go/gasto/irreversivel) -> SEMPRE "
@@ -140,7 +141,7 @@ def main() -> int:
 
     msg = (
         "[bigtech] Projeto de codigo sem porte classificado (sem arquivo "
-        ".bigtech-porte). Considere rodar /bigtech: o Cosimo (Chief of Staff) "
+        ".bigtech-porte). Considere rodar /bigtech:bigtech. O Cosimo (Chief of Staff) "
         "classifica o porte (early|scale|bigtech; piso early; headcount nao "
         "define porte), seleciona a variante de pipeline (anti over-engineering) "
         "e monta a constelacao de agents. Apos classificar, grave o marcador "

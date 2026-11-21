@@ -11,12 +11,18 @@ com prompt que não casa gatilho fica em silêncio (anti-ruído).
 import io
 import json
 import os
+import re
 import subprocess
 import sys
 
 import bigtech_reinforce as r
 
 MARKER = r.MARKER     # ".bigtech-porte"
+
+# Comando de skill sem o prefixo do plugin: `/bigtech` que nao seja
+# `/bigtech:<skill>` (pasta como `/bigtech/` nao conta) e `/proj_software`
+# (a forma certa, `/bigtech:proj_software`, nao tem barra antes do nome).
+SEM_PREFIXO = re.compile(r"/bigtech(?![\w/-]|:[\w-])|/proj_software(?![\w/-])")
 
 
 # ---------------------------------------------------------------------------
@@ -162,14 +168,26 @@ def test_main_reforco_normaliza_marcador_solo_legado(tmp_path, monkeypatch):
     assert "porte=solo" not in ctx
 
 
+def test_main_reforco_cita_skills_com_prefixo(tmp_path, monkeypatch):
+    (tmp_path / MARKER).write_text("porte=early\n")
+    rc, out = _run_main(monkeypatch, {"cwd": str(tmp_path), "prompt": "ajusta o lint"})
+    assert rc == 0
+    ctx = json.loads(out)["hookSpecificOutput"]["additionalContext"]
+    assert "/bigtech:bigtech" in ctx
+    assert "/bigtech:proj_software" in ctx
+    assert not SEM_PREFIXO.search(ctx), SEM_PREFIXO.findall(ctx)
+
+
 # --- MODO 2: roteamento por gatilho em projeto NÃO classificado -------------
 
 def test_main_roteamento_quando_prompt_pede_constelacao(tmp_path, monkeypatch):
-    # Sem .bigtech-porte + prompt com gatilho -> aponta para /bigtech.
+    # Sem .bigtech-porte + prompt com gatilho -> aponta para /bigtech:bigtech.
     rc, out = _run_main(monkeypatch, {"cwd": str(tmp_path), "prompt": "montar o time c-level"})
     assert rc == 0
     ctx = json.loads(out)["hookSpecificOutput"]["additionalContext"]
-    assert "/bigtech" in ctx
+    assert "/bigtech:bigtech" in ctx
+    assert "/bigtech:proj_software" in ctx
+    assert not SEM_PREFIXO.search(ctx), SEM_PREFIXO.findall(ctx)
     assert "Cosimo" in ctx
 
 
@@ -216,7 +234,14 @@ def test_subprocess_roteamento_exit_0_json(tmp_path):
     assert proc.returncode == 0
     obj = json.loads(proc.stdout)
     assert obj["hookSpecificOutput"]["hookEventName"] == "UserPromptSubmit"
-    assert "/bigtech" in obj["hookSpecificOutput"]["additionalContext"]
+    assert "/bigtech:bigtech" in obj["hookSpecificOutput"]["additionalContext"]
+
+
+def test_fonte_do_hook_nao_tem_comando_sem_prefixo():
+    # Cobre tambem o docstring, que documenta o comando.
+    with open(r.__file__, encoding="utf-8") as fh:
+        for n, linha in enumerate(fh, 1):
+            assert not SEM_PREFIXO.search(linha), f"linha {n}: {linha.strip()}"
 
 
 def test_subprocess_stdin_invalido_exit_0(tmp_path):

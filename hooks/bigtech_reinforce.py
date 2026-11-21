@@ -14,7 +14,7 @@ Dois modos, mutuamente exclusivos:
 
 2) ROTEAMENTO (projeto ainda nao classificado): se o prompt do usuario pede a
    constelacao C-level ("c-level", "bigtech", "montar o time", ...), injeta um
-   ponteiro forte para invocar /bigtech (Cosimo). Resolve o caso "peco a
+   ponteiro forte para invocar /bigtech:bigtech (Cosimo). Resolve o caso "peco a
    constelacao e ela nao e usada".
 
 O marcador `.bigtech-porte` e relativo ao PROJETO do usuario (cwd), nao ao
@@ -173,11 +173,11 @@ def main() -> int:
             "negocio/produto/lideranca via C-levels. PLANEJADOR = Cosimo "
             "(Chief of Staff): classifica porte (early|scale|bigtech; piso "
             "early; headcount nao define porte), devolve o mapa de ativacao "
-            "(skill /bigtech); quem dispara os agents e a thread principal. "
+            "(skill /bigtech:bigtech); quem dispara os agents e a thread principal. "
             "Para GERENCIAR projeto ou agentes dev: Cosimo (planeja) "
             "+ Cosmo (COO, execucao cross-funcional) + engineering-manager "
             "(gestao de pessoas/eng) + scrum-master (cadencia/impedimentos). "
-            "Engenharia via /proj_software. Calibrar a constelacao por "
+            "Engenharia via /bigtech:proj_software. Calibrar a constelacao por "
             "complexidade/criticidade (anti over-engineering). Decisao de alto "
             "valor (arquitetura/escopo/stack/go-no-go/gasto/irreversivel) -> "
             "SEMPRE AskUserQuestion ao usuario, que e o lider supremo (CEO) da "
@@ -193,7 +193,7 @@ def main() -> int:
     if prompt and TRIGGER_RE.search(prompt):
         emit(
             "[bigtech] O usuario quer a constelacao C-level / gerenciar projeto "
-            "ou agentes dev. ROTEAR para /bigtech, que aciona o AGENTE "
+            "ou agentes dev. ROTEAR para /bigtech:bigtech, que aciona o AGENTE "
             "PLANEJADOR = Cosimo (Chief of Staff): classifica o porte "
             "(early|scale|bigtech; piso early; anti over-engineering; headcount "
             "nao define porte), seleciona a variante de pipeline e devolve o "
@@ -202,8 +202,8 @@ def main() -> int:
             "dev, os agentes sao: Cosimo (Chief of Staff, planejador) + Cosmo "
             "(COO, execucao cross-funcional) + engineering-manager (gestao de "
             "eng/pessoas) + scrum-master (cadencia/impedimentos) + "
-            "product-manager. Engenharia pura -> /proj_software. Para essa "
-            "demanda, use a skill /bigtech. Apos classificar, "
+            "product-manager. Engenharia pura -> /bigtech:proj_software. Para essa "
+            "demanda, use a skill /bigtech:bigtech. Apos classificar, "
             "gravar .bigtech-porte na raiz (porte=early|scale|bigtech). "
             "Instruções do usuário (CLAUDE.md) prevalecem sobre este lembrete.",
             evento,

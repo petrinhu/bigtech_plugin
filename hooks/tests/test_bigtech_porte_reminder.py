@@ -11,12 +11,18 @@ manifesto/glob) com asserts de VALOR, mais os dois ramos de `main()`
 import io
 import json
 import os
+import re
 import subprocess
 import sys
 
 import bigtech_porte_reminder as p
 
 MARKER = p.MARKER     # ".bigtech-porte"
+
+# Comando de skill sem o prefixo do plugin: `/bigtech` que nao seja
+# `/bigtech:<skill>` (pasta como `/bigtech/` nao conta) e `/proj_software`
+# (a forma certa, `/bigtech:proj_software`, nao tem barra antes do nome).
+SEM_PREFIXO = re.compile(r"/bigtech(?![\w/-]|:[\w-])|/proj_software(?![\w/-])")
 
 
 # ---------------------------------------------------------------------------
@@ -96,17 +102,36 @@ def test_main_classificado_alias_solo_normaliza_para_early(tmp_path, monkeypatch
     assert p.read_porte(str(tmp_path / MARKER)) == "early"
 
 
-# --- main(): projeto de código SEM porte -> lembra /bigtech -----------------
+# --- main(): projeto de código SEM porte -> lembra /bigtech:bigtech ---------
 
 def test_main_lembra_bigtech_em_projeto_de_codigo_sem_porte(tmp_path, monkeypatch):
     (tmp_path / "pyproject.toml").write_text("[project]\n")
     rc, out = _run_main(monkeypatch, {"cwd": str(tmp_path)})
     assert rc == 0
     ctx = json.loads(out)["hookSpecificOutput"]["additionalContext"]
-    assert "/bigtech" in ctx
+    assert "/bigtech:bigtech" in ctx
+    assert not SEM_PREFIXO.search(ctx), SEM_PREFIXO.findall(ctx)
     assert ".bigtech-porte" in ctx       # instrui a gravar o marcador
     assert "early|scale|bigtech" in ctx or "early" in ctx
     assert "solo/early" not in ctx
+
+
+# --- Comandos de skill com o prefixo do plugin -------------------------------
+
+def test_main_classificado_cita_proj_software_com_prefixo(tmp_path, monkeypatch):
+    (tmp_path / MARKER).write_text("porte=early\n")
+    rc, out = _run_main(monkeypatch, {"cwd": str(tmp_path)})
+    assert rc == 0
+    ctx = json.loads(out)["hookSpecificOutput"]["additionalContext"]
+    assert "/bigtech:proj_software" in ctx
+    assert not SEM_PREFIXO.search(ctx), SEM_PREFIXO.findall(ctx)
+
+
+def test_fonte_do_hook_nao_tem_comando_sem_prefixo():
+    # Cobre tambem o docstring, que documenta o comando.
+    with open(p.__file__, encoding="utf-8") as fh:
+        for n, linha in enumerate(fh, 1):
+            assert not SEM_PREFIXO.search(linha), f"linha {n}: {linha.strip()}"
 
 
 # --- main(): silêncio em dir que não é projeto de código --------------------
