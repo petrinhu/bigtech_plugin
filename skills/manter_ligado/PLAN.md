@@ -6,7 +6,7 @@
 
 **Architecture:** Controlador fino (shell) invocado pela SKILL.md gerencia um registro de sessões em `$XDG_RUNTIME_DIR` e sobe/derruba um guardião singleton (`systemd --user` transitório) que segura um inhibitor do logind e roda um loop de bateria. A lógica pura (decisão de bateria, registro/reap, retenção de snapshots) fica em `lib.sh` com costuras injetáveis por env, testada por um harness de shell sem dependências.
 
-**Tech Stack:** Bash, systemd (`systemd-run --user`, `systemd-inhibit`), KDE Connect (`kdeconnect-cli`), `notify-send`, `claude -p` (headless). Fedora 44 + KDE Wayland.
+**Tech Stack:** Bash, systemd (`systemd-run --user`, `systemd-inhibit`), KDE Connect (`kdeconnect-cli`), `notify-send`, `claude -p` (headless). Linux com systemd e KDE (Wayland).
 
 ## Global Constraints
 
@@ -16,7 +16,7 @@
 - **Idempotência:** `on` duplo = no-op; `off` de uma sessão não afeta as outras; guardião cai só no último `off`.
 - **Higiene por padrão:** registro em tmpfs + reap de sid morto; snapshots com **retenção = 1**; log via journald.
 - **Costuras de teste (env overrides):** `MANTER_STATE_DIR`, `MANTER_SNAP_DIR`, `MANTER_BAT_CAPACITY_FILE`, `MANTER_AC_ONLINE_FILE`, `MANTER_LIVE_SIDS`, `MANTER_NOTIFY_CMD`, `MANTER_PROJECTS_DIR`, `MANTER_WARN_PCT` (default 20), `MANTER_SAVE_PCT` (default 5), `MANTER_INTERVAL` (default 60), `MEMO_HEADLESS` (default 0).
-- **Paths reais:** bateria `/sys/class/power_supply/BAT1/capacity`; AC `/sys/class/power_supply/ACAD/online`; transcripts `$CLAUDE_CONFIG_DIR/projects/*/<sid>.jsonl`; snapshots `$CLAUDE_CONFIG_DIR/manter_ligado_snapshots/`.
+- **Paths padrão (os da máquina de desenvolvimento):** bateria `/sys/class/power_supply/BAT1/capacity`; AC `/sys/class/power_supply/ACAD/online`; transcripts `$CLAUDE_CONFIG_DIR/projects/*/<sid>.jsonl`; snapshots `$CLAUDE_CONFIG_DIR/manter_ligado_snapshots/`.
 - **Identificadores/comentários em pt-br** (padrão do usuário).
 
 **Estrutura de arquivos:**

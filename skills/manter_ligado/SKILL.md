@@ -20,9 +20,16 @@ Não peça confirmação para `on`/`off`/`status`. Para `limpar` (apaga snapshot
 - `on`: registra a sessão atual e sobe um guardião singleton (`systemd --user` transitório) que segura
   um inhibitor `sleep:handle-lid-switch` (tampa fechada não suspende; a tela apaga/acorda pelo KDE) e
   roda um loop de bateria.
-- A **20%**: push de aviso ao celular (KDE Connect; fallback notify-send).
-- A **≤5%**: salva o estado de **todas** as sessões registradas (cópia do transcript, retenção=1) e,
-  se `MEMO_HEADLESS=1`, destila memórias via `claude -p`. **Não desliga nem hiberna** - a máquina segue.
+- A **20%**: push de aviso ao celular (KDE Connect; fallback notify-send). O texto sugere rodar `/memo` nas
+  sessões pelo `/rc`. O `/rc` é o Remote Control do próprio Claude Code; o `/memo` não vem no plugin, é
+  opcional e só existe se estiver na configuração do usuário. Sem ele, o aviso vale só como alerta de bateria.
+- A **≤5%**: salva o estado de **todas** as sessões registradas (cópia do transcript, retenção=1). **Não
+  desliga nem hiberna**: a máquina segue.
+- Com `MEMO_HEADLESS=1` (desligado por padrão), a **≤5%** também roda `claude -p` com a skill
+  `/memo_persistente` para destilar memórias de cada sessão. Essa skill não vem no plugin: é opcional e só
+  funciona se existir na configuração do usuário. O código não falha sem ela (a saída e o erro do
+  `claude -p` são descartados), mas cada chamada pode levar até 90 s e atrasa a cópia das sessões
+  seguintes. Sem a skill, deixe `MEMO_HEADLESS` desligado.
 - `off`: desregistra; guardião cai só no último `off`. `status`: mostra se está armado. `limpar`: faxina.
 
 Detalhes: ver `DESIGN.md` e `PLAN.md` nesta pasta.
@@ -30,6 +37,8 @@ Detalhes: ver `DESIGN.md` e `PLAN.md` nesta pasta.
 ## Plataforma
 
 Só Linux com systemd --user (`systemd-run` e `systemd-inhibit`). A guarda `ml_require_linux_systemd` (em `bin/lib.sh`) sai com código 3 e mensagem clara fora disso. Este arquivo é só o controlador; não há caminho de instalação em outro SO.
+
+A bateria e a tomada são lidas em `/sys/class/power_supply/BAT1/capacity` e `/sys/class/power_supply/ACAD/online`, os nomes da máquina onde a skill foi desenvolvida. Em máquina com outros nomes (por exemplo `BAT0` ou `AC`; confira com `ls /sys/class/power_supply/`), a leitura cai no padrão, 100% e fora da tomada, e o aviso de 20% e o salvamento de 5% não disparam.
 
 ## Nota cross-platform (não implementado)
 

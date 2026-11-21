@@ -4,9 +4,9 @@
 
 ## Propósito
 
-Com o laptop na mochila (tampa fechada, conectado ao tethering do celular), **manter a conexão de dados viva e as sessões Claude rodando** enquanto o usuário controla tudo pelo celular via `/rc`. Quando a bateria chega a **≤5%**, **salvar automaticamente o estado de todas as sessões** (conversa, contexto, decisões) no disco — **sem desligar nem hibernar**: a máquina segue rodando até a bateria zerar sozinha.
+Com o laptop na mochila (tampa fechada, conectado ao tethering do celular), **manter a conexão de dados viva e as sessões Claude rodando** enquanto o usuário controla tudo pelo celular via `/rc`, o Remote Control do Claude Code. Quando a bateria chega a **≤5%**, **salvar automaticamente o estado de todas as sessões** (conversa, contexto, decisões) no disco, **sem desligar nem hibernar**: a máquina segue rodando até a bateria zerar sozinha.
 
-Alvo: Fedora 44, systemd, KDE Plasma (Wayland), LUKS+btrfs. RAM 31 GiB, swap só zram (por isso hibernate saiu de escopo).
+Alvo: Linux com systemd e KDE Plasma (o aviso ao celular usa o KDE Connect). Hibernar ficou fora de escopo (ver "Fora de escopo").
 
 ## Comandos
 
@@ -53,16 +53,16 @@ Ciclo de vida:
 
 ## Loop de bateria (dentro do guardião)
 
-- Lê `/sys/class/power_supply/BAT1/capacity` e status de carga a cada ~60s.
+- Lê `/sys/class/power_supply/BAT1/capacity` e `/sys/class/power_supply/ACAD/online` a cada ~60s. São os nomes da máquina de desenvolvimento; em outra máquina, ver a nota de plataforma no `SKILL.md`.
 - **AC conectado a qualquer momento → aborta ações de bateria** (reseta debounce).
-- **20% (aviso, 1x com debounce):** push KDE Connect → *"Bateria 20% — rode /memo nas sessões via /rc se quiser."* Só conveniência; o 5% salva de qualquer jeito.
+- **20% (aviso, 1x com debounce):** push KDE Connect com o aviso de bateria, que sugere rodar `/memo` nas sessões pelo `/rc`. Só conveniência; o 5% salva de qualquer jeito. O `/memo` é opcional e só existe se estiver na configuração do usuário; o `/rc` é o Remote Control do Claude Code.
 - **≤5% (latch, 1x por descarga):** executa o **salvamento** (abaixo).
 
 ## Salvamento automático a 5% (feito 1x pelo guardião)
 
 1. **Push forte** → celular: *"Bat 5% — salvando estado."*
 2. **Para cada sessão no registro:** copia o `transcript .jsonl` da sessão → `$CLAUDE_CONFIG_DIR/manter_ligado_snapshots/<data>/<session-id>.jsonl` + metadata (slug, cwd, hora). **Mecânico, offline, sempre funciona — é a garantia.** O transcript é a conversa inteira em fidelidade total.
-3. **Melhor-esforço (se configurado e houver tempo/bateria):** `claude -p` headless destila cada transcript em memórias tipadas (o que o `memo_persistente` faz), **sobrescrevendo no lugar** a memória de snapshot da sessão (ex: `project_session_atual.md`).
+3. **Melhor-esforço (se configurado e houver tempo/bateria):** `claude -p` headless destila cada transcript em memórias tipadas (o que o `memo_persistente` faz), **sobrescrevendo no lugar** a memória de snapshot da sessão (ex: `project_session_atual.md`). O `memo_persistente` é uma skill opcional: não vem no plugin e só existe se estiver na configuração do usuário. Sem ela, não conte com este passo; o passo 2 continua sendo a garantia.
 4. **NÃO desliga, NÃO hiberna.** A máquina **segue rodando**. Abrir a tampa a qualquer hora → uso normal. Bateria chega a 0% → morre sozinha; o estado já está no disco.
 
 ## Higiene de artefatos (nada acumula sem `--limpar`)
@@ -71,7 +71,7 @@ Ciclo de vida:
 |---|---|---|
 | Registro de sessões | `$XDG_RUNTIME_DIR/manter_ligado/` | tmpfs (some no boot) + reap de PID morto em `on`/`status` |
 | Snapshots de transcript | `$CLAUDE_CONFIG_DIR/manter_ligado_snapshots/` | **retenção = 1**: cada save poda os anteriores |
-| Memos destilados | `memory/` da sessão | **sobrescrita no lugar** (dedup nativo do memo_persistente) |
+| Memos destilados (só com a skill opcional `memo_persistente`) | `memory/` da sessão | **sobrescrita no lugar** (dedup nativo do memo_persistente) |
 | Log do guardião | **journald** (`systemd --user`) | rotação automática do journald; sem arquivo crescendo |
 | Unidade do guardião | `systemd-run` transitória | sem arquivo permanente; morre no `off` |
 
