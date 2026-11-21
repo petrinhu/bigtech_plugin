@@ -9,18 +9,17 @@
 **Effective date:** 2026-11-20
 
 This Privacy Policy describes how the **bigtech** plugin for Claude Code handles
-data. The summary in one sentence: **the plugin does not collect, store on any
-server, or transmit personal data to its author; its hooks run locally and make
-no network calls, and the only feature that talks to the network is an opt-in
-GitHub channel that you register yourself.**
+data. The summary in one sentence: **the plugin does not collect personal data,
+does not store it on any server, and does not send it to its author; its hooks
+run locally and make no network connection.**
 
 ### What the plugin is
 
 `bigtech` is a local plugin for Claude Code, made up of Markdown files (agents,
 skills, and documentation), seven Python hook scripts (registered nine times in
-`hooks/hooks.json`), and a few optional skills. It has no server and no backend
-operated by the author. It does not create an account and does not require a
-login.
+`hooks/hooks.json`), and the scripts of a few skills, which run only when you
+invoke those skills. It has no server and no backend operated by the author. It
+does not create an account and does not require a login.
 
 ### No data collection by the author
 
@@ -33,9 +32,10 @@ the maintainer.
 The hooks run locally on your machine, under your own user account, in response
 to Claude Code session events (SessionStart, UserPromptSubmit, PreToolUse, and
 PostToolUse). They read the local session context: the files of the project you
-have open, the `.bigtech-porte` marker that records the project size, and the
-Claude Code settings files of your machine. **None of the hooks makes a network
-connection.**
+have open, the `.bigtech-porte` marker that records the project size, the
+Claude Code settings files of your machine, and, for the backlog-table
+reminders, the `git` history of the project, read-only. **None of the hooks
+makes a network connection.**
 
 The hooks are fail-safe: an internal error is caught and the session continues
 normally. The only intentional exception is the TDD guard, an opt-in test
@@ -46,19 +46,56 @@ project. This is the same kind of trust as running `make test` or `npm test` in
 a repository. For the full trust model and how to disable it, see
 [SECURITY.md](./SECURITY.md).
 
+### What can leave your machine
+
+The hooks send nothing off your machine. Outside the hooks, these are the only
+paths, and each one depends on a feature you turn on:
+
+- **`manter_ligado` skill.** At 20% and at 5% battery, it sends a short battery
+  notice to a phone already paired with your computer through KDE Connect, if
+  there is one (or through the command you set in `MANTER_NOTIFY_CMD`). Without
+  a paired phone, it shows a desktop notification.
+- **`manter_ligado` with `MEMO_HEADLESS=1`.** At 5% battery, it also starts a
+  headless Claude Code session (`claude -p`) for each registered session, to
+  save its memories. That session talks to Anthropic like any other Claude Code
+  session.
+- **Dependencies of the `bigtech-completo` bundle.** They are third-party
+  plugins with their own behavior. For example, `playwright` downloads the
+  `@playwright/mcp` package from the internet every time its server starts.
+
+Agents and skills can also ask Claude Code to use its own tools during a
+session, such as web search. Those tools are part of Claude Code and follow
+Anthropic's policies.
+
 ### Local state written by the plugin
 
 The plugin writes local state only on your own machine, under your home
-directory or the runtime directory of your user. No path is hard-coded; each is
-resolved at run time from your environment:
+directory, the runtime directory of your user, or the project you open. No path
+is hard-coded; each is resolved at run time from your environment:
 
-- TDD cycle results: `$HOME/.claude/state/tdd-guard/`.
-- Pendências hook: a per-session file in `$XDG_RUNTIME_DIR` or `$HOME/.cache`.
-  The copy of that hook inside `hooks/` writes its session timestamp to the
-  system temporary directory instead; this is a known limitation, recorded in
+- TDD cycle results: `$HOME/.claude/state/tdd-guard/`, one folder per project.
+- Backlog-table hooks: the hook in `hooks/` keeps the session start time in
+  `bigtech_tab_sessao`, and the hook of the `tab_pendencias` skill keeps, per
+  session, the notices it has already shown in `tab_pendencias_hook_state`.
+  Both folders live in `$XDG_RUNTIME_DIR`, or in `$HOME/.cache` when that
+  variable is not set, are created with mode `0700`, and are pruned by age.
+  Neither hook writes to the shared temporary directory (`/tmp`). See
   [SECURITY.md](./SECURITY.md).
-- Optional skills (`watchcode`, `manter_ligado`): state under
-  the runtime directory, `$HOME/.cache`, and `$HOME/.config/bigtech/`.
+- `bigtech` skill: once the project size is classified, the `.bigtech-porte`
+  marker at the root of the project.
+- `tab_pendencias` skill: when you run it, it writes `TODO.md` in your project
+  and, when it needs them, an `inbox/` folder next to it and an intake journal
+  inside the `.git` folder of the repository.
+- `watchcode` skill: state in `${XDG_RUNTIME_DIR:-$HOME/.cache}/watchcode`, and
+  an optional baseline that you create in
+  `$HOME/.config/bigtech/watchcode_baseline.txt`.
+- `manter_ligado` skill: state in `${XDG_RUNTIME_DIR:-$HOME/.cache}/manter_ligado`.
+  At 5% battery, it copies the transcripts of the registered sessions to
+  `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/manter_ligado_snapshots` and keeps only
+  the latest copy. Its `limpar` command deletes these copies.
+- `olhe_agentes` skill: the monitor deadline, the stop order you gave (if any),
+  and the last work it announced as done, in
+  `$HOME/.config/olhe_agentes/<project folder>/`.
 
 ### Scope and responsibility
 
@@ -66,9 +103,10 @@ This policy covers the **bigtech plugin only.** The plugin operates inside Claud
 Code, which is a product of Anthropic. Your use of Claude Code itself, and of any
 artificial-intelligence model it relies on, is governed by Anthropic's own
 policies, not by this policy. The optional plugins listed as dependencies of the
-`bigtech-completo` bundle, and the third-party services named above, have their
-own policies. This document does not control, and cannot speak for, how
-Anthropic, GitHub, Cloudflare, or any third party handles your data.
+`bigtech-completo` bundle, and tools such as KDE Connect, have their own
+policies. This document does not control, and cannot speak for, how Anthropic,
+GitHub (where the repository and its issues live), or any third party handles
+your data.
 
 ### Changes to this policy
 
@@ -90,17 +128,17 @@ Maintainer handle: `petrinhu`.
 **Data de vigência:** 2026-11-20
 
 Esta Política de Privacidade descreve como o plugin **bigtech** para o Claude
-Code lida com dados. O resumo em uma frase: **o plugin não envia dados pessoais
-ao seu autor; os hooks rodam localmente e não fazem chamada de rede; a única
-função que usa a rede é um canal opcional do GitHub, que você registra por conta
-própria.**
+Code lida com dados. O resumo em uma frase: **o plugin não coleta dados
+pessoais, não os guarda em servidor nenhum e não os envia ao seu autor; os
+hooks rodam localmente e não fazem conexão de rede.**
 
 ### O que é o plugin
 
 O `bigtech` é um plugin local do Claude Code, composto por arquivos Markdown
 (agents, skills e documentação), sete scripts Python de hook (registrados nove
-vezes em `hooks/hooks.json`) e alguns skills opcionais. Ele não tem servidor
-nem backend operado pelo autor. Ele não cria conta e não exige login.
+vezes em `hooks/hooks.json`) e os scripts de algumas skills, que só rodam
+quando você invoca essas skills. Ele não tem servidor nem backend operado pelo
+autor. Ele não cria conta e não exige login.
 
 ### Nenhuma coleta de dados pelo autor
 
@@ -114,8 +152,9 @@ Os hooks são executados localmente na sua máquina, sob o seu próprio usuário
 em resposta a eventos de sessão do Claude Code (SessionStart,
 UserPromptSubmit, PreToolUse e PostToolUse). Eles leem o contexto local da
 sessão: os arquivos do projeto que você abriu, o marcador `.bigtech-porte`, que
-registra o porte do projeto, e os arquivos de configuração do Claude Code da sua
-máquina. **Nenhum dos hooks faz conexão de rede.**
+registra o porte do projeto, os arquivos de configuração do Claude Code da sua
+máquina e, nos lembretes da tabela de pendências, o histórico `git` do projeto,
+só para leitura. **Nenhum dos hooks faz conexão de rede.**
 
 Os hooks são fail-safe: um erro interno é capturado e a sessão segue
 normalmente. A única exceção intencional é o guard de TDD, um guard-rail de
@@ -126,19 +165,58 @@ comando de teste declarado por aquele projeto. Isso tem a mesma natureza de
 confiança de rodar `make test` ou `npm test` em um repositório. Para o modelo de
 confiança completo e como desativar, consulte o [SECURITY.md](./SECURITY.md).
 
+### O que pode sair da sua máquina
+
+Os hooks não enviam nada para fora da sua máquina. Fora dos hooks, estes são os
+únicos caminhos, e cada um depende de um recurso que você liga:
+
+- **Skill `manter_ligado`.** Com 20% e com 5% de bateria, ela envia um aviso
+  curto de bateria a um celular já pareado com o computador pelo KDE Connect,
+  se houver um (ou pelo comando que você definir em `MANTER_NOTIFY_CMD`). Sem
+  celular pareado, ela mostra uma notificação na área de trabalho.
+- **`manter_ligado` com `MEMO_HEADLESS=1`.** Com 5% de bateria, ela também abre
+  uma sessão do Claude Code sem interface (`claude -p`) para cada sessão
+  registrada, para salvar as memórias dela. Essa sessão fala com a Anthropic
+  como qualquer outra sessão do Claude Code.
+- **Dependências do pacote `bigtech-completo`.** São plugins de terceiros, com
+  comportamento próprio. Por exemplo, o `playwright` baixa o pacote
+  `@playwright/mcp` da internet toda vez que o servidor dele inicia.
+
+Agents e skills também podem pedir ao Claude Code que use as ferramentas dele
+durante a sessão, como a busca na web. Essas ferramentas fazem parte do Claude
+Code e seguem as políticas da Anthropic.
+
 ### Estado local gravado pelo plugin
 
-O plugin grava estado local apenas na sua máquina, sob o seu diretório pessoal
-ou o diretório de execução do seu usuário. Nenhum caminho é fixado no código;
-cada um é resolvido em tempo de execução a partir do seu ambiente:
+O plugin grava estado local apenas na sua máquina, sob o seu diretório pessoal,
+o diretório de execução do seu usuário ou o projeto que você abriu. Nenhum
+caminho é fixado no código; cada um é resolvido em tempo de execução a partir
+do seu ambiente:
 
-- Resultados do ciclo de TDD: `$HOME/.claude/state/tdd-guard/`.
-- Hook de pendências: um arquivo por sessão em `$XDG_RUNTIME_DIR` ou
-  `$HOME/.cache`. A cópia desse hook dentro de `hooks/` grava o carimbo de
-  sessão no diretório temporário do sistema; essa é uma limitação conhecida,
-  registrada no [SECURITY.md](./SECURITY.md).
-- Skills opcionais (`watchcode`, `manter_ligado`): estado no
-  diretório de execução, em `$HOME/.cache` e em `$HOME/.config/bigtech/`.
+- Resultados do ciclo de TDD: `$HOME/.claude/state/tdd-guard/`, uma pasta por
+  projeto.
+- Hooks da tabela de pendências: o hook em `hooks/` guarda a hora de início da
+  sessão em `bigtech_tab_sessao`, e o hook da skill `tab_pendencias` guarda, por
+  sessão, os avisos que já mostrou em `tab_pendencias_hook_state`. As duas
+  pastas ficam em `$XDG_RUNTIME_DIR` ou, quando essa variável não existe, em
+  `$HOME/.cache`, são criadas com permissão `0700` e são podadas por idade.
+  Nenhum dos dois grava no diretório temporário compartilhado (`/tmp`). Veja o
+  [SECURITY.md](./SECURITY.md).
+- Skill `bigtech`: depois que o porte do projeto é classificado, o marcador
+  `.bigtech-porte` na raiz do projeto.
+- Skill `tab_pendencias`: quando você a roda, ela grava o `TODO.md` no seu
+  projeto e, quando precisa, uma pasta `inbox/` ao lado dele e um journal de
+  intake dentro da pasta `.git` do repositório.
+- Skill `watchcode`: estado em `${XDG_RUNTIME_DIR:-$HOME/.cache}/watchcode` e
+  uma baseline opcional, criada por você, em
+  `$HOME/.config/bigtech/watchcode_baseline.txt`.
+- Skill `manter_ligado`: estado em `${XDG_RUNTIME_DIR:-$HOME/.cache}/manter_ligado`.
+  Com 5% de bateria, ela copia os transcripts das sessões registradas para
+  `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/manter_ligado_snapshots` e guarda só a
+  cópia mais recente. O comando `limpar` apaga essas cópias.
+- Skill `olhe_agentes`: o prazo do monitor, a parada que você ordenou (se
+  houver) e o último trabalho que ele anunciou como concluído, em
+  `$HOME/.config/olhe_agentes/<pasta do projeto>/`.
 
 ### Escopo e responsabilidade
 
@@ -146,10 +224,10 @@ Esta política cobre **apenas o plugin bigtech.** O plugin opera dentro do Claud
 Code, que é um produto da Anthropic. O uso do próprio Claude Code, e de qualquer
 modelo de inteligência artificial do qual ele dependa, é regido pelas políticas
 da própria Anthropic, e não por esta política. Os plugins opcionais listados
-como dependências do bundle `bigtech-completo` e os serviços de terceiros
-citados acima têm políticas próprias. Este documento não controla, e não pode
-responder por, como a Anthropic, o GitHub, a Cloudflare ou qualquer terceiro
-lida com os seus dados.
+como dependências do pacote `bigtech-completo`, e ferramentas como o KDE
+Connect, têm políticas próprias. Este documento não controla, e não pode
+responder por, como a Anthropic, o GitHub (onde ficam o repositório e as
+issues) ou qualquer terceiro lida com os seus dados.
 
 ### Mudanças nesta política
 
