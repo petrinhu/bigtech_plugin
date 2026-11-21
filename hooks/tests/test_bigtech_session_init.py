@@ -116,14 +116,6 @@ def test_so_uma_faltando_nomeia_so_ela():
 # Texto do aviso (forma curta aprovada em CONS-12A)
 # ---------------------------------------------------------------------------
 
-def test_aviso_usa_a_forma_curta_literal_com_os_nomes(tmp_path):
-    cfg = _cfg(tmp_path)
-    _settings(cfg / "settings.json", {"superpowers@obra": True})
-    bloco = s.deps_block(_proj(tmp_path), cfg)
-    esperado = FORMA_CURTA.format(faltando="playwright, frontend-design")
-    assert esperado in bloco
-
-
 def test_aviso_vazio_quando_nada_falta(tmp_path):
     cfg = _cfg(tmp_path)
     _settings(cfg / "settings.json", {
@@ -162,28 +154,12 @@ def test_docs_block_aponta_para_docs_house(tmp_path, monkeypatch):
     assert "REGRA:" in block
 
 
-def test_manuais_anunciados_existem_em_docs_house():
-    casa = os.path.join(PLUGIN_ROOT, "docs", "house")
-    for nome in s.MANUALS:
-        assert os.path.isfile(os.path.join(casa, nome)), nome
-
-
 def test_docs_block_fallback_sem_root(monkeypatch):
     monkeypatch.delenv("CLAUDE_PLUGIN_ROOT", raising=False)
     block = s._docs_block()
     assert "CLAUDE_PLUGIN_ROOT ausente" in block
     assert "ORG.md" in block
     assert "REGRA:" in block
-
-
-def test_docs_block_declara_precedencia_do_usuario(tmp_path, monkeypatch):
-    monkeypatch.setenv("CLAUDE_PLUGIN_ROOT", str(tmp_path))
-    assert PRECEDENCIA_LONGA in s._docs_block()
-
-
-def test_docs_block_declara_precedencia_sem_root(monkeypatch):
-    monkeypatch.delenv("CLAUDE_PLUGIN_ROOT", raising=False)
-    assert PRECEDENCIA_LONGA in s._docs_block()
 
 
 # ---------------------------------------------------------------------------

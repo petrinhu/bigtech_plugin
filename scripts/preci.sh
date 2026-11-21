@@ -1,27 +1,24 @@
 #!/usr/bin/env bash
-# preci.sh — gates locais de pre-CI do plugin "bigtech" (TST-T15).
+# preci.sh — os gates do job Ubuntu do CI do plugin "bigtech".
 #
-# Roda os mesmos gates que o CI no GitHub Actions (.github/workflows/ci.yml),
-# na ordem, e FALHA no primeiro erro (fail-fast). Rode-o antes de abrir PR / push
-# pra pegar problema na maquina, sem gastar fila de runner.
-# Path CI: .github/workflows/ci.yml (BT-4 matrix multi-OS + containers + gitleaks).
+# E o que o job Ubuntu do CI (.github/workflows/ci.yml) roda, na ordem, e FALHA
+# no primeiro erro (fail-fast). O CI e o unico portao: rodar este script na
+# maquina e opcional e nao e exigido antes do push. O segredo (gitleaks) tem job
+# proprio no CI.
 #
-# Gates (em ordem), sao 11 no total:
+# Gates (em ordem), sao 9 no total:
 #   1. Gate ZERO-ORFAOS (spec 4.1)   -> python3 scripts/validate_plugin.py
 #   2. Testes (hooks + scripts)      -> python3 -m pytest hooks/tests scripts/tests -q
 #   3. JSON valido (4 manifestos)    -> python3 -m json.tool em cada um
 #   4. Paridade de versao            -> plugin.json == marketplace.json (plugins[0].version)
 #   5. Lint Python (se ruff existir) -> ruff check hooks/ scripts/   [degrada gracioso]
-#   6. Secret scan (se gitleaks)     -> gitleaks detect ... -c .gitleaks.toml [degrada]
-#   7. Smoke offline                 -> python3 scripts/smoke_offline.py (frontmatter + hooks)
-#   8. Drift semântico (BT-7)        -> python3 scripts/check_semantic_drift.py [obrigatório]
-#   9. Evals roteamento /bigtech     -> python3 evals/bigtech_routing/run_evals.py (BT-8)
-#  10. claude plugin validate (x2)   -> --strict no dir (marketplace); plugin.json
-#                                      sem --strict [degrada]
-#  11. sync docs/house (CONS-10)     -> gate_sync_house.py --check; sem chave ou vault
+#   6. Smoke offline                 -> python3 scripts/smoke_offline.py (frontmatter + hooks)
+#   7. Drift semântico (BT-7)        -> python3 scripts/check_semantic_drift.py [obrigatório]
+#   8. Evals roteamento /bigtech     -> python3 evals/bigtech_routing/run_evals.py (BT-8)
+#   9. sync docs/house (CONS-10)     -> gate_sync_house.py --check; sem chave ou vault
 #                                      sai NAO CONFERIDO [nunca conta como PASS]
 #
-# Banner final: so diz "PRE-CI PASS" com os 11 gates passados e nenhum pulado
+# Banner final: so diz "PRE-CI PASS" com os 9 gates passados e nenhum pulado
 # nem nao conferido. Gate pulado (SKIP) nunca conta como passado; o banner lista
 # quantos e quais foram pulados.
 #
@@ -29,9 +26,9 @@
 # isolamento mais forte, rode o preci dentro de um container; a opcao fica
 # aberta para quando as regras do usuario exigirem.
 #
-# Ferramentas opcionais (ruff, gitleaks, claude): se AUSENTES localmente, o gate
-# avisa que "rodara no CI" e segue (nao falha); paridade total e garantida no CI,
-# que as instala. Os gates 1-4, 7, 8 e 9 sao obrigatorios e usam so a stdlib do Python.
+# Ferramenta opcional (ruff): se AUSENTE localmente, o gate avisa que "rodara no
+# CI" e segue (nao falha); o CI a instala. Os gates 1-4 e 6-8 sao obrigatorios e
+# usam so a stdlib do Python.
 #
 # Uso:
 #   bash scripts/preci.sh        # da raiz do repo ou de qualquer lugar
@@ -55,7 +52,7 @@ else
 fi
 
 GATE_NUM=0
-TOTAL_GATES=11
+TOTAL_GATES=9
 GATE_TITLE=""
 # Contadores do banner final: cada gate cai em exatamente uma destas listas.
 PASSED=()
@@ -177,29 +174,7 @@ else
 fi
 
 # =================================================================================
-# Gate 6 - Secret scan (gitleaks): opcional, degrada gracioso
-# =================================================================================
-gate "Secret scan: gitleaks detect"
-if command -v gitleaks >/dev/null 2>&1; then
-  GITLEAKS_ARGS=(detect --no-banner --redact)
-  if [[ -f ".gitleaks.toml" ]]; then
-    GITLEAKS_ARGS+=(-c .gitleaks.toml)
-  fi
-  # Sem --no-git: em repo git o gitleaks roda em modo git e varre o historico de
-  # commits do --source (o padrao do detect). Arquivo nao commitado nao passa por
-  # este gate; a varredura da arvore de trabalho e outro comando.
-  GITLEAKS_ARGS+=(--source ".")
-  if gitleaks "${GITLEAKS_ARGS[@]}"; then
-    pass "gitleaks: nenhum secret detectado."
-  else
-    fail "gitleaks DETECTOU possivel secret — investigue antes de commitar."
-  fi
-else
-  skip "gitleaks ausente localmente — rodara no CI (binario de release)."
-fi
-
-# =================================================================================
-# Gate 7 - Smoke offline (frontmatter parseavel + hooks executam)
+# Gate 6 - Smoke offline (frontmatter parseavel + hooks executam)
 # =================================================================================
 gate "Smoke offline: smoke_offline.py"
 if ${PY} scripts/smoke_offline.py; then
@@ -209,7 +184,7 @@ else
 fi
 
 # =================================================================================
-# Gate 8 - Drift semântico (BT-7): registry agents/skills/hooks + porte/host
+# Gate 7 - Drift semântico (BT-7): registry agents/skills/hooks + porte/host
 # =================================================================================
 # Obrigatório, stdlib. Detecta name≠stem, contagem fora de EXPECTED_AGENT_COUNT, hook script ausente,
 # porte legado "solo" como primário sem alias, e host legado Codeberg em produto.
@@ -221,7 +196,7 @@ else
 fi
 
 # =================================================================================
-# Gate 9 - Evals de roteamento /bigtech (BT-8): hard, stdlib only
+# Gate 8 - Evals de roteamento /bigtech (BT-8): hard, stdlib only
 # =================================================================================
 # Politica pos-BT-5: piso early, nunca profile=solo, headcount peso 0,
 # criticidade eleva agents. Offline, sem LLM pago.
@@ -233,50 +208,7 @@ else
 fi
 
 # =================================================================================
-# Gate 10 - claude plugin validate (x2): opcional, degrada gracioso
-# =================================================================================
-# Validacao oficial da CLI do Claude Code, em DOIS alvos (cobre marketplace +
-# manifesto do plugin):
-#   a) no diretorio (.) --strict   -> marketplace.json (hard se CLI presente)
-#   b) em ./.claude-plugin/plugin.json (sem --strict)
-#       O CLAUDE.md de desenvolvimento mora em .claude/CLAUDE.md (contexto de
-#       campanha / dual-host; nao e contexto de produto distribuido). Desde o
-#       CONS-11A ele saiu da raiz, que era o que a CLI acusava como "not loaded
-#       as project context"; por isso o --strict do diretorio passa. O validate
-#       sem --strict no manifesto do plugin fica como esta: mudar isso e decisao
-#       do lider, nao de ajuste silencioso.
-# Se a CLI `claude` NAO estiver no runner, o gate faz SKIP avisando (degradacao
-# graciosa, igual ruff/gitleaks); nao falha o pre-CI por ausencia da CLI.
-gate "claude plugin validate (marketplace --strict + plugin.json)"
-if command -v claude >/dev/null 2>&1; then
-  validate_ok=1
-  if claude plugin validate --strict .; then
-    printf '  %s[ok]%s validate --strict no diretorio (marketplace).\n' \
-      "${C_GREEN}" "${C_RESET}"
-  else
-    printf '  %s[FAIL]%s validate --strict reprovou no diretorio.\n' \
-      "${C_RED}" "${C_RESET}" >&2
-    validate_ok=0
-  fi
-  if claude plugin validate ./.claude-plugin/plugin.json; then
-    printf '  %s[ok]%s validate no plugin.json.\n' \
-      "${C_GREEN}" "${C_RESET}"
-  else
-    printf '  %s[FAIL]%s validate reprovou no plugin.json.\n' \
-      "${C_RED}" "${C_RESET}" >&2
-    validate_ok=0
-  fi
-  if [[ "${validate_ok}" -eq 1 ]]; then
-    pass "claude plugin validate limpo nos dois alvos."
-  else
-    fail "claude plugin validate reprovou; veja acima."
-  fi
-else
-  skip "CLI 'claude' ausente no runner; validate roda em quem tiver a CLI."
-fi
-
-# =================================================================================
-# Gate 11 — sync docs/house (CONS-10). Sem vault ou sem chave sai NAO CONFERIDO:
+# Gate 9 — sync docs/house (CONS-10). Sem vault ou sem chave sai NAO CONFERIDO:
 # aparece como tal e nunca como PASS. Divergencia ou erro reprova.
 # =================================================================================
 gate "sync docs/house (CONS-10): gate_sync_house.py --check"
@@ -293,7 +225,7 @@ else
 fi
 
 # =================================================================================
-# Resumo: PASS so com os 11 gates passados e nenhum pulado nem nao conferido.
+# Resumo: PASS so com os 9 gates passados e nenhum pulado nem nao conferido.
 # =================================================================================
 printf '\n%s========================================%s\n' "${C_BOLD}" "${C_RESET}"
 N_PASS=${#PASSED[@]}

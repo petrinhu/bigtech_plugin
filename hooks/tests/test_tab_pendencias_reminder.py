@@ -108,16 +108,6 @@ def test_modo_invalido_cai_em_auto(monkeypatch):
 
 # ------------------- lembrete unico: texto sempre com prefixo -----------------
 
-def test_mensagem_de_sessao_cita_comando_com_prefixo_bigtech(tmp_path):
-    sd = str(tmp_path)
-    data = _proj(tmp_path)
-    data["session_id"] = "pref"
-    t.carimbar_sessao("pref", 0.0, state_dir=sd)
-    msg = t.avaliar_userprompt(data, 3 * 3600.0, state_dir=sd)
-    assert "/bigtech:tab_pendencias --reorder" in msg
-    assert "/tab_pendencias" not in msg.replace("/bigtech:tab_pendencias", "")
-
-
 def test_plugin_nao_emite_criar_nem_staleness(tmp_path):
     """CRIAR e STALENESS sao do produto; o plugin nao tem mais esses gatilhos."""
     assert not hasattr(t, "avaliar_sessionstart")

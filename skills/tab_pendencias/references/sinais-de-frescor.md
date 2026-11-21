@@ -51,7 +51,7 @@ fresco; interrupcao quando envelhece.
 | `TAB_TRIAGE_REQUIRED` | `classifiable > 0` **ou** residual aged **ou** `inbox/*.md` pendente | `--drain` no proximo ponto seguro |
 | `TAB_CONCURRENT_INBOX_PRESENT` | count de `inbox/*.md` > 0 | dreno do fallback entre sessoes |
 | `TAB_LEADER_DECISION_AGED` | residual `reason=needs-leader-decision` **e** `residual_is_aged` | apresentar 2-3 opcoes (AskUserQuestion); re-chamar intake apos decisao |
-| `TAB_VERIFICATION_AGING` | n_verif >= min_count **ou** (n_verif >= 1 e days_since_todo_touch >= min_days) | planejar onda TST-*/AUD-* |
+| `TAB_VERIFICATION_AGING` | n_verif >= min_count **ou** (n_verif >= 1 e days_since_todo_touch >= min_days) | conferir o CI do ramo e fechar com ✅ o que ficou verde |
 | `TAB_INTAKE_RECOVERY_REQUIRED` | journal de intake com orfaos (`state != DONE`) | recuperacao idempotente antes de novo intake |
 
 ### O que **nao** dispara `TAB_TRIAGE_REQUIRED`

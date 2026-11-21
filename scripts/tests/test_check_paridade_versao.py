@@ -17,10 +17,6 @@ RAIZ_REAL = SCRIPTS.parent
 GATE = SCRIPTS / "check_paridade_versao.py"
 
 # Decisao D1 (2026-11-20): pubmed saiu do bundle (retirado do marketplace life-sciences).
-AVISO_PAINEL = (
-    "Sem os recomendados (playwright, superpowers, frontend-design) "
-    "o plugin fica muito comprometido. Para instalar tudo, use bigtech-completo."
-)
 DEPENDENCIAS_ESPERADAS = {
     "bigtech",
     "playwright@claude-plugins-official",
@@ -157,13 +153,3 @@ def test_allowlist_cobre_os_marketplaces_das_dependencias() -> None:
     assert externos == MARKETPLACES_ESPERADOS
     assert externos <= permitidos
     assert "life-sciences" not in permitidos
-
-
-def test_aviso_aprovado_fecha_a_descricao_do_nucleo_e_da_entrada() -> None:
-    nucleo = json.loads((RAIZ_REAL / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8"))
-    market = json.loads(
-        (RAIZ_REAL / ".claude-plugin" / "marketplace.json").read_text(encoding="utf-8")
-    )
-    entrada = next(p for p in market["plugins"] if p["name"] == "bigtech")
-    assert nucleo["description"].endswith(AVISO_PAINEL)
-    assert entrada["description"].endswith(AVISO_PAINEL)

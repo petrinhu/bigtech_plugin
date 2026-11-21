@@ -71,7 +71,7 @@ _HUMAN = {
     ),
     "TAB_VERIFICATION_AGING": (
         "Itens em 🔍 Pendente verificacao acumulam sem a tabela ser "
-        "tocada -- planeje a onda TST-*/AUD-*."
+        "tocada -- confira o CI do ramo e feche os que ficaram verdes."
     ),
     "TAB_INTAKE_RECOVERY_REQUIRED": (
         "Journal de intake tem orfaos (state != DONE). Rode recuperacao "

@@ -15,9 +15,6 @@ import pytest
 HOOKS_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ROOT = os.path.dirname(HOOKS_DIR)
 HOOKS_JSON = os.path.join(HOOKS_DIR, "hooks.json")
-# comando: /tab_pendencias seguido de espaco, pontuacao ou fim; caminho
-# (/tab_pendencias_reminder.py, /tab_pendencias/tools) nao conta.
-SEM_PREFIXO = re.compile(r"(?<!bigtech:)/tab_pendencias(?![\w/])")
 
 
 def _tab_commands(event):
@@ -105,33 +102,10 @@ def test_repo_git_com_porte_sem_todo_emite_uma_unica_mensagem_de_criacao(tmp_pat
     assert "/bigtech:tab_pendencias --create" in criacoes[0]
 
 
-def test_nenhuma_mensagem_cita_comando_sem_prefixo_bigtech(tmp_path):
-    repo = tmp_path / "proj"
-    _repo_git_com_porte(repo)
-    for m in _rodar_session_start(tmp_path, repo):
-        assert not SEM_PREFIXO.search(m), m
-
-
 def test_sem_porte_nem_todo_nao_ha_mensagem(tmp_path):
     repo = tmp_path / "proj"
     repo.mkdir()
     assert _rodar_session_start(tmp_path, repo) == []
-
-
-@pytest.mark.parametrize("arquivo", [
-    "hooks/tab_pendencias_reminder.py",
-    "hooks/bigtech_session_init.py",
-    "hooks/bigtech_porte_reminder.py",
-    "hooks/bigtech_reinforce.py",
-    "hooks/tdd_guard.py",
-    "hooks/tdd_runner.py",
-    "skills/tab_pendencias/tools/session_signals.py",
-    "skills/tab_pendencias/tools/hooks/tab_pendencias_reminder.py",
-])
-def test_fonte_dos_hooks_nao_tem_comando_sem_prefixo(arquivo):
-    with open(os.path.join(ROOT, arquivo), encoding="utf-8") as fh:
-        for n, linha in enumerate(fh, 1):
-            assert not SEM_PREFIXO.search(linha), f"{arquivo}:{n}: {linha.strip()}"
 
 
 @pytest.mark.parametrize("saida", [

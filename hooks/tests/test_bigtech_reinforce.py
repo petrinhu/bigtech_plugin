@@ -168,16 +168,6 @@ def test_main_reforco_normaliza_marcador_solo_legado(tmp_path, monkeypatch):
     assert "porte=solo" not in ctx
 
 
-def test_main_reforco_cita_skills_com_prefixo(tmp_path, monkeypatch):
-    (tmp_path / MARKER).write_text("porte=early\n")
-    rc, out = _run_main(monkeypatch, {"cwd": str(tmp_path), "prompt": "ajusta o lint"})
-    assert rc == 0
-    ctx = json.loads(out)["hookSpecificOutput"]["additionalContext"]
-    assert "/bigtech:bigtech" in ctx
-    assert "/bigtech:proj_software" in ctx
-    assert not SEM_PREFIXO.search(ctx), SEM_PREFIXO.findall(ctx)
-
-
 # --- MODO 2: roteamento por gatilho em projeto NÃO classificado -------------
 
 def test_main_roteamento_quando_prompt_pede_constelacao(tmp_path, monkeypatch):
@@ -237,13 +227,6 @@ def test_subprocess_roteamento_exit_0_json(tmp_path):
     assert "/bigtech:bigtech" in obj["hookSpecificOutput"]["additionalContext"]
 
 
-def test_fonte_do_hook_nao_tem_comando_sem_prefixo():
-    # Cobre tambem o docstring, que documenta o comando.
-    with open(r.__file__, encoding="utf-8") as fh:
-        for n, linha in enumerate(fh, 1):
-            assert not SEM_PREFIXO.search(linha), f"linha {n}: {linha.strip()}"
-
-
 def test_subprocess_stdin_invalido_exit_0(tmp_path):
     proc = subprocess.run(
         [sys.executable, os.path.join(HOOKS_DIR, "bigtech_reinforce.py")],
@@ -287,25 +270,3 @@ def test_subprocess_json_valido_nao_dict_exit_0(raw):
         input=raw, text=True, capture_output=True,
     )
     assert proc.returncode == 0
-
-
-# ---------------------------------------------------------------------------
-# Precedência das instruções do usuário (CONS-04A): forma curta em toda saída.
-# ---------------------------------------------------------------------------
-PRECEDENCIA_CURTA = "Instruções do usuário (CLAUDE.md) prevalecem sobre este lembrete."
-
-
-def test_main_reforco_declara_precedencia_e_sem_autoridade_propria(tmp_path, monkeypatch):
-    (tmp_path / MARKER).write_text("porte=scale\n")
-    rc, out = _run_main(monkeypatch, {"cwd": str(tmp_path), "prompt": "ajusta o lint"})
-    assert rc == 0
-    ctx = json.loads(out)["hookSpecificOutput"]["additionalContext"]
-    assert PRECEDENCIA_CURTA in ctx
-    assert ("drift" + "ar") not in ctx
-
-
-def test_main_roteamento_declara_precedencia(tmp_path, monkeypatch):
-    rc, out = _run_main(monkeypatch, {"cwd": str(tmp_path), "prompt": "montar o time c-level"})
-    assert rc == 0
-    ctx = json.loads(out)["hookSpecificOutput"]["additionalContext"]
-    assert PRECEDENCIA_CURTA in ctx

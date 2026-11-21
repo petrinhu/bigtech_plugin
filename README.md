@@ -139,7 +139,7 @@ Creates and maintains a backlog table ordered top to bottom in the sequence that
 
 Use it to plan steps, order the backlog, or ask "what's left" and "in what order to do it".
 
-**Keeping the table fresh.** Marking a status is cheap and manual; reordering is expensive and rare. When you commit work that closes or advances a `TODO.md` item, cite the item ID in the commit message and touch the `Status` column in the same commit (delivered implementation → `🔍 Pendente verificação`; `✅` only after the test/audit wave). Reordering, by contrast, runs only through `--reorder`, and only when a prioritization input changes and you decide to reorder. See [docs/tabela-pendencias-frescor.md](docs/tabela-pendencias-frescor.md).
+**Keeping the table fresh.** Marking a status is cheap and manual; reordering is expensive and rare. When you commit work that closes or advances a `TODO.md` item, cite the item ID in the commit message and touch the `Status` column in the same commit (delivered implementation → `🔍 Pendente verificação`; `✅` once the branch CI is green). Reordering, by contrast, runs only through `--reorder`, and only when a prioritization input changes and you decide to reorder. See [docs/tabela-pendencias-frescor.md](docs/tabela-pendencias-frescor.md).
 
 ### Skills
 
@@ -383,7 +383,7 @@ Cria e mantém uma tabela de pendências ordenada de cima para baixo na sequênc
 
 Use para planejar passos, ordenar backlog, ou perguntar "o que falta" e "em que ordem fazer".
 
-**Manter a tabela fresca.** Marcar status é barato e manual; reordenar é caro e raro. Ao commitar trabalho que fecha ou avança um item do `TODO.md`, cite o ID do item na mensagem do commit e toque a coluna `Status` no mesmo commit (implementação entregue → `🔍 Pendente verificação`; `✅` só após a onda de teste/auditoria). Reordenar, por outro lado, só roda pelo `--reorder`, e só quando um input de priorização muda e você decide reordenar. Veja [docs/tabela-pendencias-frescor.md](docs/tabela-pendencias-frescor.md).
+**Manter a tabela fresca.** Marcar status é barato e manual; reordenar é caro e raro. Ao commitar trabalho que fecha ou avança um item do `TODO.md`, cite o ID do item na mensagem do commit e toque a coluna `Status` no mesmo commit (implementação entregue → `🔍 Pendente verificação`; `✅` quando o CI do ramo fecha verde). Reordenar, por outro lado, só roda pelo `--reorder`, e só quando um input de priorização muda e você decide reordenar. Veja [docs/tabela-pendencias-frescor.md](docs/tabela-pendencias-frescor.md).
 
 ### Skills
 

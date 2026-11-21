@@ -1,10 +1,13 @@
 # Catalogo de Testes e Auditorias (embutido)
 
-> Catalogo GENERICO usado pela skill tab_pendencias para injetar itens de teste e
-> auditoria na tabela. Derivado de guias de teste/auditoria multi-stack. NAO contem
-> nada especifico de um sistema pessoal. Quando o projeto tem ./TESTES.md ou
-> ./AUDITORIAS.md proprios, eles tem precedencia; este catalogo e a base/fallback e
-> a fonte dos manuais que a skill cria quando faltam.
+> Catalogo GENERICO de itens de teste e auditoria da skill tab_pendencias. Por padrao
+> a skill NAO injeta nada daqui (piso de testes): so sugere teste de logica de produto
+> e, quando o projeto toca seguranca, privacidade ou deploy irreversivel, a auditoria
+> AUD-SEC. Os demais itens entram so quando o usuario pede (--add_tests_audit).
+> Derivado de guias de teste/auditoria multi-stack. NAO contem nada especifico de um
+> sistema pessoal. Quando o projeto tem ./TESTES.md ou ./AUDITORIAS.md proprios, eles
+> tem precedencia; este catalogo e a base/fallback e a fonte dos manuais que a skill
+> cria quando o usuario pede.
 
 ## Deteccao de stack
 
@@ -33,7 +36,8 @@ Caracteristicas (habilitam tipos condicionais):
 
 ## Testes (T1-T15)
 
-`Aplica`: `sempre` | condicao (caracteristica). T1 e SEMPRE EXCLUIDO (coberto pelo
+`Aplica`: `sempre` | condicao (caracteristica) | `a pedido`. Mesmo `sempre`, o item
+so entra na tabela quando o usuario pede. T1 e SEMPRE EXCLUIDO (coberto pelo
 hook de TDD; nunca vira item na tabela).
 
 | ID | Tipo | Objetivo (1 linha) | Aplica | Ferramentas tipicas |
@@ -51,7 +55,7 @@ hook de TDD; nunca vira item na tabela).
 | TST-T11 | Fuzzing de Protocolos | protocolo de rede custom | rede com protocolo proprio | boofuzz |
 | TST-T12 | Busca de CVEs | CVE nas deps | sempre | trivy, grype, OSV/NVD |
 | TST-T14 | Integracao (fim-a-fim) | sistema integrado contra fontes de verdade | sempre (quase) | harness de integracao por stack |
-| TST-T15 | Pre-CI (espelhar CI local) | rodar a suite do CI antes do push | sempre | scripts/preci.sh por stack |
+| TST-T15 | Pre-CI (espelhar CI local) | rodar a suite do CI na maquina, opcional (o CI e o unico portao) | a pedido | scripts/preci.sh por stack |
 
 ## Auditorias (consolidadas)
 
@@ -76,7 +80,7 @@ por tema. ID semantico e estavel. `Aplica` igual ao das tabelas de teste.
 ## Criacao dos manuais do projeto (poda por stack)
 
 Quando `./TESTES.md` ou `./AUDITORIAS.md` faltam na raiz do projeto e o usuario
-confirma acrescentar, a skill os CRIA a partir dos templates abaixo, removendo as
+pede (`--add_tests_audit`), a skill os CRIA a partir dos templates abaixo, removendo as
 linhas cujo `Aplica` nao casa o stack/caracteristicas detectados. NUNCA sobrescreve
 um manual existente.
 
@@ -86,7 +90,7 @@ um manual existente.
 # Testes do Projeto
 
 > Tipos de teste aplicaveis a este projeto (stack: {STACK}). T1 unitario fica sob o
-> hook de TDD, nao listado aqui. Cada tipo vira um item TST-* na tabela de pendencias.
+> hook de TDD, nao listado aqui. Cada tipo pedido vira um item TST-* na tabela de pendencias.
 
 <<linhas de TST-* aplicaveis, no formato: "## TST-T<n> <Tipo>\n<objetivo>\n**Ferramentas:** ...">>
 ```
@@ -96,7 +100,7 @@ um manual existente.
 ```markdown
 # Auditorias do Projeto
 
-> Auditorias aplicaveis a este projeto (stack: {STACK}). Cada uma vira um item AUD-*
+> Auditorias aplicaveis a este projeto (stack: {STACK}). Cada uma pedida vira um item AUD-*
 > na tabela de pendencias, nas ondas finais (downstream de codigo+teste).
 
 <<linhas de AUD-* aplicaveis, no formato: "## AUD-<ID> <Tema>\n<objetivo>\n**Ferramentas:** ...">>

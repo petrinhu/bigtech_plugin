@@ -53,8 +53,8 @@ Caminho do vault para o `--check` local: `--vault`, depois a variável `BIGTECH_
 <!-- sync:tabela inicio -->
 | Arquivo | hmac_vault_sha256 (chave local) | sha256_corpo_transformado | Transformações aplicadas |
 |---|---|---|---|
-| CONTRACT.md | `0037f7a1fd787488f3cce7a00078c101baeb575693b7efad273ca884a2a562ed` | `c2f64ced18876520d9d988f43a696690c345e2963cc7da97f47d723bf6217005` | T1 |
-| TESTES.md | `66b094fc2ae4d97252c8edb1a6476c8dd49349b2123184345098a30179dead5e` | `1e3db19b040492080fa3d76a68ae559b7e0274ffd610d40ef5872c761967262f` | T1 |
+| CONTRACT.md | `28ee64d1fafe9b5f11ccc25cab9943a5426c73a8fcdab86e22fe28b347d99755` | `854a01933d1789b21175e4e821f15b8e9ce2c7ae1b77b1c98a73c0b31b5a0fa8` | T1 |
+| TESTES.md | `8ee8d00d09465be7eae74830aa03435ab353afa9ee6babd1a6597373578cfa42` | `efcd310ad99e1abba95caca52995bf6321646c9b83e55a0dc197f45dbf29f8ca` | T1 |
 | TOOLING.md | `93d7abb6f16fbc61827f7131dd0a72c6d04d9a470302c439f5625c9885e050f1` | `412fc1c4c647ea10d0435a4dcc7c6dd998e2413386edfdc3e8a45360cfa225e6` | nenhuma |
 | pipeline_release_1.0.md | `19a5c3aad4cbe5d3a32890e9d324e01780d30f9044c5b54c1309bf7f8591008d` | `6839afdf80fece62d7593be3978c0120d9e4ea348ceb581ac8921ef2b52dcd20` | nenhuma |
 | DEPLOY_CHECKLIST.md | `ed548f1da52830cd85e39bd184d16f9686f70427019cd70f1ce50309b0f728ba` | `b4e3e9931af31c191541f83a90996855511ef449e0331f12106e2b056b5696a3` | T1 |
@@ -62,7 +62,7 @@ Caminho do vault para o `--check` local: `--vault`, depois a variável `BIGTECH_
 | ORG.md | `e99d55729b4e75c81c870c97ead8902f0481736e8bc73d785437af363cabe2ac` | `e73c595f10ee93c7a3d4eacaadbc645888ec593037bf1320a466f81ab3349d92` | T2 |
 | Standards.md | `28a9d129ba72df0f943b1ebd9d6032840c65c9cddb585b9e9096ffdf040a1974` | `34f8283ada07a24a2bd983b96b8554b983ce276c9fd4b649cd29d16850435291` | T1 |
 | AGILE.md | `2655cfc9058e35eb0a0baa040fcf3d0e52df4433a7f073d1dc11bb7a51fd95d7` | `e33ebf74074254ec6668fb2f472142cffbad7b0d6ea5cf2aafae64a190303260` | T1 |
-| AUDITORIAS.md | `7210c74415749a6053d1af65b830ac701921403161808133ea85fadae48d3474` | `189ad565f2b854df57d9641b54e06ae2bb5a0c0d857abe3dbd8dbef1b232bef8` | T1 |
+| AUDITORIAS.md | `f2e29e9c2220715c8dc3d3a0fd81261babc5b97231feaa814e94d26940a56b5a` | `540960ebe7a207ce9cd5984b008ec62a69062486cc1ec18b1027ccac0079e12d` | T1 |
 | audit-seo.md | `d0ce5704cbec73a320f2ecba5a967f680d1d7d465da35553cfbbf860f5cd01f1` | `491b79f3443e7f554219ce6f463edb1af6e14a4963764d63f87c078c1935e1e3` | T4 |
 | CLAUDE-vault.md | `180eea1f2660709cf40f330f0eaee9e4a0abefa1d43e8ebfafd26f75a8901c5b` | `2e7d2615f60cc0b86aec250a3e46fb2a3d9c7b3420c77a189681a32e60cb68f3` | T3a, T5 |
 <!-- sync:tabela fim -->

@@ -1,8 +1,8 @@
 <!--
   docs/house sync
   origem: vault claudebrain / CONTRACT.md
-  sync_date: 2026-11-20
-  hmac_vault_sha256: 0037f7a1fd787488f3cce7a00078c101baeb575693b7efad273ca884a2a562ed
+  sync_date: 2026-11-21
+  hmac_vault_sha256: 28ee64d1fafe9b5f11ccc25cab9943a5426c73a8fcdab86e22fe28b347d99755
   transformacoes: T1=4 T2=0 T3a=0 T3=0 T4=0 T5=0
   regra: As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário. Se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
   sem segredos: não incluir tokens/credenciais
@@ -21,7 +21,7 @@
 > **Audience:** AI coding agents (Claude, GPT, Gemini, Copilot, etc.)
 > **Purpose:** Mandatory reference before writing, modifying, or reviewing any code.
 > **Authority:** Rules use RFC 2119 keywords  -  MUST, MUST NOT, SHOULD, SHOULD NOT, MAY.
-> **Testing & Audit:** All testing, quality and audit procedures are defined in [TESTES.md](TESTES.md).
+> **Testing & Audit:** test floor in section 11 (tests only for product logic; the CI is the only gate). Procedures in [TESTES.md](TESTES.md).
 
 ---
 
@@ -54,7 +54,7 @@
 1. Read this document fully for the first task in a project.
 2. Identify the target language and framework  -  apply sections 12 and 13 accordingly.
 3. Identify the architecture layer being modified  -  apply section 5 rules.
-4. After completing any task: run the checklist in section 11.
+4. After completing any task: apply the test floor in section 11 (the CI is the only gate).
 
 **Decision flow:**
 
@@ -74,10 +74,10 @@ Apply SOLID + Design Pattern rules
 Write a failing test → see it fail → write minimal code → see it pass → refactor
       │
       ▼
-Run applicable tests from TESTES.md
+Commit with Conventional Commits format
       │
       ▼
-Commit with Conventional Commits format
+Push to the branch: the CI is the only gate
       │
       ▼
 Done
@@ -87,7 +87,7 @@ Done
 - Write code without reading existing files first.
 - Add features beyond what was requested.
 - Introduce hardcoded secrets, credentials, or API keys.
-- Skip the build step before committing.
+- Push code that breaks the CI build (the CI is the only gate).
 - Use deprecated APIs, unsafe functions, or patterns marked ANTI-PATTERN below.
 - Ignore compiler warnings.
 
@@ -361,7 +361,7 @@ public:
 - Business rule calculation inside a repository.
 - UI framework import inside a service or domain class.
 
-### 5.2 Layer Checklist Before Committing
+### 5.2 Layer Rules (quick reference)
 
 ```
 [ ] Class belongs to exactly one layer?
@@ -671,11 +671,11 @@ chore/ferramenta-ou-dep
 test/modulo-testado
 ```
 
-### 10.4 Commit Checklist (MUST complete before every commit)
+### 10.4 Commit Checklist
+
+Build, warnings and product-logic tests are checked by the CI, the only gate; they are not a local step before the commit.
 
 ```
-[ ] Build passes with zero errors
-[ ] Zero new compiler warnings introduced
 [ ] No hardcoded secrets, tokens, or credentials
 [ ] .gitignore excludes build artifacts, IDE files, .env files
 [ ] Commit message follows Conventional Commits format
@@ -706,9 +706,7 @@ test/modulo-testado
 - [Key technical decision 2]
 
 ## Checklist
-- [ ] Build passes
-- [ ] Tests pass (reference TESTES.md sections run)
-- [ ] No new warnings
+- [ ] CI green (build, product-logic tests, no new warnings; the only gate)
 - [ ] No secrets committed
 - [ ] CHANGELOG.md updated (if user-facing change)
 ```
@@ -717,31 +715,30 @@ test/modulo-testado
 
 ## 11. Testing & Audit Mandate
 
-> Full procedures, commands, and tools: **[TESTES.md](TESTES.md)**
+> **Piso de testes.** Teste só para lógica de produto. O CI é o único portão. Nada de teste de mutação, sabotagem, auditoria, reauditoria, varredura de gêmeos, checklist de perguntas do revisor, script de verificação extra nem portão local novo. Exceção: segurança, privacidade e deploy irreversível.
+
+> Catalog of procedures, commands, and tools: **[TESTES.md](TESTES.md)**. Anything there beyond this floor runs only when the user asks.
 
 ### When to Run Tests
 
-| Event | Required tests |
-|-------|---------------|
-| Every commit | Build passes, zero warnings |
-| Feature complete | T1 (unit), T2 (static analysis), T4 (ASan/UBSan) |
-| Before any release/deploy | T1-T12 full suite + A1-A10 full audit |
-| New dependency added | T5 (dependency scan) + T12 (CVE check) |
+| Event | Required |
+|-------|----------|
+| Product logic added or changed | A test written first (TDD, T1), run by the CI |
+| Every push | The CI of the branch, the only gate |
+| New dependency added | T5 (dependency scan) + T12 (CVE check), in the CI |
 | Auth/crypto code changed | T8 (secrets), T10 (SQL injection), A5 (dynamic analysis) |
-| UI changed | A3 (UX/accessibility) |
-| Architecture changed | A2 (layer audit), A7 (coupling), A9 (SOLID) |
+| Personal data touched | Privacy review (section 17) |
+| Irreversible deploy | [DEPLOY_CHECKLIST.md](DEPLOY_CHECKLIST.md), once, before the go |
 
-### Minimum Quality Gates (MUST pass before release)
+### Minimum Quality Gate (MUST pass before release)
 
 ```
-[ ] T1  Unit tests: 0 failures
-[ ] T2  Static analysis: 0 security/bugprone errors
-[ ] T4  ASan: 0 ERROR SUMMARY
-[ ] T8  Secrets scan: 0 detected
-[ ] T12 CVE scan: 0 CRITICAL unpatched
-[ ] A2  Architecture: 0 layer violations
-[ ] A10 Audit report generated and reviewed
+[ ] CI green on the release commit: build, product-logic tests (T1),
+    secrets scan (T8: 0 detected), CVE scan (T12: 0 CRITICAL unpatched)
 ```
+
+- The CI MUST be the only gate. MUST NOT add mutation testing, sabotage, audits, re-audits, twin-defect sweeps, reviewer question checklists, extra verification scripts or new local gates.
+- An audit in the exception (security, privacy, irreversible deploy) runs once; the fix for a finding is confirmed by the CI, without re-audit.
 
 ### Post-Release Cleanup (per the user's rules)
 

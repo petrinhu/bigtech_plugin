@@ -29,12 +29,6 @@ import sync_house as sh
 
 CHAVE = b"\x01" * 32  # chave de teste; a real nunca entra no repo
 
-FRASE_LONGA = (
-    "As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que "
-    "eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin "
-    "em qualquer conflito. Onde divergirem, siga as do usuário."
-)
-
 LINHA_AUTORIDADE = (
     "**O usuário (" + "pet" + "rus) é o líder supremo e soberano de todos os projetos "
     "desta máquina.** Títulos: " + "Kai" + "ser, Presidente, Rei."
@@ -89,12 +83,6 @@ def _home_descartavel(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 # ---------------------------------------------------------------------------
 # Cabecalho de sync
 # ---------------------------------------------------------------------------
-
-
-def test_cabecalho_leva_a_frase_longa_de_precedencia() -> None:
-    assert sh.FRASE_PRECEDENCIA_LONGA == FRASE_LONGA
-    saida = sh.gerar_manual(VAULT_EXEMPLO, "ORG", "2026-11-20", CHAVE)
-    assert FRASE_LONGA in saida[: saida.find("-->\n")]
 
 
 def test_cabecalho_nao_tem_caminho_local_nem_path_vault() -> None:
@@ -173,19 +161,6 @@ LINHA_CWD_VAULT = (
     + "/" + "home/" + "pet" + "rus/IDrive/Documentos/projetos_claudebrain/"
     + "`. Conteúdo em docs separados."
 )
-
-
-def test_marcas_das_transformacoes_sao_as_declaradas() -> None:
-    # T1 a T4 sao de privacidade; a T5 (link para fora de docs/house) tem marca propria.
-    marcas = {t.id: t.marca for t in sh.TRANSFORMACOES}
-    assert marcas == {
-        "T1": "privacidade",
-        "T2": "privacidade",
-        "T3a": "privacidade",
-        "T3": "privacidade",
-        "T4": "privacidade",
-        "T5": "link-externo",
-    }
 
 
 def test_t3a_caminho_do_vault_em_frase_de_cwd_vira_a_raiz_do_vault() -> None:

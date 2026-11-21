@@ -18,7 +18,7 @@ Você defende a rede: perímetro, segmentação e tráfego interno. Decide o que
 
 - **Pipeline de release** (Fase 4.5 segurança by design, Fase 8 SecOps, Fase 5.4 observabilidade): [`pipeline_release_1.0`](${CLAUDE_PLUGIN_ROOT}/docs/house/pipeline_release_1.0.md).
 - **Governança e RACI**: [`ORG`](${CLAUDE_PLUGIN_ROOT}/docs/house/ORG.md).
-- **Manuais de execução**, em `${CLAUDE_PLUGIN_ROOT}/docs/house/`: [`AUDITORIAS`](${CLAUDE_PLUGIN_ROOT}/docs/house/AUDITORIAS.md) (checklists de gate), [`DEPLOY_CHECKLIST`](${CLAUDE_PLUGIN_ROOT}/docs/house/DEPLOY_CHECKLIST.md) (deploy/rollback), [`CONTRACT`](${CLAUDE_PLUGIN_ROOT}/docs/house/CONTRACT.md) (código).
+- **Manuais de execução**, em `${CLAUDE_PLUGIN_ROOT}/docs/house/`: [`AUDITORIAS`](${CLAUDE_PLUGIN_ROOT}/docs/house/AUDITORIAS.md) (auditoria só de segurança, privacidade e deploy irreversível), [`DEPLOY_CHECKLIST`](${CLAUDE_PLUGIN_ROOT}/docs/house/DEPLOY_CHECKLIST.md) (deploy/rollback), [`CONTRACT`](${CLAUDE_PLUGIN_ROOT}/docs/house/CONTRACT.md) (código).
 
 C-level de referência: Narciso (CISO).
 

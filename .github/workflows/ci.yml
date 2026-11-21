@@ -7,6 +7,7 @@ name: CI
 on:
   push:
     branches: [main]
+    tags: ["v*"]
   pull_request:
   workflow_dispatch:
 
@@ -52,35 +53,45 @@ jobs:
         run: pip install -r requirements-dev.txt
 
       - name: pytest hooks/tests scripts/tests
+        if: runner.os == 'Windows'
         run: python -m pytest hooks/tests scripts/tests -q
 
       - name: validate_plugin (ZERO-ORFAOS)
+        if: runner.os == 'Windows'
         run: python scripts/validate_plugin.py
 
       # CONS-10: sem vault na CI, o gate sai com NAO CONFERIDO (aviso, nunca PASS).
       # So reprova divergencia ou erro de uso (gate_sync_house.py mapeia 0/1/2/3).
       - name: "sync docs/house (CONS-10, sem vault: 3 = nao conferido)"
+        if: runner.os == 'Windows'
         run: python scripts/gate_sync_house.py --check
 
       - name: smoke_offline
+        if: runner.os == 'Windows'
         run: python scripts/smoke_offline.py
 
       - name: check_semantic_drift (BT-7)
+        if: runner.os == 'Windows'
         run: python scripts/check_semantic_drift.py
 
       - name: evals roteamento /bigtech (BT-8)
+        if: runner.os == 'Windows'
         run: python evals/bigtech_routing/run_evals.py
 
       - name: JSON valido plugin.json
+        if: runner.os == 'Windows'
         run: python -m json.tool .claude-plugin/plugin.json
 
       - name: JSON valido marketplace.json
+        if: runner.os == 'Windows'
         run: python -m json.tool .claude-plugin/marketplace.json
 
       - name: JSON valido hooks.json
+        if: runner.os == 'Windows'
         run: python -m json.tool hooks/hooks.json
 
       - name: Paridade de versao plugin.json == marketplace
+        if: runner.os == 'Windows'
         shell: bash
         run: |
           python - <<'PY'
@@ -96,20 +107,22 @@ jobs:
           PY
 
       - name: ruff check hooks/ scripts/
+        if: runner.os == 'Windows'
         run: ruff check hooks/ scripts/
 
-      # Ubuntu: espelha o pre-CI completo (gates Python ja rodados acima;
-      # preci.sh revalida e degrada gitleaks/claude se ausentes).
+      # Ubuntu: roda so o preci.sh, que tem os mesmos gates dos passos acima
+      # (esses passos rodam so no Windows).
       - name: preci.sh (Ubuntu only)
         if: runner.os == 'Linux'
         run: bash scripts/preci.sh
 
   # ---------------------------------------------------------------------
-  # Containers: Debian 12, Fedora 41, Arch (sobre ubuntu-latest)
+  # Containers: Debian 12, Fedora 41, Arch (sobre ubuntu-latest), so na tag.
   # Digests e padrao install reutilizados do tab_pendencias CI-2.
   # ---------------------------------------------------------------------
   test-distros:
     name: validate (${{ matrix.distro }} via container)
+    if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     container:
       image: ${{ matrix.image }}

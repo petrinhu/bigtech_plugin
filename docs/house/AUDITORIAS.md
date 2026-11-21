@@ -1,8 +1,8 @@
 <!--
   docs/house sync
   origem: vault claudebrain / AUDITORIAS.md
-  sync_date: 2026-11-20
-  hmac_vault_sha256: 7210c74415749a6053d1af65b830ac701921403161808133ea85fadae48d3474
+  sync_date: 2026-11-21
+  hmac_vault_sha256: f2e29e9c2220715c8dc3d3a0fd81261babc5b97231feaa814e94d26940a56b5a
   transformacoes: T1=4 T2=0 T3a=0 T3=0 T4=0 T5=0
   regra: As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário. Se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
   sem segredos: não incluir tokens/credenciais
@@ -21,7 +21,9 @@
 > Checklists operacionais de auditoria para projetos C++ · Python · Web (PHP/JS/HTML).
 > Cada item tem prioridade **CRÍTICO · IMPORTANTE · COSMÉTICO**.
 
-> **Como usar este manual.** Este é o catálogo de referência dos temas de auditoria por stack. O conjunto de auditorias aplicável a um projeto concreto é materializado no `AUDITORIAS.md` da raiz daquele projeto, gerado e podado pela skill `tab_pendencias` conforme o stack detectado (cada tema vira um item `AUD-*` na tabela de pendências). Consulte aqui o escopo de cada tema; rode lá a auditoria do seu projeto.
+> **Piso de testes.** Teste só para lógica de produto. O CI é o único portão. Nada de teste de mutação, sabotagem, auditoria, reauditoria, varredura de gêmeos, checklist de perguntas do revisor, script de verificação extra nem portão local novo. Exceção: segurança, privacidade e deploy irreversível.
+
+> **Como usar este manual.** Este é o catálogo de referência dos temas de auditoria por stack. Pelo piso, auditoria só roda na exceção (segurança, privacidade e deploy irreversível): uma vez, depois do código que ela cobre, sem reauditoria, com a correção de cada achado conferida no CI. Os outros temas só entram quando o usuário pede; aí a skill `tab_pendencias` os poda pelo stack no `AUDITORIAS.md` da raiz do projeto (`--add_tests_audit`). Consulte aqui o escopo de cada tema.
 
 > **Ferramenta ausente.** Siga a regra de [[TOOLING]] (legenda de status): ferramenta de linha de comando de uso geral pode ser instalada com aviso; biblioteca, dependência de projeto, modelo, extensão, navegador e serviço só com permissão do usuário; nunca falhar calado.
 
@@ -31,7 +33,7 @@
 
 | Prioridade | Significado |
 |---|---|
-| CRÍTICO | Bloqueia release: falha de segurança, perda de dado, violação de arquitetura grave |
+| CRÍTICO | Bloqueia release: falha de segurança, vazamento de dado pessoal, perda de dado |
 | IMPORTANTE | Corrigir antes do próximo marco: dívida técnica relevante, risco médio |
 | COSMÉTICO | Melhoria incremental: estilo, consistência, baixo impacto |
 
@@ -65,4 +67,4 @@ Os ícones 🔴 (crítico), 🟠 (importante) e 🟢 (cosmético) só entram se 
 
 - [[TESTES]]: os procedimentos de teste (T1-T15) que precedem e alimentam a auditoria.
 - [[DEPLOY_CHECKLIST]]: gates pré-deploy que dependem das auditorias de segurança.
-- O `AUDITORIAS.md` na raiz do seu projeto traz o subconjunto aplicável ao stack dele.
+- O `AUDITORIAS.md` na raiz do seu projeto traz o subconjunto que o usuário pediu, podado pelo stack.

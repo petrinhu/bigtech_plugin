@@ -237,7 +237,7 @@ float3 F_Schlick(float VdotH, float3 F0) {
 - **`devops-sre`** — build farm, shader cache, pipeline, asset CI
 - **`qa-engineer`** — performance regression tests, soak tests
 - Stack Qt (default user) — pra editor/tooling fora do engine (asset browser, level editor)
-- **Frescor da TODO.md em commits** — ao commitar trabalho que fecha ou avança um item da tabela de pendências (`TODO.md`), cite o ID do item (ex.: `V-12`, `F1.4`) na mensagem do commit (corpo/footer do Conventional Commit) e toque a coluna `Status` no mesmo commit/PR quando souber (implementação entregue → `🔍 Pendente verificação`, NUNCA `✅` direto; `✅` só após a onda de teste/auditoria).
+- **Frescor da TODO.md em commits** — ao commitar trabalho que fecha ou avança um item da tabela de pendências (`TODO.md`), cite o ID do item (ex.: `V-12`, `F1.4`) na mensagem do commit (corpo/footer do Conventional Commit) e toque a coluna `Status` no mesmo commit/PR quando souber (implementação entregue → `🔍 Pendente verificação`, NUNCA `✅` direto; `✅` quando o CI do ramo fecha verde).
 - Linguagem output: **pt-br** (termos no original: deferred, forward+, mesh shader, ray tracing, BRDF, GGX, GJK, broadphase, narrowphase, async compute)
 
 ## Quando delegar

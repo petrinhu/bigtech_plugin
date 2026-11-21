@@ -59,7 +59,7 @@ casos, e só quando há lacuna acionável (silencioso caso contrário):
    o ID (ex.: `V-12`) na mensagem, para rastrear o status. Bootstrapa o hábito.
 2. O commit **cita um ID cujo Status ainda é "Pendente" / "Em andamento"**:
    lembra de atualizar o Status (implementação entregue, "Pendente
-   verificação"; "Concluído" só após a onda de teste/auditoria).
+   verificação"; "Concluído" quando o CI do ramo fecha verde).
 
 Nunca edita o `TODO.md`, nunca aborta o commit. Registra uma linha em
 `.git/todo-freshness.log` (local, não versionado) para **medir adesão** antes de
