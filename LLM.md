@@ -113,7 +113,7 @@ If the user's environment already has **global** agents, skills, or hooks (defin
 
 Run this check before installing:
 
-1. Inspect the `agents` folder of your global Claude Code configuration for files with the same names as the agents in the "What this plugin is" section.
+1. Inspect the `agents` folder of your global Claude Code configuration for files named like any of the 71 agents of this plugin. "What this plugin is" gives only their count and roles; the names are listed in the Agents section of the [README.md](README.md) and are the file names of the plugin's `agents/` folder, without `.md` (for example `celso-ceo`).
 2. Inspect `~/.claude/skills/` for folders, and `~/.claude/commands/` for `.md` files, named like the 15 skills listed in "What this plugin is", written without the slash and without the `bigtech:` prefix (for example `bigtech`, `proj_software`, `tab_pendencias`). Global skills have no plugin prefix, so search for the bare name: a global `tab_pendencias` folder is the homonym of the plugin's `/bigtech:tab_pendencias`.
 3. Inspect `~/.claude/hooks/` for homonymous TDD or governance hooks (`tdd_guard`, `tdd_runner`, `bigtech_*`).
 
@@ -259,7 +259,7 @@ Se o ambiente do usuário já tiver agents, skills ou hooks **globais** (definid
 
 Faça esta checagem antes de instalar:
 
-1. Inspecione a pasta `agents` da sua configuração global do Claude Code em busca de arquivos com os mesmos nomes dos agents da seção "O que é este plugin".
+1. Inspecione a pasta `agents` da sua configuração global do Claude Code em busca de arquivos com o nome de algum dos 71 agents deste plugin. A seção "O que é este plugin" dá só a contagem e os papéis; os nomes estão na seção Agents do [README.md](README.md) e são os nomes dos arquivos da pasta `agents/` do plugin, sem o `.md` (por exemplo `celso-ceo`).
 2. Inspecione `~/.claude/skills/` em busca de pastas, e `~/.claude/commands/` em busca de arquivos `.md`, com o nome das 15 skills listadas em "O que é este plugin", escrito sem a barra e sem o prefixo `bigtech:` (por exemplo `bigtech`, `proj_software`, `tab_pendencias`). Skill global não tem prefixo de plugin, então procure o nome puro: uma pasta global `tab_pendencias` é a homônima da `/bigtech:tab_pendencias` do plugin.
 3. Inspecione `~/.claude/hooks/` em busca de hooks de TDD ou de governança homônimos (`tdd_guard`, `tdd_runner`, `bigtech_*`).
 
