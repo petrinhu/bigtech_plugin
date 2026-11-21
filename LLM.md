@@ -109,12 +109,12 @@ Confirm the three signals. If any of them fails, report it to the user before mo
 
 This is the most important point for you, agent. **Check it before running the install commands.**
 
-If the user's environment already has **global** agents, skills, or hooks (defined in `~/.claude/`, outside the plugin) with the **same names** as the ones this plugin ships, installing the plugin causes duplication and conflict. Examples of a likely collision: homonymous agents such as `celso-ceo`; homonymous skills such as `/bigtech` and `/bigtech:tab_pendencias`; and, most seriously, **homonymous TDD hooks would run twice** (the global version plus the plugin's), which can block or run the test suite twice over.
+If the user's environment already has **global** agents, skills, or hooks (defined in `~/.claude/`, outside the plugin) with the **same names** as the ones this plugin ships, installing the plugin causes duplication and conflict. Examples of a likely collision: homonymous agents such as `celso-ceo`; homonymous skills such as a global `bigtech` or `tab_pendencias`, which the plugin ships as `/bigtech:bigtech` and `/bigtech:tab_pendencias`; and, most seriously, **homonymous TDD hooks would run twice** (the global version plus the plugin's), which can block or run the test suite twice over.
 
 Run this check before installing:
 
 1. Inspect the `agents` folder of your global Claude Code configuration for files with the same names as the agents in the "What this plugin is" section.
-2. Inspect `~/.claude/skills/` (or `~/.claude/commands/`) for `/bigtech`, `/proj_software`, `/bigtech:tab_pendencias`.
+2. Inspect `~/.claude/skills/` for folders, and `~/.claude/commands/` for `.md` files, named like the 15 skills listed in "What this plugin is", written without the slash and without the `bigtech:` prefix (for example `bigtech`, `proj_software`, `tab_pendencias`). Global skills have no plugin prefix, so search for the bare name: a global `tab_pendencias` folder is the homonym of the plugin's `/bigtech:tab_pendencias`.
 3. Inspect `~/.claude/hooks/` for homonymous TDD or governance hooks (`tdd_guard`, `tdd_runner`, `bigtech_*`).
 
 If there is a collision, **do not install over it.** Present to the user, as a question, the two safe ways out (recommend the first):
@@ -127,7 +127,7 @@ With no collision, proceed with the installation normally.
 ### Compatibility
 
 - **Built for Claude Code (Anthropic).** No guarantee it works on other assistants or code CLIs (for example, Gemini CLI, GitHub Copilot CLI, OpenAI Codex, Cursor, or Aider). Hooks, skills, and the subagent protocol depend on Claude Code; porting requires adaptation and is not officially supported.
-- **Incompatible with the `caveman` plugin.** `caveman` compresses communication and conflicts with `bigtech`'s mode reinforcement. If `caveman` is active, **disable it** before using `bigtech`. The `bigtech_session_init` hook warns on `SessionStart` when it detects both active at the same time.
+- **Possible conflict with the `caveman` plugin.** `caveman` compresses communication and can interfere with `bigtech`'s mode reinforcement and routing. If `caveman` is active, tell the user: keeping or disabling plugins is the user's decision, so do not disable it yourself. If the user keeps both, make sure requests for the constellation still reach the `bigtech` skill. The `bigtech_session_init` hook warns on `SessionStart` when it detects `caveman` active.
 - **Dependencies:** the section "Installation in Claude Code" above lists them, with the install command for the bundle. `frontend-design` comes from the `claude-plugins-official` marketplace only.
 
 ### Security
@@ -255,12 +255,12 @@ Confirme os três sinais. Se algum falhar, relate ao usuário antes de seguir.
 
 Este é o ponto mais importante para você, agente. **Verifique antes de rodar os comandos de instalação.**
 
-Se o ambiente do usuário já tiver agents, skills ou hooks **globais** (definidos em `~/.claude/`, fora do plugin) com os **mesmos nomes** dos que este plugin traz, instalar o plugin causa duplicação e conflito. Exemplos de colisão provável: agents homônimos como `celso-ceo`; skills homônimas como `/bigtech` e `/bigtech:tab_pendencias`; e, o mais grave, **hooks de TDD homônimos rodariam duas vezes** (a versão global mais a do plugin), o que pode bloquear ou rodar a suíte de testes em duplicidade.
+Se o ambiente do usuário já tiver agents, skills ou hooks **globais** (definidos em `~/.claude/`, fora do plugin) com os **mesmos nomes** dos que este plugin traz, instalar o plugin causa duplicação e conflito. Exemplos de colisão provável: agents homônimos como `celso-ceo`; skills homônimas como uma `bigtech` ou uma `tab_pendencias` globais, que o plugin traz como `/bigtech:bigtech` e `/bigtech:tab_pendencias`; e, o mais grave, **hooks de TDD homônimos rodariam duas vezes** (a versão global mais a do plugin), o que pode bloquear ou rodar a suíte de testes em duplicidade.
 
 Faça esta checagem antes de instalar:
 
 1. Inspecione a pasta `agents` da sua configuração global do Claude Code em busca de arquivos com os mesmos nomes dos agents da seção "O que é este plugin".
-2. Inspecione `~/.claude/skills/` (ou `~/.claude/commands/`) em busca de `/bigtech`, `/proj_software`, `/bigtech:tab_pendencias`.
+2. Inspecione `~/.claude/skills/` em busca de pastas, e `~/.claude/commands/` em busca de arquivos `.md`, com o nome das 15 skills listadas em "O que é este plugin", escrito sem a barra e sem o prefixo `bigtech:` (por exemplo `bigtech`, `proj_software`, `tab_pendencias`). Skill global não tem prefixo de plugin, então procure o nome puro: uma pasta global `tab_pendencias` é a homônima da `/bigtech:tab_pendencias` do plugin.
 3. Inspecione `~/.claude/hooks/` em busca de hooks de TDD ou de governança homônimos (`tdd_guard`, `tdd_runner`, `bigtech_*`).
 
 Se houver colisão, **não instale por cima.** Apresente ao usuário, via pergunta, as duas saídas seguras (recomende a primeira):
@@ -273,7 +273,7 @@ Sem colisão, siga a instalação normalmente.
 ### Compatibilidade
 
 - **Feito para o Claude Code (Anthropic).** Sem garantia de funcionamento em outros assistentes ou CLIs de código (por exemplo, Gemini CLI, GitHub Copilot CLI, OpenAI Codex, Cursor ou Aider). Hooks, skills e o protocolo de subagents dependem do Claude Code; portar exige adaptação e não é suportado oficialmente.
-- **Incompatível com o plugin `caveman`.** O `caveman` comprime a comunicação e conflita com o reforço de modo do `bigtech`. Se o `caveman` estiver ativo, **desative-o** antes de usar o `bigtech`. O hook `bigtech_session_init` avisa no `SessionStart` quando detecta os dois ativos ao mesmo tempo.
+- **Possível conflito com o plugin `caveman`.** O `caveman` comprime a comunicação e pode interferir no reforço de modo e no roteamento do `bigtech`. Se o `caveman` estiver ativo, informe o usuário: manter ou desativar plugins é decisão dele, então não o desative por conta própria. Se o usuário mantiver os dois, garanta que os pedidos da constelação ainda cheguem à skill `bigtech`. O hook `bigtech_session_init` avisa no `SessionStart` quando detecta o `caveman` ativo.
 - **Dependências:** a seção "Instalação no Claude Code" acima lista todas, com o comando de instalação do pacote. O `frontend-design` vem só do marketplace `claude-plugins-official`.
 
 ### Segurança
