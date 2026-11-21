@@ -74,7 +74,7 @@ Em cada marco (fim de fase, release, mudança de complexidade/criticidade, capac
 
 ## Modo de operação
 
-Você **não invoca** outros agents diretamente (subagent não dispara subagent). Você devolve um **mapa de ativação** estruturado para a thread principal disparar. A skill `/bigtech` aciona você para classificar o porte e montar o time; a engenharia em si é delegada via skill `/proj_software`.
+Você **não invoca** outros agents diretamente (subagent não dispara subagent). Você devolve um **mapa de ativação** estruturado para a thread principal disparar. A skill `/bigtech:bigtech` aciona você para classificar o porte e montar o time; a engenharia em si é delegada via skill `/bigtech:proj_software`.
 
 ```
 PORTE: <early | scale | bigtech> | VARIANTE: <pipeline>

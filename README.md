@@ -28,7 +28,7 @@ High-stakes decisions (macro architecture, scope, stack, go/no-go, irreversible 
 `bigtech` packages a complete product-and-engineering organization as a plugin for Claude Code:
 
 - **71 agents.** 12 C-level (strategy, product, engineering, marketing, operations, security, data, AI, finance, revenue, legal, chief of staff) and 59 operational agents that do the work, including the game-development squad and the medical-expert agents.
-- **15 skills.** Orchestration skills (`/bigtech`, `/proj_software`, `/proj_jogo`, `/bigtech:tab_pendencias`), agent shortcuts (`/dr-advogado`, `/dr-medico-perito`, `/dr-medico-psiquiatra`, `/dr-medico-trabalho`, `/learning-designer`, `/suporte-linux`, `/visual-design-director`), the case orchestrator `/pericia-medica`, and three new skills: `/watchcode`, `/manter_ligado` and `/olhe_agentes`. `github-gossips` left the plugin and stays available outside it.
+- **15 skills.** Orchestration skills (`/bigtech:bigtech`, `/bigtech:proj_software`, `/bigtech:proj_jogo`, `/bigtech:tab_pendencias`), agent shortcuts (`/bigtech:dr-advogado`, `/bigtech:dr-medico-perito`, `/bigtech:dr-medico-psiquiatra`, `/bigtech:dr-medico-trabalho`, `/bigtech:learning-designer`, `/bigtech:suporte-linux`, `/bigtech:visual-design-director`), the case orchestrator `/bigtech:pericia-medica`, and three new skills: `/bigtech:watchcode`, `/bigtech:manter_ligado` and `/bigtech:olhe_agentes`. `github-gossips` left the plugin and stays available outside it.
 - **Governance and TDD hooks.** Test guard-rail (red, green, refactor), project-size reassessment, operating-mode reinforcement, and bootstrap of the manuals into the session.
 
 The core principle: **the process adapts to the size of the project, never the other way around.** A 200-line CLI does not summon the whole team. The Chief of Staff classifies the size and turns on only what is needed, preventing over-engineering.
@@ -90,29 +90,42 @@ If you are an AI agent installing on behalf of a user, follow [LLM.md](LLM.md).
 
 The user's instructions (the global CLAUDE.md and the project CLAUDE.md, and the rules they reference) take precedence over this plugin's manuals, agents, and reminders in any conflict. Where they diverge, follow the user's instructions.
 
-The 2 orchestration skills are the entry points. Invoke them with a slash or describe your intent in natural language; the mode reinforcement routes the request to the right skill. The other skills are agent shortcuts, a case orchestrator, or operational tools, listed under [Skills](#skills).
+The 4 orchestration skills are the entry points: `/bigtech:bigtech`, `/bigtech:proj_software`, `/bigtech:proj_jogo` and `/bigtech:tab_pendencias`. Invoke them with a slash or describe your intent in natural language: Claude picks the skill whose description matches the request, and, in a project not yet classified, the mode reinforcement points requests for the constellation to `/bigtech:bigtech`. The other skills are agent shortcuts, a case orchestrator, or operational tools, listed under [Skills](#skills).
 
-#### `/bigtech`: assemble the constellation
+Always type the `bigtech:` prefix. With it, the command reaches the plugin's skill even when another skill has the same name; the name without the prefix only works while no other skill or command uses it.
+
+#### `/bigtech:bigtech`: assemble the constellation
 
 Business and leadership layer (product, marketing, sales, legal, finance, release). Invokes the Chief of Staff (Cósimo), who classifies the size, recommends the pipeline variant (the user confirms), and returns the activation map: which C-levels and operational agents to turn on, and in which of the 12 phases.
 
 ```
-/bigtech ./my-project
-/bigtech "scheduling app for clinics" --porte early --dispatch
+/bigtech:bigtech ./my-project
+/bigtech:bigtech "scheduling app for clinics" --porte early --dispatch
 ```
 
 Use it when you want to "assemble the team", "organize it like a bigtech", "which pipeline and which agents", "who leads this", or "classify the size".
 
-#### `/proj_software`: SDLC engine
+#### `/bigtech:proj_software`: SDLC engine
 
-Orchestrates the software development life cycle across 5 macro-phases, allocating the engineering agents by level, with an anti-over-engineering gatekeeper and cross-cutting security (shift-left). This is where `/bigtech` delegates engineering execution.
+Orchestrates the software development life cycle across 5 macro-phases, allocating the engineering agents by level, with an anti-over-engineering gatekeeper and cross-cutting security (shift-left). This is where `/bigtech:bigtech` delegates engineering execution.
 
 ```
-/proj_software
-/proj_software "payments API with idempotency"
+/bigtech:proj_software
+/bigtech:proj_software "payments API with idempotency"
 ```
 
 Use it when starting a new software project: "I'm going to build software", "new system", "build a feature", "which flow to follow".
+
+#### `/bigtech:proj_jogo`: game-development engine
+
+The game counterpart of `/bigtech:proj_software`: runs the game-development life cycle across 5 macro-phases with the game squad, with an anti-over-engineering gatekeeper sized from game jam to AAA.
+
+```
+/bigtech:proj_jogo
+/bigtech:proj_jogo "2D platformer for a 48-hour game jam"
+```
+
+Use it when the project is a game: "I'm going to make a game", "new game", "game design", "game jam".
 
 #### `/bigtech:tab_pendencias`: WSJF planning table
 
@@ -129,6 +142,8 @@ Use it to plan steps, order the backlog, or ask "what's left" and "in what order
 **Keeping the table fresh.** Marking a status is cheap and manual; reordering is expensive and rare. When you commit work that closes or advances a `TODO.md` item, cite the item ID in the commit message and touch the `Status` column in the same commit (delivered implementation → `🔍 Pendente verificação`; `✅` only after the test/audit wave). Reordering, by contrast, runs only through `--reorder`, and only when a prioritization input changes and you decide to reorder. See [docs/tabela-pendencias-frescor.md](docs/tabela-pendencias-frescor.md).
 
 ### Skills
+
+Each skill is invoked with the plugin prefix, as `/bigtech:<skill>`.
 
 | Skill | Kind | Function |
 |---|---|---|
@@ -148,7 +163,7 @@ Use it to plan steps, order the backlog, or ask "what's left" and "in what order
 | `manter_ligado` | operational | Keeps the connection alive with the lid closed and saves sessions at 5% battery (Linux with systemd only). |
 | `olhe_agentes` | operational | Turns the agent monitor on or off and reports idle agents on a 5-minute tick. |
 
-Shortcuts such as `/dr-advogado` and `/learning-designer` call the agent of the same name, with the `bigtech:` prefix (for example, `bigtech:dr-advogado`).
+Shortcuts such as `/bigtech:dr-advogado` and `/bigtech:learning-designer` call the agent of the same name, which also carries the `bigtech:` prefix (for example, the agent `bigtech:dr-advogado`).
 
 ### Agents
 
@@ -199,7 +214,7 @@ When invoked, 63 of the 71 agents run a pre-flight check on the backlog table (`
 | `bigtech_porte_reminder.py` | SessionStart | Reassesses the project size (scales up or down); only fires on a code project not yet classified. |
 | `tab_pendencias_reminder.py` | SessionStart, UserPromptSubmit | Session-length reminder for the backlog table. On SessionStart it records when the session started; on UserPromptSubmit, once per session, if the project has the `.bigtech-porte` marker and a `TODO.md` and the session has run for more than 2 hours, it reminds you to mark delivered items in the `Status` column and to reorder through `/bigtech:tab_pendencias --reorder` only when priorities change. The time limit, or turning the reminder off, goes in an optional `.tab-staleness.json` at the project root. It only reminds, never blocks or reorders. |
 | `skills/tab_pendencias/tools/hooks/tab_pendencias_reminder.py` | SessionStart, UserPromptSubmit | Freshness signals of the backlog table, from the `tab_pendencias` skill. On SessionStart: a `git` repository without `TODO.md` (suggests `/bigtech:tab_pendencias --create`), a table with pending or in-progress items that has not been touched for several commits or days (measured with read-only `git`), an INBOX that needs triage, items piling up while waiting for verification, decisions waiting for you that have aged, and unfinished intake-journal entries. On UserPromptSubmit: new notes in `inbox/` written by another session. Thresholds go in the `[signals]` section of an optional `.tab_pendencias.ini` next to `TODO.md`. It only reminds, never blocks or reorders. |
-| `bigtech_reinforce.py` | UserPromptSubmit | Reinforces bigtech mode and routes natural-language activation to `/bigtech`. Marker-scoped, noise-resistant. |
+| `bigtech_reinforce.py` | UserPromptSubmit | Reinforces bigtech mode and routes natural-language activation to `/bigtech:bigtech`. Marker-scoped, noise-resistant. |
 
 The plugin declares 9 hook entries across 4 events (SessionStart, UserPromptSubmit, PreToolUse, and PostToolUse); the smoke test checks each one.
 
@@ -209,7 +224,7 @@ The plugin declares 9 hook entries across 4 events (SessionStart, UserPromptSubm
 
 **Built for Claude Code (Anthropic).** The official install path is the Claude Code plugin/marketplace format (life-cycle hooks, skills, subagent protocol). Other assistants or code CLIs (Gemini CLI, GitHub Copilot CLI, OpenAI Codex, Cursor, Aider, etc.) are not supported without their own adaptation.
 
-**Possible conflict with the `caveman` plugin.** `caveman` compresses communication and can interfere with this plugin's mode reinforcement and routing. The session hook warns you if it detects both active at the same time. Whether to keep `caveman` is your decision; if you keep both, make sure requests for the constellation still reach `/bigtech`.
+**Possible conflict with the `caveman` plugin.** `caveman` compresses communication and can interfere with this plugin's mode reinforcement and routing. The session hook warns you if it detects both active at the same time. Whether to keep `caveman` is your decision; if you keep both, make sure requests for the constellation still reach `/bigtech:bigtech`.
 
 ### Model and effort
 
@@ -257,7 +272,7 @@ Decisões de altíssimo valor (arquitetura macro, escopo, stack, go/no-go, deplo
 `bigtech` empacota uma organização completa de produto e engenharia em forma de plugin para o Claude Code:
 
 - **71 agents.** 12 C-level (estratégia, produto, engenharia, marketing, operações, segurança, dados, IA, finanças, receita, jurídico, chief of staff) e 59 operacionais que executam o trabalho, incluindo o time de desenvolvimento de jogos e os agents médico-periciais.
-- **15 skills.** Skills de orquestração (`/bigtech`, `/proj_software`, `/proj_jogo`, `/bigtech:tab_pendencias`), atalhos de agent (`/dr-advogado`, `/dr-medico-perito`, `/dr-medico-psiquiatra`, `/dr-medico-trabalho`, `/learning-designer`, `/suporte-linux`, `/visual-design-director`), o orquestrador de caso `/pericia-medica` e três skills novas: `/watchcode`, `/manter_ligado` e `/olhe_agentes`. `github-gossips` saiu do plugin e continua disponível fora dele.
+- **15 skills.** Skills de orquestração (`/bigtech:bigtech`, `/bigtech:proj_software`, `/bigtech:proj_jogo`, `/bigtech:tab_pendencias`), atalhos de agent (`/bigtech:dr-advogado`, `/bigtech:dr-medico-perito`, `/bigtech:dr-medico-psiquiatra`, `/bigtech:dr-medico-trabalho`, `/bigtech:learning-designer`, `/bigtech:suporte-linux`, `/bigtech:visual-design-director`), o orquestrador de caso `/bigtech:pericia-medica` e três skills novas: `/bigtech:watchcode`, `/bigtech:manter_ligado` e `/bigtech:olhe_agentes`. `github-gossips` saiu do plugin e continua disponível fora dele.
 - **Hooks de governança e TDD.** Guard-rail de testes (red, green, refactor), reavaliação de porte do projeto, reforço do modo de operação e bootstrap dos manuais na sessão.
 
 O princípio central: **o processo se adapta ao porte do projeto, nunca o contrário.** Um CLI de 200 linhas não chama o time inteiro. O Chief of Staff classifica o porte e liga só o necessário, prevenindo over-engineering.
@@ -319,29 +334,42 @@ Se você é um agente de IA instalando a pedido de um usuário, siga [LLM.md](LL
 
 As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário.
 
-As 2 skills de orquestração são os pontos de entrada. Invoque por barra ou descreva a intenção em linguagem natural; o reforço de modo roteia o pedido para a skill certa. As demais skills são atalhos de agent, um orquestrador de caso ou ferramentas operacionais, listadas em [Skills](#skills).
+As 4 skills de orquestração são os pontos de entrada: `/bigtech:bigtech`, `/bigtech:proj_software`, `/bigtech:proj_jogo` e `/bigtech:tab_pendencias`. Invoque por barra ou descreva a intenção em linguagem natural: o Claude escolhe a skill cuja descrição casa com o pedido e, em projeto ainda não classificado, o reforço de modo aponta os pedidos da constelação para o `/bigtech:bigtech`. As demais skills são atalhos de agent, um orquestrador de caso ou ferramentas operacionais, listadas em [Skills](#skills).
 
-#### `/bigtech`: montar a constelação
+Digite sempre o prefixo `bigtech:`. Com ele, o comando chega à skill do plugin mesmo quando outra skill tem o mesmo nome; o nome sem o prefixo só funciona enquanto nenhuma outra skill ou comando o usa.
+
+#### `/bigtech:bigtech`: montar a constelação
 
 Camada de negócio e liderança (produto, marketing, vendas, jurídico, finanças, release). Invoca o Chief of Staff (Cósimo), que classifica o porte, recomenda a variante de pipeline (o usuário confirma) e devolve o mapa de ativação: quais C-levels e operacionais ligar, em quais das 12 fases.
 
 ```
-/bigtech ./meu-projeto
-/bigtech "app de agenda para clínicas" --porte early --dispatch
+/bigtech:bigtech ./meu-projeto
+/bigtech:bigtech "app de agenda para clínicas" --porte early --dispatch
 ```
 
 Use quando quiser "montar o time", "organizar como bigtech", "qual pipeline e quais agents", "quem lidera isso" ou "classificar o porte".
 
-#### `/proj_software`: motor de SDLC
+#### `/bigtech:proj_software`: motor de SDLC
 
-Orquestra o ciclo de vida de software em 5 macrofases, alocando os agents de engenharia por nível, com gatekeeper anti-over-engineering e segurança transversal (shift-left). É para onde o `/bigtech` delega a execução de engenharia.
+Orquestra o ciclo de vida de software em 5 macrofases, alocando os agents de engenharia por nível, com gatekeeper anti-over-engineering e segurança transversal (shift-left). É para onde o `/bigtech:bigtech` delega a execução de engenharia.
 
 ```
-/proj_software
-/proj_software "API de pagamentos com idempotência"
+/bigtech:proj_software
+/bigtech:proj_software "API de pagamentos com idempotência"
 ```
 
 Use quando começar um projeto novo de software: "vou criar um software", "novo sistema", "construir feature", "qual fluxo seguir".
+
+#### `/bigtech:proj_jogo`: motor de desenvolvimento de jogo
+
+O par do `/bigtech:proj_software` para jogos: toca o ciclo de desenvolvimento de jogo em 5 macrofases com o time de game, com gatekeeper anti-over-engineering calibrado de game jam a AAA.
+
+```
+/bigtech:proj_jogo
+/bigtech:proj_jogo "jogo de plataforma 2D para uma game jam de 48 horas"
+```
+
+Use quando o projeto for um jogo: "vou fazer um jogo", "novo jogo", "game design", "game jam".
 
 #### `/bigtech:tab_pendencias`: tabela de planejamento WSJF
 
@@ -358,6 +386,8 @@ Use para planejar passos, ordenar backlog, ou perguntar "o que falta" e "em que 
 **Manter a tabela fresca.** Marcar status é barato e manual; reordenar é caro e raro. Ao commitar trabalho que fecha ou avança um item do `TODO.md`, cite o ID do item na mensagem do commit e toque a coluna `Status` no mesmo commit (implementação entregue → `🔍 Pendente verificação`; `✅` só após a onda de teste/auditoria). Reordenar, por outro lado, só roda pelo `--reorder`, e só quando um input de priorização muda e você decide reordenar. Veja [docs/tabela-pendencias-frescor.md](docs/tabela-pendencias-frescor.md).
 
 ### Skills
+
+Cada skill é invocada com o prefixo do plugin, como `/bigtech:<skill>`.
 
 | Skill | Tipo | Função |
 |---|---|---|
@@ -377,7 +407,7 @@ Use para planejar passos, ordenar backlog, ou perguntar "o que falta" e "em que 
 | `manter_ligado` | operacional | Mantém a conexão com a tampa fechada e salva as sessões com 5% de bateria (só Linux com systemd). |
 | `olhe_agentes` | operacional | Liga, desliga ou mostra o monitor de agents, com tick a cada 5 minutos. |
 
-Atalhos como `/dr-advogado` e `/learning-designer` chamam o agent de mesmo nome, com o prefixo `bigtech:` (por exemplo, `bigtech:dr-advogado`).
+Atalhos como `/bigtech:dr-advogado` e `/bigtech:learning-designer` chamam o agent de mesmo nome, que também leva o prefixo `bigtech:` (por exemplo, o agent `bigtech:dr-advogado`).
 
 ### Agents
 
@@ -428,7 +458,7 @@ Ao serem acionados, 63 dos 71 agents fazem um pre-flight da tabela de pendência
 | `bigtech_porte_reminder.py` | SessionStart | Reavalia o porte do projeto (escala para cima ou para baixo); só dispara em projeto de código ainda não classificado. |
 | `tab_pendencias_reminder.py` | SessionStart, UserPromptSubmit | Lembrete de tempo de sessão da tabela de pendências. No SessionStart, registra a hora de início da sessão; no UserPromptSubmit, uma vez por sessão, se o projeto tem o marcador `.bigtech-porte` e um `TODO.md` e a sessão já passou de 2 horas, lembra de marcar no `Status` os itens entregues e de reordenar pelo `/bigtech:tab_pendencias --reorder` só quando a prioridade mudar. O limite de tempo, ou o desligamento do lembrete, fica num `.tab-staleness.json` opcional na raiz do projeto. Só lembra, nunca bloqueia nem reordena. |
 | `skills/tab_pendencias/tools/hooks/tab_pendencias_reminder.py` | SessionStart, UserPromptSubmit | Sinais de frescor da tabela de pendências, da skill `tab_pendencias`. No SessionStart: repositório `git` sem `TODO.md` (sugere `/bigtech:tab_pendencias --create`), tabela com itens pendentes ou em andamento sem toque há vários commits ou dias (medido com `git` só para leitura), INBOX que precisa de triagem, itens acumulados à espera de verificação, decisões à sua espera que envelheceram e entradas inacabadas no journal de intake. No UserPromptSubmit: notas novas em `inbox/`, escritas por outra sessão. Os limiares ficam na seção `[signals]` de um `.tab_pendencias.ini` opcional ao lado do `TODO.md`. Só lembra, nunca bloqueia nem reordena. |
-| `bigtech_reinforce.py` | UserPromptSubmit | Reforça o modo bigtech e roteia ativação por linguagem natural para `/bigtech`. Escopado por marcador, anti-ruído. |
+| `bigtech_reinforce.py` | UserPromptSubmit | Reforça o modo bigtech e roteia ativação por linguagem natural para `/bigtech:bigtech`. Escopado por marcador, anti-ruído. |
 
 O plugin declara 9 entradas de hook em 4 eventos (SessionStart, UserPromptSubmit, PreToolUse e PostToolUse); o smoke test confere cada uma.
 
@@ -438,7 +468,7 @@ O plugin declara 9 entradas de hook em 4 eventos (SessionStart, UserPromptSubmit
 
 **Feito para o Claude Code (Anthropic).** O caminho oficial de instalação é o formato de plugin/marketplace do Claude Code (hooks de ciclo de vida, skills, protocolo de subagents). Outros assistentes ou CLIs de código (Gemini CLI, GitHub Copilot CLI, OpenAI Codex, Cursor, Aider, etc.) não são suportados sem adaptação própria.
 
-**Possível conflito com o plugin `caveman`.** O `caveman` comprime a comunicação e pode interferir no reforço de modo e no roteamento deste plugin. O hook de sessão avisa caso detecte os dois ativos ao mesmo tempo. Manter ou desativar o `caveman` é decisão sua; se mantiver os dois, garanta que os pedidos da constelação ainda cheguem ao `/bigtech`.
+**Possível conflito com o plugin `caveman`.** O `caveman` comprime a comunicação e pode interferir no reforço de modo e no roteamento deste plugin. O hook de sessão avisa caso detecte os dois ativos ao mesmo tempo. Manter ou desativar o `caveman` é decisão sua; se mantiver os dois, garanta que os pedidos da constelação ainda cheguem ao `/bigtech:bigtech`.
 
 ### Modelo e esforço
 

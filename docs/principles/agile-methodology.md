@@ -4,7 +4,7 @@
 
 **Escopo**: este documento se aplica em **todo projeto que use a constelação bigtech**, sem necessidade de cópia local. Define o paradigma Ágil (Manifesto 2001 + Scrum Guide 2020 + Kanban) **e seu escalonamento via SAFe 6.0** como contrato de gestão, planejamento e entrega.
 
-Princípios relacionados: [arquitetura e princípios](arquitetura-principios.md) · [anti-patterns](anti-patterns.md). O manual [AGILE](../house/AGILE.md) detalha os rituais e artefatos; a priorização WSJF é operada pela skill `/tab_pendencias`.
+Princípios relacionados: [arquitetura e princípios](arquitetura-principios.md) · [anti-patterns](anti-patterns.md). O manual [AGILE](../house/AGILE.md) detalha os rituais e artefatos; a priorização WSJF é operada pela skill `/bigtech:tab_pendencias`.
 
 Conteúdo coberto pela diretiva:
 
@@ -35,7 +35,7 @@ Conteúdo coberto pela diretiva:
 
 1. **Pedidos cirúrgicos**: a pergunta "essa demanda cabe em história existente?" não se aplica a edições pontuais óbvias (correção de bug, typo, ajuste de uma linha). Apenas demanda **nova de feature ou épico** exige a pergunta, confirmação ou adição explícita ao backlog.
 2. **TDD sobre cobertura**: nenhuma meta numérica de cobertura vale aqui. TDD (red, green, refactor; ver [arquitetura e princípios](arquitetura-principios.md)) é obrigatório em código de comportamento; cobertura é consequência de TDD, não objetivo. Não inflar testes só para bater um número.
-3. **`TODO.md` tabular como backlog**: o backlog do projeto vive no `TODO.md` da raiz (formato da skill `/tab_pendencias`). Mapeamento: coluna `Grupo` corresponde a Épico, cada linha é uma História ou Tarefa, `Dificuldade` mapeia para story points (Baixa = 1-2, Média = 3-5, Alta = 8). Não criar `BACKLOG.md` paralelo. Itens novos seguem formato User Story na descrição quando aplicável; itens legados não precisam ser reescritos.
+3. **`TODO.md` tabular como backlog**: o backlog do projeto vive no `TODO.md` da raiz (formato da skill `/bigtech:tab_pendencias`). Mapeamento: coluna `Grupo` corresponde a Épico, cada linha é uma História ou Tarefa, `Dificuldade` mapeia para story points (Baixa = 1-2, Média = 3-5, Alta = 8). Não criar `BACKLOG.md` paralelo. Itens novos seguem formato User Story na descrição quando aplicável; itens legados não precisam ser reescritos.
 4. **Time solo**: em projeto com um único desenvolvedor, ritos com time (Daily, Planning, Review, Retro) viram self-review/self-retro implícitas via commits/changelog/`TODO.md`. Papéis (PO, SM, Dev) são acumulados pela mesma pessoa, mas cada decisão deve ser tomada com a mentalidade do papel correspondente.
 5. **Definition of Done estendida** para projetos com hooks/CI: além dos 5 itens do paradigma base, adicionar "smoke automatizado verde" e "pre-commit/pre-push limpos".
 6. **Conventional Commits são DoD implícita**: commit `feat:`/`fix:`/`refactor:` etc. é evidência mínima de que a história está pronta para Review. Histórias sem commit não passam pela DoD.

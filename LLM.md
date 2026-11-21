@@ -19,7 +19,7 @@ General rule: prefer the main path (remote marketplace). Use the local-clone alt
 `bigtech` is a plugin for Claude Code that packages a product-and-engineering organization:
 
 - **71 agents.** 12 C-level (CEO, CPO, CTO, CMO, COO, CISO, CDO, CAIO, CFO, CRO, CLO, and Chief of Staff) and 59 operational agents that do the work, including `visual-design-director`, the game-development squad, and the medical-expert agents.
-- **15 skills.** Orchestration skills (`/bigtech`, `/proj_software`, `/proj_jogo`, `/bigtech:tab_pendencias`), agent shortcuts (`/visual-design-director`, `/dr-advogado`, `/dr-medico-perito`, `/dr-medico-psiquiatra`, `/dr-medico-trabalho`, `/learning-designer`, `/suporte-linux`), the case orchestrator `/pericia-medica`, and three new operational skills: `/watchcode`, `/manter_ligado` and `/olhe_agentes`. `github-gossips` left the plugin and stays available outside it.
+- **15 skills.** Orchestration skills (`/bigtech:bigtech`, `/bigtech:proj_software`, `/bigtech:proj_jogo`, `/bigtech:tab_pendencias`), agent shortcuts (`/bigtech:visual-design-director`, `/bigtech:dr-advogado`, `/bigtech:dr-medico-perito`, `/bigtech:dr-medico-psiquiatra`, `/bigtech:dr-medico-trabalho`, `/bigtech:learning-designer`, `/bigtech:suporte-linux`), the case orchestrator `/bigtech:pericia-medica`, and three new operational skills: `/bigtech:watchcode`, `/bigtech:manter_ligado` and `/bigtech:olhe_agentes`. `github-gossips` left the plugin and stays available outside it.
 - **Governance and TDD hooks.** Bootstrap of the manuals into the session, size reassessment, operating-mode reinforcement, TDD guard-rail (red, green, refactor), and a test runner.
 
 Package identity (confirmed in `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`):
@@ -102,7 +102,7 @@ Replace `/absolute/path/to/bigtech_plugin` with the absolute path of the directo
 Confirm the three signals. If any of them fails, report it to the user before moving on.
 
 1. **The 71 agents show up.** List the available agents and check for the C-level ones (`celso-ceo`, `capitolino-cpo`, `caetano-cto`, `camilo-cmo`, `cosmo-coo`, `narciso-ciso`, `candido-cdo`, `caio-caio`, `confucio-cfo`, `cicero-cro`, `claudio-clo`, `cosimo-chief-of-staff`) and a sample of the operational ones (`software-architect`, `backend-engineer`, `qa-engineer`, `visual-design-director`, `technical-writer`).
-2. **The 15 skills exist.** `/bigtech`, `/proj_software`, `/bigtech:tab_pendencias` and `/visual-design-director` must be listed and invokable.
+2. **The 15 skills exist.** `/bigtech:bigtech`, `/bigtech:proj_software`, `/bigtech:tab_pendencias` and `/bigtech:visual-design-director` must be listed and invokable.
 3. **The hooks run.** When starting a new session, `bigtech_session_init` should inject the path of the manuals into the context. On a code project not yet classified, `bigtech_porte_reminder` reassesses the size. Use `/plugin` to confirm that the plugin is active and that the hooks are registered.
 
 ### ⚠️ Name conflicts (check BEFORE installing)
@@ -140,13 +140,13 @@ This plugin's hooks **run code on the user's machine**, as that user. Before ins
 
 ### How to use it after installing
 
-The main entry points are the 2 orchestration skills, `/bigtech` and `/proj_software`, plus `/bigtech:tab_pendencias` for the backlog. To get started, invoke `/bigtech` pointing at the project: the Chief of Staff classifies the size (avoiding over-engineering) and returns the activation map, that is, which C-levels and operational agents to turn on and in which phases.
+The main entry points are the 4 orchestration skills: `/bigtech:bigtech`, `/bigtech:proj_software`, `/bigtech:proj_jogo` and, for the backlog, `/bigtech:tab_pendencias`. Always invoke them with the `bigtech:` prefix: the name without the prefix only works while no other skill or command uses it. To get started, invoke `/bigtech:bigtech` pointing at the project: the Chief of Staff classifies the size (avoiding over-engineering) and returns the activation map, that is, which C-levels and operational agents to turn on and in which phases.
 
 ```
-/bigtech ./my-project
+/bigtech:bigtech ./my-project
 ```
 
-From there, `/proj_software` runs the software cycle and `/bigtech:tab_pendencias` plans the backlog. To keep that table fresh, follow one convention: when you commit work that closes or advances a `TODO.md` item, cite the item ID in the commit message and touch the `Status` column in the same commit (delivered implementation → `🔍 Pendente verificação`; `✅` only after the test/audit wave); reordering is separate and runs only through `/bigtech:tab_pendencias --reorder`. Detail in [docs/tabela-pendencias-frescor.md](docs/tabela-pendencias-frescor.md). For the detail of each skill, the agents, and the governance manuals, see the [README.md](README.md) and the `docs/` directory.
+From there, `/bigtech:proj_software` runs the software cycle (`/bigtech:proj_jogo`, when the project is a game) and `/bigtech:tab_pendencias` plans the backlog. To keep that table fresh, follow one convention: when you commit work that closes or advances a `TODO.md` item, cite the item ID in the commit message and touch the `Status` column in the same commit (delivered implementation → `🔍 Pendente verificação`; `✅` only after the test/audit wave); reordering is separate and runs only through `/bigtech:tab_pendencias --reorder`. Detail in [docs/tabela-pendencias-frescor.md](docs/tabela-pendencias-frescor.md). For the detail of each skill, the agents, and the governance manuals, see the [README.md](README.md) and the `docs/` directory.
 
 ---
 
@@ -165,7 +165,7 @@ Regra geral: prefira o caminho principal (marketplace remoto). Use a alternativa
 `bigtech` é um plugin para o Claude Code que empacota uma organização de produto e engenharia:
 
 - **71 agents.** 12 C-level (CEO, CPO, CTO, CMO, COO, CISO, CDO, CAIO, CFO, CRO, CLO e Chief of Staff) e 59 operacionais que executam o trabalho, incluindo `visual-design-director`, o diretor de design visual, o time de desenvolvimento de jogos e os agents médico-periciais.
-- **15 skills.** Skills de orquestração (`/bigtech`, `/proj_software`, `/proj_jogo`, `/bigtech:tab_pendencias`), atalhos de agent (`/visual-design-director`, `/dr-advogado`, `/dr-medico-perito`, `/dr-medico-psiquiatra`, `/dr-medico-trabalho`, `/learning-designer`, `/suporte-linux`), o orquestrador de caso `/pericia-medica` e três skills operacionais novas: `/watchcode`, `/manter_ligado` e `/olhe_agentes`. `github-gossips` saiu do plugin e continua disponível fora dele.
+- **15 skills.** Skills de orquestração (`/bigtech:bigtech`, `/bigtech:proj_software`, `/bigtech:proj_jogo`, `/bigtech:tab_pendencias`), atalhos de agent (`/bigtech:visual-design-director`, `/bigtech:dr-advogado`, `/bigtech:dr-medico-perito`, `/bigtech:dr-medico-psiquiatra`, `/bigtech:dr-medico-trabalho`, `/bigtech:learning-designer`, `/bigtech:suporte-linux`), o orquestrador de caso `/bigtech:pericia-medica` e três skills operacionais novas: `/bigtech:watchcode`, `/bigtech:manter_ligado` e `/bigtech:olhe_agentes`. `github-gossips` saiu do plugin e continua disponível fora dele.
 - **Hooks de governança e TDD.** Bootstrap dos manuais na sessão, reavaliação de porte, reforço do modo de operação, guard-rail de TDD (red, green, refactor) e runner de testes.
 
 Identidade do pacote (confirmada em `.claude-plugin/plugin.json` e `.claude-plugin/marketplace.json`):
@@ -248,7 +248,7 @@ Substitua `/caminho/absoluto/para/bigtech_plugin` pelo caminho absoluto do diret
 Confirme os três sinais. Se algum falhar, relate ao usuário antes de seguir.
 
 1. **Os 71 agents aparecem.** Liste os agents disponíveis e confira a presença dos C-level (`celso-ceo`, `capitolino-cpo`, `caetano-cto`, `camilo-cmo`, `cosmo-coo`, `narciso-ciso`, `candido-cdo`, `caio-caio`, `confucio-cfo`, `cicero-cro`, `claudio-clo`, `cosimo-chief-of-staff`) e de uma amostra dos operacionais (`software-architect`, `backend-engineer`, `qa-engineer`, `visual-design-director`, `technical-writer`).
-2. **As 15 skills existem.** `/bigtech`, `/proj_software`, `/bigtech:tab_pendencias` e `/visual-design-director` devem estar listadas e invocáveis.
+2. **As 15 skills existem.** `/bigtech:bigtech`, `/bigtech:proj_software`, `/bigtech:tab_pendencias` e `/bigtech:visual-design-director` devem estar listadas e invocáveis.
 3. **Os hooks rodam.** Ao iniciar uma nova sessão, o `bigtech_session_init` deve injetar o caminho dos manuais no contexto. Em projeto de código ainda não classificado, o `bigtech_porte_reminder` reavalia o porte. Use `/plugin` para confirmar que o plugin está ativo e que os hooks estão registrados.
 
 ### ⚠️ Conflito de nomes (verifique ANTES de instalar)
@@ -286,10 +286,10 @@ Os hooks deste plugin **executam código na máquina do usuário**, com o usuár
 
 ### Como usar depois de instalar
 
-Os pontos de entrada principais são as 2 skills de orquestração, `/bigtech` e `/proj_software`, mais `/bigtech:tab_pendencias` para o backlog. Para começar, invoque `/bigtech` apontando para o projeto: o Chief of Staff classifica o porte (evitando over-engineering) e devolve o mapa de ativação, ou seja, quais C-levels e operacionais ligar e em quais fases.
+Os pontos de entrada principais são as 4 skills de orquestração: `/bigtech:bigtech`, `/bigtech:proj_software`, `/bigtech:proj_jogo` e, para o backlog, `/bigtech:tab_pendencias`. Invoque sempre com o prefixo `bigtech:`: o nome sem o prefixo só funciona enquanto nenhuma outra skill ou comando o usa. Para começar, invoque `/bigtech:bigtech` apontando para o projeto: o Chief of Staff classifica o porte (evitando over-engineering) e devolve o mapa de ativação, ou seja, quais C-levels e operacionais ligar e em quais fases.
 
 ```
-/bigtech ./meu-projeto
+/bigtech:bigtech ./meu-projeto
 ```
 
-A partir daí, `/proj_software` toca o ciclo de software e `/bigtech:tab_pendencias` planeja o backlog. Para manter essa tabela fresca, siga uma convenção: ao commitar trabalho que fecha ou avança um item do `TODO.md`, cite o ID do item na mensagem do commit e toque a coluna `Status` no mesmo commit (implementação entregue → `🔍 Pendente verificação`; `✅` só após a onda de teste/auditoria); reordenar é à parte e só roda pelo `/bigtech:tab_pendencias --reorder`. Detalhe em [docs/tabela-pendencias-frescor.md](docs/tabela-pendencias-frescor.md). Para o detalhe de cada skill, dos agents e dos manuais de governança, consulte o [README.md](README.md) e o diretório `docs/`.
+A partir daí, `/bigtech:proj_software` toca o ciclo de software (`/bigtech:proj_jogo`, quando o projeto é um jogo) e `/bigtech:tab_pendencias` planeja o backlog. Para manter essa tabela fresca, siga uma convenção: ao commitar trabalho que fecha ou avança um item do `TODO.md`, cite o ID do item na mensagem do commit e toque a coluna `Status` no mesmo commit (implementação entregue → `🔍 Pendente verificação`; `✅` só após a onda de teste/auditoria); reordenar é à parte e só roda pelo `/bigtech:tab_pendencias --reorder`. Detalhe em [docs/tabela-pendencias-frescor.md](docs/tabela-pendencias-frescor.md). Para o detalhe de cada skill, dos agents e dos manuais de governança, consulte o [README.md](README.md) e o diretório `docs/`.

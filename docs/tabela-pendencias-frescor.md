@@ -1,8 +1,8 @@
 # Frescor da tabela de pendências (TODO.md) no sprint
 
 > **Tipo (Diátaxis):** Explanation + Reference (convenção). **Audiência:** quem opera o plugin (o líder) e os agents de implementação.
-> **Escopo:** convenção do plugin para manter o `TODO.md` de projeto fresco durante um sprint. Complementa a skill `/tab_pendencias`.
-> **Last-reviewed:** 2026-11-20 · **Owner:** mantenedor do projeto · **Aplica a:** todo projeto com `TODO.md` (skill `/tab_pendencias`).
+> **Escopo:** convenção do plugin para manter o `TODO.md` de projeto fresco durante um sprint. Complementa a skill `/bigtech:tab_pendencias`.
+> **Last-reviewed:** 2026-11-20 · **Owner:** mantenedor do projeto · **Aplica a:** todo projeto com `TODO.md` (skill `/bigtech:tab_pendencias`).
 
 Este documento registra a **convenção de frescor** (Camadas 0+1, já adotadas pelo plugin) e descreve, de forma genérica, uma **escada de escalonamento** opcional (Camadas 2-4) para quem mais tarde precisar de mais automação. O foco é a convenção: marcar status é barato e manual; reordenar é caro e raro.
 
@@ -28,7 +28,7 @@ A distinção é a ideia central deste documento:
 | Eixo | O que é | Custo | Frequência | Quem faz |
 |---|---|---|---|---|
 | **Status** | Em que ponto o item está (`🔍`, `✅`, etc.) | Barato | Frequente (a cada item fechado) | Quem abre o PR, à mão, no mesmo commit |
-| **Prioridade** | Em que ordem fazer (dependência + WSJF + ondas) | Caro | Rara (só com input novo) | O usuário decide, com a thread principal executando, via `/tab_pendencias --reorder` |
+| **Prioridade** | Em que ordem fazer (dependência + WSJF + ondas) | Caro | Rara (só com input novo) | O usuário decide, com a thread principal executando, via `/bigtech:tab_pendencias --reorder` |
 
 Status é higiene barata e local. Prioridade é decisão cara, do usuário. **Nunca tratá-las com o mesmo verbo.**
 
@@ -52,10 +52,10 @@ O sinal certo para agir é:
 Ao fechar trabalho, **toque a coluna `Status` do item no MESMO commit/PR** que entrega o trabalho. Regras:
 
 - **Cite o ID do item na mensagem do commit** (corpo ou footer do Conventional Commit). Use o ID que o projeto **já tem** (`V-NN`, `ORG-NN`, `Fx.y`, etc.). Não inventar esquema novo, não renumerar.
-- **Use o glyph correto** do vocabulário da skill `/tab_pendencias`:
+- **Use o glyph correto** do vocabulário da skill `/bigtech:tab_pendencias`:
   - Implementação entregue → `🔍 Pendente verificação`. **NUNCA `✅` direto.**
   - `✅ Concluído` **só** após rodar a onda de teste/auditoria correspondente (`TST-*` / `AUD-*`).
-- **Marcar status NUNCA dispara o time de agents.** É edição mecânica de uma célula, feita à mão no commit que fecha o item. Não exige a skill `/tab_pendencias`.
+- **Marcar status NUNCA dispara o time de agents.** É edição mecânica de uma célula, feita à mão no commit que fecha o item. Não exige a skill `/bigtech:tab_pendencias`.
 
 Isso evita o **"falso-done"**: o board dizer `✅ Concluído` enquanto o teste ou a auditoria ainda não rodou. O estado intermediário `🔍 Pendente verificação` torna visível o trabalho entregue-mas-não-validado.
 
@@ -70,7 +70,7 @@ Trabalho novo descoberto durante o sprint vai para a **INBOX imediatamente** - 1
 - **Local padrão:** seção `## INBOX (descobertas não priorizadas)` no `TODO.md` de projeto, no formato da tabela de pendências do usuário (posição e drenagem).
 - **Worktrees e PRs paralelos:** a INBOX continua no `TODO.md`, na mesma forma; a convenção de paralelismo do usuário, se houver, prevalece.
 - **Regra de conflito da INBOX:** em merge, sempre **UNIÃO**, **NUNCA descartar linha**. Toda descoberta sobrevive.
-- **Drenagem:** a skill `/tab_pendencias` **drena a INBOX** no `--create` / `--reorder` - integra cada item na ordenação (dependência + WSJF + ondas) e **esvazia** a INBOX. **INBOX não-vazia é o gatilho natural para propor reordenação ao usuário.**
+- **Drenagem:** a skill `/bigtech:tab_pendencias` **drena a INBOX** no `--create` / `--reorder` - integra cada item na ordenação (dependência + WSJF + ondas) e **esvazia** a INBOX. **INBOX não-vazia é o gatilho natural para propor reordenação ao usuário.**
 
 O hook `tab_pendencias_reminder.py` (incluído no plugin) continua lembrando:
 
@@ -110,13 +110,13 @@ As camadas abaixo **não fazem parte do plugin** e **não estão adotadas**. Cad
 | **3 - Rotina agendada determinística** | Tarefa agendada de **baixa frequência, condicional a atividade** | Faz **só a higiene mecânica** (sincronizar status, drenar INBOX, abrir PR). **NÃO reordena por WSJF** - uma rotina cega reordenaria com contexto *stale*. | Sprint formal + cadência de review estabelecida | Sempre **PR**, nunca auto-merge |
 | **4 - Fonte-da-verdade → issues + milestones do repositório** | Status passa a viver em **issues** (fechamento nativo via palavra-chave do tipo `Closes #N`); `TODO.md` vira *view* gerada | Alto valor; **difícil de reverter** (one-way door) | `>30-40` itens vivos **ou** entrada de colaborador externo | Decisão do usuário via **AskUserQuestion** |
 
-**Nota sobre a Camada 4:** mesmo migrando para issues, **reordenar por WSJF continua exigindo a skill** `/tab_pendencias`. Ou seja, mover o *status* para issues resolve o fechamento nativo, mas **não** elimina a necessidade do re-planejamento por julgamento. Além disso, nem todo servidor de issues move um card para "Done" de forma nativa; verifique antes de assumir essa migração.
+**Nota sobre a Camada 4:** mesmo migrando para issues, **reordenar por WSJF continua exigindo a skill** `/bigtech:tab_pendencias`. Ou seja, mover o *status* para issues resolve o fechamento nativo, mas **não** elimina a necessidade do re-planejamento por julgamento. Além disso, nem todo servidor de issues move um card para "Done" de forma nativa; verifique antes de assumir essa migração.
 
 ### Mecânico vs julgamento, local vs externo
 
 Há **dois eixos independentes**: *mecânico × julgamento* (o que se automatiza) e *local × externo* (onde roda). A escada acima descreve versões externas (servidor de CI, agendador na nuvem, servidor de issues), mas cada camada tem um equivalente **local, on-machine**, para quem prefere manter a execução sob controle e o dado fora da rede (relevante sob LGPD). Local resolve "onde", não "o quê": **mesmo uma automação local não deve reordenar** por WSJF, porque o contexto fica *stale*.
 
-A metade **mecânica** do frescor (sincronizar status, drenar INBOX) é determinística e pode rodar offline; um **git hook local opcional** pode automatizar esse sync da parte mecânica - apenas marcando status a partir dos IDs citados nos commits, **nunca `✅` e nunca reordenando**. A metade de **julgamento** (reordenar) usa a skill `/tab_pendencias` e depende da inferência do modelo; é a única dependência externa irredutível.
+A metade **mecânica** do frescor (sincronizar status, drenar INBOX) é determinística e pode rodar offline; um **git hook local opcional** pode automatizar esse sync da parte mecânica - apenas marcando status a partir dos IDs citados nos commits, **nunca `✅` e nunca reordenando**. A metade de **julgamento** (reordenar) usa a skill `/bigtech:tab_pendencias` e depende da inferência do modelo; é a única dependência externa irredutível.
 
 ---
 
@@ -132,7 +132,7 @@ A metade **mecânica** do frescor (sincronizar status, drenar INBOX) é determin
 
 ## Ver também
 
-- Skill `/tab_pendencias` (seção "Frescor: manter a tabela viva no sprint") - a convenção operacional resumida.
+- Skill `/bigtech:tab_pendencias` (seção "Frescor: manter a tabela viva no sprint") - a convenção operacional resumida.
 - [manuals/AGILE.md](house/AGILE.md) - WSJF, fluxo e WIP.
 - [manuals/TESTES.md](house/TESTES.md) e [manuals/AUDITORIAS.md](house/AUDITORIAS.md) - as ondas `TST-*`/`AUD-*` que liberam o `✅`.
 
