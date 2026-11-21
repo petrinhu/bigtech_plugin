@@ -72,12 +72,12 @@ Trabalho novo descoberto durante o sprint vai para a **INBOX imediatamente** - 1
 - **Regra de conflito da INBOX:** em merge, sempre **UNIÃO**, **NUNCA descartar linha**. Toda descoberta sobrevive.
 - **Drenagem:** a skill `/bigtech:tab_pendencias` **drena a INBOX** no `--create` / `--reorder` - integra cada item na ordenação (dependência + WSJF + ondas) e **esvazia** a INBOX. **INBOX não-vazia é o gatilho natural para propor reordenação ao usuário.**
 
-O hook `tab_pendencias_reminder.py` (incluído no plugin) continua lembrando:
+Os dois hooks `tab_pendencias_reminder.py` incluídos no plugin, o da skill `tab_pendencias` e o da raiz (`hooks/`), continuam lembrando:
 
-- **`SessionStart`** - por defasagem detectada no git (commits que fecharam trabalho sem status tocado);
-- **`UserPromptSubmit`** - por tempo de sessão decorrido.
+- **`SessionStart`:** o da skill avisa da defasagem medida no git (itens pendentes ou em andamento com o `TODO.md` sem toque há vários commits ou dias);
+- **`UserPromptSubmit`:** o da raiz lembra pelo tempo de sessão decorrido, e o da skill avisa de notas novas em `inbox/`.
 
-A mensagem do hook **distingue as duas ações**: a barata (sincronizar status - faça você mesmo no commit) versus a cara (reordenar - decisão do usuário, só com input novo). O hook só lembra; nunca bloqueia nem reordena.
+As mensagens dos hooks **distinguem as duas ações**: a barata (sincronizar status, que você mesmo faz no commit) versus a cara (reordenar, decisão do usuário, só com input novo). Os hooks só lembram; nunca bloqueiam nem reordenam.
 
 ---
 
@@ -125,7 +125,7 @@ A metade **mecânica** do frescor (sincronizar status, drenar INBOX) é determin
 - **Falso-done residual** - se a onda de teste/auditoria nunca roda, o item fica eterno `🔍 Pendente verificação`. Mitigação: garantir que `TST-*`/`AUD-*` entrem no plano da onda.
 - **Dependência de disciplina humana** - a DoD de status (Camada 0) ainda depende de quem abre o PR lembrar de tocar a célula e citar o ID. **Medir adesão** (quantos PRs que fecham trabalho também tocam status).
 - **INBOX vira lixeira** - se não for drenada com regularidade, acumula. A drenagem no `--create`/`--reorder` é a válvula; INBOX gigante é sinal de re-planejamento atrasado.
-- **Fadiga de alerta** - o hook pode incomodar. **Medir a taxa de disparo**; se subir, recuar a sensibilidade (config `.tab-staleness.json` na raiz do projeto).
+- **Fadiga de alerta:** os hooks podem incomodar. **Medir a taxa de disparo**; se subir, recuar a sensibilidade. Os limiares dos sinais de frescor ficam na seção `[signals]` do `.tab_pendencias.ini`, ao lado do `TODO.md`; o lembrete de tempo de sessão tem o limite (`horas_sessao`) e o desligamento (`off`) próprios no `.tab-staleness.json`, na raiz do projeto.
 - **Custo do próprio aparato** - manter CI/rotina/issues tem custo. Por isso **cada camada acima do mínimo é condicional a evidência** de falha, nunca preventiva.
 
 ---

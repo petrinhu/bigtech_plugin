@@ -83,8 +83,10 @@ def parse_hook_stdin(raw):
 #
 # `UserPromptSubmit` dispara a CADA turno. Sem memoria, um `inbox/x.md` nao
 # drenado emitiria o mesmo aviso 20 vezes numa conversa de 20 turnos. O
-# estado e um arquivo por sessao no diretorio temporario do SO (nunca dentro
-# do repositorio do usuario -- o produto nao escreve na arvore dele).
+# estado e um arquivo por sessao num diretorio privado do usuario,
+# `$XDG_RUNTIME_DIR` ou, na falta dele, `~/.cache` (ver default_state_dir).
+# Nunca o tempdir compartilhado nem o repositorio do usuario: o produto nao
+# escreve na arvore dele.
 #
 # `SessionStart` NAO passa por dedup de proposito: ele dispara poucas vezes
 # por sessao e cada disparo (startup/resume/clear/compact) segue um reset de
