@@ -42,7 +42,7 @@ Mostra o prazo restante, a parada do usuário (sim/não e o texto), o modo autô
 1. **Prazo:** se vencido, escreva "monitor de agentes encerrado (prazo de 7 dias)" e NÃO reagende. Fim.
 2. **Leitura do estado**, sempre por comando e nunca de memória:
    - modo autônomo: arquivo `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/autonomo/$SLUG.json` presente e dentro do prazo;
-   - agentes despachados por esta sessão ainda sem relatório final, com o mtime do `.output` de cada um (`/var/tmp/builds/claude-$UID/<slug-do-cwd>/<sid>/tasks/*.output`). **O `.output` é LINK SIMBÓLICO: meça com `stat -L -c %Y`, nunca `stat -c %Y`, que lê a data de criação do link e acusa silêncio falso (medido em 03/10/2026: 881 s sem `-L` contra 2 s com `-L`, com o agente escrevendo);**
+   - agentes despachados por esta sessão ainda sem relatório final, com o mtime do `.output` de cada um. Ele fica no diretório temporário do Claude Code: a base é `$CLAUDE_CODE_TMPDIR` quando definido e, sem ele, o diretório temporário do sistema (`$TMPDIR` ou `/tmp` no Linux, `/tmp` no macOS), seguida de `claude-$UID/`; dentro dela o caminho observado é `<slug-do-cwd>/<sid>/tasks/*.output`, então confira com `ls` antes de medir. **O `.output` é LINK SIMBÓLICO: meça com `stat -L -c %Y`, nunca `stat -c %Y`, que lê a data de criação do link e acusa silêncio falso (medido em 03/10/2026: 881 s sem `-L` contra 2 s com `-L`, com o agente escrevendo);**
    - comandos de trabalho em execução, numa ÚNICA chamada de `ps`/`pgrep` (nunca um processo por item): ctest, cmake, ninja, cc1plus, clang-tidy, cppcheck, preci.sh, docker build/run/exec, wine, cl.exe, link.exe;
    - `git status` e `git log -3`;
    - o snapshot da sessão (`project_session_atual.md` na memória do projeto), para saber qual é o trabalho em curso.

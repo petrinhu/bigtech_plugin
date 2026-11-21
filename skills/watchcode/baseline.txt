@@ -6,8 +6,8 @@
 # WATCHCODE_BASELINE_FILE apontar). Se o arquivo local existir, ele vence este.
 #
 # Estenda a lista local para os seus falsos-positivos (sondas de sanitizer,
-# death-tests, scratch de auditoria). Nunca alargue para /var/tmp/builds/* inteiro:
-# isso cegaria o vigia para crash de verdade.
+# death-tests, scratch de auditoria). Nunca alargue para o diretorio temporario
+# inteiro (ex.: /tmp/*): isso cegaria o vigia para crash de verdade.
 /var/tmp/*_probes/*
 *death*test*
 *death_test*
