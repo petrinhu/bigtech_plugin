@@ -1,8 +1,8 @@
 <!--
   docs/house sync
   origem: vault claudebrain / TESTES.md
-  sync_date: 2026-11-20
-  hmac_vault_sha256: 66b094fc2ae4d97252c8edb1a6476c8dd49349b2123184345098a30179dead5e
+  sync_date: 2026-11-21
+  hmac_vault_sha256: 8ee8d00d09465be7eae74830aa03435ab353afa9ee6babd1a6597373578cfa42
   transformacoes: T1=4 T2=0 T3a=0 T3=0 T4=0 T5=0
   regra: As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário. Se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
   sem segredos: não incluir tokens/credenciais
@@ -18,14 +18,17 @@
 
 ---
 
-> Documento instrucional para qualquer agente de IA ou engenheiro executar a suíte
-> completa de verificação em projetos **C · C++ · Python · Rust · Node.js/TypeScript**.
+> Catálogo de referência de testes e auditoria para qualquer agente de IA ou engenheiro,
+> em projetos **C · C++ · Python · Rust · Node.js/TypeScript**. O que de fato roda num
+> projeto segue o piso de testes abaixo.
 > As seções T1-T12 e A1-A10 cobrem C/C++/Qt. As seções T13-T15 e A11-A13 cobrem os demais stacks.
 > Adapte os caminhos e nomes de módulos conforme o projeto alvo.
 
 > **Portabilidade dos comandos (agnóstico de SO).** Os comandos de instalação usam `dnf` (Fedora/RHEL) e `apt` (Debian/Ubuntu) como exemplos. Adapte ao gerenciador do sistema: `apt`, `dnf`, `pacman` ou `zypper` no Linux; `brew` no macOS; `winget`, `choco` ou `scoop` no Windows. Prefira gerenciadores cross-platform quando houver: `pip`/`uv`, `cargo` e `npm`/`pnpm` valem igual em Windows, macOS e Linux. Para detectar uma ferramenta, use `command -v <ferramenta>` no Unix ou no WSL, e `Get-Command <ferramenta>` ou `where <ferramenta>` no Windows. No Windows, rodar o Claude Code via WSL torna válidos os comandos Unix deste manual.
 
 > **Ferramenta ausente.** Siga a regra de [[TOOLING]] (legenda de status): ferramenta de linha de comando de uso geral pode ser instalada com aviso; biblioteca, dependência de projeto, modelo, extensão, navegador e serviço só com permissão do usuário; nunca falhar calado.
+
+> **Piso de testes (vale acima de qualquer seção deste manual).** Teste só para lógica de produto. O CI é o único portão. Nada de teste de mutação, sabotagem, auditoria, reauditoria, varredura de gêmeos, checklist de perguntas do revisor, script de verificação extra nem portão local novo. Exceção: segurança, privacidade e deploy irreversível. Varredura de gêmeos é caçar o mesmo defeito em outros pontos depois de achar um. As seções T e A abaixo são catálogo: entram num projeto só quando testam lógica de produto, quando caem na exceção ou quando o usuário pede. Auditoria da exceção roda uma vez, sem reauditoria; a correção de um achado se confere no CI.
 
 ---
 
@@ -119,16 +122,16 @@
 
 ## T15  -  Pré-CI · Espelhar CI Localmente
 
-**Objetivo:** rodar a MESMA suíte que o CI roda, antes de push/tag, evitando ciclo "push, esperar 8 min, falhar, corrigir". Funciona em qualquer stack porque os comandos do CI são exatamente os mesmos comandos locais.
+**Objetivo:** rodar na máquina, quando for útil, a mesma suíte que o CI roda. É opcional e nunca obrigatório antes do push ou da tag. Funciona em qualquer stack porque os comandos do CI são exatamente os mesmos comandos locais.
 
-> **Escopo de uso:** Rodar APENAS como pré-flight antes de `git push` que dispara CI/release. NÃO substituem o CI remoto e NÃO devem ser usados como gate único de envio final: o envio definitivo do projeto SEMPRE passa pelo CI no servidor (fonte de verdade). Pré-CI local antecipa falhas óbvias para reduzir ida-volta; CI remoto valida que o build é reprodutível fora da máquina do dev. 
+> **Escopo de uso:** atalho opcional para ver uma falha óbvia antes de esperar o CI. Não é portão, não é passo obrigatório antes do push e não substitui o CI remoto: o CI é a fonte de verdade e o único portão. 
 
 ### T15.0  Instalar ferramentas necessárias
 
 Cada stack exige um conjunto de ferramentas para os testes T15.X. Instale antes do primeiro uso; depois apenas atualizar quando precisar.
 
 > **No Windows.** Os gerenciadores cross-platform já cobrem Windows: `uv`/`pip` (Python), `cargo` (Rust) e `npm`/`pnpm` (Node) instalam igual em Windows, macOS e Linux. Equivalentes nativos quando precisar: Python, instalador do `uv` (`powershell -c "irm https://astral.sh/uv/install.ps1 | iex"`) ou `pip`; Rust, `rustup-init.exe` ou `winget install Rustlang.Rustup`; Node, `winget install OpenJS.NodeJS` ou nvm-windows; ferramentas de sistema (cmake, clang, cppcheck), `winget`, `choco` ou msys2. Alternativa: rodar o Claude Code via WSL torna válidos os blocos `apt` e `dnf` deste T15.0 sem tradução.
-Crie o próprio container de CI com RAM e número de jobs (`-j`) medidos na máquina atual, nunca estimados. Crie um gate para CI local pesado como o primeiro step do job pesado: lê MemAvailable, espera com sleep até o mínimo de RAM livre medido na máquina (config por env), com timeout medido no próprio job (config por env), para não travar a fila. O gate precisa de um selftest que não espera 45 minutos: um gate cuja única prova é rodar em produção não tem prova. O selftest injeta um MemAvailable falso e demonstra os três caminhos: limiar já satisfeito (sai na hora), nunca satisfeito (estoura e falha), satisfeito depois de N leituras (reporta quanto esperou). O gate também precisa de progresso legível a cada leitura, porque um step mudo por 40 minutos parece travado e alguém mata a fila achando que enguiçou. Defaults funcionam sem env nenhum. Se os números vivessem só no YAML, rodar o script à mão daria comportamento diferente do CI, e aí a ferramenta mente sobre si mesma. Se o projeto precisar de container maior, menor ou de outra especificação, meça a máquina e pergunte ao usuário, por AskUserQuestion sem painel lateral, qual adaptação fazer nessas configs, com a primeira opção como a recomendada e "(Recomendada)" no final da opção.
+Se rodar o espelho em container, dimensione RAM e número de jobs (`-j`) medindo a máquina atual, nunca estimando; se o projeto precisar de outra especificação, pergunte ao usuário.
 
 **Python (uv):**
 ```bash
@@ -186,7 +189,7 @@ sudo apt install docker.io
 
 ### T15.1  Python (uv + pyproject)
 
-Crie `scripts/preci.sh` na raiz do repo, modelo abaixo. Rode `./scripts/preci.sh` antes de `git push`.
+Se quiser o atalho, crie `scripts/preci.sh` na raiz do repo, modelo abaixo, e rode `./scripts/preci.sh` quando for útil. É opcional: o CI é o único portão.
 
 ```bash
 #!/usr/bin/env bash
@@ -301,29 +304,19 @@ pnpm audit --audit-level=high
 echo "ALL GREEN"
 ```
 
-### T15.5  Hook git pre-push (opcional, recomendado)
-
-Adicionar `.git/hooks/pre-push`:
-
-```bash
-#!/usr/bin/env bash
-# Se as regras do usuário exigirem isolamento, rode o preci dentro do container.
-exec scripts/preci.sh
-```
-
-`chmod +x .git/hooks/pre-push`. Falha local bloqueia push, evitando viajar até o CI.
-
 ### Limitação
 
 Container-level só é 100 % idêntico se a imagem do CI for pública e fixada por digest. Imagens latest podem divergir entre runs. Para reprodutibilidade total, fixar digest no CI (`image: catthehacker/ubuntu:act-22.04@sha256:...`) e usar o mesmo digest local.
 
 ---
 
+> As seções A abaixo são auditoria fora da exceção do piso de testes: só rodam quando o usuário pede. A auditoria de segurança, privacidade e deploy irreversível segue [[AUDITORIAS]] e [[DEPLOY_CHECKLIST]].
+
 ## A2  -  Auditoria de Arquitetura e Camadas
 
 **Objetivo:** validar que nenhuma camada viola as regras de dependência da arquitetura.
 
-**Critério de aprovação:** zero violações críticas (API em widget, SQL em domínio).
+**Critério de aprovação (quando pedida):** zero violações críticas (API em widget, SQL em domínio).
 
 ---
 
@@ -337,4 +330,4 @@ Container-level só é 100 % idêntico se a imagem do CI for pública e fixada p
 
 **Objetivo:** consolidar todos os resultados em um único documento com score, problemas e patches.
 
-**Entregável obrigatório:** documento com score global (0-100), sumário de problemas e patches unificados.
+**Entregável (quando pedida):** documento com score global (0-100), sumário de problemas e patches unificados.
