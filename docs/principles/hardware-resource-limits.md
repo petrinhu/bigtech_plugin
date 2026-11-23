@@ -1,6 +1,6 @@
 ---
 title: Limites de recursos de hardware
-description: Como rodar workloads pesados (ML, RAG, build, transcoding, render, big-data) sem esgotar CPU, RAM ou GPU da máquina do usuário.
+description: Como rodar workloads pesados (ML, RAG, build, suíte de testes, transcoding, render, big-data) sem esgotar CPU, RAM ou GPU da máquina do usuário, inclusive com vários agentes na mesma máquina.
 ---
 
 # Limites de recursos de hardware
@@ -32,6 +32,8 @@ Estes limites valem **sempre** que um comando puder consumir CPU/RAM/GPU de form
 - Transcoding de áudio/vídeo (`ffmpeg -threads`).
 - Compressão/descompressão massiva (`zstd -T`, `xz -T`, pipelines de `tar`).
 - Big-data / processamento em lote (Spark local, pandas/polars em datasets grandes).
+- Suíte de testes, teste de navegador, container e checagem de tipos de projeto grande, sobretudo
+  com vários agentes na mesma máquina (§11).
 - **Qualquer comando com flag `-j N`, `--threads N`, `--jobs N` ou equivalente.**
 
 ---
@@ -185,9 +187,12 @@ nice -n 5 <comando pesado>
 flock -x /tmp/<workload>.lock <comando pesado>
 ```
 
-- **`nice -n 5`** (ou maior) em qualquer comando intensivo de CPU.
+- **`nice -n 5`** (ou maior) em qualquer comando intensivo de CPU. Trabalho disparado por
+  agente usa a prioridade mínima, `nice -n 19` (§11).
 - **`flock`** quando o workload satura um recurso compartilhado (VRAM, RAM): garante **uma
-  execução por vez** e evita que duas chamadas se atropelem.
+  execução por vez** e evita que duas chamadas se atropelem. Com vários agentes na mesma
+  máquina, todo trabalho pesado passa também por uma trava única da máquina, por fora da trava
+  do recurso (§11).
 
 > **Equivalentes por SO.** `nice` e `flock` são Unix (Linux/macOS). No macOS, `nice` existe;
 > `flock` não vem por padrão (instale via `brew install flock`, ou serialize com um lockfile
@@ -272,10 +277,72 @@ sobre os passos abaixo.
 2. **Exporte** as env vars de threads (§4) e, se houver GPU, as de GPU (§5).
 3. **Envolva** o comando em `nice` e, se ele saturar GPU/RAM, em `flock` (§6); ou use um
    wrapper "safe" (§7).
-4. **Na falta de travas definidas pelo usuário, avise antes de paralelizar** cargas pesadas
+4. **Com vários agentes na mesma máquina, siga §11:** trava única, núcleos reservados, teto de
+   memória e de processos por trabalho e prioridade mínima; a publicação vem primeiro.
+5. **Na falta de travas definidas pelo usuário, avise antes de paralelizar** cargas pesadas
    ou de qualquer lote que possa estourar os limites.
-5. **Peça autorização antes de usar a GPU.** Em dúvida, peça confirmação, apresentando a
+6. **Peça autorização antes de usar a GPU.** Em dúvida, peça confirmação, apresentando a
    opção recomendada primeiro. A decisão de disparar uma carga arriscada é do usuário.
+
+---
+
+## 11. Máquina compartilhada por vários agentes
+
+Com vários agentes ou sessões na mesma máquina, o limite de cada comando não basta. Dois
+trabalhos pesados juntos disputam CPU e memória, levam mais tempo do que um depois do outro e
+ainda podem falhar por falta de memória. As práticas abaixo valem para build, suíte de testes,
+teste de navegador, container e checagem de tipos de projeto grande. Os valores são exemplos:
+ajuste-os ao seu hardware (§1). Se as regras do usuário definirem outras travas ou limites,
+elas prevalecem.
+
+- **Um trabalho pesado por vez, numa trava única da máquina.** Todos os agentes e sessões usam
+  o mesmo arquivo de trava (por exemplo `/var/tmp/pesado.lock`). Uma trava por projeto não
+  basta, porque a disputa é pela máquina.
+- **Núcleos reservados ao sistema.** O trabalho pesado fica fora de alguns núcleos, para o
+  sistema e o assistente continuarem respondendo enquanto ele roda. Com
+  `taskset -c 2-$(( $(nproc) - 1 ))`, os núcleos 0 e 1 ficam livres.
+- **Teto de memória e de processos por trabalho.** Cada trabalho pesado roda num escopo com
+  teto próprio, e um teste descontrolado é contido sem derrubar o resto:
+  `systemd-run --user --scope -p MemoryMax=6G -p TasksMax=400`.
+- **Prioridade baixa para agentes.** O trabalho de agente roda com a prioridade mínima
+  (`nice -n 19`).
+- **A publicação vem primeiro.** A trava não garante a ordem de chegada, e uma publicação pode
+  esperar na fila sem começar. Por isso a publicação roda fora da fila, com prioridade normal;
+  os agentes seguem com um pesado por vez, em prioridade mínima.
+- **Espera sem laço.** Esperar é bloquear na própria trava (`flock` sem `-n`) ou no aviso de
+  fim da ferramenta. Laço de espera (`sleep` curto repetido, `read -t`, consulta em intervalo
+  curto) gasta núcleo e processo sem avançar.
+- **Teste sem janela roda no host, com estes limites. Teste que abre janela fica isolado**
+  (container, display virtual ou compositor aninhado), para não tocar a tela, o teclado nem o
+  foco de quem usa a máquina.
+
+Os quatro limites juntos, num comando (valores de exemplo):
+
+```bash
+flock /var/tmp/pesado.lock \
+  systemd-run --user --scope -p MemoryMax=6G -p TasksMax=400 \
+  nice -n 19 taskset -c 2-$(( $(nproc) - 1 )) \
+  <comando pesado>
+```
+
+> **Por SO.** `systemd-run` e `taskset` são Linux com systemd. Em container, os equivalentes
+> são `--cpuset-cpus`, `--memory` e `--pids-limit` (por exemplo
+> `docker run --cpuset-cpus=2-7 --memory=6g --pids-limit=400 ...`). No macOS e no Windows, use
+> o container ou os equivalentes de §5 e §6.
+
+Tropeços que estas práticas evitam:
+
+- **Processo se para pelo número (pid) ou pelo grupo, nunca por padrão de texto.**
+  `pkill -f <padrão>` casa também com o texto do comando que o chamou e pode derrubar o
+  próprio terminal. Guarde o pid ao iniciar (`$!`) e use `kill <pid>`, ou `kill -- -<pgid>`
+  para o grupo.
+- **Travas sempre na mesma ordem.** Quando um trabalho precisa de duas travas, a do trabalho
+  pesado vem por fora e a do recurso (uma porta, a GPU) por dentro. Com a ordem trocada entre
+  dois agentes, cada um segura a trava que o outro espera, e os dois param.
+- **Porta livre antes de teste de navegador.** Antes de subir o servidor do teste, confira que
+  a porta está livre (`ss -ltnH 'sport = :<porta>'` não imprime nada). Um servidor esquecido de
+  outra rodada faz o teste conferir a versão errada e dar falso vermelho. Ao parar o teste, pare
+  também o servidor dele.
 
 ---
 
@@ -288,3 +355,5 @@ sobre os passos abaixo.
 - [ ] Env de GPU exportada; fallback CPU no OOM; **sem** `ulimit -v` rígido.
 - [ ] `nice` em comando pesado; `flock` quando satura GPU/RAM (1 instância por vez).
 - [ ] Usuário avisado antes de lote arriscado; autorização pedida antes de qualquer processo de GPU.
+- [ ] Vários agentes na máquina: um pesado por vez na trava única, núcleos reservados, teto de memória e de processos, `nice -n 19` (§11).
+- [ ] Espera na trava ou no aviso de fim, nunca em laço; processo parado pelo pid, nunca com `pkill -f`.

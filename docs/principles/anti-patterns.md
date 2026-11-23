@@ -34,6 +34,13 @@ Princípios relacionados: [arquitetura e princípios](arquitetura-principios.md)
 
   **Antes de tocar qualquer arquivo de referência externo ao projeto, SEMPRE pedir permissão explícita ao usuário e avisar do risco** ("se modificarmos esse arquivo, deixamos de ter cópia íntegra para restaurar; tem certeza?"). Cobre QUALQUER tipo de arquivo, sem exceções por extensão.
 
+## Diagnóstico e testes
+
+- Escrever a causa de uma falha num relatório ou briefing sem ler antes a asserção que falhou.
+- Tratar uma falha de rede como causa, ou refazer uma publicação por ela, sem reconferir duas vezes.
+- Teste que zera variável de ambiente que o portão real usa. Se o teste precisa de outro valor, ele muda só no próprio processo.
+- Parar processo por padrão de texto (`pkill -f`): o padrão casa também com o comando que o chamou e pode derrubar o próprio terminal. Pare pelo pid ou pelo grupo. Travas, porta e trabalho pesado ficam em [limites de hardware](hardware-resource-limits.md), seção 11.
+
 ## Ver também
 
 - Arquitetura, SOLID, DRY e TDD: [arquitetura e princípios](arquitetura-principios.md).
