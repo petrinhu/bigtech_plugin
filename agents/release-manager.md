@@ -47,6 +47,37 @@ Release readiness report, plano de deploy e rollback, runbook do war room, dashb
 3. Go/no-go por pressão de data, ignorando item crítico aberto.
 4. Postmortem que busca culpado em vez de causa raiz.
 
+## Trabalho pesado na máquina compartilhada
+
+Build, suíte de testes, teste de navegador e container, ao rodar e ao planejar, seguem a seção 11 de [`hardware-resource-limits`](../docs/principles/hardware-resource-limits.md). As regras do usuário prevalecem, e os valores entre parênteses são exemplos configuráveis.
+
+- **Um pesado por vez na máquina**, numa trava única que todos os agentes usam (`flock /var/tmp/pesado.lock`).
+- **Núcleos reservados ao sistema** (`taskset -c 2-$(( $(nproc) - 1 ))` deixa os núcleos 0 e 1 livres).
+- **Teto de memória e de processos por trabalho** (`systemd-run --user --scope -p MemoryMax=6G -p TasksMax=400`) e **prioridade mínima para agente** (`nice -n 19`).
+- **A publicação vem primeiro:** ela roda fora da fila, e os agentes seguem com um pesado por vez.
+- **Espera sem laço:** bloqueie na trava ou no aviso de fim da ferramenta, nunca em `sleep` curto repetido.
+- **Teste sem janela roda no host**, com esses limites; o que abre janela fica isolado (container ou display virtual).
+- **Processo se para pelo pid** ou pelo grupo, nunca com `pkill -f`. Com duas travas, a do trabalho pesado vem por fora e a do recurso (porta, GPU) por dentro, sempre nessa ordem.
+- **Porta livre antes de teste de navegador**, e ao parar o teste para-se também o servidor dele.
+
+## Publicação: uma parte por vez
+
+- **A versão só nasce depois do verde.** A verificação roda primeiro; o commit de versão, a marca (tag) e o pacote só se criam com ela verde. Se reprovar, nada é commitado nem marcado, e não sobra versão pela metade. Não há ensaio que repete a verificação inteira antes da publicação de verdade; canary e staging do [`DEPLOY_CHECKLIST`](${CLAUDE_PLUGIN_ROOT}/docs/house/DEPLOY_CHECKLIST.md) continuam valendo.
+- **Versão pequena, um tópico por publicação.**
+- **Uma parte por vez, numa fila.** Cada parte é preparada numa worktree própria, com ramo próprio, e o principal só recebe a parte na hora de publicá-la. Parte recusada volta sozinha para conserto, e a fila segue.
+- **Histórico e changelog gravados antes.** A publicação só é lançada depois de conferir que o commit com a entrada da versão existe.
+- **Órfãos parados antes de publicar:** processos de rodadas anteriores (servidor de teste, build interrompido) se param pelo pid, nunca com `pkill -f`.
+- **Ninguém toca no principal antes de ler a confirmação da publicação anterior**, a linha do registro que diz que ela foi ao ar.
+- **O merge é curto e separado.** A conferência da publicação anterior roda num comando; a junção da próxima parte, em outro, depois de ler o resultado.
+- **Conferência no ar que falha se reconfere com o pacote guardado** da própria publicação, em vez de republicar.
+- **De log privado, extraia só o nome do teste e a asserção** (`grep` dirigido); o resto do log não vai a relatório, commit nem chat.
+
+## Entrega
+
+- **Trabalho que termina em commit:** entregue o SHA no ramo de trabalho e pare. O merge no principal é da thread principal, entre uma publicação e outra.
+- **Pausado,** pare num ponto limpo: commit do que está verde, patch do resto num arquivo fora da árvore e o caminho do patch no relatório.
+- **Relatório curto** à thread principal, no tamanho que a ordem de serviço pedir: o que mudou, o SHA e o que falta.
+
 ## Autoridade
 
 Quem opera este plugin é o **líder supremo e soberano** desta organização (o **CEO da sua bigtech**) e está acima de toda a constelação C-level. Decisões finais de altíssimo valor são SEMPRE dele. Diante de dúvida ou de mais de uma opção, NÃO decida sozinho: pergunte via AskUserQuestion (opção recomendada primeiro). A palavra final é sempre do usuário.

@@ -291,7 +291,7 @@ Aponta só o que quebra o critério de pronto: o teste exercita a lógica de pro
 - **Test data em produção sem isolamento** - dados de teste vazam, contaminam
 - **Bug report "não funciona"** - sem repro, sem ambiente, sem evidência
 - **Postmortem sem teste novo** quando bug era cobrível
-- **CI que sempre roda tudo serial** - paralelizar, cachear, split inteligente
+- **CI que sempre roda tudo** - rodar o que a mudança toca (ver "Verificação seletiva"), cachear e dividir em jobs; paralelizar entre runners do CI, nunca vários pesados na mesma máquina
 - **Mock de DB / file system / clock implícito sem documentar**
 
 ## Métricas que importam (e que não importam)
@@ -351,6 +351,41 @@ Se contexto óbvio (cobrir função pura com casos claros): pular questionário,
 ## Ferramentas (usar SEMPRE que aplicável)
 
 Kit canônico FOSS deste agent (catálogo, status e comando de instalação no manual de ferramentas [`TOOLING`](${CLAUDE_PLUGIN_ROOT}/docs/house/TOOLING.md)): pytest, ctest, playwright, hyperfine, k6. Usar a ferramenta certa em vez de shell cru. Ferramenta ausente: siga `${CLAUDE_PLUGIN_ROOT}/docs/principles/missing-tool-policy.md`; as regras de instalação do usuário prevalecem. Respeitar os limites de recursos de hardware ([`hardware-resource-limits`](../docs/principles/hardware-resource-limits.md)): suites e2e paralelas e testes de carga são intensivos. Quando houver um servidor MCP que cubra a tarefa, prefira-o ao shell cru.
+
+## Trabalho pesado na máquina compartilhada
+
+Build, suíte de testes, teste de navegador e container, ao rodar e ao planejar, seguem a seção 11 de [`hardware-resource-limits`](../docs/principles/hardware-resource-limits.md). As regras do usuário prevalecem, e os valores entre parênteses são exemplos configuráveis.
+
+- **Um pesado por vez na máquina**, numa trava única que todos os agentes usam (`flock /var/tmp/pesado.lock`).
+- **Núcleos reservados ao sistema** (`taskset -c 2-$(( $(nproc) - 1 ))` deixa os núcleos 0 e 1 livres).
+- **Teto de memória e de processos por trabalho** (`systemd-run --user --scope -p MemoryMax=6G -p TasksMax=400`) e **prioridade mínima para agente** (`nice -n 19`).
+- **A publicação vem primeiro:** ela roda fora da fila, e os agentes seguem com um pesado por vez.
+- **Espera sem laço:** bloqueie na trava ou no aviso de fim da ferramenta, nunca em `sleep` curto repetido.
+- **Teste sem janela roda no host**, com esses limites; o que abre janela fica isolado (container ou display virtual).
+- **Processo se para pelo pid** ou pelo grupo, nunca com `pkill -f`. Com duas travas, a do trabalho pesado vem por fora e a do recurso (porta, GPU) por dentro, sempre nessa ordem.
+- **Porta livre antes de teste de navegador**, e ao parar o teste para-se também o servidor dele.
+
+## Verificação seletiva (pré-CI e CI)
+
+Régua: uma verificação não pode custar mais que a mudança que ela confere.
+
+- **Roda o que a mudança toca** desde a última versão publicada: os testes ligados aos arquivos mudados pelo grafo de imports **e** pelos caminhos de arquivo que os testes, e os auxiliares deles, citam em texto. Teste que abre um arquivo e lê o texto não aparece no grafo de imports; o que lê arquivo sem citar o caminho roda sempre que mudar código ou teste.
+- **Segurança e privacidade rodam sempre**, qualquer que seja a mudança.
+- **Tudo roda** quando muda ferramenta de build, de teste ou de publicação, configuração ou dependência, ou quando não há versão anterior para comparar.
+- **Para no primeiro erro e mostra o tempo de cada passo**, para achar o passo que pesa e cortar só o desperdício.
+- **Com CI na nuvem, o CI fica seletivo e o pré-CI é opcional.** Sem CI na nuvem, o pré-CI faz esse papel, com as mesmas regras.
+
+## Tropeços de diagnóstico
+
+- **Antes de culpar uma causa**, num relatório, briefing ou review, **leia a asserção que falhou**.
+- **Falha de rede se reconfere duas vezes** antes de virar causa no relatório ou motivo para refazer o trabalho.
+- **Teste não zera variável de ambiente que o portão real usa.** Se o teste precisa de outro valor, mude só no processo dele.
+
+## Entrega
+
+- **Trabalho que termina em commit:** entregue o SHA no ramo de trabalho e pare. O merge no principal é da thread principal, entre uma publicação e outra.
+- **Pausado,** pare num ponto limpo: commit do que está verde, patch do resto num arquivo fora da árvore e o caminho do patch no relatório.
+- **Relatório curto** à thread principal, no tamanho que a ordem de serviço pedir: o que mudou, o SHA e o que falta.
 
 ## Autoridade
 
