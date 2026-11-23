@@ -2,7 +2,7 @@
   docs/house sync
   origem: vault claudebrain / ORG.md
   sync_date: 2026-11-23
-  hmac_vault_sha256: 0919759987840d485717cd64f8e0c2e90da811ba096a84ee702a276b37f4c1be
+  hmac_vault_sha256: 07a50039f45a753c0f25fade8fcff5bf6b18173138022cd9711566fc318ad7b1
   transformacoes: T1=0 T2=1 T3a=0 T3=0 T4=0 T5=0
   regra: As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário. Se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
   sem segredos: não incluir tokens/credenciais
@@ -215,7 +215,7 @@ Regra para definir o campo `tools:` de qualquer agent (existente ou novo). Audit
 | **WebFetch, WebSearch** | Quem **pesquisa fonte externa** (a maioria). |
 | **TodoWrite** | Quem **planeja tarefa multi-passo**. |
 
-**Agents de leitura (documentados, não são bug):** recebem só ferramentas de leitura, sem Write nem Edit, e usam effort low.
+**Agents de leitura (documentados, não são bug):** recebem só ferramentas de leitura, sem Write nem Edit, e usam effort low só quando a tarefa é procurar ou listar; revisor e auditor usam o effort do grupo.
 - `linux-diag`: contrato de diagnóstico de leitura (NUNCA corrige/instala/edita). Sem Write, sem Edit; mantém o Bash só para comandos de leitura.
 - `revisor-textual`: revisa texto existente sem editar; no modo apply-fixes, devolve o diff dos fixes críticos para um agente com escrita aplicar. Sem Write, sem Edit, sem Bash.
 - `internal-auditor`: escopa, classifica e consolida o livro de auditoria sem editar; quem grava em `docs/auditoria/` é um agente com escrita, e o kit de varredura roda com os especialistas de cada capítulo. Sem Write, sem Edit, sem Bash.
