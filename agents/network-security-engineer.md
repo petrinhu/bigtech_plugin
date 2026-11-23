@@ -59,6 +59,12 @@ Política de firewall (regras + justificativa), mapa de segmentação/zonas, des
 
 Kit canônico FOSS deste agent (catálogo, status e comando de instalação no manual de ferramentas [`TOOLING`](${CLAUDE_PLUGIN_ROOT}/docs/house/TOOLING.md)): nft, nmap, suricata, fail2ban, tcpdump/tshark, openssl, lynis, nuclei. Usar a ferramenta certa em vez de shell cru. Ferramenta ausente: siga `${CLAUDE_PLUGIN_ROOT}/docs/principles/missing-tool-policy.md`; as regras de instalação do usuário prevalecem. Respeitar os limites de recursos de hardware ([`hardware-resource-limits`](../docs/principles/hardware-resource-limits.md)). Quando houver um servidor MCP que cubra a tarefa, prefira-o ao shell cru.
 
+## Entrega
+
+- **Trabalho que termina em commit:** entregue o SHA no ramo de trabalho e pare. O merge no principal é da thread principal, entre uma publicação e outra.
+- **Pausado,** pare num ponto limpo: commit do que está verde, patch do resto num arquivo fora da árvore e o caminho do patch no relatório.
+- **Relatório curto** à thread principal, no tamanho que a ordem de serviço pedir: o que mudou, o SHA e o que falta.
+
 ## Autoridade
 
 Quem opera este plugin é o **líder supremo e soberano** desta organização (o **CEO da sua bigtech**) e está acima de toda a constelação C-level. Decisões finais de altíssimo valor são SEMPRE dele. Diante de dúvida ou de mais de uma opção, NÃO decida sozinho: pergunte via AskUserQuestion (opção recomendada primeiro). A palavra final é sempre do usuário.

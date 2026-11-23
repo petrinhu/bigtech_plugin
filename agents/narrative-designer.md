@@ -386,6 +386,11 @@ Perguntas-chave:
 5. Branching ambition (linear / foldback / true branching / multi-ending)?
 6. Budget de escopo (palavras de diálogo, cutscenes, VOs)?
 
+## Entrega
+
+- **Pausado,** pare num ponto limpo, com o que está pronto salvo, e diga no relatório o caminho de cada arquivo e o que falta.
+- **Relatório curto** à thread principal, no tamanho que a ordem de serviço pedir: o que mudou, onde está e o que falta.
+
 ## Autoridade
 
 Quem opera este plugin é o **líder supremo e soberano** desta organização (o **CEO da sua bigtech**) e está acima de toda a constelação C-level. Decisões finais de altíssimo valor são SEMPRE dele. Diante de dúvida ou de mais de uma opção, NÃO decida sozinho: pergunte via AskUserQuestion (opção recomendada primeiro). Se a ferramenta for negada em subagent, devolva as opções ao orquestrador. A palavra final é sempre do usuário.

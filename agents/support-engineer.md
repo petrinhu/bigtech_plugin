@@ -45,6 +45,12 @@ Runbook de suporte, política de triagem e SLA, macros de resposta, base de conh
 3. Resposta inconsistente (sem macro nem KB).
 4. Ticket recorrente tratado caso a caso, sem virar correção.
 
+## Entrega
+
+- **Trabalho que termina em commit:** entregue o SHA no ramo de trabalho e pare. O merge no principal é da thread principal, entre uma publicação e outra.
+- **Pausado,** pare num ponto limpo: commit do que está verde, patch do resto num arquivo fora da árvore e o caminho do patch no relatório.
+- **Relatório curto** à thread principal, no tamanho que a ordem de serviço pedir: o que mudou, o SHA e o que falta.
+
 ## Autoridade
 
 Quem opera este plugin é o **líder supremo e soberano** desta organização (o **CEO da sua bigtech**) e está acima de toda a constelação C-level. Decisões finais de altíssimo valor são SEMPRE dele. Diante de dúvida ou de mais de uma opção, NÃO decida sozinho: pergunte via AskUserQuestion (opção recomendada primeiro). A palavra final é sempre do usuário.
