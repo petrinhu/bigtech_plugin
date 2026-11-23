@@ -1,8 +1,8 @@
 <!--
   docs/house sync
   origem: vault claudebrain / AUDITORIAS.md
-  sync_date: 2026-11-21
-  hmac_vault_sha256: f2e29e9c2220715c8dc3d3a0fd81261babc5b97231feaa814e94d26940a56b5a
+  sync_date: 2026-11-23
+  hmac_vault_sha256: 6782751c19f404353a43cc9e2c3db22760df2c7b4417d6c493bc9790673591b2
   transformacoes: T1=4 T2=0 T3a=0 T3=0 T4=0 T5=0
   regra: As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário. Se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
   sem segredos: não incluir tokens/credenciais
@@ -21,9 +21,9 @@
 > Checklists operacionais de auditoria para projetos C++ · Python · Web (PHP/JS/HTML).
 > Cada item tem prioridade **CRÍTICO · IMPORTANTE · COSMÉTICO**.
 
-> **Piso de testes.** Teste só para lógica de produto. O CI é o único portão. Nada de teste de mutação, sabotagem, auditoria, reauditoria, varredura de gêmeos, checklist de perguntas do revisor, script de verificação extra nem portão local novo. Exceção: segurança, privacidade e deploy irreversível.
+> **Piso de testes.** Teste só para lógica de produto. O CI é o portão, uma vez, depois do push; sem CI na nuvem, o pré-CI seletivo ([[TESTES]] T15) é o portão. Nada de teste de mutação, sabotagem, auditoria, reauditoria, varredura de gêmeos, checklist de perguntas do revisor, script de verificação extra nem portão local novo. Exceção: segurança, privacidade e deploy irreversível.
 
-> **Como usar este manual.** Este é o catálogo de referência dos temas de auditoria por stack. Pelo piso, auditoria só roda na exceção (segurança, privacidade e deploy irreversível): uma vez, depois do código que ela cobre, sem reauditoria, com a correção de cada achado conferida no CI. Os outros temas só entram quando o usuário pede; aí a skill `tab_pendencias` os poda pelo stack no `AUDITORIAS.md` da raiz do projeto (`--add_tests_audit`). Consulte aqui o escopo de cada tema.
+> **Como usar este manual.** Este é o catálogo de referência dos temas de auditoria por stack. Pelo piso, auditoria só roda na exceção (segurança, privacidade e deploy irreversível): uma vez, depois do código que ela cobre, sem reauditoria, com a correção de cada achado conferida no portão. Os outros temas só entram quando o usuário pede; aí a skill `tab_pendencias` os poda pelo stack no `AUDITORIAS.md` da raiz do projeto (`--add_tests_audit`). Consulte aqui o escopo de cada tema.
 
 > **Ferramenta ausente.** Siga a regra de [[TOOLING]] (legenda de status): ferramenta de linha de comando de uso geral pode ser instalada com aviso; biblioteca, dependência de projeto, modelo, extensão, navegador e serviço só com permissão do usuário; nunca falhar calado.
 

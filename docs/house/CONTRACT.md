@@ -1,8 +1,8 @@
 <!--
   docs/house sync
   origem: vault claudebrain / CONTRACT.md
-  sync_date: 2026-11-21
-  hmac_vault_sha256: 28ee64d1fafe9b5f11ccc25cab9943a5426c73a8fcdab86e22fe28b347d99755
+  sync_date: 2026-11-23
+  hmac_vault_sha256: 702c809fd238cb8289e40f89157ff7167b6eed3c9d31b92b791bcae60d89dd79
   transformacoes: T1=4 T2=0 T3a=0 T3=0 T4=0 T5=0
   regra: As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário. Se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
   sem segredos: não incluir tokens/credenciais
@@ -71,7 +71,7 @@ Identify layer (Front / Mid / Back / Foundation; the user's layering rules preva
 Apply SOLID + Design Pattern rules
       │
       ▼
-Write a failing test → see it fail → write minimal code → see it pass → refactor
+Lógica de produto: teste que falha → vê falhar → código mínimo → vê passar → refatora
       │
       ▼
 Commit with Conventional Commits format
@@ -625,11 +625,7 @@ const QString apiKey = gerenciadorChaves.recuperar("limitless_api_key");
 ```bash
 # MUST: read current state of files to be modified
 # MUST: understand existing patterns before introducing new ones
-# MUST: check if a build passes before starting
-cmake --build build --parallel "${THREADS:?set THREADS from your hardware limits}" 2>&1 | grep -E "error:|warning:"
 ```
-
-Valor de THREADS por SO, conforme os limites de hardware do usuário (medidos, nunca estimados): Linux, `$(nproc)`; macOS, `$(sysctl -n hw.logicalcpu)`; Windows, `%NUMBER_OF_PROCESSORS%`. Sem THREADS definido, o comando falha alto em vez de usar paralelismo solto.
 
 ### 10.2 Conventional Commits (MANDATORY)
 
@@ -690,6 +686,7 @@ Build, warnings and product-logic tests are checked by the CI, the only gate; th
 - MUST NOT amend published commits (use a new commit instead).
 - MUST NOT use `--no-verify` to skip hooks unless explicitly instructed.
 - MUST NOT batch unrelated changes into one commit.
+- MUST NOT juntar o merge a outro comando: ele roda sozinho, num comando curto, separado da conferência da publicação anterior.
 - MUST NOT commit generated files (build artifacts, `moc_*.cpp`, `qrc_*.cpp`).
 
 ### 10.6 Pull Request Description Template
@@ -711,11 +708,17 @@ Build, warnings and product-logic tests are checked by the CI, the only gate; th
 - [ ] CHANGELOG.md updated (if user-facing change)
 ```
 
+### 10.7 Pausa e retomada
+
+Agente pausado para num ponto limpo: commit do que está verde e patch do resto. A retomada é pelo mesmo agente.
+
 ---
 
 ## 11. Testing & Audit Mandate
 
-> **Piso de testes.** Teste só para lógica de produto. O CI é o único portão. Nada de teste de mutação, sabotagem, auditoria, reauditoria, varredura de gêmeos, checklist de perguntas do revisor, script de verificação extra nem portão local novo. Exceção: segurança, privacidade e deploy irreversível.
+> **Piso de testes.** Teste só para lógica de produto. O CI é o portão, uma vez, depois do push; sem CI na nuvem, o pré-CI seletivo ([TESTES.md](TESTES.md) T15) é o portão. Nada de teste de mutação, sabotagem, auditoria, reauditoria, varredura de gêmeos, checklist de perguntas do revisor, script de verificação extra nem portão local novo. Exceção: segurança, privacidade e deploy irreversível.
+
+> Sem CI na nuvem, onde este contrato diz "CI", leia o pré-CI seletivo.
 
 > Catalog of procedures, commands, and tools: **[TESTES.md](TESTES.md)**. Anything there beyond this floor runs only when the user asks.
 
@@ -733,8 +736,9 @@ Build, warnings and product-logic tests are checked by the CI, the only gate; th
 ### Minimum Quality Gate (MUST pass before release)
 
 ```
-[ ] CI green on the release commit: build, product-logic tests (T1),
-    secrets scan (T8: 0 detected), CVE scan (T12: 0 CRITICAL unpatched)
+[ ] A versão só nasce depois do CI verde, sem ensaio duplicado: build,
+    testes de lógica de produto (T1), segredos (T8: 0 achados),
+    CVE (T12: 0 CRITICAL sem correção)
 ```
 
 - The CI MUST be the only gate. MUST NOT add mutation testing, sabotage, audits, re-audits, twin-defect sweeps, reviewer question checklists, extra verification scripts or new local gates.
@@ -827,6 +831,9 @@ printf/scanf   // use qDebug() / QTextStream
 gets()         // buffer overflow risk
 strcpy/strcat  // use QString or std::string
 ```
+
+**Build:**
+- Cabeçalho pré-compilado nos cabeçalhos estáveis; `-ftime-trace` uma vez antes de otimizar o tempo de build.
 
 ---
 

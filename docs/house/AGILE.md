@@ -1,8 +1,8 @@
 <!--
   docs/house sync
   origem: vault claudebrain / AGILE.md
-  sync_date: 2026-11-20
-  hmac_vault_sha256: 2655cfc9058e35eb0a0baa040fcf3d0e52df4433a7f073d1dc11bb7a51fd95d7
+  sync_date: 2026-11-23
+  hmac_vault_sha256: 8395187d0c06dfc5ba3f4c51bcc0efaca65ad571ab858fae5c725d001f3e1ce9
   transformacoes: T1=2 T2=0 T3a=0 T3=0 T4=0 T5=0
   regra: As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário. Se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
   sem segredos: não incluir tokens/credenciais
@@ -97,7 +97,7 @@ Então [resultado esperado e verificável].
 
 Uma história só está concluída quando:
 - [ ] Código implementado e revisado
-- [ ] Testes automatizados escritos e passando
+- [ ] Teste só na lógica de produto, escrito antes do código, e portão verde ([[TESTES]])
 - [ ] Documentação mínima atualizada
 - [ ] Demonstrável para o stakeholder
 - [ ] Sem dívida técnica crítica introduzida
@@ -213,7 +213,7 @@ Usar a escala de Fibonacci para estimativas relativas de complexidade:
 | **N** | Negotiable (negociável, não contratual) |
 | **V** | Valuable (gera valor ao usuário/negócio) |
 | **E** | Estimable (estimável pela equipe) |
-| **S** | Small (pequena o suficiente para uma sprint) |
+| **S** | Small (fatia pequena: um tópico por publicação) |
 | **T** | Testable (testável com critérios claros) |
 
 ### Priorização
@@ -231,10 +231,10 @@ A LLM deve sugerir priorização baseada em:
 
 ### Princípios de Qualidade Ágil
 
-- **TDD (Test-Driven Development):** Escrever o teste antes da implementação, em todo código de comportamento. Exceções (protótipo descartável, script ad-hoc) são declaradas explicitamente.
+- **TDD (Test-Driven Development):** Escrever o teste antes da implementação, na lógica de produto (regra de domínio, endpoint, correção de bug de produto). Em segurança, privacidade e deploy irreversível, em todo código de comportamento, com as exceções (protótipo descartável, script ad-hoc) declaradas explicitamente.
 - **CI/CD:** Integração contínua e entrega contínua devem ser metas arquiteturais desde o início.
 - **Refatoração contínua:** Parte do trabalho de cada sprint, não um projeto separado.
-- **Pair programming / Code review:** Mínimo de uma revisão por pull request.
+- **Pair programming / Code review:** Uma revisão por pull request.
 
 ### Gestão de Dívida Técnica
 

@@ -1,8 +1,8 @@
 <!--
   docs/house sync
   origem: vault claudebrain / pipeline_release_1.0.md
-  sync_date: 2026-11-20
-  hmac_vault_sha256: 19a5c3aad4cbe5d3a32890e9d324e01780d30f9044c5b54c1309bf7f8591008d
+  sync_date: 2026-11-23
+  hmac_vault_sha256: 38bb7c8f7cea5ee6820dc3e0696136e74382999484b3f010a865d1e21a3ec538
   transformacoes: T1=0 T2=0 T3a=0 T3=0 T4=0 T5=0
   regra: As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário. Se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
   sem segredos: não incluir tokens/credenciais
@@ -202,7 +202,7 @@ Caetano (CTO), via `software-architect` (modo colaborativo: opções antes de gr
 Monorepo (Turborepo, Nx) ou polyrepo, branching (trunk-based, GitHub Flow, GitFlow), Conventional Commits + changelog automatizado.
 
 ### 5.2. CI/CD
-CI: lint, type-check, testes, build, SAST, análise de licenças. CD: deploy automático para staging no merge, promoção para produção. Ferramentas: GitHub Actions.
+CI seletivo ([[TESTES]] T15): lint, type-check, testes, build, SAST, análise de licenças. CD: deploy automático para staging no merge, promoção para produção. Pacote (AppImage, Flatpak, instalador) só na tag. Ferramentas: GitHub Actions.
 
 ### 5.3. Ambientes
 local, dev, staging, production. Paridade via variáveis de ambiente (12-factor). Staging com dados sintéticos ou anonimizados.
@@ -223,7 +223,7 @@ Caetano (CTO), via `devops-sre` e `tech-lead`. Papéis humanos: DevOps/SRE, Plat
 
 ## Fase 6: Desenvolvimento (Caminhos Paralelos)
 
-Múltiplas trilhas em paralelo, sincronizadas por Cosmo (COO) via daily standups, sprint planning (Scrum) ou cadências leves (Shape Up, Kanban). Ver [[AGILE]].
+Múltiplas trilhas em paralelo, sincronizadas por Cosmo (COO) via daily standups, sprint planning (Scrum) ou cadências leves (Shape Up, Kanban). Ver [[AGILE]]. Cada parte é feita numa worktree própria, e o ramo `main` só recebe a parte na hora de publicá-la; o merge é da thread principal, entre uma publicação e a seguinte.
 
 ### 6a. Frontend Web
 Setup: bundler (Vite, esbuild), linter/formatter (ESLint/Biome/Prettier), TypeScript strict. Implementação: componentes do design system, estado (local -> context -> store), roteamento, lazy loading, i18n. Performance: Core Web Vitals (LCP, INP, CLS), Lighthouse CI, bundle analysis. Agent: `frontend-engineer`.
@@ -275,7 +275,7 @@ Caetano (CTO), via `qa-engineer` e `accessibility-specialist`. Papéis humanos: 
 SAST (Semgrep, SonarQube, CodeQL), DAST (OWASP ZAP, Burp), SCA (Dependabot, Snyk, Renovate), secrets scanning (Gitleaks, TruffleHog), container scanning (Trivy, Grype).
 
 ### 8.2. Pentest
-Equipe externa ou interna. Cobertura mínima OWASP Web + API Top 10. Relatório com severidade, PoC, remediação. Re-teste após correção.
+Equipe externa ou interna. Cobertura mínima OWASP Web + API Top 10. Relatório com severidade, PoC, remediação.
 
 ### 8.3. Compliance regulatório (Brasil + global)
 LGPD (base legal, finalidade, minimização, ROPA, DPIA), GDPR (usuários UE), HIPAA (saúde EUA). Apps médicos no Brasil: Resolução CFM 1.821/2007, 2.314/2022 (telemedicina), retenção de 20 anos do prontuário, ANVISA RDC 657/2022 para SaMD.
@@ -361,10 +361,12 @@ Camilo (CMO), via `product-marketing-manager`, `growth-engineer`, `content-seo`,
 - [ ] DR drill nos últimos 90 dias.
 - [ ] LGPD ROPA atualizado.
 
-Ver [[DEPLOY_CHECKLIST]] para as 7 fases de deploy irreversível.
+O rito de 7 fases de [[DEPLOY_CHECKLIST]] vale só para as mudanças que ele lista.
 
 ### 11.2. Estratégia de deploy
 Blue-green (dois ambientes, switch instantâneo), canary (1% -> 5% -> 25% -> 100% com observação de métricas), feature flags (release técnico desacoplado do release de produto).
+
+Publicação por partes: uma parte por vez numa fila, e um erro custa só aquela parte. Antes de publicar, o histórico e o changelog ficam gravados, com o limite de tamanho conferido, e os processos órfãos são parados pelo pid. Se a conferência no ar falhar, reconfira com o pacote guardado em vez de republicar.
 
 ### 11.3. War room (dia do lançamento)
 Celso (CEO) coordena. Presentes: PM, Tech Lead, SRE on-call, engenheiros de áreas críticas, suporte sênior, comunicação/PR, liderança em standby.
@@ -401,7 +403,7 @@ Revisão do roadmap com dado real, repriorização do backlog, decisão sobre ac
 A/B testing incremental, performance budgets revisitados, refinamento de onboarding pelo funil.
 
 ### 12.6. Operação madura
-Cadência regular (semanal, bi-semanal), sprints de tech debt, auditorias periódicas (segurança trimestral, acessibilidade semestral, ver [[AUDITORIAS]]).
+Cadência regular (semanal, bi-semanal), sprints de tech debt, auditoria periódica de segurança (trimestral, ver [[AUDITORIAS]]).
 
 ### 12.7. Liderança
 Capitolino (CPO) no roadmap, via `product-manager`, `data-scientist`, `customer-success` (retenção) e `support-engineer` (suporte contínuo). Apoio: Caetano (CTO) estabilidade, Camilo (CMO) crescimento. Papéis humanos: PM, Data Analyst/Scientist, Customer Success, Suporte, Engenheiros, SRE.

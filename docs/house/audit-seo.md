@@ -1,7 +1,7 @@
 <!--
   docs/house sync
   origem: vault claudebrain / audit-seo.md
-  sync_date: 2026-11-20
+  sync_date: 2026-11-23
   hmac_vault_sha256: d0ce5704cbec73a320f2ecba5a967f680d1d7d465da35553cfbbf860f5cd01f1
   transformacoes: T1=0 T2=0 T3a=0 T3=0 T4=1 T5=0
   regra: As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário. Se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.

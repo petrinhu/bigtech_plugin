@@ -1,8 +1,8 @@
 <!--
   docs/house sync
   origem: vault claudebrain / TOOLING.md
-  sync_date: 2026-11-20
-  hmac_vault_sha256: 93d7abb6f16fbc61827f7131dd0a72c6d04d9a470302c439f5625c9885e050f1
+  sync_date: 2026-11-23
+  hmac_vault_sha256: a72de16aca5daf160901d0214e170c5ae4974c0dc0fd1704d4ddaa8e93ccd08e
   transformacoes: T1=0 T2=0 T3a=0 T3=0 T4=0 T5=0
   regra: As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário. Se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
   sem segredos: não incluir tokens/credenciais
@@ -19,7 +19,21 @@ Hub: [[Standards]]. Irmãos: [[CONTRACT]], [[TESTES]], [[AGILE]], [[DEPLOY_CHECK
 - ⬇ **baixar** (faltando; instalar conforme a regra abaixo)
 - ↺ **preferir** (temos o moderno; usar no lugar do legado)
 
-Regra: o agent usa a ferramenta canônica do seu domínio SEMPRE que aplicável (não reinventa em shell cru). Se faltar (⬇): ferramenta de linha de comando de uso geral pode ser instalada com o comando desta tabela, com aviso. Biblioteca, dependência de projeto, modelo, extensão, navegador e serviço só com permissão do usuário. Se faltar algo sem permissão, pare e diga o que falta; não prossiga com contorno; nunca falhe calado. Respeitar limites de hardware ([[feedback_hardware_resource_limits]]) e prioridade MCP ([[feedback_mcp_priority]]).
+Regra: o agent usa a ferramenta canônica do seu domínio SEMPRE que aplicável (não reinventa em shell cru). Se faltar (⬇): ferramenta de linha de comando de uso geral pode ser instalada com o comando desta tabela, com aviso. Biblioteca, dependência de projeto, modelo, extensão, navegador e serviço só com permissão do usuário. Se faltar algo sem permissão, pare e diga o que falta; não prossiga com contorno; nunca falhe calado. Respeitar limites de hardware ([[feedback_hardware_resource_limits]]) e prioridade MCP ([[feedback_mcp_priority]]). Trabalho pesado (build, checagem de tipos, suíte de teste, navegador de teste) segue estas regras:
+
+- um pesado por vez, na trava única `/var/tmp/pesado.trava` (`flock`);
+- núcleos 0 e 1 livres: `taskset -c 2-15`;
+- o agente roda o pesado em `systemd-run --user --scope -p TasksMax=400 -p MemoryMax=6G`, com `nice -n 19`; o teto de memória é ajustável por projeto, porque link de C++ grande pode precisar de mais;
+- a publicação fura a fila: roda direto, fora da trava;
+- as travas se pegam sempre na mesma ordem, a `pesado.trava` por fora e a da porta do servidor de teste por dentro;
+- antes de teste de navegador, a porta tem de estar livre.
+
+Uso sem desperdício:
+
+- processo se para pelo pid, nunca por padrão de texto;
+- espera-se pela notificação de fim, sem polling curto;
+- worktree barata: `git worktree add --no-checkout`, com as dependências ligadas por symlink, sem reinstalar por parte; em C++, um `ccache` numa pasta única para todas as worktrees e o build fora da árvore;
+- de log com dado privado, `grep` só do nome do teste e da asserção.
 
 > **Portabilidade dos comandos (agnóstico de SO).** Os comandos de instalação usam `dnf` (Fedora/RHEL) e `apt` (Debian/Ubuntu) como exemplos. Adapte ao gerenciador do sistema: `apt`, `dnf`, `pacman` ou `zypper` no Linux; `brew` no macOS; `winget`, `choco` ou `scoop` no Windows. Prefira gerenciadores cross-platform quando houver: `pip`/`uv`, `cargo` e `npm`/`pnpm` valem igual em Windows, macOS e Linux. Para detectar uma ferramenta, use `command -v <ferramenta>` no Unix ou no WSL, e `Get-Command <ferramenta>` ou `where <ferramenta>` no Windows. No Windows, rodar o Claude Code via WSL torna válidos os comandos Unix deste manual.
 
@@ -48,7 +62,7 @@ Regra: o agent usa a ferramenta canônica do seu domínio SEMPRE que aplicável 
 | tokei | ⬇ | contar LoC por linguagem (preferir sobre cloc) | architect, tech-lead, internal-auditor | `sudo dnf install tokei` |
 | cmake / ninja / make | ✓ | build C++/Qt | backend, architect | `sudo dnf install cmake ninja-build make` |
 | ccache | ⬇ | cache de compilação C/C++ | backend | `sudo dnf install ccache` |
-| mold | ⬇ | linker rápido | backend | `sudo dnf install mold` |
+| mold | ⬇ | linker rápido, onde o projeto aceitar | backend | `sudo dnf install mold` |
 | pre-commit | ⬇ | hooks de lint/format no commit | tech-lead, todos eng | `pipx install pre-commit` |
 | ruff | ⬇ | lint+format Python (substitui flake8+black+isort) | backend, data | `uv tool install ruff` |
 | shellcheck | ⬇ | lint de shell | todos eng, devops | `sudo dnf install ShellCheck` |

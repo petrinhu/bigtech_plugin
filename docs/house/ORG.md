@@ -1,8 +1,8 @@
 <!--
   docs/house sync
   origem: vault claudebrain / ORG.md
-  sync_date: 2026-11-20
-  hmac_vault_sha256: e99d55729b4e75c81c870c97ead8902f0481736e8bc73d785437af363cabe2ac
+  sync_date: 2026-11-23
+  hmac_vault_sha256: eccb8911769d3a240c1a4e2bb1dedc6de35b4a6565fa7fbdd75820a781677af1
   transformacoes: T1=0 T2=1 T3a=0 T3=0 T4=0 T5=0
   regra: As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário. Se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
   sem segredos: não incluir tokens/credenciais
@@ -19,15 +19,15 @@ Hub de referência: [[Standards]]. Manuais: [[CONTRACT]], [[TESTES]], [[AGILE]],
 
 Quem opera este plugin é o líder supremo e soberano desta organização.
 
-A constelação C-level (Celso/CEO inclusive) propõe e executa, mas **a palavra final é do usuário**. Decisões de altíssimo valor (arquitetura macro, escopo, stack, go/no-go, deploy irreversível, gasto, qualquer escolha difícil de reverter, e toda decisão médica/clínica) são SEMPRE dele. Ele lidera os times quando há dúvida ou mais de uma opção.
+A constelação C-level (Celso/CEO inclusive) decide e escreve a ordem de serviço, mas **a palavra final é do usuário**. Decisões de altíssimo valor (arquitetura macro, escopo, stack, go/no-go, deploy irreversível, gasto, qualquer escolha difícil de reverter, e toda decisão médica/clínica) são SEMPRE dele. Ele lidera os times quando há dúvida ou mais de uma opção.
 
-Regra operacional: diante de dúvida ou de mais de uma opção viável, **perguntar via AskUserQuestion** (opção recomendada primeiro), nunca decidir sozinho. Executar o que o usuário já pediu não exige nova pergunta; qualquer escolha nova segue as regras de decisão do usuário. Detalhe em [[user-lider-supremo]] (memória global) e na "Regra de design 2026-05-27" do CLAUDE.md global.
+Regra operacional: diante de dúvida ou de mais de uma opção viável, **perguntar via AskUserQuestion** (opção recomendada primeiro), nunca decidir sozinho. As pendências do usuário vão juntas num AskUserQuestion só, com até 4 perguntas e multiSelect, nunca como lista em texto solto. Quando ele diz "resolva com clevel", o C-level decide, e a decisão fica marcada "a ratificar". Executar o que o usuário já pediu não exige nova pergunta; qualquer escolha nova segue as regras de decisão do usuário. Detalhe em [[user-lider-supremo]] (memória global) e na "Regra de design 2026-05-27" do CLAUDE.md global.
 
 ---
 
 ## 1. Visão
 
-O pipeline de release (12 fases) cruza três domínios: o quê construir, como construir, como vender. Cada domínio tem um C-level. Para operar isso no Claude, cada C-level vira um **agent de planejamento**: ele propõe e devolve um mapa de delegação, as decisões de alto valor ficam com o usuário e quem dispara os agents é a thread principal; os **agents operacionais** (já existentes) executam. Um **Chief of Staff** (Cósimo) classifica o porte do projeto e ativa só o necessário, prevenindo over-engineering.
+O pipeline de release (12 fases) cruza três domínios: o quê construir, como construir, como vender. Cada domínio tem um C-level. Para operar isso no Claude, cada C-level vira um **agent de planejamento**: só decide e escreve a ordem de serviço, as decisões de alto valor ficam com o usuário e quem dispara os agents é a thread principal; os **agents operacionais** (já existentes) executam. Consulta fica na sessão, sem agent; alteração de código vai sempre a agente especialista. A ordem de serviço é fechada: arquivos, comportamento, teste que prova (quando há lógica de produto), critério de pronto, proibições e relatório de 3 a 6 linhas. As decisões de cada projeto ficam num arquivo único, só de acréscimo. Um **Chief of Staff** (Cósimo) classifica o porte do projeto e ativa só o necessário, prevenindo over-engineering.
 
 Princípio anti-OE: **o processo se adapta ao porte, nunca o contrário.** Quem classifica o porte e recomenda a variante de pipeline é o Cósimo (Chief of Staff); o usuário confirma. Ver seção 5.
 
@@ -220,6 +220,8 @@ Regra para definir o campo `tools:` de qualquer agent (existente ou novo). Audit
 - `revisor-textual`: revisa e corrige texto existente (tem Edit, modo apply-fixes opt-in); não cria arquivo, então sem Write.
 
 **Resultado da auditoria:** Read 61/61, Write 59/61, Edit 60/61. Todo agent que produz ou mantém artefato tem Read+Write+Edit; só as 2 exceções acima ficam de fora, por design. Ao criar agent novo, seguir esta tabela.
+
+Agent de leitura usa effort low e recebe só ferramentas de leitura. No fim da onda, olhe o `/usage` por tipo de agent.
 
 ---
 

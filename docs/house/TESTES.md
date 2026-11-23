@@ -1,8 +1,8 @@
 <!--
   docs/house sync
   origem: vault claudebrain / TESTES.md
-  sync_date: 2026-11-21
-  hmac_vault_sha256: 8ee8d00d09465be7eae74830aa03435ab353afa9ee6babd1a6597373578cfa42
+  sync_date: 2026-11-23
+  hmac_vault_sha256: 65f3a297765825202e5df443ef1d829a7fb22938a475d3ea131d394d2076ade7
   transformacoes: T1=4 T2=0 T3a=0 T3=0 T4=0 T5=0
   regra: As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário. Se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
   sem segredos: não incluir tokens/credenciais
@@ -28,7 +28,7 @@
 
 > **Ferramenta ausente.** Siga a regra de [[TOOLING]] (legenda de status): ferramenta de linha de comando de uso geral pode ser instalada com aviso; biblioteca, dependência de projeto, modelo, extensão, navegador e serviço só com permissão do usuário; nunca falhar calado.
 
-> **Piso de testes (vale acima de qualquer seção deste manual).** Teste só para lógica de produto. O CI é o único portão. Nada de teste de mutação, sabotagem, auditoria, reauditoria, varredura de gêmeos, checklist de perguntas do revisor, script de verificação extra nem portão local novo. Exceção: segurança, privacidade e deploy irreversível. Varredura de gêmeos é caçar o mesmo defeito em outros pontos depois de achar um. As seções T e A abaixo são catálogo: entram num projeto só quando testam lógica de produto, quando caem na exceção ou quando o usuário pede. Auditoria da exceção roda uma vez, sem reauditoria; a correção de um achado se confere no CI.
+> **Piso de testes (vale acima de qualquer seção deste manual).** Teste só para lógica de produto. O CI é o portão, uma vez, depois do push; sem CI na nuvem, o pré-CI seletivo (T15) é o portão. Nada de teste de mutação, sabotagem, auditoria, reauditoria, varredura de gêmeos, checklist de perguntas do revisor, script de verificação extra nem portão local novo. Exceção: segurança, privacidade e deploy irreversível. Varredura de gêmeos é caçar o mesmo defeito em outros pontos depois de achar um. As seções T e A abaixo são catálogo: entram num projeto só quando testam lógica de produto, quando caem na exceção ou quando o usuário pede. Auditoria da exceção roda uma vez, sem reauditoria; a correção de um achado se confere no portão.
 
 ---
 
@@ -70,7 +70,7 @@
 
 **Ferramenta:** QtTest (embutido no Qt6) ou Google Test.
 
-**Critério de aprovação:** 0 falhas; todo comportamento novo nasce de um teste visto falhando antes.
+**Critério de aprovação:** 0 falhas; toda lógica de produto nova nasce de um teste visto falhando antes.
 
 ---
 
@@ -122,9 +122,17 @@
 
 ## T15  -  Pré-CI · Espelhar CI Localmente
 
-**Objetivo:** rodar na máquina, quando for útil, a mesma suíte que o CI roda. É opcional e nunca obrigatório antes do push ou da tag. Funciona em qualquer stack porque os comandos do CI são exatamente os mesmos comandos locais.
+**Objetivo:** rodar só o que a mudança toca. Com CI na nuvem, o CI fica seletivo e o pré-CI local é opcional; sem CI na nuvem, o pré-CI seletivo é o portão, uma vez, antes de publicar. Funciona em qualquer stack porque os comandos do CI são exatamente os mesmos comandos locais.
 
-> **Escopo de uso:** atalho opcional para ver uma falha óbvia antes de esperar o CI. Não é portão, não é passo obrigatório antes do push e não substitui o CI remoto: o CI é a fonte de verdade e o único portão. 
+**O que roda:**
+
+- o que a mudança toca desde a última versão publicada: os testes ligados aos arquivos mudados pelo grafo de imports MAIS os testes que citam em texto o caminho de um arquivo mudado;
+- segurança e privacidade, sempre;
+- tudo, quando muda ferramenta, configuração da raiz, manifesto de dependências ou o próprio seletivo.
+
+No CI na nuvem, a rodada nova cancela a antiga no mesmo ramo, nunca em deploy; dependências e ccache ficam em cache, com a chave pelo arquivo de lock; push só de docs pula o CI.
+
+Os modelos de T15.1 a T15.4 são a bateria completa de cada stack, o que roda quando tudo roda. O pré-CI para no primeiro erro e mostra o tempo de cada passo (`set -e` e `time`). Régua: uma verificação não pode custar mais que a mudança que ela confere; o tempo de cada passo mostra onde cortar. Quando um passo falha, leia a asserção antes de escrever a causa, e reconfira duas vezes uma falha de rede antes de concluir.
 
 ### T15.0  Instalar ferramentas necessárias
 
@@ -184,37 +192,38 @@ sudo apt install docker.io
 
 **Dois níveis de espelhamento:**
 
-1. **Host-level (rápido, só onde as instruções do usuário permitirem).** Executar binário a binário no host. Idêntico ao CI exceto pelo OS subjacente (libs do sistema). Cobre 90 % das falhas de CI: lint, type-check, testes, contratos, security scan, build.
-2. **Container-level (lento, idêntico; nível padrão quando as instruções do usuário exigirem isolamento).** Rodar a imagem Docker que o CI usa via `act` (GitHub Actions) ou `docker run` direto. Necessário quando se suspeita de deps de SO (ex.: PySide6 + libGL).
+1. **Host-level (rápido; o padrão para teste sem janela, inclusive teste de widget Qt com `QT_QPA_PLATFORM=offscreen`).** Executar binário a binário no host. Idêntico ao CI exceto pelo OS subjacente (libs do sistema). Cobre 90 % das falhas de CI: lint, type-check, testes, contratos, security scan, build.
+2. **Container-level (lento, idêntico; obrigatório para o que precisa de janela de verdade, que fica isolado).** Rodar a imagem Docker que o CI usa via `act` (GitHub Actions) ou `docker run` direto. Necessário também quando se suspeita de deps de SO (ex.: PySide6 + libGL).
 
 ### T15.1  Python (uv + pyproject)
 
-Se quiser o atalho, crie `scripts/preci.sh` na raiz do repo, modelo abaixo, e rode `./scripts/preci.sh` quando for útil. É opcional: o CI é o único portão.
+Modelo de `scripts/preci.sh` na raiz do repo, rodado com `./scripts/preci.sh`:
 
 ```bash
 #!/usr/bin/env bash
 set -euo pipefail
+TIMEFORMAT='   %0R s'
 
 echo "== ruff check =="
-uv run ruff check src/ tests/
+time uv run ruff check src/ tests/
 
 echo "== ruff format check =="
-uv run ruff format --check src/ tests/
+time uv run ruff format --check src/ tests/
 
 echo "== mypy strict =="
-uv run mypy src/
+time uv run mypy src/
 
 echo "== import-linter (hex/clean arch) =="
-uv run lint-imports
+time uv run lint-imports
 
 echo "== bandit (high+) =="
-uv run bandit -r src/ -c bandit.yaml --severity-level medium
+time uv run bandit -r src/ -c bandit.yaml --severity-level medium
 
 echo "== pytest unit =="
-uv run pytest -m unit -q --no-cov
+time uv run pytest -m unit -q --no-cov
 
 echo "== build wheel + sdist =="
-uv build
+time uv build
 
 echo "ALL GREEN"
 ```
@@ -239,33 +248,34 @@ docker run --rm -v "$PWD":/work:Z -w /work -e QT_QPA_PLATFORM=offscreen \
 
 ### T15.2  C++ / Qt (CMake + Ninja)
 
-`scripts/preci.sh`:
+No C++, o seletivo roda o ctest só dos alvos que dependem dos arquivos mudados, pelo grafo do CMake, e roda tudo quando muda CMakeLists, toolchain ou preset. Bateria completa, em `scripts/preci.sh`:
 
 ```bash
 #!/usr/bin/env bash
 set -euo pipefail
-BUILD=build/preci
+TIMEFORMAT='   %0R s'
+BUILD="${BUILD:?defina BUILD fora da árvore do repo}"
 THREADS="${THREADS:?defina THREADS conforme os limites de hardware do usuário}"
 
 echo "== clang-format check =="
-find src/ tests/ -name '*.cpp' -o -name '*.h' | xargs clang-format --dry-run -Werror
+time find src/ tests/ -name '*.cpp' -o -name '*.h' | xargs clang-format --dry-run -Werror
 
 echo "== cmake configure (strict warnings) =="
-cmake -S . -B "$BUILD" -G Ninja \
+time cmake -S . -B "$BUILD" -G Ninja \
   -DCMAKE_BUILD_TYPE=Debug \
   -DCMAKE_CXX_FLAGS="-Wall -Wextra -Wpedantic -Werror -Wshadow -Wnull-dereference"
 
 echo "== compile =="
-cmake --build "$BUILD" --parallel "$THREADS"
+time cmake --build "$BUILD" --parallel "$THREADS"
 
 echo "== clang-tidy =="
-find src/ -name '*.cpp' -exec clang-tidy -p "$BUILD" {} +
+time find src/ -name '*.cpp' -exec clang-tidy -p "$BUILD" {} +
 
 echo "== cppcheck =="
-cppcheck --enable=all --inline-suppr --error-exitcode=1 --suppress=missingIncludeSystem src/
+time cppcheck --enable=all --inline-suppr --error-exitcode=1 --suppress=missingIncludeSystem src/
 
 echo "== ctest =="
-ctest --test-dir "$BUILD" --output-on-failure
+time ctest --test-dir "$BUILD" --output-on-failure
 
 echo "ALL GREEN"
 ```
@@ -275,14 +285,15 @@ echo "ALL GREEN"
 ```bash
 #!/usr/bin/env bash
 set -euo pipefail
+TIMEFORMAT='   %0R s'
 echo "== fmt =="
-cargo fmt --check
+time cargo fmt --check
 echo "== clippy =="
-cargo clippy --all-targets --all-features -- -D warnings
+time cargo clippy --all-targets --all-features -- -D warnings
 echo "== test =="
-cargo test --all-features
+time cargo test --all-features
 echo "== audit =="
-cargo audit
+time cargo audit
 echo "ALL GREEN"
 ```
 
@@ -291,16 +302,17 @@ echo "ALL GREEN"
 ```bash
 #!/usr/bin/env bash
 set -euo pipefail
+TIMEFORMAT='   %0R s'
 echo "== type-check =="
-pnpm exec tsc --noEmit
+time pnpm exec tsc --noEmit
 echo "== lint =="
-pnpm exec eslint . --max-warnings 0
+time pnpm exec eslint . --max-warnings 0
 echo "== format =="
-pnpm exec prettier --check .
+time pnpm exec prettier --check .
 echo "== test =="
-pnpm test
+time pnpm test
 echo "== audit =="
-pnpm audit --audit-level=high
+time pnpm audit --audit-level=high
 echo "ALL GREEN"
 ```
 
