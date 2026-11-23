@@ -393,6 +393,14 @@ Régua: uma verificação não pode custar mais que a mudança que ela confere.
 - **O merge é curto e separado.** A conferência da publicação anterior roda num comando; a junção da próxima parte, em outro, depois de ler o resultado.
 - **Pacote** (AppImage, Flatpak, instalador, build da loja) **só na tag**, nunca a cada push.
 
+### Deploy seguro
+
+- **Smoke curto depois do deploy.** Teste rápido de saúde em produção logo após cada publicação. Falha duas vezes seguidas: rollback automático, sem esperar decisão. A primeira falha só reconfere.
+- **Erro em produção vira aviso ao usuário.** Erro novo em produção é reportado na hora, com o sintoma e o estado do rollback.
+- **Dependabot para atualização de segurança.** Ele abre a atualização; o CI testa e o usuário aprova antes do merge.
+- **Chave de recurso para subir parte pela metade desligada.** Parte nova nasce desligada e só liga com aval do usuário.
+- **Ramo de parte com no máximo um dia.** Parte que passa de um dia se divide.
+
 ### Build nativo (C/C++, CMake, Qt)
 
 Vale onde o jogo ou a engine compila código nativo; os valores são exemplos configuráveis.

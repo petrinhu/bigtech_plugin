@@ -73,6 +73,14 @@ Build, suíte de testes, teste de navegador e container, ao rodar e ao planejar,
 - **Conferência no ar que falha se reconfere com o pacote guardado** da própria publicação, em vez de republicar.
 - **De log privado, extraia só o nome do teste e a asserção** (`grep` dirigido); o resto do log não vai a relatório, commit nem chat.
 
+## Deploy seguro
+
+- **Smoke curto depois do deploy.** Teste rápido de saúde em produção logo após cada publicação. Falha duas vezes seguidas: rollback automático, sem esperar decisão. A primeira falha só reconfere.
+- **Erro em produção vira aviso ao usuário.** Erro novo em produção é reportado na hora, com o sintoma e o estado do rollback.
+- **Dependabot para atualização de segurança.** Ele abre a atualização; o CI testa e o usuário aprova antes do merge.
+- **Chave de recurso para subir parte pela metade desligada.** Parte nova nasce desligada e só liga com aval do usuário.
+- **Ramo de parte com no máximo um dia.** Parte que passa de um dia se divide.
+
 ## Entrega
 
 - **Trabalho que termina em commit:** entregue o SHA no ramo de trabalho e pare. O merge no principal é da thread principal, entre uma publicação e outra.
