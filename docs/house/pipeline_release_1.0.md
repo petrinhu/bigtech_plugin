@@ -2,7 +2,7 @@
   docs/house sync
   origem: vault claudebrain / pipeline_release_1.0.md
   sync_date: 2026-11-23
-  hmac_vault_sha256: 38bb7c8f7cea5ee6820dc3e0696136e74382999484b3f010a865d1e21a3ec538
+  hmac_vault_sha256: 2be688e483f6588b36a060ec718939dd51cbbd1eaa90291c3be8f491de163994
   transformacoes: T1=0 T2=0 T3a=0 T3=0 T4=0 T5=0
   regra: As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário. Se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
   sem segredos: não incluir tokens/credenciais
@@ -272,7 +272,7 @@ Caetano (CTO), via `qa-engineer` e `accessibility-specialist`. Papéis humanos: 
 ## Fase 8: Segurança e Compliance
 
 ### 8.1. Application Security
-SAST (Semgrep, SonarQube, CodeQL), DAST (OWASP ZAP, Burp), SCA (Dependabot, Snyk, Renovate), secrets scanning (Gitleaks, TruffleHog), container scanning (Trivy, Grype).
+SAST (Semgrep, SonarQube, CodeQL), DAST (OWASP ZAP, Burp), SCA (Dependabot, Snyk, Renovate), secrets scanning (Gitleaks, TruffleHog), container scanning (Trivy, Grype). Ligue o Dependabot para atualização de segurança: o CI testa cada atualização, e o usuário aprova.
 
 ### 8.2. Pentest
 Equipe externa ou interna. Cobertura mínima OWASP Web + API Top 10. Relatório com severidade, PoC, remediação.
@@ -366,7 +366,7 @@ O rito de 7 fases de [[DEPLOY_CHECKLIST]] vale só para as mudanças que ele lis
 ### 11.2. Estratégia de deploy
 Blue-green (dois ambientes, switch instantâneo), canary (1% -> 5% -> 25% -> 100% com observação de métricas), feature flags (release técnico desacoplado do release de produto).
 
-Publicação por partes: uma parte por vez numa fila, e um erro custa só aquela parte. Antes de publicar, o histórico e o changelog ficam gravados, com o limite de tamanho conferido, e os processos órfãos são parados pelo pid. Se a conferência no ar falhar, reconfira com o pacote guardado em vez de republicar.
+Publicação por partes: uma parte por vez numa fila, e um erro custa só aquela parte. Antes de publicar, o histórico e o changelog ficam gravados, com o limite de tamanho conferido, e os processos órfãos são parados pelo pid. Depois do deploy, rode um smoke curto; se ele falhar duas vezes, faça o rollback automático. Se a conferência no ar falhar, reconfira com o pacote guardado em vez de republicar.
 
 ### 11.3. War room (dia do lançamento)
 Celso (CEO) coordena. Presentes: PM, Tech Lead, SRE on-call, engenheiros de áreas críticas, suporte sênior, comunicação/PR, liderança em standby.
@@ -375,7 +375,7 @@ Celso (CEO) coordena. Presentes: PM, Tech Lead, SRE on-call, engenheiros de áre
 Press release no horário T, email para lista de espera, post no blog, redes sociais, Product Hunt (terças rendem mais), Show HN, Reddit relevantes.
 
 ### 11.5. Observação ativa
-Dashboard com taxa de erro, latência p50/p95/p99, throughput, conversão, sign-ups por minuto, custo de infra em tempo real. Alertas em canal dedicado.
+Dashboard com taxa de erro, latência p50/p95/p99, throughput, conversão, sign-ups por minuto, custo de infra em tempo real. Alertas em canal dedicado. Avise o usuário de cada erro em produção.
 
 ### 11.6. Postmortem técnico (D+1 a D+7)
 O que foi bem, o que falhou, surpresas, action items. Blameless.

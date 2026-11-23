@@ -53,13 +53,13 @@ Caminho do vault para o `--check` local: `--vault`, depois a variável `BIGTECH_
 <!-- sync:tabela inicio -->
 | Arquivo | hmac_vault_sha256 (chave local) | sha256_corpo_transformado | Transformações aplicadas |
 |---|---|---|---|
-| CONTRACT.md | `b3c02c12aafcbe6b03d1d261c260595dfff8f213b482aa69f6ef0255ada3cacc` | `497c40b6140e77faf2958fc0a887656211f42e556515264d59b053c4082bba47` | T1 |
+| CONTRACT.md | `576853a943b5678bfa8017b0856515d2bb156a5527548a730a3cdf715ed3eae8` | `16c60f4e0bea6ad052b282262945ad4398ec677f088571a0ebbdcc860f86ff8d` | T1 |
 | TESTES.md | `f5104865913bf9c3d51f0df893e0c2dd97cda9e99ada1118bdd04a11afe87b7a` | `5e31e3aeeecc8d839298f6c39fabc56e1a50b9e1c46e528e78d3a12a205dc10c` | T1 |
-| TOOLING.md | `a72de16aca5daf160901d0214e170c5ae4974c0dc0fd1704d4ddaa8e93ccd08e` | `8d0fc96efffa0664a0defa633c7b1181f1c6e00e1666b3c9855728e7d1cb408c` | nenhuma |
-| pipeline_release_1.0.md | `38bb7c8f7cea5ee6820dc3e0696136e74382999484b3f010a865d1e21a3ec538` | `16b7c38f136edd6f4714cd1b09b59100f1b8e57e354c7df0b149d76f6a8a998e` | nenhuma |
+| TOOLING.md | `007be5c5577d4054168afbcec2c53470b53c00a9daa6171c47202ce0d7c168b2` | `b024c05bc83cb1fa62d51e370461d52675fd880d6da768f6f621db5412ae7d08` | nenhuma |
+| pipeline_release_1.0.md | `2be688e483f6588b36a060ec718939dd51cbbd1eaa90291c3be8f491de163994` | `0b5a90ae31316cce4be8bb58b79b841c8a77f0e9a6dd8b51f1924247e33f60e3` | nenhuma |
 | DEPLOY_CHECKLIST.md | `51414fc76586eb2c39a92ce368b0f36687ff645b56a9ee7d42fd2d0117d30f9a` | `5c926bdffdaa94e300728ac647c1d2daaf6249121031ce49dcb4707d2e184424` | T1 |
 | lideranca_pipeline_release.md | `6fa88b4477e725fe51d666387e05572eabebf28223e1819e31f6a53efbe9257d` | `20cd774f42b11fc20bb65d9d6c3912b9b666c39aa6133eb23ac81486250f4b89` | nenhuma |
-| ORG.md | `07a50039f45a753c0f25fade8fcff5bf6b18173138022cd9711566fc318ad7b1` | `cc0a2237018863e51e165fbe70ada9e60f612c1eb051cb7c5ed2e6bd5ec372e2` | T2 |
+| ORG.md | `4a478eb75d28fcc2fecdb6650084d6c2eebc9eec5f193fba1feddc4faa96e1c0` | `21fdace270f69c04aa616f10f988347d06df58788f41c82c3f563fe345550643` | T2 |
 | Standards.md | `6d73c4c246498ae8027a59166408393f0a42d3fe00bba40b5a6d0ec59af25eaf` | `dec4bc0c1297c03f050356b45305bad9aa4a0c44f696b5a02d735a5d45d5cad4` | T1 |
 | AGILE.md | `8395187d0c06dfc5ba3f4c51bcc0efaca65ad571ab858fae5c725d001f3e1ce9` | `35e63eaa5d76e987717b20fa102243a23b0ad5537bd87c5ae7619fa2ab781165` | T1 |
 | AUDITORIAS.md | `6782751c19f404353a43cc9e2c3db22760df2c7b4417d6c493bc9790673591b2` | `1126051a179c726cfb2533cb01cbd1272ce30fabe8cefa0ac4140cf591642030` | T1 |

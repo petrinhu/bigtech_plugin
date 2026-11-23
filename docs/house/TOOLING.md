@@ -2,7 +2,7 @@
   docs/house sync
   origem: vault claudebrain / TOOLING.md
   sync_date: 2026-11-23
-  hmac_vault_sha256: a72de16aca5daf160901d0214e170c5ae4974c0dc0fd1704d4ddaa8e93ccd08e
+  hmac_vault_sha256: 007be5c5577d4054168afbcec2c53470b53c00a9daa6171c47202ce0d7c168b2
   transformacoes: T1=0 T2=0 T3a=0 T3=0 T4=0 T5=0
   regra: As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário. Se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
   sem segredos: não incluir tokens/credenciais
@@ -21,12 +21,15 @@ Hub: [[Standards]]. Irmãos: [[CONTRACT]], [[TESTES]], [[AGILE]], [[DEPLOY_CHECK
 
 Regra: o agent usa a ferramenta canônica do seu domínio SEMPRE que aplicável (não reinventa em shell cru). Se faltar (⬇): ferramenta de linha de comando de uso geral pode ser instalada com o comando desta tabela, com aviso. Biblioteca, dependência de projeto, modelo, extensão, navegador e serviço só com permissão do usuário. Se faltar algo sem permissão, pare e diga o que falta; não prossiga com contorno; nunca falhe calado. Respeitar limites de hardware ([[feedback_hardware_resource_limits]]) e prioridade MCP ([[feedback_mcp_priority]]). Trabalho pesado (build, checagem de tipos, suíte de teste, navegador de teste) segue estas regras:
 
-- um pesado por vez, na trava única `/var/tmp/pesado.trava` (`flock`);
-- núcleos 0 e 1 livres: `taskset -c 2-15`;
-- o agente roda o pesado em `systemd-run --user --scope -p TasksMax=400 -p MemoryMax=6G`, com `nice -n 19`; o teto de memória é ajustável por projeto, porque link de C++ grande pode precisar de mais;
-- a publicação fura a fila: roda direto, fora da trava;
-- as travas se pegam sempre na mesma ordem, a `pesado.trava` por fora e a da porta do servidor de teste por dentro;
-- antes de teste de navegador, a porta tem de estar livre.
+- Rode um pesado por vez, na trava única `/var/tmp/pesado.trava`, e entre na fila pelo comando `~/.claude/bin/pesado -- <comando>`, que segue a ordem de chegada.
+- Rode sem a trava o trabalho de menos de 1 minuto e menos de 1 GB de memória, porque esperar na fila custaria mais que o próprio trabalho.
+- Dê a cada trabalho na trava um teto de 15 minutos, ajustável no canon do projeto, porque um trabalho travado não pode prender a fila.
+- Divida a suíte longa em partes, porque cada parte cabe no teto da trava.
+- Deixe os núcleos 0 e 1 livres: `taskset -c 2-15`.
+- Rode o pesado de agente em `systemd-run --user --scope -p TasksMax=400 -p MemoryMax=6G`, com `nice -n 19`, e ajuste o teto de memória no projeto quando preciso, porque link de C++ grande pode precisar de mais.
+- Deixe a publicação furar a fila: ela roda direto, fora da trava.
+- Pegue as travas sempre na mesma ordem, a `pesado.trava` por fora e a da porta do servidor de teste por dentro, porque a ordem trocada deixa dois agentes esperando um pelo outro.
+- Antes de teste de navegador, confira que a porta está livre.
 
 Uso sem desperdício:
 

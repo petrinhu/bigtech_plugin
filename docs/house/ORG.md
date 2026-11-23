@@ -2,7 +2,7 @@
   docs/house sync
   origem: vault claudebrain / ORG.md
   sync_date: 2026-11-23
-  hmac_vault_sha256: 07a50039f45a753c0f25fade8fcff5bf6b18173138022cd9711566fc318ad7b1
+  hmac_vault_sha256: 4a478eb75d28fcc2fecdb6650084d6c2eebc9eec5f193fba1feddc4faa96e1c0
   transformacoes: T1=0 T2=1 T3a=0 T3=0 T4=0 T5=0
   regra: As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário. Se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
   sem segredos: não incluir tokens/credenciais
@@ -27,7 +27,7 @@ Regra operacional: diante de dúvida ou de mais de uma opção viável, **pergun
 
 ## 1. Visão
 
-O pipeline de release (12 fases) cruza três domínios: o quê construir, como construir, como vender. Cada domínio tem um C-level. Para operar isso no Claude, cada C-level vira um **agent de planejamento**: só decide e escreve a ordem de serviço, as decisões de alto valor ficam com o usuário e quem dispara os agents é a thread principal; os **agents operacionais** (já existentes) executam. Consulta fica na sessão, sem agent; alteração de código vai sempre a agente especialista. A ordem de serviço é fechada: arquivos, comportamento, teste que prova (quando há lógica de produto), critério de pronto, proibições e relatório de 3 a 6 linhas. As decisões de cada projeto ficam num arquivo único, só de acréscimo. Um **Chief of Staff** (Cósimo) classifica o porte do projeto e ativa só o necessário, prevenindo over-engineering.
+O pipeline de release (12 fases) cruza três domínios: o quê construir, como construir, como vender. Cada domínio tem um C-level. Para operar isso no Claude, cada C-level vira um **agent de planejamento**: só decide e escreve a ordem de serviço, as decisões de alto valor ficam com o usuário e quem dispara os agents é a thread principal; os **agents operacionais** (já existentes) executam. Consulta fica na sessão, sem agent; alteração de código vai sempre a agente especialista. Feche a ordem de serviço: arquivos, comportamento, teste que prova (quando há lógica de produto), critério de pronto e proibições. Cole nela só o trecho da lei que importa, nunca o arquivo inteiro, porque o arquivo inteiro gasta o contexto do agente. Peça relatório de no máximo 6 linhas, com o detalhe num arquivo. As decisões de cada projeto ficam num arquivo único, só de acréscimo. Um **Chief of Staff** (Cósimo) classifica o porte do projeto e ativa só o necessário, prevenindo over-engineering.
 
 Princípio anti-OE: **o processo se adapta ao porte, nunca o contrário.** Quem classifica o porte e recomenda a variante de pipeline é o Cósimo (Chief of Staff); o usuário confirma. Ver seção 5.
 
@@ -222,7 +222,7 @@ Regra para definir o campo `tools:` de qualquer agent (existente ou novo). Audit
 
 **Resultado da auditoria:** Read 61/61, Write 59/61, Edit 60/61. Todo agent que produz ou mantém artefato tem Read+Write+Edit; só os agents de leitura acima ficam de fora, por design. Ao criar agent novo, seguir esta tabela.
 
-No fim da onda, olhe o `/usage` por tipo de agent.
+No fim da onda, olhe o `/usage` por tipo de agent. No fim de cada marco, rode `/memo_persistente` e `/clear`, porque o marco seguinte começa com a memória gravada e o contexto limpo.
 
 ---
 

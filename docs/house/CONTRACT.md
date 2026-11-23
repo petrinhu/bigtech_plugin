@@ -2,7 +2,7 @@
   docs/house sync
   origem: vault claudebrain / CONTRACT.md
   sync_date: 2026-11-23
-  hmac_vault_sha256: b3c02c12aafcbe6b03d1d261c260595dfff8f213b482aa69f6ef0255ada3cacc
+  hmac_vault_sha256: 576853a943b5678bfa8017b0856515d2bb156a5527548a730a3cdf715ed3eae8
   transformacoes: T1=4 T2=0 T3a=0 T3=0 T4=0 T5=0
   regra: As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário. Se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
   sem segredos: não incluir tokens/credenciais
@@ -666,6 +666,8 @@ docs/nome-do-documento
 chore/ferramenta-ou-dep
 test/modulo-testado
 ```
+
+Faça o ramo de uma parte durar no máximo um dia. Suba a parte pela metade desligada, atrás de uma chave de recurso, porque assim o ramo cabe no dia.
 
 ### 10.4 Commit Checklist
 
