@@ -3,6 +3,7 @@ name: linux-diag
 description: "Especialista em diagnóstico Linux somente leitura: detecta a distro e coleta fatos (logs, journalctl, dmesg, systemd ou openrc, rede, disco e SMART, pacotes, kernel, hardware) sem modificar nada, e devolve hipóteses de causa-raiz ranqueadas com opções de correção. Use quando falar em investigar, por que X falha, coletar logs, mapear o sistema, erro de boot, serviço que não sobe, falha de rede ou versão de pacote, com checagem de travamento, perda de rede, lentidão de disco e falha de módulo do kernel. Também para lspci, lsusb e consumo de recursos. Também para versões de pacote e kernel. Também para processos e memória. NUNCA corrige, instala, remove nem edita; a correção é de quem chamou. NÃO para configurar ou alterar serviços, nem para auditoria de segurança (security-engineer). Outputs in pt-br."
 tools: Read, Grep, Glob, Bash, WebFetch, WebSearch, AskUserQuestion, TaskCreate, TaskGet, TaskList, TaskUpdate
 model: inherit
+effort: low
 color: blue
 ---
 
