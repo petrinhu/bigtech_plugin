@@ -9,7 +9,7 @@ Aplica o **macrofluxo de engenharia em 5 fases** delegando aos agentes corretos.
 
 > **Regra de ouro:** projeto pequeno usa poucos agentes em fases simples. Não invocar o squad inteiro pra um CLI de 200 linhas. Calibrar SEMPRE pela matriz de tamanho.
 
-> **Piso de testes.** Teste só para lógica de produto. O CI é o único portão. Nada de teste de mutação, sabotagem, auditoria, reauditoria, varredura de gêmeos, checklist de perguntas do revisor, script de verificação extra nem portão local novo. Exceção: segurança, privacidade e deploy irreversível. Os gates de fase abaixo seguem este piso.
+> **Piso de testes.** Teste só para lógica de produto. O CI é o único portão. Nada de teste de mutação, sabotagem, auditoria, reauditoria, varredura de gêmeos, checklist de perguntas do revisor, script de verificação extra nem portão local novo. Exceção: segurança, privacidade e deploy irreversível. Os gates de fase abaixo seguem este piso. A verificação é seletiva, e a publicação vai uma parte por vez (seção 8).
 
 ## Leitura obrigatória antes de alocar o squad
 
@@ -337,6 +337,43 @@ Status: Accepted | Date: YYYY-MM-DD
 6. **Reconheça sinais de escalonamento** e migre incrementalmente quando aparecerem
 7. **Documente decisões one-way door** em ADR
 8. **Sempre prefira o agente correto** ao codificar genericamente: esse é o ponto desta skill
+9. **Siga a seção 8** ao despachar agentes, verificar e publicar
+
+## 8. Orquestração, verificação e publicação
+
+### Orquestração dos agentes
+
+- **C-level decide e escreve a ordem de serviço, sem editar nada.** A ordem é fechada: os arquivos que o agente pode tocar e os que não pode, o comportamento, o teste que prova, o critério de pronto, as proibições e "relatório em até N linhas", com N de 3 a 6.
+- **Operacional entrega o SHA no ramo e para.** O merge no principal é da thread principal, entre uma publicação e outra. Pausado, o agente para num ponto limpo: commit do que está verde, patch do resto e o caminho do patch no relatório.
+- **Retome o mesmo agente** por SendMessage para continuar, corrigir ou destravar o trabalho dele, em vez de despachar outro do zero.
+- **Pendências do usuário** (decisões e confirmações que esperam por ele) **vão juntas num AskUserQuestion só**, com até 4 perguntas e multiSelect, nunca como lista em texto solto.
+- **"Resolva com clevel"** delega a decisão ao C-level do domínio, e ela entra marcada "a ratificar" até o usuário confirmar.
+- **Um arquivo único de decisões, só de acréscimo:** entrada nova no fim, nunca reescrita; correção vira entrada nova que aponta a anterior.
+- **Vigie pela notificação** de fim do agente ou da ferramenta, sem polling curto.
+- **Worktree barata:** `git worktree add --no-checkout` e, dentro dela, só os arquivos da parte (sparse-checkout); dependências já instaladas entram por symlink, sem reinstalar.
+- **Antes de escrever a causa de uma falha no briefing**, leia a asserção que falhou.
+
+### Verificação seletiva (pré-CI e CI)
+
+Régua: uma verificação não pode custar mais que a mudança que ela confere.
+
+- **Roda o que a mudança toca** desde a última versão publicada: os testes ligados aos arquivos mudados pelo grafo de imports **e** pelos caminhos de arquivo que os testes, e os auxiliares deles, citam em texto. Teste que abre um arquivo e lê o texto não aparece no grafo de imports; o que lê arquivo sem citar o caminho roda sempre que mudar código ou teste.
+- **Segurança e privacidade rodam sempre**, qualquer que seja a mudança.
+- **Tudo roda** quando muda ferramenta de build, de teste ou de publicação, configuração ou dependência, ou quando não há versão anterior para comparar.
+- **Para no primeiro erro e mostra o tempo de cada passo**, para achar o passo que pesa e cortar só o desperdício.
+- **Com CI na nuvem, o CI fica seletivo e o pré-CI é opcional.** Sem CI na nuvem, o pré-CI faz esse papel, com as mesmas regras.
+
+### Publicação: uma parte por vez
+
+- **A versão só nasce depois do verde.** A verificação roda primeiro; o commit de versão, a marca (tag) e o pacote só se criam com ela verde. Se reprovar, nada é commitado nem marcado. Não há ensaio que repete a verificação inteira antes da publicação de verdade; canary e staging do `DEPLOY_CHECKLIST` continuam valendo.
+- **Uma parte por vez, numa fila.** Cada parte é preparada numa worktree própria, com ramo próprio, e o principal só recebe a parte na hora de publicá-la. Parte recusada volta sozinha para conserto, e a fila segue.
+- **Histórico e changelog gravados antes.** A publicação só é lançada depois de conferir que o commit com a entrada da versão existe.
+- **Ninguém toca no principal antes de ler a confirmação da publicação anterior**, a linha do registro que diz que ela foi ao ar.
+- **O merge é curto e separado.** A conferência da publicação anterior roda num comando; a junção da próxima parte, em outro, depois de ler o resultado.
+
+### Trabalho pesado na máquina
+
+Build, suíte, teste de navegador e container seguem a seção 11 de [`hardware-resource-limits`](../../docs/principles/hardware-resource-limits.md): um pesado por vez na trava única da máquina, núcleos reservados ao sistema, teto de memória e de processos por trabalho, prioridade mínima para agente, a publicação primeiro, espera sem laço, teste sem janela no host com esses limites e o que abre janela isolado. Repasse isso na ordem de serviço de quem roda trabalho pesado.
 
 ## Integração com ecossistema
 

@@ -95,7 +95,7 @@ Para cada **C-level ativo**, dispare o agent correspondente (tool Agent) para li
 
 Cada C-level devolve decisões + mapa de delegação aos seus operacionais; a thread principal dispara os operacionais (repassando o mesmo caminho de `docs/` no prompt de cada um). Para as fases de engenharia, **invoque `/bigtech:proj_software`** em vez de re-listar os eng agents aqui (DRY).
 
-**Piso de testes.** Teste só para lógica de produto. O CI é o único portão. Nada de teste de mutação, sabotagem, auditoria, reauditoria, varredura de gêmeos, checklist de perguntas do revisor, script de verificação extra nem portão local novo. Exceção: segurança, privacidade e deploy irreversível. Testes são enabler/DoD (TDD, shift-left): rodam COM a implementação nas Fases 6-7, nunca depois. Auditoria (Fase 8, `bigtech:internal-auditor`) só entra na exceção, depois do código que cobre, uma vez e sem reauditoria; `/bigtech:tab_pendencias` não injeta teste nem auditoria por padrão. Leia `TESTES` (`${CLAUDE_PLUGIN_ROOT}/docs/house/TESTES.md`), `AUDITORIAS` (`${CLAUDE_PLUGIN_ROOT}/docs/house/AUDITORIAS.md`) e `AGILE` (`${CLAUDE_PLUGIN_ROOT}/docs/house/AGILE.md`) (TDD/DoD) antes de fechar a ordem.
+**Piso de testes.** Teste só para lógica de produto. O CI é o único portão. Nada de teste de mutação, sabotagem, auditoria, reauditoria, varredura de gêmeos, checklist de perguntas do revisor, script de verificação extra nem portão local novo. Exceção: segurança, privacidade e deploy irreversível. Testes são enabler/DoD (TDD, shift-left): rodam COM a implementação nas Fases 6-7, nunca depois. Auditoria (Fase 8, `bigtech:internal-auditor`) só entra na exceção, depois do código que cobre, uma vez e sem reauditoria; `/bigtech:tab_pendencias` não injeta teste nem auditoria por padrão. Leia `TESTES` (`${CLAUDE_PLUGIN_ROOT}/docs/house/TESTES.md`), `AUDITORIAS` (`${CLAUDE_PLUGIN_ROOT}/docs/house/AUDITORIAS.md`) e `AGILE` (`${CLAUDE_PLUGIN_ROOT}/docs/house/AGILE.md`) (TDD/DoD) antes de fechar a ordem. A verificação é seletiva (seção 6).
 
 ---
 
@@ -106,6 +106,36 @@ Após classificar, grave (ou devolva o texto ao usuário, se as regras dele rese
 ## 5. Re-roteamento
 
 Registre o porte escolhido e o gatilho de re-avaliação. A cada marco (fim de fase, release, mudança de complexidade/criticidade, capacity humana só como sinal auxiliar, novo requisito regulatório), reinvoque `/bigtech:bigtech` ou Cósimo para checar se o projeto subiu ou desceu de porte, e ajustar a constelação. Documente a transição no changelog ou diário do projeto e na governança do próprio projeto; os manuais do plugin não são editados.
+
+## 6. Orquestração, verificação e trabalho pesado
+
+### Orquestração dos agentes
+
+- **C-level decide e escreve a ordem de serviço, sem editar nada.** A ordem é fechada: os arquivos que o agente pode tocar e os que não pode, o comportamento, o teste que prova, o critério de pronto, as proibições e "relatório em até N linhas", com N de 3 a 6.
+- **Operacional entrega o SHA no ramo e para.** O merge no principal é da thread principal, entre uma publicação e outra. Pausado, o agente para num ponto limpo: commit do que está verde, patch do resto e o caminho do patch no relatório.
+- **Retome o mesmo agente** por SendMessage para continuar, corrigir ou destravar o trabalho dele, em vez de despachar outro do zero.
+- **Pendências do usuário** (decisões e confirmações que esperam por ele) **vão juntas num AskUserQuestion só**, com até 4 perguntas e multiSelect, nunca como lista em texto solto.
+- **"Resolva com clevel"** delega a decisão ao C-level do domínio, e ela entra marcada "a ratificar" até o usuário confirmar.
+- **Um arquivo único de decisões, só de acréscimo:** entrada nova no fim, nunca reescrita; correção vira entrada nova que aponta a anterior.
+- **Vigie pela notificação** de fim do agente ou da ferramenta, sem polling curto.
+- **Worktree barata:** `git worktree add --no-checkout` e, dentro dela, só os arquivos da parte (sparse-checkout); dependências já instaladas entram por symlink, sem reinstalar.
+- **Antes de escrever a causa de uma falha no briefing**, leia a asserção que falhou.
+
+### Verificação seletiva (pré-CI e CI)
+
+Régua: uma verificação não pode custar mais que a mudança que ela confere.
+
+- **Roda o que a mudança toca** desde a última versão publicada: os testes ligados aos arquivos mudados pelo grafo de imports **e** pelos caminhos de arquivo que os testes, e os auxiliares deles, citam em texto.
+- **Segurança e privacidade rodam sempre**, qualquer que seja a mudança.
+- **Tudo roda** quando muda ferramenta de build, de teste ou de publicação, configuração ou dependência, ou quando não há versão anterior para comparar.
+- **Para no primeiro erro e mostra o tempo de cada passo.**
+- **Com CI na nuvem, o CI fica seletivo e o pré-CI é opcional.** Sem CI na nuvem, o pré-CI faz esse papel, com as mesmas regras.
+
+A publicação de engenharia, uma parte por vez, segue a seção 8 de `/bigtech:proj_software` e o agent `bigtech:release-manager`.
+
+### Trabalho pesado na máquina
+
+Build, suíte, teste de navegador e container seguem a seção 11 de [`hardware-resource-limits`](../../docs/principles/hardware-resource-limits.md): um pesado por vez na trava única da máquina, núcleos reservados ao sistema, teto de memória e de processos por trabalho, prioridade mínima para agente, a publicação primeiro, espera sem laço, teste sem janela no host com esses limites e o que abre janela isolado. Repasse isso na ordem de serviço de quem roda trabalho pesado.
 
 ---
 
