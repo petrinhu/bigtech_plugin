@@ -14,16 +14,61 @@ on:
 permissions:
   contents: read
 
+# Push novo cancela a execucao velha do mesmo ramo; execucao de tag (release) nunca se cancela.
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
 
 jobs:
+  # ---------------------------------------------------------------------
+  # Push so de docs pula os testes; segredos e privacidade rodam sempre.
+  # Docs aqui: docs/**, .md da raiz, hooks/*.md, .md de evals/ e .claude/**.
+  # agents/ e skills/ sao produto: mudanca neles roda os testes.
+  # Tag, workflow_dispatch, ramo novo ou base ilegivel: roda tudo.
+  # ---------------------------------------------------------------------
+  mudanca:
+    name: mudanca so de docs?
+    runs-on: ubuntu-latest
+    outputs:
+      testes: ${{ steps.diff.outputs.testes }}
+    steps:
+      - name: Checkout (historico completo)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+
+      - name: Arquivos mudados contra a base
+        id: diff
+        shell: bash
+        env:
+          EVENTO: ${{ github.event_name }}
+          REF: ${{ github.ref }}
+          ANTES: ${{ github.event.before }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          DOCS='^(docs/.*|[^/]+\.md|hooks/[^/]+\.md|evals/.+\.md|\.claude/.*)$'
+          testes=true
+          base=""
+          if [ "$EVENTO" = "push" ] && [ "${REF#refs/tags/}" = "$REF" ]; then base="$ANTES"; fi
+          if [ "$EVENTO" = "pull_request" ]; then base="$PR_BASE"; fi
+          arquivos=""
+          if [ -n "$base" ] && [ "$base" != "0000000000000000000000000000000000000000" ] \
+             && arquivos="$(git diff --name-only "$base" HEAD)"; then
+            if [ -n "$arquivos" ] && ! printf '%s\n' "$arquivos" | grep -vE "$DOCS" >/dev/null; then
+              testes=false
+            fi
+          fi
+          printf 'arquivos mudados:\n%s\n' "$arquivos"
+          echo "roda os testes: $testes"
+          echo "testes=$testes" >> "$GITHUB_OUTPUT"
+
   # ---------------------------------------------------------------------
   # Job nativo: ubuntu + windows x Python 3.11 / 3.12
   # ---------------------------------------------------------------------
   test:
     name: validate (${{ matrix.os }}, py${{ matrix.python-version }})
+    needs: mudanca
+    if: needs.mudanca.outputs.testes == 'true'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -180,7 +225,26 @@ jobs:
         run: /tmp/venv/bin/python evals/bigtech_routing/run_evals.py
 
   # ---------------------------------------------------------------------
-  # gitleaks — historico completo (hard gate)
+  # Privacidade (caminho local, termo pessoal, links): roda sempre,
+  # inclusive em push so de docs.
+  # ---------------------------------------------------------------------
+  privacidade:
+    name: privacidade (validate_plugin)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
+      - name: Setup Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: "3.12"
+
+      - name: validate_plugin
+        run: python scripts/validate_plugin.py
+
+  # ---------------------------------------------------------------------
+  # gitleaks: historico completo (hard gate), roda sempre
   # ---------------------------------------------------------------------
   secrets-scan:
     name: gitleaks (secrets)

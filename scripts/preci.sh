@@ -2,9 +2,10 @@
 # preci.sh — os gates do job Ubuntu do CI do plugin "bigtech".
 #
 # E o que o job Ubuntu do CI (.github/workflows/ci.yml) roda, na ordem, e FALHA
-# no primeiro erro (fail-fast). O CI e o unico portao: rodar este script na
-# maquina e opcional e nao e exigido antes do push. O segredo (gitleaks) tem job
-# proprio no CI.
+# no primeiro erro (fail-fast). O CI e o portao, uma vez, depois do push: rodar
+# este script na maquina e opcional e nao e exigido antes do push. Push so de
+# docs pula os testes no CI; o segredo (gitleaks) e a privacidade
+# (validate_plugin) tem jobs proprios, que rodam sempre.
 #
 # Gates (em ordem), sao 9 no total:
 #   1. Gate ZERO-ORFAOS (spec 4.1)   -> python3 scripts/validate_plugin.py
