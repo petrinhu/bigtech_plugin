@@ -234,7 +234,8 @@ na tabela:
    não vira item separado.
 2. **Auditoria de segurança, só na exceção:** quando o projeto toca segurança, privacidade
    (dado pessoal) ou deploy irreversível, sugere um item `AUD-SEC` numa Onda depois do
-   código que ele cobre. Deploy irreversível segue também o `DEPLOY_CHECKLIST`.
+   código que ele cobre. Deploy irreversível (login, permissão, token, segredo, apagar dado,
+   schema e rotação de chave) segue também o `DEPLOY_CHECKLIST`.
 
 Fora desses dois casos, a skill não sugere teste nem auditoria.
 

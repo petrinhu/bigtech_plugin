@@ -111,6 +111,7 @@ Registre o porte escolhido e o gatilho de re-avaliação. A cada marco (fim de f
 
 ### Orquestração dos agentes
 
+- **Consulta e leitura ficam na sessão**, sem abrir agent; toda alteração de código continua com agente especialista.
 - **C-level decide e escreve a ordem de serviço, sem editar nada.** A ordem é fechada: os arquivos que o agente pode tocar e os que não pode, o comportamento, o teste que prova, o critério de pronto, as proibições e "relatório em até N linhas", com N de 3 a 6.
 - **Operacional entrega o SHA no ramo e para.** O merge no principal é da thread principal, entre uma publicação e outra. Pausado, o agente para num ponto limpo: commit do que está verde, patch do resto e o caminho do patch no relatório.
 - **Retome o mesmo agente** por SendMessage para continuar, corrigir ou destravar o trabalho dele, em vez de despachar outro do zero.
@@ -120,6 +121,7 @@ Registre o porte escolhido e o gatilho de re-avaliação. A cada marco (fim de f
 - **Vigie pela notificação** de fim do agente ou da ferramenta, sem polling curto.
 - **Worktree barata:** `git worktree add --no-checkout` e, dentro dela, só os arquivos da parte (sparse-checkout); dependências já instaladas entram por symlink, sem reinstalar.
 - **Antes de escrever a causa de uma falha no briefing**, leia a asserção que falhou.
+- **No fim da onda, olhe o `/usage` por tipo de agent**, para ver onde foi o custo.
 
 ### Verificação seletiva (pré-CI e CI)
 

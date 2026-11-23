@@ -55,7 +55,7 @@ hook de TDD; nunca vira item na tabela).
 | TST-T11 | Fuzzing de Protocolos | protocolo de rede custom | rede com protocolo proprio | boofuzz |
 | TST-T12 | Busca de CVEs | CVE nas deps | sempre | trivy, grype, OSV/NVD |
 | TST-T14 | Integracao (fim-a-fim) | sistema integrado contra fontes de verdade | sempre (quase) | harness de integracao por stack |
-| TST-T15 | Pre-CI (espelhar CI local) | rodar a suite do CI na maquina, opcional (o CI e o unico portao) | a pedido | scripts/preci.sh por stack |
+| TST-T15 | Pre-CI seletivo (espelhar CI local) | rodar na maquina so o que a mudanca toca; com CI na nuvem e opcional (o CI e o portao, uma vez, depois do push); sem CI na nuvem e o portao, uma vez, antes de publicar | a pedido; sem CI na nuvem, antes de publicar | scripts/preci.sh por stack |
 
 ## Auditorias (consolidadas)
 

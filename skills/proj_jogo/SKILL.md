@@ -356,6 +356,7 @@ Jogo cresce. Reconheça sinais e migre incrementalmente.
 
 ### Orquestração dos agentes
 
+- **Consulta e leitura ficam na sessão**, sem abrir agent; toda alteração de código continua com agente especialista.
 - **C-level decide e escreve a ordem de serviço, sem editar nada.** A ordem é fechada: os arquivos que o agente pode tocar e os que não pode, o comportamento, o teste que prova, o critério de pronto, as proibições e "relatório em até N linhas", com N de 3 a 6.
 - **Operacional entrega o SHA no ramo e para.** O merge no principal é da thread principal, entre uma publicação e outra. Pausado, o agente para num ponto limpo: commit do que está verde, patch do resto e o caminho do patch no relatório.
 - **Retome o mesmo agente** por SendMessage para continuar, corrigir ou destravar o trabalho dele, em vez de despachar outro do zero.
@@ -365,6 +366,7 @@ Jogo cresce. Reconheça sinais e migre incrementalmente.
 - **Vigie pela notificação** de fim do agente ou da ferramenta, sem polling curto.
 - **Worktree barata:** `git worktree add --no-checkout` e, dentro dela, só os arquivos da parte (sparse-checkout); dependências e assets já baixados entram por symlink, sem baixar de novo.
 - **Antes de escrever a causa de uma falha no briefing**, leia a asserção que falhou.
+- **No fim da onda, olhe o `/usage` por tipo de agent**, para ver onde foi o custo.
 
 ### Verificação seletiva (pré-CI e CI)
 
@@ -376,6 +378,12 @@ Régua: uma verificação não pode custar mais que a mudança que ela confere.
 - **Para no primeiro erro e mostra o tempo de cada passo**, para achar o passo que pesa e cortar só o desperdício.
 - **Com CI na nuvem, o CI fica seletivo e o pré-CI é opcional.** Sem CI na nuvem, o pré-CI faz esse papel, com as mesmas regras.
 
+### CI na nuvem
+
+- **Concurrency com cancel-in-progress no mesmo ramo:** um push novo cancela a execução velha do mesmo ramo. Nunca em deploy nem release: o workflow de deploy e a execução de tag de release não se cancelam.
+- **Cache de dependências com chave pelo lock** (`actions/setup-python` com `cache: pip` e `cache-dependency-path` apontando o arquivo de dependências, ou `actions/cache` com a chave pelo hash do lock).
+- **Push só de docs pula os testes, mas a varredura de segredos e o portão de privacidade rodam sempre.** O job de testes pula quando a mudança toca só docs que nenhum teste lê como texto; os jobs de segredos e de privacidade ficam sem esse filtro. `paths-ignore` no workflow inteiro pularia também a segurança.
+
 ### Publicação: uma parte por vez
 
 - **A build só nasce depois do verde.** A verificação roda primeiro; o commit de versão, a marca (tag) e o pacote para a loja só se criam com ela verde. Se reprovar, nada é commitado nem marcado. Não há ensaio que repete a verificação inteira antes da publicação de verdade; certificação e beta da loja continuam onde a plataforma pede.
@@ -383,6 +391,19 @@ Régua: uma verificação não pode custar mais que a mudança que ela confere.
 - **Histórico e changelog (patch notes) gravados antes.** A publicação só é lançada depois de conferir que o commit com a entrada da versão existe.
 - **Ninguém toca no principal antes de ler a confirmação da publicação anterior**, a linha do registro que diz que ela foi ao ar.
 - **O merge é curto e separado.** A conferência da publicação anterior roda num comando; a junção da próxima parte, em outro, depois de ler o resultado.
+- **Pacote** (AppImage, Flatpak, instalador, build da loja) **só na tag**, nunca a cada push.
+
+### Build nativo (C/C++, CMake, Qt)
+
+Vale onde o jogo ou a engine compila código nativo; os valores são exemplos configuráveis.
+
+- **Cache de compilação comum:** `ccache` numa pasta única, compartilhada por todas as worktrees (`CCACHE_DIR=/var/tmp/ccache`), e build fora da árvore do código (`cmake -B <pasta de build>`).
+- **ctest seletivo:** só os alvos que dependem dos arquivos mudados, pelo grafo do CMake. Tudo roda quando muda `CMakeLists.txt`, toolchain ou preset.
+- **Teste de widget Qt com `QT_QPA_PLATFORM=offscreen` roda no host**; só o que precisa de janela de verdade fica isolado.
+- **Teto de memória ajustável por projeto:** o link de um C++ grande pode precisar de mais que o teto padrão.
+- **Linker rápido** (`mold`) onde o projeto aceitar.
+- **Cabeçalho pré-compilado** (`target_precompile_headers`) só nos cabeçalhos estáveis, que quase não mudam.
+- **`-ftime-trace`** (Clang) uma vez antes de otimizar o tempo de build, para medir onde ele vai.
 
 ### Trabalho pesado na máquina
 
