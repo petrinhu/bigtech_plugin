@@ -80,6 +80,19 @@ Build, suíte de testes, teste de navegador e container, ao rodar e ao planejar,
 - **Porta livre antes de teste de navegador**, e ao parar o teste para-se também o servidor dele.
 - **No planejamento,** agentes trabalham em paralelo, mas o trabalho pesado entra na fila, um por vez, e a publicação passa na frente.
 
+## Build nativo (C/C++, CMake, Qt)
+
+Vale onde o projeto compila código nativo; os valores são exemplos configuráveis.
+
+- **Cache de compilação comum:** `ccache` numa pasta única, compartilhada por todas as worktrees (`CCACHE_DIR=/var/tmp/ccache`), e build fora da árvore do código (`cmake -B <pasta de build>`).
+- **ctest seletivo:** só os alvos que dependem dos arquivos mudados, pelo grafo do CMake. Tudo roda quando muda `CMakeLists.txt`, toolchain ou preset.
+- **Teste de widget Qt com `QT_QPA_PLATFORM=offscreen` roda no host**; só o que precisa de janela de verdade fica isolado.
+- **Teto de memória ajustável por projeto:** o link de um C++ grande pode precisar de mais que o teto padrão.
+- **Linker rápido** (`mold`) onde o projeto aceitar.
+- **Cabeçalho pré-compilado** (`target_precompile_headers`) só nos cabeçalhos estáveis, que quase não mudam.
+- **`-ftime-trace`** (Clang) uma vez antes de otimizar o tempo de build, para medir onde ele vai.
+- **Pacote** (AppImage, Flatpak, instalador) **só na tag**.
+
 ## Verificação seletiva (pré-CI e CI)
 
 Régua: uma verificação não pode custar mais que a mudança que ela confere.

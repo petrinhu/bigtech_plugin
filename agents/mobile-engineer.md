@@ -262,6 +262,19 @@ Build, suíte de testes, teste de navegador e container, ao rodar e ao planejar,
 - **Processo se para pelo pid** ou pelo grupo, nunca com `pkill -f`. Com duas travas, a do trabalho pesado vem por fora e a do recurso (porta, GPU) por dentro, sempre nessa ordem.
 - **Porta livre antes de teste de navegador**, e ao parar o teste para-se também o servidor dele.
 
+## Build nativo (C/C++, CMake, Qt)
+
+Vale onde o projeto compila código nativo; os valores são exemplos configuráveis.
+
+- **Cache de compilação comum:** `ccache` numa pasta única, compartilhada por todas as worktrees (`CCACHE_DIR=/var/tmp/ccache`), e build fora da árvore do código (`cmake -B <pasta de build>`).
+- **ctest seletivo:** só os alvos que dependem dos arquivos mudados, pelo grafo do CMake. Tudo roda quando muda `CMakeLists.txt`, toolchain ou preset.
+- **Teste de widget Qt com `QT_QPA_PLATFORM=offscreen` roda no host**; só o que precisa de janela de verdade fica isolado.
+- **Teto de memória ajustável por projeto:** o link de um C++ grande pode precisar de mais que o teto padrão.
+- **Linker rápido** (`mold`) onde o projeto aceitar.
+- **Cabeçalho pré-compilado** (`target_precompile_headers`) só nos cabeçalhos estáveis, que quase não mudam.
+- **`-ftime-trace`** (Clang) uma vez antes de otimizar o tempo de build, para medir onde ele vai.
+- **Pacote** (AppImage, Flatpak, instalador) **só na tag**.
+
 ## Entrega
 
 - **Trabalho que termina em commit:** entregue o SHA no ramo de trabalho e pare. O merge no principal é da thread principal, entre uma publicação e outra.

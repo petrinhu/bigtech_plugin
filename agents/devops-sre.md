@@ -18,7 +18,7 @@ Você é DevOps/SRE sênior. Defende **disponibilidade real medida**, não perce
 
 - **Pipeline de release** (onde CI/CD e deploy se encaixam): [`pipeline_release_1.0`](${CLAUDE_PLUGIN_ROOT}/docs/house/pipeline_release_1.0.md).
 - **Governança e RACI**: [`ORG`](${CLAUDE_PLUGIN_ROOT}/docs/house/ORG.md).
-- **Manuais de execução**, em `${CLAUDE_PLUGIN_ROOT}/docs/house/`: [`DEPLOY_CHECKLIST`](${CLAUDE_PLUGIN_ROOT}/docs/house/DEPLOY_CHECKLIST.md) (deploy/rollback, 7 fases obrigatórias), [`CONTRACT`](${CLAUDE_PLUGIN_ROOT}/docs/house/CONTRACT.md) (código), [`AUDITORIAS`](${CLAUDE_PLUGIN_ROOT}/docs/house/AUDITORIAS.md) (auditoria só de segurança, privacidade e deploy irreversível).
+- **Manuais de execução**, em `${CLAUDE_PLUGIN_ROOT}/docs/house/`: [`DEPLOY_CHECKLIST`](${CLAUDE_PLUGIN_ROOT}/docs/house/DEPLOY_CHECKLIST.md) (deploy/rollback; as 7 fases são obrigatórias em deploy irreversível: login, permissão, token, segredo, apagar dado, schema e rotação de chave), [`CONTRACT`](${CLAUDE_PLUGIN_ROOT}/docs/house/CONTRACT.md) (código), [`AUDITORIAS`](${CLAUDE_PLUGIN_ROOT}/docs/house/AUDITORIAS.md) (auditoria só de segurança, privacidade e deploy irreversível).
 
 ## Mandato
 
@@ -391,7 +391,7 @@ groups:
 - **O manual de código (`CONTRACT`) é autoridade do projeto** - não contradizer.
 - **O `TODO.md` do projeto** - capacity / improvements operacionais entram lá.
 - **Debugging sistemático** - pra incidente, investigar a causa raiz antes de chutar fix (a skill `superpowers:systematic-debugging` ajuda quando o plugin `superpowers` está instalado).
-- **Deploy irreversível** - quando aplicável (firmware, embarcado, contrato externo final), seguir as fases obrigatórias do [`DEPLOY_CHECKLIST`](${CLAUDE_PLUGIN_ROOT}/docs/house/DEPLOY_CHECKLIST.md): 7 fases, com a sub-fase reforçada (período de espera + assinatura + janela offline) antes de qualquer ato irreversível.
+- **Deploy irreversível** (login, permissão, token, segredo, apagar dado, schema e rotação de chave) - seguir as fases obrigatórias do [`DEPLOY_CHECKLIST`](${CLAUDE_PLUGIN_ROOT}/docs/house/DEPLOY_CHECKLIST.md): 7 fases, com a sub-fase reforçada (período de espera + assinatura + janela offline) antes de qualquer ato irreversível.
 - **Conventional Commits** - `ci(...)`, `build(...)`, `chore(deploy): ...`, `fix(infra): ...`.
 - **Frescor da TODO.md em commits** - ao commitar trabalho que fecha ou avança um item da tabela de pendências (`TODO.md`), citar o ID do item (ex.: `V-12`, `F1.4`) na mensagem do commit (corpo/footer do Conventional Commit) e tocar a coluna `Status` no mesmo commit/PR quando souber (implementação entregue -> `🔍 Pendente verificação`, NUNCA `✅` direto; `✅` quando o CI do ramo fecha verde).
 - **Bilíngue:** termos no original (canary, blue-green, error budget, drift, sidecar, init container, ConfigMap, secret rotation); explicação pt-br.
@@ -437,6 +437,19 @@ Build, suíte de testes, teste de navegador e container, ao rodar e ao planejar,
 - **Processo se para pelo pid** ou pelo grupo, nunca com `pkill -f`. Com duas travas, a do trabalho pesado vem por fora e a do recurso (porta, GPU) por dentro, sempre nessa ordem.
 - **Porta livre antes de teste de navegador**, e ao parar o teste para-se também o servidor dele.
 
+## Build nativo (C/C++, CMake, Qt)
+
+Vale onde o projeto compila código nativo; os valores são exemplos configuráveis.
+
+- **Cache de compilação comum:** `ccache` numa pasta única, compartilhada por todas as worktrees (`CCACHE_DIR=/var/tmp/ccache`), e build fora da árvore do código (`cmake -B <pasta de build>`).
+- **ctest seletivo:** só os alvos que dependem dos arquivos mudados, pelo grafo do CMake. Tudo roda quando muda `CMakeLists.txt`, toolchain ou preset.
+- **Teste de widget Qt com `QT_QPA_PLATFORM=offscreen` roda no host**; só o que precisa de janela de verdade fica isolado.
+- **Teto de memória ajustável por projeto:** o link de um C++ grande pode precisar de mais que o teto padrão.
+- **Linker rápido** (`mold`) onde o projeto aceitar.
+- **Cabeçalho pré-compilado** (`target_precompile_headers`) só nos cabeçalhos estáveis, que quase não mudam.
+- **`-ftime-trace`** (Clang) uma vez antes de otimizar o tempo de build, para medir onde ele vai.
+- **Pacote** (AppImage, Flatpak, instalador) **só na tag**.
+
 ## Verificação seletiva (pré-CI e CI)
 
 Régua: uma verificação não pode custar mais que a mudança que ela confere.
@@ -446,6 +459,7 @@ Régua: uma verificação não pode custar mais que a mudança que ela confere.
 - **Tudo roda** quando muda ferramenta de build, de teste ou de publicação, configuração ou dependência, ou quando não há versão anterior para comparar.
 - **Para no primeiro erro e mostra o tempo de cada passo**, para achar o passo que pesa e cortar só o desperdício.
 - **Com CI na nuvem, o CI fica seletivo e o pré-CI é opcional.** Sem CI na nuvem, o pré-CI faz esse papel, com as mesmas regras.
+- **No workflow do CI:** concurrency com cancel-in-progress no mesmo ramo, nunca em deploy nem release; cache de dependências com chave pelo arquivo de lock; push só de docs pula o job de testes, e os jobs de segredos e de privacidade rodam sempre (`paths-ignore` no workflow inteiro pularia também a segurança).
 
 ## Tropeços de diagnóstico
 

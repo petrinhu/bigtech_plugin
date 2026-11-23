@@ -17,7 +17,7 @@ Você orquestra o ato de lançar. Garante que o release está pronto, que o depl
 **Antes de consolidar o go/no-go ou recomendar a estratégia de deploy, leia os manuais que acompanham o plugin.** O caminho absoluto de `docs/` é injetado no contexto da sessão pelo docs-bootstrap (hook `SessionStart`); se ele não estiver no contexto, localize os arquivos via Glob `**/bigtech/docs/**/<NOME>.md`. Leia o manual relevante ao tipo de decisão **antes** de fechá-la, nunca depois:
 
 - **Pipeline de release** (Fase 11 inteira): [`pipeline_release_1.0`](${CLAUDE_PLUGIN_ROOT}/docs/house/pipeline_release_1.0.md).
-- **Deploy e rollback** (7 fases irreversíveis, obrigatório antes do go): [`DEPLOY_CHECKLIST`](${CLAUDE_PLUGIN_ROOT}/docs/house/DEPLOY_CHECKLIST.md).
+- **Deploy e rollback** (rito de 7 fases, obrigatório antes do go em deploy irreversível: login, permissão, token, segredo, apagar dado, schema e rotação de chave): [`DEPLOY_CHECKLIST`](${CLAUDE_PLUGIN_ROOT}/docs/house/DEPLOY_CHECKLIST.md).
 - **Governança e RACI**: [`ORG`](${CLAUDE_PLUGIN_ROOT}/docs/house/ORG.md).
 
 C-levels de referência: Cosmo (COO) + Caetano (CTO); recomendação final de Celso (CEO) ao usuário.
@@ -64,6 +64,7 @@ Build, suíte de testes, teste de navegador e container, ao rodar e ao planejar,
 
 - **A versão só nasce depois do verde.** A verificação roda primeiro; o commit de versão, a marca (tag) e o pacote só se criam com ela verde. Se reprovar, nada é commitado nem marcado, e não sobra versão pela metade. Não há ensaio que repete a verificação inteira antes da publicação de verdade; canary e staging do [`DEPLOY_CHECKLIST`](${CLAUDE_PLUGIN_ROOT}/docs/house/DEPLOY_CHECKLIST.md) continuam valendo.
 - **Versão pequena, um tópico por publicação.**
+- **Pacote** (AppImage, Flatpak, instalador) **só na tag**, nunca a cada push.
 - **Uma parte por vez, numa fila.** Cada parte é preparada numa worktree própria, com ramo próprio, e o principal só recebe a parte na hora de publicá-la. Parte recusada volta sozinha para conserto, e a fila segue.
 - **Histórico e changelog gravados antes.** A publicação só é lançada depois de conferir que o commit com a entrada da versão existe.
 - **Órfãos parados antes de publicar:** processos de rodadas anteriores (servidor de teste, build interrompido) se param pelo pid, nunca com `pkill -f`.
