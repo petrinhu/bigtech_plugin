@@ -169,21 +169,10 @@ def main() -> int:
     if classificado:
         porte = read_porte(marker_path)
         emit(
-            "BIGTECH ATIVO (porte=" + porte + "). Operar como a constelacao: "
-            "negocio/produto/lideranca via C-levels. PLANEJADOR = Cosimo "
-            "(Chief of Staff): classifica porte (early|scale|bigtech; piso "
-            "early; headcount nao define porte), devolve o mapa de ativacao "
-            "(skill /bigtech:bigtech); quem dispara os agents e a thread principal. "
-            "Para GERENCIAR projeto ou agentes dev: Cosimo (planeja) "
-            "+ Cosmo (COO, execucao cross-funcional) + engineering-manager "
-            "(gestao de pessoas/eng) + scrum-master (cadencia/impedimentos). "
-            "Engenharia via /bigtech:proj_software. Calibrar a constelacao por "
-            "complexidade/criticidade (anti over-engineering). Decisao de alto "
-            "valor (arquitetura/escopo/stack/go-no-go/gasto/irreversivel) -> "
-            "SEMPRE AskUserQuestion ao usuario, que e o lider supremo (CEO) da "
-            "propria bigtech. Dever de contra-argumentar decisao destrutiva "
-            "(problema -> risco -> alternativa -> decisao do usuario). "
-            "Instruções do usuário (CLAUDE.md) prevalecem sobre este lembrete.",
+            "[bigtech] BIGTECH ATIVO (porte=" + porte + "). Cosimo planeja; "
+            "o main dispara os agents.\n"
+            "Decisao de alto valor: AskUserQuestion ao usuario. "
+            "Instruções do usuário (CLAUDE.md) prevalecem.",
             evento,
         )
         return 0
@@ -192,20 +181,10 @@ def main() -> int:
     # nao classificado. So dispara se o prompt casa um gatilho.
     if prompt and TRIGGER_RE.search(prompt):
         emit(
-            "[bigtech] O usuario quer a constelacao C-level / gerenciar projeto "
-            "ou agentes dev. ROTEAR para /bigtech:bigtech, que aciona o AGENTE "
-            "PLANEJADOR = Cosimo (Chief of Staff): classifica o porte "
-            "(early|scale|bigtech; piso early; anti over-engineering; headcount "
-            "nao define porte), seleciona a variante de pipeline e devolve o "
-            "mapa de ativacao de C-levels + agents operacionais; a thread "
-            "principal dispara os agents. Para GERENCIAR projeto/agentes "
-            "dev, os agentes sao: Cosimo (Chief of Staff, planejador) + Cosmo "
-            "(COO, execucao cross-funcional) + engineering-manager (gestao de "
-            "eng/pessoas) + scrum-master (cadencia/impedimentos) + "
-            "product-manager. Engenharia pura -> /bigtech:proj_software. Para essa "
-            "demanda, use a skill /bigtech:bigtech. Apos classificar, "
-            "gravar .bigtech-porte na raiz (porte=early|scale|bigtech). "
-            "Instruções do usuário (CLAUDE.md) prevalecem sobre este lembrete.",
+            "[bigtech] O usuario quer a constelacao C-level. Rotear para "
+            "/bigtech:bigtech (Cosimo planeja; o main dispara).\n"
+            "Engenharia: /bigtech:proj_software. Decisao de alto valor: "
+            "AskUserQuestion. Instruções do usuário (CLAUDE.md) prevalecem.",
             evento,
         )
         return 0

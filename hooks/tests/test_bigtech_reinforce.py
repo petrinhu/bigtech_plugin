@@ -270,3 +270,34 @@ def test_subprocess_json_valido_nao_dict_exit_0(raw):
         input=raw, text=True, capture_output=True,
     )
     assert proc.returncode == 0
+
+
+# ---------------------------------------------------------------------------
+# LEMBRETE POR TURNO CURTO (decisão do líder, 23/11/2026): o reforço repete a
+# cada prompt, então cabe em no máximo 2 linhas e TETO_TURNO_CHARS caracteres.
+# O texto longo fica só no SessionStart (bigtech_porte_reminder.py).
+# ---------------------------------------------------------------------------
+TETO_TURNO_CHARS = 240
+
+
+@pytest.mark.parametrize("cenario", ["classificado", "roteamento"])
+def test_lembrete_por_turno_cabe_em_duas_linhas_e_teto_de_chars(tmp_path, monkeypatch, cenario):
+    if cenario == "classificado":
+        (tmp_path / MARKER).write_text("porte=early\n")
+        prompt = "ajusta o lint"
+    else:
+        prompt = "montar o time c-level"
+    rc, out = _run_main(monkeypatch, {"cwd": str(tmp_path), "prompt": prompt})
+    assert rc == 0
+    ctx = json.loads(out)["hookSpecificOutput"]["additionalContext"]
+    assert ctx.count("\n") + 1 <= 2, ctx
+    assert len(ctx) <= TETO_TURNO_CHARS, (len(ctx), ctx)
+
+
+def test_lembrete_classificado_mantem_essencial(tmp_path, monkeypatch):
+    # Os quatro pontos que o lembrete curto precisa dizer.
+    (tmp_path / MARKER).write_text("porte=early\n")
+    rc, out = _run_main(monkeypatch, {"cwd": str(tmp_path), "prompt": "ajusta o lint"})
+    ctx = json.loads(out)["hookSpecificOutput"]["additionalContext"]
+    for termo in ("BIGTECH ATIVO (porte=early)", "Cosimo", "AskUserQuestion", "CLAUDE.md"):
+        assert termo in ctx, termo
