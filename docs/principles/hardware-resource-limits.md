@@ -303,7 +303,8 @@ elas prevalecem.
   `taskset -c 2-$(( $(nproc) - 1 ))`, os núcleos 0 e 1 ficam livres.
 - **Teto de memória e de processos por trabalho.** Cada trabalho pesado roda num escopo com
   teto próprio, e um teste descontrolado é contido sem derrubar o resto:
-  `systemd-run --user --scope -p MemoryMax=6G -p TasksMax=400`.
+  `systemd-run --user --scope -p MemoryMax=6G -p TasksMax=400`. O teto é ajustável por
+  projeto: o link de um C++ grande pode precisar de mais memória que o padrão.
 - **Prioridade baixa para agentes.** O trabalho de agente roda com a prioridade mínima
   (`nice -n 19`).
 - **A publicação vem primeiro.** A trava não garante a ordem de chegada, e uma publicação pode
@@ -314,7 +315,12 @@ elas prevalecem.
   curto) gasta núcleo e processo sem avançar.
 - **Teste sem janela roda no host, com estes limites. Teste que abre janela fica isolado**
   (container, display virtual ou compositor aninhado), para não tocar a tela, o teclado nem o
-  foco de quem usa a máquina.
+  foco de quem usa a máquina. Teste de widget Qt com `QT_QPA_PLATFORM=offscreen` não abre
+  janela e roda no host; só o que precisa de janela de verdade fica isolado.
+- **Build nativo com várias worktrees.** Um cache de compilação comum (`ccache` numa pasta
+  única, compartilhada por todas as worktrees, por exemplo `CCACHE_DIR=/var/tmp/ccache`)
+  evita recompilar em cada cópia o que outra já compilou. O build fica fora da árvore do código
+  (`cmake -B <pasta de build>`), e um linker rápido (`mold`) entra onde o projeto aceitar.
 
 Os quatro limites juntos, num comando (valores de exemplo):
 
