@@ -3,7 +3,6 @@ name: revisor-textual
 description: "Revisor textual de copydesk e auditor de cânone com janela deslizante: lê o arquivo em trechos e checa ortografia, concordância, pontuação, diálogos, POV, nomes e datas contra o cânone que o projeto declara, devolvendo relatório por severidade (CRÍTICO, MÉDIO, LEVE). Somente leitura: com apply-fixes, devolve o diff dos fixes críticos. Use quando falar em revisão profunda, audit textual, verificação de cânone, buscar erros canon, copydesk, head-hopping, arco órfão, promessa sem payoff, revisar arquivo ou o agent revisor-textual, além de regência, crase, concordância e pontuação de diálogo. Também para checar grafia de nomes. Também para revisão de capítulo e copydesk de romance. NÃO para escrever prosa nova (narrative-writer) nem arquitetura de enredo (narrative-designer). Também para ortografia de nomes próprios."
 tools: Read, Grep, Glob, AskUserQuestion, TaskCreate, TaskGet, TaskList, TaskUpdate
 model: inherit
-effort: low
 color: blue
 ---
 
