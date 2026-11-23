@@ -57,8 +57,9 @@ a auto-avanço mecânico via `todo_sync.py`.
 - Ao entregar uma implementação, o status do item vira **`🔍 Pendente verificação`**.
   **Nunca `✅ Concluído` direto.**
 - **`✅ Concluído`** só é atribuído **depois** que o CI do ramo fecha verde com o item
-  (o CI é o único portão; auditoria só entra na exceção de segurança, privacidade ou
-  deploy irreversível).
+  (com CI na nuvem, o CI seletivo é o portão e o pré-CI é opcional; sem CI na nuvem,
+  o pré-CI seletivo é o portão; auditoria só entra na exceção de segurança,
+  privacidade ou deploy irreversível).
 - Tocar a coluna `Status` é um ato **mecânico**: nunca exige planejamento, replanejamento
   ou reordenação da tabela.
 

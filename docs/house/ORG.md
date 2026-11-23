@@ -2,7 +2,7 @@
   docs/house sync
   origem: vault claudebrain / ORG.md
   sync_date: 2026-11-23
-  hmac_vault_sha256: eccb8911769d3a240c1a4e2bb1dedc6de35b4a6565fa7fbdd75820a781677af1
+  hmac_vault_sha256: 0919759987840d485717cd64f8e0c2e90da811ba096a84ee702a276b37f4c1be
   transformacoes: T1=0 T2=1 T3a=0 T3=0 T4=0 T5=0
   regra: As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário. Se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
   sem segredos: não incluir tokens/credenciais
@@ -66,7 +66,7 @@ Invocação pelo slug `nome-cargo`. Os 12 C-levels são `celso-ceo`, `capitolino
 | Jogo: produção | game-producer | skill proj_jogo |
 | Jogo: arte, áudio e código | 3d-artist-rigger, game-animator, audio-designer-composer, gameplay-engineer, engine-graphics-programmer | skill proj_jogo |
 | Narrativa | narrative-writer | sem skill própria; a arquitetura narrativa é do narrative-designer |
-| Revisão textual | revisor-textual | sem skill própria; somente leitura, salvo pedido |
+| Revisão textual | revisor-textual | sem skill própria; somente leitura (no apply-fixes, devolve o diff) |
 | Perícia médica | dr-medico-perito, dr-medico-trabalho, dr-medico-psiquiatra | skill pericia-medica ou atalho de cada um; caso misto passa pela skill, que aciona o quarteto |
 | Jurídico forense | dr-advogado | atalho dr-advogado; compliance de software fica com claudio-clo |
 | Ensino | learning-designer | atalho learning-designer |
@@ -211,17 +211,18 @@ Regra para definir o campo `tools:` de qualquer agent (existente ou novo). Audit
 | **Grep, Glob** | Todos, sempre (navegação e busca). |
 | **Write** | Quem **produz artefato** (doc, PRD, ADR, spec, relatório, código, config). |
 | **Edit** | Quem **mantém/revisa artefato existente** in-place (itera PRD, emenda ORG, corrige ToS, edita código). |
-| **Bash** | Quem **executa** (engenharia, devops, performance, diagnóstico, auditoria, qa). |
+| **Bash** | Quem **executa** (engenharia, devops, performance, diagnóstico, qa). |
 | **WebFetch, WebSearch** | Quem **pesquisa fonte externa** (a maioria). |
 | **TodoWrite** | Quem **planeja tarefa multi-passo**. |
 
-**Exceções read-only (documentadas, não são bug):**
-- `linux-diag`: contrato de diagnóstico read-only (NUNCA corrige/instala/edita). Sem Write, sem Edit.
-- `revisor-textual`: revisa e corrige texto existente (tem Edit, modo apply-fixes opt-in); não cria arquivo, então sem Write.
+**Agents de leitura (documentados, não são bug):** recebem só ferramentas de leitura, sem Write nem Edit, e usam effort low.
+- `linux-diag`: contrato de diagnóstico de leitura (NUNCA corrige/instala/edita). Sem Write, sem Edit; mantém o Bash só para comandos de leitura.
+- `revisor-textual`: revisa texto existente sem editar; no modo apply-fixes, devolve o diff dos fixes críticos para um agente com escrita aplicar. Sem Write, sem Edit, sem Bash.
+- `internal-auditor`: escopa, classifica e consolida o livro de auditoria sem editar; quem grava em `docs/auditoria/` é um agente com escrita, e o kit de varredura roda com os especialistas de cada capítulo. Sem Write, sem Edit, sem Bash.
 
-**Resultado da auditoria:** Read 61/61, Write 59/61, Edit 60/61. Todo agent que produz ou mantém artefato tem Read+Write+Edit; só as 2 exceções acima ficam de fora, por design. Ao criar agent novo, seguir esta tabela.
+**Resultado da auditoria:** Read 61/61, Write 59/61, Edit 60/61. Todo agent que produz ou mantém artefato tem Read+Write+Edit; só os agents de leitura acima ficam de fora, por design. Ao criar agent novo, seguir esta tabela.
 
-Agent de leitura usa effort low e recebe só ferramentas de leitura. No fim da onda, olhe o `/usage` por tipo de agent.
+No fim da onda, olhe o `/usage` por tipo de agent.
 
 ---
 

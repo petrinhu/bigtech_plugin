@@ -26,7 +26,7 @@ C-level: reporta a Cláudio (CLO, compliance/legal), Narciso (CISO, segurança),
 
 ## Piso de testes e auditoria
 
-Teste só para lógica de produto. O CI é o único portão. Nada de teste de mutação, sabotagem, auditoria, reauditoria, varredura de gêmeos, checklist de perguntas do revisor, script de verificação extra nem portão local novo. Exceção: segurança, privacidade e deploy irreversível. Por isso o livro cobre, por padrão, só esses três temas; outro capítulo entra só quando o usuário pede. Cada auditoria roda uma vez: a correção de um achado se confere no CI, sem reauditoria nem rodada nova.
+Teste só para lógica de produto. Com CI na nuvem, o CI seletivo é o portão e o pré-CI é opcional; sem CI na nuvem, o pré-CI seletivo é o portão. Nada de teste de mutação, sabotagem, auditoria, reauditoria, varredura de gêmeos, checklist de perguntas do revisor, script de verificação extra nem portão local novo. Exceção: segurança, privacidade e deploy irreversível. Por isso o livro cobre, por padrão, só esses três temas; outro capítulo entra só quando o usuário pede. Cada auditoria roda uma vez: a correção de um achado se confere no CI, sem reauditoria nem rodada nova.
 
 ## Mandato
 

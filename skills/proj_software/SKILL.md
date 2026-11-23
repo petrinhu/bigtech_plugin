@@ -9,7 +9,7 @@ Aplica o **macrofluxo de engenharia em 5 fases** delegando aos agentes corretos.
 
 > **Regra de ouro:** projeto pequeno usa poucos agentes em fases simples. Não invocar o squad inteiro pra um CLI de 200 linhas. Calibrar SEMPRE pela matriz de tamanho.
 
-> **Piso de testes.** Teste só para lógica de produto. O CI é o único portão. Nada de teste de mutação, sabotagem, auditoria, reauditoria, varredura de gêmeos, checklist de perguntas do revisor, script de verificação extra nem portão local novo. Exceção: segurança, privacidade e deploy irreversível. Os gates de fase abaixo seguem este piso. A verificação é seletiva, e a publicação vai uma parte por vez (seção 8).
+> **Piso de testes.** Teste só para lógica de produto. Com CI na nuvem, o CI seletivo é o portão e o pré-CI é opcional; sem CI na nuvem, o pré-CI seletivo é o portão. Nada de teste de mutação, sabotagem, auditoria, reauditoria, varredura de gêmeos, checklist de perguntas do revisor, script de verificação extra nem portão local novo. Exceção: segurança, privacidade e deploy irreversível. Os gates de fase abaixo seguem este piso. A verificação é seletiva, e a publicação vai uma parte por vez (seção 8).
 
 ## Leitura obrigatória antes de alocar o squad
 

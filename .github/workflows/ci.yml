@@ -22,8 +22,10 @@ concurrency:
 jobs:
   # ---------------------------------------------------------------------
   # Push so de docs pula os testes; segredos e privacidade rodam sempre.
-  # Docs aqui: docs/**, .md da raiz, hooks/*.md, .md de evals/ e .claude/**.
-  # agents/ e skills/ sao produto: mudanca neles roda os testes.
+  # Docs aqui: so o que nenhum teste nem portao le (TODO.md, .claude/**,
+  # .md de evals/, docs/campanha, docs/auditoria, docs/submission e
+  # docs/superpowers). docs/house e os .md da raiz que o drift e o sync
+  # leem rodam o CI normal, como agents/ e skills/.
   # Tag, workflow_dispatch, ramo novo ou base ilegivel: roda tudo.
   # ---------------------------------------------------------------------
   mudanca:
@@ -46,7 +48,7 @@ jobs:
           ANTES: ${{ github.event.before }}
           PR_BASE: ${{ github.event.pull_request.base.sha }}
         run: |
-          DOCS='^(docs/.*|[^/]+\.md|hooks/[^/]+\.md|evals/.+\.md|\.claude/.*)$'
+          DOCS='^(TODO\.md|\.claude/.*|evals/.+\.md|docs/(campanha|auditoria|submission|superpowers)/.*)$'
           testes=true
           base=""
           if [ "$EVENTO" = "push" ] && [ "${REF#refs/tags/}" = "$REF" ]; then base="$ANTES"; fi

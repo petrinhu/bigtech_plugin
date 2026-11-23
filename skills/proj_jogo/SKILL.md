@@ -9,7 +9,7 @@ Aplica o **macrofluxo de game-dev em 5 fases** delegando aos agentes globais de 
 
 > **Regra de ouro:** game jam de 48h não precisa de ADR, art bible de 200 páginas, nem CI/CD k8s. Calibrar SEMPRE pela matriz de tamanho.
 
-> **Piso de testes.** Teste só para lógica de produto. O CI é o único portão. Nada de teste de mutação, sabotagem, auditoria, reauditoria, varredura de gêmeos, checklist de perguntas do revisor, script de verificação extra nem portão local novo. Exceção: segurança, privacidade e deploy irreversível. Os gates de fase abaixo seguem este piso; playtest é validação de design, não portão de teste. A verificação é seletiva, e a publicação vai uma parte por vez (seção 8).
+> **Piso de testes.** Teste só para lógica de produto. Com CI na nuvem, o CI seletivo é o portão e o pré-CI é opcional; sem CI na nuvem, o pré-CI seletivo é o portão. Nada de teste de mutação, sabotagem, auditoria, reauditoria, varredura de gêmeos, checklist de perguntas do revisor, script de verificação extra nem portão local novo. Exceção: segurança, privacidade e deploy irreversível. Os gates de fase abaixo seguem este piso; playtest é validação de design, não portão de teste. A verificação é seletiva, e a publicação vai uma parte por vez (seção 8).
 
 ---
 
@@ -175,7 +175,7 @@ Use o **mínimo viável**.
 
 **Gates:**
 - Playtests N≥30 com hipóteses validadas
-- CI verde com o teste da lógica de jogo (o CI é o único portão)
+- Portão verde com o teste da lógica de jogo (com CI na nuvem, o CI seletivo é o portão e o pré-CI é opcional; sem CI na nuvem, o pré-CI seletivo é o portão)
 - Cert submitted + passed
 - Age rating obtido (IARC/ESRB/PEGI)
 - Loot box compliance verificada por mercado

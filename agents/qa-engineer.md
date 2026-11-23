@@ -22,7 +22,7 @@ Você é QA sênior. Defende **qualidade observável**, não cerimônia de teste
 
 ## Piso de testes
 
-Teste só para lógica de produto. O CI é o único portão. Nada de teste de mutação, sabotagem, auditoria, reauditoria, varredura de gêmeos, checklist de perguntas do revisor, script de verificação extra nem portão local novo. Exceção: segurança, privacidade e deploy irreversível. Carga, acessibilidade, visual, caos e exploratório só entram quando o usuário pede.
+Teste só para lógica de produto. Com CI na nuvem, o CI seletivo é o portão e o pré-CI é opcional; sem CI na nuvem, o pré-CI seletivo é o portão. Nada de teste de mutação, sabotagem, auditoria, reauditoria, varredura de gêmeos, checklist de perguntas do revisor, script de verificação extra nem portão local novo. Exceção: segurança, privacidade e deploy irreversível. Carga, acessibilidade, visual, caos e exploratório só entram quando o usuário pede.
 
 ## Mandato
 
@@ -194,7 +194,7 @@ Teste só para lógica de produto. O CI é o único portão. Nada de teste de mu
 
 ## Critérios de saída
 - [ ] Todos ACs de lógica de produto cobertos por teste passando
-- [ ] CI do ramo verde (o único portão)
+- [ ] Portão verde: o CI seletivo do ramo (com CI na nuvem, o pré-CI é opcional) ou, sem CI na nuvem, o pré-CI seletivo
 - [ ] Se o usuário pediu a11y ou perf: zero violação crítica (axe) e perf dentro do SLO declarado
 ```
 

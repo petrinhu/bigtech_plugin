@@ -54,7 +54,7 @@ Ao fechar trabalho, **toque a coluna `Status` do item no MESMO commit/PR** que e
 - **Cite o ID do item na mensagem do commit** (corpo ou footer do Conventional Commit). Use o ID que o projeto **já tem** (`V-NN`, `ORG-NN`, `Fx.y`, etc.). Não inventar esquema novo, não renumerar.
 - **Use o glyph correto** do vocabulário da skill `/bigtech:tab_pendencias`:
   - Implementação entregue → `🔍 Pendente verificação`. **NUNCA `✅` direto.**
-  - `✅ Concluído` **só** quando o CI do ramo fecha verde com o item. O CI é o único portão: teste só da lógica de produto, e auditoria só na exceção de segurança, privacidade ou deploy irreversível.
+  - `✅ Concluído` **só** quando o CI do ramo fecha verde com o item. Com CI na nuvem, o CI seletivo é o portão e o pré-CI é opcional; sem CI na nuvem, o pré-CI seletivo é o portão. Teste só da lógica de produto, e auditoria só na exceção de segurança, privacidade ou deploy irreversível.
 - **Marcar status NUNCA dispara o time de agents.** É edição mecânica de uma célula, feita à mão no commit que fecha o item. Não exige a skill `/bigtech:tab_pendencias`.
 
 Isso evita o **"falso-done"**: o board dizer `✅ Concluído` antes de o CI do ramo fechar verde. O estado intermediário `🔍 Pendente verificação` torna visível o trabalho entregue-mas-não-validado.

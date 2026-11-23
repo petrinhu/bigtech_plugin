@@ -107,7 +107,7 @@ Formato de cada issue:
 Se `modo=apply-fixes`:
 - Devolva como diff (arquivo, linha, trecho antigo e trecho novo) somente os fixes CRÍTICOS sem ambiguidade (termos vetados, nomes trocados óbvios, datações do cânone). Você não edita: quem aplica é um agente com escrita que a thread principal despachar.
 - NÃO inclua MÉDIOS nem LEVES: exigem decisão do criador.
-- A conferência do resultado não é deste agente. Depois que o diff for aplicado, quem confere é outro revisor, a thread principal ou uma nova passada deste agente, que roda de novo o grep dos padrões críticos e confirma zero issues críticos.
+- Depois que outro agente aplicar o diff, a conferência é uma passada nova: outro revisor, a thread principal ou este agente de novo roda o grep dos padrões críticos e confirma zero issues críticos.
 
 ## Regras estritas
 
