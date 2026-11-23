@@ -2,7 +2,7 @@
   docs/house sync
   origem: vault claudebrain / TESTES.md
   sync_date: 2026-11-23
-  hmac_vault_sha256: 65f3a297765825202e5df443ef1d829a7fb22938a475d3ea131d394d2076ade7
+  hmac_vault_sha256: f5104865913bf9c3d51f0df893e0c2dd97cda9e99ada1118bdd04a11afe87b7a
   transformacoes: T1=4 T2=0 T3a=0 T3=0 T4=0 T5=0
   regra: As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário. Se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
   sem segredos: não incluir tokens/credenciais
@@ -130,7 +130,7 @@
 - segurança e privacidade, sempre;
 - tudo, quando muda ferramenta, configuração da raiz, manifesto de dependências ou o próprio seletivo.
 
-No CI na nuvem, a rodada nova cancela a antiga no mesmo ramo, nunca em deploy; dependências e ccache ficam em cache, com a chave pelo arquivo de lock; push só de docs pula o CI.
+No CI na nuvem, a rodada nova cancela a antiga no mesmo ramo, nunca em deploy; dependências e ccache ficam em cache, com a chave pelo arquivo de lock; push só de docs pula os testes, mas roda a busca de segredos e o portão de privacidade.
 
 Os modelos de T15.1 a T15.4 são a bateria completa de cada stack, o que roda quando tudo roda. O pré-CI para no primeiro erro e mostra o tempo de cada passo (`set -e` e `time`). Régua: uma verificação não pode custar mais que a mudança que ela confere; o tempo de cada passo mostra onde cortar. Quando um passo falha, leia a asserção antes de escrever a causa, e reconfira duas vezes uma falha de rede antes de concluir.
 

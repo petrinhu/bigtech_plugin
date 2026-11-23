@@ -2,7 +2,7 @@
   docs/house sync
   origem: vault claudebrain / CONTRACT.md
   sync_date: 2026-11-23
-  hmac_vault_sha256: 702c809fd238cb8289e40f89157ff7167b6eed3c9d31b92b791bcae60d89dd79
+  hmac_vault_sha256: b3c02c12aafcbe6b03d1d261c260595dfff8f213b482aa69f6ef0255ada3cacc
   transformacoes: T1=4 T2=0 T3a=0 T3=0 T4=0 T5=0
   regra: As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário. Se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
   sem segredos: não incluir tokens/credenciais
@@ -727,7 +727,7 @@ Agente pausado para num ponto limpo: commit do que está verde e patch do resto.
 | Event | Required |
 |-------|----------|
 | Product logic added or changed | A test written first (TDD, T1), run by the CI |
-| Every push | The CI of the branch, the only gate |
+| Every push | O CI do ramo, uma vez; push só de docs roda só a busca de segredos e o portão de privacidade |
 | New dependency added | T5 (dependency scan) + T12 (CVE check), in the CI |
 | Auth/crypto code changed | T8 (secrets), T10 (SQL injection), A5 (dynamic analysis) |
 | Personal data touched | Privacy review (section 17) |

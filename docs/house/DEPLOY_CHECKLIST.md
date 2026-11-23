@@ -2,7 +2,7 @@
   docs/house sync
   origem: vault claudebrain / DEPLOY_CHECKLIST.md
   sync_date: 2026-11-23
-  hmac_vault_sha256: 85b5f33400319b0f27cd368565940b9b31183e4f852b440fb4c57c51ae313f97
+  hmac_vault_sha256: 51414fc76586eb2c39a92ce368b0f36687ff645b56a9ee7d42fd2d0117d30f9a
   transformacoes: T1=1 T2=0 T3a=0 T3=0 T4=0 T5=0
   regra: As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário. Se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
   sem segredos: não incluir tokens/credenciais
@@ -19,7 +19,7 @@
 
 ---
 
-> O rito vale só para as cinco classes da Fase 0. Antes de executar uma delas, percorra **todos** os itens abaixo.
+> O rito vale só para as sete classes da Fase 0. Antes de executar uma delas, percorra **todos** os itens abaixo.
 >
 > Cada item recebe `[PASSOU]`, `[FALHOU]` ou `[BLOQUEADO]`. Qualquer `[FALHOU]` ou `[BLOQUEADO]` aborta o deploy imediatamente, e o deploy só é autorizado com as 7 fases `[PASSOU]`. Se as instruções do usuário definem um processo próprio de deploy irreversível, ele prevalece por inteiro.
 
@@ -29,10 +29,12 @@
 - Login: implementação ou modificação de autenticação (2FA, OAuth, SSO)
 - Permissão: alteração de RBAC/ACL
 - Token: geração, rotação ou revogação de token em produção
-- Segredo: geração ou rotação de chave criptográfica ou de outro segredo em produção
-- Apagar dado: DROP, TRUNCATE, ou ALTER TABLE e migração que apagam dado sem rollback trivial
+- Segredo: geração ou troca de senha, credencial ou outro segredo em produção
+- Apagar dado: DROP, TRUNCATE ou ALTER TABLE sem rollback trivial
+- Schema de banco: migração ou alteração de schema de banco de dados
+- Rotação de chave: rotação ou geração de chave criptográfica em produção
 
-Fora destas cinco, a mudança não passa por este rito e segue a publicação comum ([[pipeline_release_1.0]], Fase 11.2).
+Fora destas sete, a mudança não passa por este rito e segue a publicação comum ([[pipeline_release_1.0]], Fase 11.2).
 
 ---
 
