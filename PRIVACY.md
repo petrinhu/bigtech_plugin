@@ -164,7 +164,10 @@ is hard-coded; each is resolved at run time from your environment:
   flag was on, `desvios_noite.md`; and `arquivo/<date-time>/`, where each
   `vigia.sh acordar` moves the queue, the decisions, and those deviations. The
   skill never prunes `log.tsv` or `arquivo/`; remove them by hand when you no
-  longer want them. `vigia.sh instalar`
+  longer want them. When the automatic flag clears, the timer's pass prints
+  the grouped queue, decisions, and deviations, so that text also lands in
+  your user journal (`journalctl --user -u bigtech-eficacia.service`), which
+  keeps it as long as your system's journal settings say. `vigia.sh instalar`
   writes the units `bigtech-eficacia.service` and `bigtech-eficacia.timer` in
   `${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user/`, and `vigia.sh remover`
   deletes them. The optional settings file
@@ -360,7 +363,11 @@ do seu ambiente:
   ligada, `desvios_noite.md`; e `arquivo/<data-hora>/`, para onde cada
   `vigia.sh acordar` move a fila, as decisões e esses desvios. A skill nunca
   poda o `log.tsv` nem o `arquivo/`; apague-os à mão quando não os quiser
-  mais. O `vigia.sh instalar`
+  mais. Quando a bandeira automática se apaga, a passada do timer imprime a
+  fila, as decisões e os desvios agrupados, e esse texto vai também para o
+  journal do seu usuário (`journalctl --user -u bigtech-eficacia.service`),
+  que o guarda pelo tempo que a configuração do journal do seu sistema
+  mandar. O `vigia.sh instalar`
   grava as unidades `bigtech-eficacia.service` e `bigtech-eficacia.timer` em
   `${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user/`, e o `vigia.sh remover` as
   apaga. O arquivo opcional de configuração,

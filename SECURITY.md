@@ -249,6 +249,10 @@ só roda com o seu sim, instala um timer permanente do `systemd --user`.
   `decisoes_clevel.md`, `desvios_noite.md` e `arquivo/<data-hora>/`. A skill
   nunca poda o `log.tsv` nem o `arquivo/`: apague-os à mão quando não os
   quiser mais.
+- **Journal.** Quando a bandeira automática se apaga, a passada do timer
+  imprime a fila, as decisões e os desvios agrupados, e esse texto vai também
+  para o journal do seu usuário (`journalctl --user -u bigtech-eficacia.service`),
+  com a retenção que a configuração do journal do sistema definir.
 - **A bandeira é do usuário, não do projeto.** Enquanto ela existir, os três
   hooks da `eficacia` agem em todas as sessões do Claude Code do seu usuário.
   Ela também se liga sozinha com a tela bloqueada há mais de
