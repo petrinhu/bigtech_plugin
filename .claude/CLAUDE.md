@@ -8,14 +8,14 @@
 | | |
 |---|---|
 | Produto | Plugin **bigtech** para Claude Code |
-| Versão package | **2.1.0** (`plugin.json`, `marketplace.json` e `bigtech-completo`; a tag `v2.0.0` sai só no último push da onda, com OK do líder) |
+| Versão package | **2.1.0** (`plugin.json`, `marketplace.json` e `bigtech-completo`); tag `v2.1.0` publicada em 24/11/2026, Release Latest. Cada tag nova sai com o CI verde e o OK do líder no momento |
 | Campanha 2026-08-16 | **FECHADA** - tag `campanha/2026-08-16-fechada` |
 | Pacote | 71 agents (12 C-level + 59 operacionais), 16 skills, hooks TDD + governança |
 | Licença | Apache-2.0 |
 | Autor | petrinhu |
 
 **HEAD de fechamento da campanha:** `6a7b212757b92b01328f0aa1e19ad652ae41eaa7` (tag `campanha/2026-08-16-fechada`; AUD-BT-1 APROVADO 96/100).  
-**Baseline de release package:** tag `bigtech--v0.2.0` (`61c3ea4…`) - última tag existente; a `v2.0.0` ainda não foi criada.  
+**Baseline de release package:** tag `v2.1.0` (`ed0f21a`), a última publicada; antes dela, `v2.0.0` (`7f0f4eb`).  
 Se `git rev-parse HEAD` divergir do que você alega, **re-medir** inventários e atualizar memórias/snapshot.
 
 Release GitHub: https://github.com/petrinhu/bigtech_plugin/releases/tag/campanha/2026-08-16-fechada  
