@@ -106,7 +106,7 @@ claude plugin update bigtech-completo@petrinhu
 
 The first line refreshes the catalog. The second updates the core, which you have with either install. Run the third only if you installed the full bundle. Then run `/reload-plugins` in a session that is already open, or restart it; new sessions start with the new version.
 
-If you turned on the `eficacia` timer, install it again after updating (see **Optional: eficacia** below): the timer keeps the path of the old version's folder, which Claude Code deletes 14 days after the update.
+The `eficacia` timer runs a copy kept in a fixed folder, so an update of the plugin does not break it. After updating the plugin, the status warns if the timer's copy is old; then run `vigia.sh instalar` again (see **Optional: eficacia** below).
 
 #### Optional: manter_ligado (Linux with systemd only)
 
@@ -394,7 +394,7 @@ claude plugin update bigtech-completo@petrinhu
 
 A primeira linha atualiza o catálogo. A segunda atualiza o núcleo, que você tem nas duas formas de instalação. Rode a terceira só se instalou o pacote completo. Depois, rode `/reload-plugins` na sessão que já estiver aberta, ou reinicie-a; as sessões novas já começam com a versão nova.
 
-Se você ligou o timer da `eficacia`, instale-o de novo depois de atualizar (veja **Opcional: eficacia**, abaixo): o timer guarda o caminho da pasta da versão antiga, que o Claude Code apaga 14 dias depois da atualização.
+O timer da `eficacia` roda uma cópia guardada numa pasta fixa, então a atualização do plugin não o quebra. Depois de atualizar o plugin, o status avisa se a cópia do timer ficou velha; aí rode `vigia.sh instalar` de novo (veja **Opcional: eficacia**, abaixo).
 
 #### Opcional: manter_ligado (só Linux com systemd)
 

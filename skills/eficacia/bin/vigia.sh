@@ -19,6 +19,8 @@ UNIT_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
 UNIT="bigtech-eficacia"
 SELF="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
 LIMPA="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/limpa_texto.py"
+# Pasta fixa do timer: a copia do vigia que o systemd roda. Nao depende da versao do plugin.
+DATA_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/bigtech-eficacia"
 
 die() { printf 'vigia: %s\n' "$1" >&2; exit "${2:-1}"; }
 
@@ -345,6 +347,34 @@ cmd_tokens() {
   done <<< "$out"
 }
 
+# Versao do plugin (plugin.json), so quando rodado de dentro da pasta do plugin.
+vigia_versao_plugin() {
+  case "$(dirname "$SELF")" in */skills/eficacia/bin) ;; *) return 0 ;; esac
+  local pj; pj="$(dirname "$SELF")/../../../.claude-plugin/plugin.json"
+  [ -f "$pj" ] || return 0
+  python3 -I -c 'import json,sys; print(json.load(open(sys.argv[1],encoding="utf-8")).get("version",""))' "$pj" 2>/dev/null || true
+}
+
+# Aviso (so no plugin): a copia do timer e mais velha que o plugin. A copia no timer nao avisa.
+vigia_avisa_copia() {
+  local ver_plugin ver_copia
+  ver_plugin="$(vigia_versao_plugin)"
+  [ -n "$ver_plugin" ] || return 0
+  [ -f "$DATA_DIR/VERSAO" ] || return 0
+  ver_copia="$(head -n1 "$DATA_DIR/VERSAO")"
+  [ "$ver_copia" = "$ver_plugin" ] && return 0
+  if python3 -I -c 'import sys
+def v(s):
+    try:
+        return tuple(int(x) for x in s.split(".")[:3])
+    except ValueError:
+        return None
+a, b = v(sys.argv[1]), v(sys.argv[2])
+sys.exit(0 if a is not None and b is not None and a < b else 1)' "$ver_copia" "$ver_plugin"; then
+    printf 'timer com copia da versao %s; rode vigia.sh instalar para atualizar\n' "$ver_copia"
+  fi
+}
+
 cmd_instalar() {
   local min=5
   while [ $# -gt 0 ]; do
@@ -360,6 +390,20 @@ cmd_instalar() {
   [ "$min" -ge 1 ] || die "intervalo minimo e 1 minuto" 2
   command -v systemctl >/dev/null 2>&1 || die "systemctl ausente (exige systemd --user)" 3
 
+  local src ver
+  src="$(dirname "$SELF")"
+  ( umask 077; mkdir -p "$DATA_DIR" )
+  chmod 700 "$DATA_DIR"
+  if [ "$src" != "$DATA_DIR" ]; then
+    cp -f "$src/vigia.sh" "$src/limpa_texto.py" "$DATA_DIR/"
+  fi
+  chmod 700 "$DATA_DIR/vigia.sh" "$DATA_DIR/limpa_texto.py"
+  ver="$(vigia_versao_plugin)"
+  if [ -n "$ver" ]; then
+    printf '%s\n' "$ver" > "$DATA_DIR/VERSAO"
+  elif [ ! -f "$DATA_DIR/VERSAO" ]; then
+    printf '%s\n' desconhecida > "$DATA_DIR/VERSAO"
+  fi
   mkdir -p "$UNIT_DIR"
   cat > "$UNIT_DIR/$UNIT.service" <<EOF
 [Unit]
@@ -368,7 +412,7 @@ Description=bigtech eficacia: vigia de sessoes (sem modelo)
 [Service]
 Type=oneshot
 Nice=19
-ExecStart=/bin/bash "$SELF" check
+ExecStart=/bin/bash "$DATA_DIR/vigia.sh" check
 EOF
   cat > "$UNIT_DIR/$UNIT.timer" <<EOF
 [Unit]
@@ -383,14 +427,20 @@ WantedBy=timers.target
 EOF
   systemctl --user daemon-reload
   systemctl --user enable --now "$UNIT.timer"
-  printf 'instalado: %s.timer a cada %s min\n' "$UNIT" "$min"
+  printf 'instalado: %s.timer a cada %s min; copia em %s (versao %s)\n' "$UNIT" "$min" "$DATA_DIR" "$(head -n1 "$DATA_DIR/VERSAO")"
 }
 
 cmd_remover() {
+  local f
+  for f in "$UNIT_DIR/$UNIT.timer" "$UNIT_DIR/$UNIT.service" "$DATA_DIR/vigia.sh" "$DATA_DIR/limpa_texto.py" "$DATA_DIR/VERSAO"; do
+    [ -e "$f" ] && printf 'apagando: %s\n' "$f"
+  done
   if command -v systemctl >/dev/null 2>&1; then
     systemctl --user disable --now "$UNIT.timer" >/dev/null 2>&1 || true
   fi
   rm -f "$UNIT_DIR/$UNIT.timer" "$UNIT_DIR/$UNIT.service"
+  rm -f "$DATA_DIR/vigia.sh" "$DATA_DIR/limpa_texto.py" "$DATA_DIR/VERSAO"
+  rmdir "$DATA_DIR" 2>/dev/null || true
   if command -v systemctl >/dev/null 2>&1; then
     systemctl --user daemon-reload >/dev/null 2>&1 || true
   fi
@@ -507,8 +557,8 @@ EOF
 }
 
 case "${1:-help}" in
-  check) shift; cmd_check "$@" ;;
-  status) cmd_status; cmd_tokens ;;
+  check) shift; vigia_avisa_copia; cmd_check "$@" ;;
+  status) cmd_status; cmd_tokens; vigia_avisa_copia ;;
   instalar) shift; cmd_instalar "$@" ;;
   remover) cmd_remover ;;
   dormir) cmd_dormir ;;
