@@ -138,8 +138,10 @@ for event, groups in (hj.get("hooks") or {}).items():
             cmd = h.get("command")
             args = h.get("args")
             # Asserção estrutural: forma EXEC, nao forma shell.
-            if cmd != "python3":
-                fail(f"hook em {event}: command esperado 'python3' (forma exec), "
+            # Interpretadores aceitos na forma exec: python3 (hooks do produto) e bash
+            # (hook do shell, skills/eficacia/bin/hook_lider_dormindo.sh). Ambos com args[] literal.
+            if cmd not in ("python3", "bash"):
+                fail(f"hook em {event}: command esperado 'python3' ou 'bash' (forma exec), "
                      f"obtido {cmd!r}")
             if not isinstance(args, list) or not args:
                 fail(f"hook em {event}: 'args' ausente/vazio - nao esta na forma exec")
@@ -155,10 +157,10 @@ for event, groups in (hj.get("hooks") or {}).items():
             declared.setdefault(script_path.name, expanded)
             declared_all.append((event, expanded))
 
-EXPECTED_HOOKS = 9
+EXPECTED_HOOKS = 10
 if exec_blocks != EXPECTED_HOOKS:
     fail(f"esperados {EXPECTED_HOOKS} hooks type=command, encontrados {exec_blocks}")
-print(f"  hooks type=command: {exec_blocks} (todos forma exec: command=python3 + args[])")
+print(f"  hooks type=command: {exec_blocks} (todos forma exec: command=python3|bash + args[])")
 
 # 5. Executa os 6 hooks DISTINTOS com ambiente simulado, mas agora pela invocacao
 #    REAL declarada no hooks.json ([command, *args]) - nao mais [sys.executable, script].

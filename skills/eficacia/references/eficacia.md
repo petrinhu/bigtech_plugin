@@ -116,7 +116,7 @@ rm -f "$d/projeto-a"                    # retomada
 
 ## Trava "líder dormindo": estado da verificação
 
-- **Estado: registrado; prova ao vivo A.** O script `bin/hook_lider_dormindo.sh` está no `hooks/hooks.json` do plugin, no PreToolUse com matcher `AskUserQuestion`. Com a bandeira, ele nega a pergunta e manda gravá-la nas pendências e trocar de trabalho; sem ela, sai em silêncio. A documentação oficial diz que o PreToolUse cobre toda chamada de ferramenta, e o script tem teste próprio (`tests/test_hook_lider_dormindo.sh`). Falta a prova ao vivo: numa sessão real, com a bandeira, o AskUserQuestion volta negado.
+- **Estado: verificado ao vivo em 24/11/2026: com a bandeira ligada, a pergunta foi negada.** O script `bin/hook_lider_dormindo.sh` está no `hooks/hooks.json` do plugin, no PreToolUse com matcher `AskUserQuestion`. Com a bandeira, ele nega a pergunta e manda gravá-la nas pendências e trocar de trabalho; sem ela, sai em silêncio. A documentação oficial diz que o PreToolUse cobre toda chamada de ferramenta, e o script tem teste próprio (`tests/test_hook_lider_dormindo.sh`).
 - **Como conferir:** na raiz do plugin, `grep -n lider_dormindo hooks/hooks.json` mostra o registro. Para a prova ao vivo, num perfil de teste (`CLAUDE_CONFIG_DIR` isolado) com o plugin instalado, rode `vigia.sh dormir`, provoque uma pergunta e confira que ela volta negada com o motivo; depois, `vigia.sh acordar`.
 - **Se a prova falhar,** a bandeira só vale se a sessão a ler antes de perguntar (modo `projeto`, passo 2). Isso é lembrete, e lembrete não segura (último tópico desta página).
 

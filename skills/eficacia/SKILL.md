@@ -42,6 +42,6 @@ Avise sempre que o % de uso vem do líder: a sessão não o vê.
 
 ## Trava "líder dormindo"
 
-`vigia.sh dormir` cria a bandeira e `vigia.sh acordar` a apaga. Enquanto ela existir, o hook PreToolUse `bin/hook_lider_dormindo.sh`, registrado no `hooks/hooks.json` do plugin, nega o AskUserQuestion e manda gravar a pergunta nas pendências. Depende da verificação do hook; confira o estado na referência. Lembrete em prompt e memória não segura: o conserto é mecânico e preventivo.
+`vigia.sh dormir` cria a bandeira e `vigia.sh acordar` a apaga. Enquanto ela existir, o hook PreToolUse `bin/hook_lider_dormindo.sh`, registrado no `hooks/hooks.json` do plugin, nega o AskUserQuestion e manda gravar a pergunta nas pendências. Verificado ao vivo em 24/11/2026: com a bandeira ligada, a pergunta foi negada. Lembrete em prompt e memória não segura: o conserto é mecânico e preventivo.
 
 As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário.

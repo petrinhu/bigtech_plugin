@@ -10,7 +10,7 @@
 | Produto | Plugin **bigtech** para Claude Code |
 | Versão package | **2.0.0** (`plugin.json`, `marketplace.json` e `bigtech-completo`; a tag `v2.0.0` sai só no último push da onda, com OK do líder) |
 | Campanha 2026-08-16 | **FECHADA** - tag `campanha/2026-08-16-fechada` |
-| Pacote | 71 agents (12 C-level + 59 operacionais), 15 skills, hooks TDD + governança |
+| Pacote | 71 agents (12 C-level + 59 operacionais), 16 skills, hooks TDD + governança |
 | Licença | Apache-2.0 |
 | Autor | petrinhu |
 
