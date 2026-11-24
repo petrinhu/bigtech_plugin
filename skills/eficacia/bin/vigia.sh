@@ -22,6 +22,10 @@ LIMPA="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/limpa_texto.py"
 
 die() { printf 'vigia: %s\n' "$1" >&2; exit "${2:-1}"; }
 
+# fixnum <var>: so digitos passam para a aritmetica; qualquer outra coisa vira 0.
+# Aritmetica do bash avalia subscrito (a[$(cmd)]), por isso valida ANTES de cada $(( )).
+fixnum() { case "${!1:-}" in ''|*[!0-9]*) printf -v "$1" '%s' 0 ;; esac; }
+
 # Aviso ao celular: copia minima do lib.sh do manter_ligado (sem source entre skills).
 # EFICACIA_NOTIFY_CMD existe so para teste (stub). Falha de aviso nunca derruba a passada.
 vigia_notify() {
@@ -115,7 +119,7 @@ bandeira_auto() {
     if [ "$dry" = 1 ]; then printf 'bandeira auto: tela bloqueada (dry-run, nada gravado)\n'; return 0; fi
     ( umask 077; mkdir -p "$STATE_DIR" )
     [ -s "$STATE_DIR/lock_desde" ] || printf '%s\n' "$agora" > "$STATE_DIR/lock_desde"
-    since="$(cat "$STATE_DIR/lock_desde")"
+    since="$(cat "$STATE_DIR/lock_desde")"; fixnum since
     if [ $(( agora - since )) -gt $(( auto_min * 60 )) ] && [ ! -e "$STATE_DIR/lider_dormindo" ]; then
       printf 'automatica\n' > "$STATE_DIR/lider_dormindo"
       printf 'bandeira automatica criada (tela bloqueada ha mais de %s min)\n' "$auto_min"
@@ -147,9 +151,10 @@ cmd_check() {
 
   while IFS=$'\t' read -r kind a b c d e f; do
     case "$kind" in
-      C) esp="$a"; trav="$b"; auto="$c" ;;
+      C) esp="$a"; trav="$b"; auto="$c"; fixnum esp; fixnum trav; fixnum auto ;;
       E) E_NAMES+=("$a") ;;
       S)
+        fixnum a; fixnum d; fixnum e; fixnum f
         S_PID+=("$a"); S_NAME+=("$b"); S_STATUS+=("$c")
         S_SUA+=("$d"); S_TM+=("$e"); S_VIVO+=("$f")
         ;;
@@ -288,7 +293,7 @@ for p in sorted(glob.glob(os.path.join(sess_dir, "*.json"))):
     except (OSError, ValueError):
         continue
     cwd = str(d.get("cwd") or "")
-    nome = str(d.get("name") or "desconhecida")
+    nome = " ".join(str(d.get("name") or "desconhecida").split())
     tin = tout = tcache = 0
     if cwd:
         slug = re.sub(r"[^A-Za-z0-9]", "-", cwd)
@@ -313,7 +318,7 @@ for p in sorted(glob.glob(os.path.join(sess_dir, "*.json"))):
                         tcache += int(u.get("cache_creation_input_tokens") or 0) + int(u.get("cache_read_input_tokens") or 0)
             except (OSError, ValueError, TypeError):
                 continue
-    cwd_limpo = cwd.replace("\t", " ").replace("\n", " ")
+    cwd_limpo = " ".join(cwd.split())
     print("T\t%s\t%s\t%d\t%d\t%d" % (nome, cwd_limpo, tin, tout, tcache))
 '
 
@@ -325,12 +330,14 @@ cmd_tokens() {
   local k nome cwd tin tout tcache entregas total per
   while IFS=$'\t' read -r k nome cwd tin tout tcache; do
     [ "$k" = T ] || continue
+    fixnum tin; fixnum tout; fixnum tcache
     entregas=0
     # Repo de terceiro: so conta se o .git for do usuario atual, e com git endurecido
     # (sem fsmonitor, hooks, gpg nem verificacao de assinatura).
     if [ -n "$cwd" ] && [ -d "$cwd" ] && [ "$(stat -c %u "$cwd/.git" 2>/dev/null || echo x)" = "$(id -u)" ]; then
       entregas="$(git -c core.fsmonitor= -c core.hooksPath=/dev/null -c gpg.program=true -c log.showSignature=false --no-pager -C "$cwd" log --no-show-signature --since="24 hours ago" --oneline 2>/dev/null | wc -l | tr -d ' ')" || entregas=0
     fi
+    fixnum entregas
     total=$(( tin + tout + tcache ))
     per="-"
     [ "$entregas" -gt 0 ] && per=$(( total / entregas ))
@@ -407,7 +414,7 @@ for p in sorted(glob.glob(os.path.join(sess, "*.json"))):
     except (OSError, ValueError):
         continue
     if str(d.get("cwd") or "") == cwd:
-        print(str(d.get("name") or "desconhecida"))
+        print(" ".join(str(d.get("name") or "desconhecida").split()))
         break
 else:
     print("desconhecida")
