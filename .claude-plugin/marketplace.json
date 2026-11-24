@@ -15,7 +15,7 @@
       "source": "./",
       "description": "Constelação de 71 agents, C-level e operacionais, com skills de orquestração (bigtech, proj_software) para tocar produto e SDLC como uma bigtech. Sem os recomendados (playwright, superpowers, frontend-design) o plugin fica muito comprometido. Para instalar tudo, use bigtech-completo.",
       "category": "workflow",
-      "version": "2.1.0",
+      "version": "2.1.1",
       "license": "Apache-2.0"
     },
     {
@@ -23,7 +23,7 @@
       "source": "./bundles/bigtech-completo",
       "description": "Pacote completo: o bigtech mais playwright, superpowers e frontend-design. Recomendado para a experiência completa.",
       "category": "workflow",
-      "version": "2.1.0",
+      "version": "2.1.1",
       "license": "Apache-2.0"
     }
   ]

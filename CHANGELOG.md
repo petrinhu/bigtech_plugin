@@ -1,3 +1,16 @@
+## [2.1.1] - 2026-11-24
+
+Correção de eficácia e documentação. Sem mudança de agents, skills ou hooks.
+
+### Fixed
+
+- **Timer da `eficacia` em pasta fixa.** O `vigia.sh instalar` copia `vigia.sh` e `limpa_texto.py` para `${XDG_DATA_HOME:-$HOME/.local/share}/bigtech-eficacia` (modo 700) e grava nela um `VERSAO` com a versão do plugin. O service do systemd aponta para essa cópia, e não mais para a pasta da versão, que muda a cada atualização e é apagada depois. Os hooks continuam no plugin. `status` e `check` avisam `timer com copia da versao X` quando a cópia é mais velha que o plugin; a cópia no timer não avisa. `remover` mostra e apaga só os arquivos da cópia e do timer. Para atualizar a cópia depois de atualizar o plugin, rode `vigia.sh instalar` de novo.
+
+### Docs
+
+- **README (EN e PT) com como atualizar e instalar.** Três subseções novas: instalar pelo `/plugin` dentro da sessão, como atualizar (o update do `bigtech@petrinhu` sempre; o do `bigtech-completo@petrinhu` só para quem tem o pacote) e como ligar a `eficacia` (opcional), com o aviso de reinstalar o timer depois de atualizar.
+- **`.claude/CLAUDE.md` interno** com a versão 2.1.1 e a linha de base da última tag publicada (`v2.1.0`).
+
 ## [2.1.0] - 2026-11-24
 
 Release de eficácia: o máximo de trabalho útil pelo menor gasto. A constelação segue com **71 agents**; as skills passam a **16**, com a nova `eficacia`. O `hooks/hooks.json` passa a ter **12 entradas em 6 eventos** (SessionStart, UserPromptSubmit, PreToolUse, PermissionRequest, Stop e PostToolUse), servidas por **10 scripts**: os 7 em Python de antes e 3 em bash da `eficacia`. Entram também o piso de testes e as regras de trabalho pesado, orquestração, publicação e deploy seguro nos agents, nas skills e nos manuais.

@@ -8,7 +8,7 @@
 | | |
 |---|---|
 | Produto | Plugin **bigtech** para Claude Code |
-| Versão package | **2.1.0** (`plugin.json`, `marketplace.json` e `bigtech-completo`); tag `v2.1.0` publicada em 24/11/2026, Release Latest. Cada tag nova sai com o CI verde e o OK do líder no momento |
+| Versão package | **2.1.1** (`plugin.json`, `marketplace.json` e `bigtech-completo`); tag `v2.1.0` publicada em 24/11/2026, Release Latest. Cada tag nova sai com o CI verde e o OK do líder no momento |
 | Campanha 2026-08-16 | **FECHADA** - tag `campanha/2026-08-16-fechada` |
 | Pacote | 71 agents (12 C-level + 59 operacionais), 16 skills, hooks TDD + governança |
 | Licença | Apache-2.0 |
