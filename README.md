@@ -82,9 +82,47 @@ claude plugin install bigtech@petrinhu
 
 If you are an AI agent installing on behalf of a user, follow [LLM.md](LLM.md).
 
+#### Install from inside a session
+
+You can also install without leaving Claude Code. Type these lines **inside** a Claude Code session, not at the terminal prompt (`/plugin` runs only in an interactive terminal session). If a marketplace is already added, skip its line:
+
+```
+/plugin marketplace add anthropics/claude-plugins-official
+/plugin marketplace add https://github.com/petrinhu/bigtech_plugin
+/plugin install bigtech-completo@petrinhu
+```
+
+In a session, `/plugin install` does not install right away: it opens the `/plugin` panel on the plugin's details, so you can review it and choose a scope. **Install for you (user scope)** gives you the plugin in every project; after you choose, the install runs. For the core only, use `bigtech@petrinhu`. To browse instead of typing the name, run `/plugin` alone: the panel opens on the **Discover** tab. Then restart the session, as in **After install** above.
+
+#### How to update
+
+The `petrinhu` marketplace does not update by itself: Claude Code leaves automatic updates off by default for third-party marketplaces, and you can turn them on in the **Marketplaces** tab of `/plugin`. To get a new version, run in your terminal:
+
+```
+claude plugin marketplace update petrinhu
+claude plugin update bigtech@petrinhu
+claude plugin update bigtech-completo@petrinhu
+```
+
+The first line refreshes the catalog. The second updates the core, which you have with either install. Run the third only if you installed the full bundle. Then run `/reload-plugins` in a session that is already open, or restart it; new sessions start with the new version.
+
+If you turned on the `eficacia` timer, install it again after updating (see **Optional: eficacia** below): the timer keeps the path of the old version's folder, which Claude Code deletes 14 days after the update.
+
 #### Optional: manter_ligado (Linux with systemd only)
 
 `manter_ligado` keeps the data connection alive with the lid closed and saves the state of the sessions at 5% battery, without shutting the machine down. It depends on systemd and runs only on Linux with systemd.
+
+#### Optional: eficacia (Linux with systemd only)
+
+The `eficacia` timer checks the sessions every 5 minutes without using an AI model. It needs Linux with `systemd --user`. To turn it on, run in your terminal:
+
+```
+bash ~/.claude/plugins/cache/petrinhu/bigtech/<version>/skills/eficacia/bin/vigia.sh instalar --intervalo 5
+```
+
+Replace `<version>` with the version that `claude plugin list` shows for `bigtech@petrinhu`; `claude plugin list --json` gives the whole folder in the `installPath` field. Or ask a session for `/bigtech:eficacia --gerente`, which checks the timer and offers to install it.
+
+Without the timer, two things are off: the watch that alerts you when a session stalls, and the automatic "leader asleep" flag, which turns on by itself when the screen stays locked. The manual lock (`vigia.sh dormir` and `vigia.sh acordar`) and the queue keep working. After each plugin update, run `instalar` again from the new version's folder; to turn the timer off, run `remover` in its place.
 
 ### Usage
 
@@ -332,9 +370,47 @@ claude plugin install bigtech@petrinhu
 
 Se você é um agente de IA instalando a pedido de um usuário, siga [LLM.md](LLM.md).
 
+#### Instalar por dentro da sessão
+
+Você também pode instalar sem sair do Claude Code. Digite estas linhas **dentro** de uma sessão do Claude Code, não no prompt do terminal (o `/plugin` só roda em sessão interativa de terminal). Se um marketplace já estiver adicionado, pule a linha dele:
+
+```
+/plugin marketplace add anthropics/claude-plugins-official
+/plugin marketplace add https://github.com/petrinhu/bigtech_plugin
+/plugin install bigtech-completo@petrinhu
+```
+
+Na sessão, o `/plugin install` não instala na hora: ele abre o painel do `/plugin` nos detalhes do plugin, para você revisar e escolher o escopo. **Install for you (user scope)** deixa o plugin em todos os seus projetos; depois da escolha, a instalação roda. Para só o núcleo, use `bigtech@petrinhu`. Para procurar em vez de digitar o nome, rode só `/plugin`: o painel abre na aba **Discover**. Depois, reinicie a sessão, como em **Depois de instalar**, acima.
+
+#### Como atualizar
+
+O marketplace `petrinhu` não se atualiza sozinho: o Claude Code deixa a atualização automática desligada, por padrão, nos marketplaces de terceiros, e você pode ligá-la na aba **Marketplaces** do `/plugin`. Para buscar uma versão nova, rode no terminal:
+
+```
+claude plugin marketplace update petrinhu
+claude plugin update bigtech@petrinhu
+claude plugin update bigtech-completo@petrinhu
+```
+
+A primeira linha atualiza o catálogo. A segunda atualiza o núcleo, que você tem nas duas formas de instalação. Rode a terceira só se instalou o pacote completo. Depois, rode `/reload-plugins` na sessão que já estiver aberta, ou reinicie-a; as sessões novas já começam com a versão nova.
+
+Se você ligou o timer da `eficacia`, instale-o de novo depois de atualizar (veja **Opcional: eficacia**, abaixo): o timer guarda o caminho da pasta da versão antiga, que o Claude Code apaga 14 dias depois da atualização.
+
 #### Opcional: manter_ligado (só Linux com systemd)
 
 `manter_ligado` mantém a conexão de dados viva com a tampa fechada e salva o estado das sessões com 5% de bateria, sem desligar a máquina. Depende do systemd e roda só em Linux com systemd.
+
+#### Opcional: eficacia (só Linux com systemd)
+
+O timer da `eficacia` confere as sessões a cada 5 minutos, sem usar modelo de IA. Ele exige Linux com `systemd --user`. Para ligá-lo, rode no terminal:
+
+```
+bash ~/.claude/plugins/cache/petrinhu/bigtech/<versão>/skills/eficacia/bin/vigia.sh instalar --intervalo 5
+```
+
+Troque `<versão>` pela versão que o `claude plugin list` mostra para o `bigtech@petrinhu`; o `claude plugin list --json` traz a pasta inteira no campo `installPath`. Ou peça `/bigtech:eficacia --gerente` numa sessão: ele confere o timer e oferece instalar.
+
+Sem o timer, ficam desligadas duas coisas: a vigia, que avisa quando uma sessão empaca, e a bandeira automática "líder dormindo", que liga sozinha com a tela bloqueada. A trava manual (`vigia.sh dormir` e `vigia.sh acordar`) e a fila continuam funcionando. A cada atualização do plugin, rode o `instalar` de novo a partir da pasta da versão nova; para desligar o timer, rode `remover` no lugar dele.
 
 ### Uso
 
