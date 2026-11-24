@@ -28,7 +28,7 @@ Package identity (confirmed in `.claude-plugin/plugin.json` and `.claude-plugin/
 |---|---|
 | Marketplace | `petrinhu` |
 | Plugin | `bigtech` (core) and `bigtech-completo` (bundle with the recommended dependencies) |
-| Version | `2.0.0` |
+| Version | `2.1.0` |
 | License | `Apache-2.0` |
 | Repository | `https://github.com/petrinhu/bigtech_plugin` |
 | Author | `petrinhu` |
@@ -174,7 +174,7 @@ Identidade do pacote (confirmada em `.claude-plugin/plugin.json` e `.claude-plug
 |---|---|
 | Marketplace | `petrinhu` |
 | Plugin | `bigtech` (núcleo) e `bigtech-completo` (pacote com as dependências recomendadas) |
-| Versão | `2.0.0` |
+| Versão | `2.1.0` |
 | Licença | `Apache-2.0` |
 | Repositório | `https://github.com/petrinhu/bigtech_plugin` |
 | Autor | `petrinhu` |
