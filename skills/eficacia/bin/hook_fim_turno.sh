@@ -24,5 +24,5 @@ if [ "$ATIVO" = "1" ]; then
   exit 0
 fi
 
-printf '%s\n' '{"decision":"block","reason":"lider dormindo: nao pare esperando o lider. Duvida tecnica vai ao C-level pela ferramenta Agent; decisao so do lider vai a fila com vigia.sh registrar ou ja esta la. Troque de trabalho: pegue o proximo item marcado no TODO.md; se o trabalho acabou de verdade, pode parar."}'
+printf '%s\n' '{"decision":"block","reason":"lider dormindo: nao pare esperando o lider. Duvida tecnica vai ao C-level pela ferramenta Agent; decisao so do lider vai a fila com vigia.sh registrar ou ja esta la. Troque de trabalho: item sem dependencia no TODO.md; se depende da resposta e e reversivel, siga a recomendacao num ramo sem merge; se nada sobrar, pode parar."}'
 exit 0

@@ -79,6 +79,7 @@ O C-level é caro (opus): entra só na dúvida técnica de verdade, não em toda
 ## Pré-voo, enfileire e siga, resumo ao acordar
 
 - **Pré-voo:** antes de o líder dormir, cada sessão lista as decisões que prevê precisar, e o líder responde tudo de uma vez.
+- **Fatia que depende da resposta:** três saídas, nesta ordem. (1) Pegue um item sem dependência da pergunta, pela coluna Pré-requisito do `TODO.md`: outra onda ou grupo, teste ou doc da parte feita, ou a limpeza da onda. (2) Se a escolha for reversível, siga a opção recomendada deixada na fila, num ramo próprio, sem merge, sem push no main e sem tag, para o líder aprovar ou descartar de manhã; nunca com o irreversível (deploy, permissão, apagar dado, rotação de chave, schema, segredo). (3) Se nada sobrar, pare de verdade: parado sem trabalho não gasta.
 - **Enfileire e siga:** diante de uma decisão classe 3, a sessão grava a pergunta nas pendências do projeto (a INBOX do `TODO.md`, se houver), com a recomendação, e passa ao próximo item que não depende dela.
 - **Resumo único ao acordar:** todas as decisões pendentes, em lote, cada uma com a sua recomendação.
 

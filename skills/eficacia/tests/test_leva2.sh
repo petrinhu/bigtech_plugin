@@ -70,7 +70,7 @@ assert_has "$(cat "$ST/desvios_noite.md" 2>/dev/null)" "ESPERANDO" "desvio grava
 
 echo "== 3. Stop com bandeira: motivo pede o proximo item do TODO.md"
 out="$(printf '{"hook_event_name":"Stop","stop_hook_active":false}' | bash "$STOP")"
-assert_has "$out" "pegue o proximo item marcado no TODO.md" "Stop: motivo cita o TODO.md"
+assert_has "$out" "item sem dependencia no TODO.md" "Stop: motivo cita o TODO.md"
 
 echo "== 4. bandeira automatica por tela bloqueada"
 rm -f "$ST/lider_dormindo"
