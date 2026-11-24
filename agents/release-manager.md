@@ -83,7 +83,7 @@ Build, suíte de testes, teste de navegador e container, ao rodar e ao planejar,
 
 ## Entrega
 
-- **Trabalho que termina em commit:** entregue o SHA no ramo de trabalho e pare. O merge no principal é da thread principal, entre uma publicação e outra.
+- **Trabalho que termina em commit:** entregue o SHA no ramo de trabalho e pare. O merge no principal é feito por um agente operacional, e o main revisa.
 - **Pausado,** pare num ponto limpo: commit do que está verde, patch do resto num arquivo fora da árvore e o caminho do patch no relatório.
 - **Relatório curto** à thread principal, no tamanho que a ordem de serviço pedir: o que mudou, o SHA e o que falta.
 
