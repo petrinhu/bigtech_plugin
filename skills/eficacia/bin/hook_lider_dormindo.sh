@@ -10,6 +10,7 @@ SESS_DIR="$HOME/.claude/sessions"
 
 # Le o JSON do evento uma vez (stdin).
 IN="$(cat || true)"
+LIMPA="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/limpa_texto.py"
 
 if [ ! -e "$STATE_DIR/lider_dormindo" ]; then
   exit 0
@@ -18,9 +19,7 @@ fi
 # Bloco de texto da fila, montado por python3 -I (uma chamada). Nome da sessao:
 # casa pelo session_id e, se nao achar, pelo cwd do JSON de entrada.
 PY_FILA='
-import glob, json, os, sys, time, unicodedata
-def clean(v):
-    return "".join(c for c in str(v) if c == "\n" or not unicodedata.category(c).startswith("C"))
+import glob, json, os, sys, time
 sess_dir = sys.argv[1]
 try:
     data = json.loads(sys.stdin.read() or "{}")
@@ -44,7 +43,7 @@ if achou is None and cwd:
 if achou is not None:
     nome = str(achou.get("name") or "desconhecida")
 def lim(v):
-    return " ".join(clean(v).split())
+    return " ".join(str(v).split())
 ti = data.get("tool_input") or {}
 perguntas = ti.get("questions") or []
 out = ["## %s - sessao: %s" % (time.strftime("%Y-%m-%d %H:%M"), lim(nome))]
@@ -63,7 +62,7 @@ if not perguntas:
 print("\n".join(out))
 '
 
-BLOCO="$(printf '%s' "$IN" | python3 -I -c "$PY_FILA" "$SESS_DIR" 2>/dev/null || true)"
+BLOCO="$(printf '%s' "$IN" | python3 -I -c "$PY_FILA" "$SESS_DIR" 2>/dev/null | python3 -I "$LIMPA" || true)"
 if [ -n "$BLOCO" ]; then
   ( umask 077; mkdir -p "$STATE_DIR" )
   (

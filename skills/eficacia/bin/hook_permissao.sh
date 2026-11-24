@@ -7,17 +7,16 @@ set -euo pipefail
 STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/bigtech-eficacia"
 SESS_DIR="$HOME/.claude/sessions"
 IN="$(cat || true)"
+LIMPA="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/limpa_texto.py"
 
 if [ ! -e "$STATE_DIR/lider_dormindo" ]; then
   exit 0
 fi
 
 PY_PERM='
-import glob, json, os, sys, time, unicodedata
-def clean(v):
-    return "".join(c for c in str(v) if c == "\n" or not unicodedata.category(c).startswith("C"))
+import glob, json, os, sys, time
 def lim(v):
-    return " ".join(clean(v).split())
+    return " ".join(str(v).split())
 sess_dir = sys.argv[1]
 try:
     data = json.loads(sys.stdin.read() or "{}")
@@ -50,7 +49,7 @@ print("## %s - sessao: %s" % (time.strftime("%Y-%m-%d %H:%M"), nome))
 print("- PERMISSAO: %s %s" % (ferr, resumo))
 '
 
-BLOCO="$(printf '%s' "$IN" | python3 -I -c "$PY_PERM" "$SESS_DIR" 2>/dev/null || true)"
+BLOCO="$(printf '%s' "$IN" | python3 -I -c "$PY_PERM" "$SESS_DIR" 2>/dev/null | python3 -I "$LIMPA" || true)"
 if [ -n "$BLOCO" ]; then
   ( umask 077; mkdir -p "$STATE_DIR" )
   (

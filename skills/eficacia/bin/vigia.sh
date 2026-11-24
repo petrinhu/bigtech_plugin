@@ -18,6 +18,7 @@ CONF_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/bigtech/eficacia.json"
 UNIT_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
 UNIT="bigtech-eficacia"
 SELF="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
+LIMPA="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/limpa_texto.py"
 
 die() { printf 'vigia: %s\n' "$1" >&2; exit "${2:-1}"; }
 
@@ -280,8 +281,6 @@ PY_TOKENS='
 import glob, json, os, re, sys, time, unicodedata
 sess_dir, proj_dir = sys.argv[1], sys.argv[2]
 corte = time.time() - 86400
-def clean(v):
-    return "".join(c for c in str(v) if not unicodedata.category(c).startswith("C"))
 for p in sorted(glob.glob(os.path.join(sess_dir, "*.json"))):
     try:
         with open(p, encoding="utf-8") as f:
@@ -289,7 +288,7 @@ for p in sorted(glob.glob(os.path.join(sess_dir, "*.json"))):
     except (OSError, ValueError):
         continue
     cwd = str(d.get("cwd") or "")
-    nome = clean(d.get("name") or "desconhecida")
+    nome = str(d.get("name") or "desconhecida")
     tin = tout = tcache = 0
     if cwd:
         slug = re.sub(r"[^A-Za-z0-9]", "-", cwd)
@@ -314,21 +313,23 @@ for p in sorted(glob.glob(os.path.join(sess_dir, "*.json"))):
                         tcache += int(u.get("cache_creation_input_tokens") or 0) + int(u.get("cache_read_input_tokens") or 0)
             except (OSError, ValueError, TypeError):
                 continue
-    cwd_limpo = clean(cwd).replace("\t", " ")
+    cwd_limpo = cwd.replace("\t", " ").replace("\n", " ")
     print("T\t%s\t%s\t%d\t%d\t%d" % (nome, cwd_limpo, tin, tout, tcache))
 '
 
 cmd_tokens() {
   local out
-  out="$(python3 -I -c "$PY_TOKENS" "$SESS_DIR" "$PROJ_DIR" 2>/dev/null || true)"
+  out="$(python3 -I -c "$PY_TOKENS" "$SESS_DIR" "$PROJ_DIR" 2>/dev/null | python3 -I "$LIMPA" || true)"
   [ -n "$out" ] || return 0
   printf '\n%-24s %12s %12s %12s %12s %10s %18s\n' sessao tokens input output cache entregas tokens_por_entrega
   local k nome cwd tin tout tcache entregas total per
   while IFS=$'\t' read -r k nome cwd tin tout tcache; do
     [ "$k" = T ] || continue
     entregas=0
-    if [ -n "$cwd" ] && [ -d "$cwd" ]; then
-      entregas="$(git -C "$cwd" log --since="24 hours ago" --oneline 2>/dev/null | wc -l | tr -d ' ')" || entregas=0
+    # Repo de terceiro: so conta se o .git for do usuario atual, e com git endurecido
+    # (sem fsmonitor, hooks, gpg nem verificacao de assinatura).
+    if [ -n "$cwd" ] && [ -d "$cwd" ] && [ "$(stat -c %u "$cwd/.git" 2>/dev/null || echo x)" = "$(id -u)" ]; then
+      entregas="$(git -c core.fsmonitor= -c core.hooksPath=/dev/null -c gpg.program=true -c log.showSignature=false --no-pager -C "$cwd" log --no-show-signature --since="24 hours ago" --oneline 2>/dev/null | wc -l | tr -d ' ')" || entregas=0
     fi
     total=$(( tin + tout + tcache ))
     per="-"
@@ -397,10 +398,8 @@ cmd_dormir() {
 
 # Nome da sessao pelo cwd (PWD): casa com $HOME/.claude/sessions/*.json. Uma chamada de python3.
 PY_NOME='
-import glob, json, os, sys, unicodedata
+import glob, json, os, sys
 cwd, sess = sys.argv[1], sys.argv[2]
-def clean(v):
-    return "".join(c for c in str(v) if not unicodedata.category(c).startswith("C"))
 for p in sorted(glob.glob(os.path.join(sess, "*.json"))):
     try:
         with open(p, encoding="utf-8") as f:
@@ -408,7 +407,7 @@ for p in sorted(glob.glob(os.path.join(sess, "*.json"))):
     except (OSError, ValueError):
         continue
     if str(d.get("cwd") or "") == cwd:
-        print(clean(d.get("name") or "desconhecida"))
+        print(str(d.get("name") or "desconhecida"))
         break
 else:
     print("desconhecida")
@@ -417,8 +416,8 @@ else:
 cmd_registrar() {
   [ $# -ge 1 ] && [ -n "$1" ] || die "uso: vigia.sh registrar \"<texto da decisao>\"" 2
   local texto="$1" nome hora
-  nome="$(python3 -I -c "$PY_NOME" "$PWD" "$SESS_DIR" 2>/dev/null || echo desconhecida)"
-  texto="$(printf '%s' "$texto" | tr -d '\000-\011\013-\037\177' | tr '\n' ' ')"
+  nome="$(python3 -I -c "$PY_NOME" "$PWD" "$SESS_DIR" 2>/dev/null | python3 -I "$LIMPA" || echo desconhecida)"
+  texto="$(printf '%s' "$texto" | python3 -I "$LIMPA" | tr '\n' ' ')"
   hora="$(date +%Y-%m-%d\ %H:%M)"
   ( umask 077; mkdir -p "$STATE_DIR" )
   (
@@ -483,7 +482,7 @@ cmd_acordar() {
       printf 'fila vazia\n'
     else
       # Saida filtrada: sem caracteres de controle (escape de terminal), so \t e \n.
-      python3 -I -c "$PY_AGRUPA" "$STATE_DIR" | LC_ALL=C tr -d '\000-\010\013-\037\177' || true
+      python3 -I -c "$PY_AGRUPA" "$STATE_DIR" | python3 -I "$LIMPA" || true
       dest="$STATE_DIR/arquivo/$(date +%Y%m%d-%H%M%S)"
       ( umask 077; mkdir -p "$dest" )
       for f in fila.md decisoes_clevel.md desvios_noite.md; do
