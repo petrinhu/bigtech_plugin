@@ -1,8 +1,8 @@
 <!--
   docs/house sync
   origem: vault claudebrain / CONTRACT.md
-  sync_date: 2026-11-23
-  hmac_vault_sha256: 576853a943b5678bfa8017b0856515d2bb156a5527548a730a3cdf715ed3eae8
+  sync_date: 2026-11-24
+  hmac_vault_sha256: 860bbace0fdab523408ed9f40d6ea05e62bf237a15d22febc512bb9bb1da4861
   transformacoes: T1=4 T2=0 T3a=0 T3=0 T4=0 T5=0
   regra: As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário. Se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
   sem segredos: não incluir tokens/credenciais

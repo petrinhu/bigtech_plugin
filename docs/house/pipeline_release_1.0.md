@@ -1,7 +1,7 @@
 <!--
   docs/house sync
   origem: vault claudebrain / pipeline_release_1.0.md
-  sync_date: 2026-11-23
+  sync_date: 2026-11-24
   hmac_vault_sha256: 2be688e483f6588b36a060ec718939dd51cbbd1eaa90291c3be8f491de163994
   transformacoes: T1=0 T2=0 T3a=0 T3=0 T4=0 T5=0
   regra: As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário. Se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.

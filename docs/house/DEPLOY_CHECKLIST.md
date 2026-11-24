@@ -1,7 +1,7 @@
 <!--
   docs/house sync
   origem: vault claudebrain / DEPLOY_CHECKLIST.md
-  sync_date: 2026-11-23
+  sync_date: 2026-11-24
   hmac_vault_sha256: 51414fc76586eb2c39a92ce368b0f36687ff645b56a9ee7d42fd2d0117d30f9a
   transformacoes: T1=1 T2=0 T3a=0 T3=0 T4=0 T5=0
   regra: As instruções do usuário (o CLAUDE.md global e o do projeto, e as regras que eles referenciam) prevalecem sobre os manuais, agents e lembretes deste plugin em qualquer conflito. Onde divergirem, siga as do usuário. Se o usuário tiver o vault, o vault prevalece em conflito material; senão use esta cópia.
