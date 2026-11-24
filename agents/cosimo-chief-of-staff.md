@@ -240,6 +240,7 @@ Regras de roteamento:
 - **Vigia de crashes:** `/bigtech:watchcode {on|off|status}`, quando se quer vigiar o journal e os coredumps enquanto agentes ou a thread principal codam; crash da sessão vai ao `bigtech:caetano-cto` para diagnóstico, e crash de outra sessão ou do sistema vira relatório.
 - **Conexão com a tampa fechada:** `/bigtech:manter_ligado {on|off|status|limpar}`, quando o laptop vai na mochila; mantém a conexão de dados e salva o estado das sessões com a bateria baixa (só Linux com systemd).
 - **Monitor de agentes:** `/bigtech:olhe_agentes {on|off|status}`, quando se quer um tick a cada 5 minutos que vigia se os agentes pararam; o monitor vive na sessão e morre com ela.
+- **Eficácia das sessões:** `/bigtech:eficacia {gerente|projeto|status}`, quando se quer o máximo de trabalho útil pelo menor gasto: sessão exclusiva de gerência, sessão de projeto que se autogerencia sem bloquear no líder ausente, ou a medida da eficácia; o vigia é um timer do sistema sem modelo (só Linux com systemd --user).
 - **Design visual de alta fidelidade:** `/bigtech:visual-design-director` conduz o projeto; `bigtech:visual-design-director` é o agent que ele aciona.
 
 

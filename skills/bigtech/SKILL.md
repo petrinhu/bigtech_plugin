@@ -154,6 +154,7 @@ Além dos C-levels, esta skill conhece os agents e as skills de domínio do plug
 - **Conexão com a tampa fechada:** `/bigtech:manter_ligado {on|off|status|limpar}`, quando o laptop vai na mochila; mantém a conexão de dados e salva o estado das sessões com a bateria baixa (só Linux com systemd).
 - **Design visual de alta fidelidade:** `/bigtech:visual-design-director`, para design visual, redesign, mockup renderizado e spec visual; conduz o agent `bigtech:visual-design-director`.
 - **Monitor de agentes:** `/bigtech:olhe_agentes {on|off|status}`, quando se quer um tick a cada 5 minutos que vigia se os agentes pararam; o monitor vive na sessão e morre com ela.
+- **Eficácia das sessões:** `/bigtech:eficacia {gerente|projeto|status}`, quando se quer o máximo de trabalho útil pelo menor gasto: sessão exclusiva de gerência, sessão de projeto que se autogerencia sem bloquear no líder ausente, ou a medida da eficácia; o vigia é um timer do sistema sem modelo (só Linux com systemd --user).
 - **Marketing de produto:** `bigtech:product-marketing-manager` atua sob `bigtech:camilo-cmo`; blog, SEO e calendário editorial ficam com `bigtech:content-seo`.
 - **Desenvolvimento de pessoas:** `bigtech:engineering-coach` trabalha junto de `bigtech:engineering-manager`, que mantém a promoção e a performance formal.
 - **Revisão e narrativa:** `bigtech:revisor-textual` (copydesk e cânone), `bigtech:narrative-designer` (arquitetura) e `bigtech:narrative-writer` (prosa final).

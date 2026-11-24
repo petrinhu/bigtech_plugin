@@ -5,7 +5,7 @@
 ![Status](https://img.shields.io/badge/status-stable-brightgreen)
 ![Language](https://img.shields.io/badge/lang-pt--br%20%2F%20en-lightgrey)
 ![Agents](https://img.shields.io/badge/agents-71-yellow)
-![Skills](https://img.shields.io/badge/skills-15-yellow)
+![Skills](https://img.shields.io/badge/skills-16-yellow)
 ![CI](https://img.shields.io/github/actions/workflow/status/petrinhu/bigtech_plugin/ci.yml?label=CI)
 ![Release](https://img.shields.io/github/v/release/petrinhu/bigtech_plugin?label=release)
 
@@ -15,7 +15,7 @@
 
 ## English
 
-> Structure any project like a digital-product company: a constellation of 71 agents (12 C-level + 59 operational), 15 skills, and governance and TDD hooks. Scales from **early** through **scale** to **bigtech** (deprecated alias: `solo` → `early`).
+> Structure any project like a digital-product company: a constellation of 71 agents (12 C-level + 59 operational), 16 skills, and governance and TDD hooks. Scales from **early** through **scale** to **bigtech** (deprecated alias: `solo` → `early`).
 
 ### Welcome, supreme leader
 
@@ -28,7 +28,7 @@ High-stakes decisions (macro architecture, scope, stack, go/no-go, irreversible 
 `bigtech` packages a complete product-and-engineering organization as a plugin for Claude Code:
 
 - **71 agents.** 12 C-level (strategy, product, engineering, marketing, operations, security, data, AI, finance, revenue, legal, chief of staff) and 59 operational agents that do the work, including the game-development squad and the medical-expert agents.
-- **15 skills.** Orchestration skills (`/bigtech:bigtech`, `/bigtech:proj_software`, `/bigtech:proj_jogo`, `/bigtech:tab_pendencias`), agent shortcuts (`/bigtech:dr-advogado`, `/bigtech:dr-medico-perito`, `/bigtech:dr-medico-psiquiatra`, `/bigtech:dr-medico-trabalho`, `/bigtech:learning-designer`, `/bigtech:suporte-linux`, `/bigtech:visual-design-director`), the case orchestrator `/bigtech:pericia-medica`, and three new skills: `/bigtech:watchcode`, `/bigtech:manter_ligado` and `/bigtech:olhe_agentes`. `github-gossips` left the plugin and stays available outside it.
+- **16 skills.** Orchestration skills (`/bigtech:bigtech`, `/bigtech:proj_software`, `/bigtech:proj_jogo`, `/bigtech:tab_pendencias`), agent shortcuts (`/bigtech:dr-advogado`, `/bigtech:dr-medico-perito`, `/bigtech:dr-medico-psiquiatra`, `/bigtech:dr-medico-trabalho`, `/bigtech:learning-designer`, `/bigtech:suporte-linux`, `/bigtech:visual-design-director`), the case orchestrator `/bigtech:pericia-medica`, and four operational skills: `/bigtech:watchcode`, `/bigtech:manter_ligado`, `/bigtech:olhe_agentes` and `/bigtech:eficacia`. `github-gossips` left the plugin and stays available outside it.
 - **Governance and TDD hooks.** Test guard-rail (red, green, refactor), a reminder to classify the project size, operating-mode reinforcement, and bootstrap of the manuals into the session.
 
 The core principle: **the process adapts to the size of the project, never the other way around.** A 200-line CLI does not summon the whole team. The Chief of Staff classifies the size and turns on only what is needed, preventing over-engineering.
@@ -162,6 +162,7 @@ Each skill is invoked with the plugin prefix, as `/bigtech:<skill>`.
 | `watchcode` | operational | Watches the journal and coredumps during agent work and captures real crashes. |
 | `manter_ligado` | operational | Keeps the connection alive with the lid closed and saves sessions at 5% battery (Linux with systemd only). |
 | `olhe_agentes` | operational | Turns the agent monitor on or off and reports idle agents on a 5-minute tick. |
+| `eficacia` | operational | More useful work for less spend: a model-free system timer watches the sessions, and a manager or project session queues questions for the leader instead of blocking (the timer needs systemd --user). |
 
 Shortcuts such as `/bigtech:dr-advogado` and `/bigtech:learning-designer` call the agent of the same name, which also carries the `bigtech:` prefix (for example, the agent `bigtech:dr-advogado`).
 
@@ -259,7 +260,7 @@ Distributed under the [Apache-2.0](./LICENSE) license.
 
 ## Português
 
-> Estruture qualquer projeto como uma empresa de produto digital: uma constelação de 71 agents (12 C-level + 59 operacionais), 15 skills e hooks de governança e TDD. Dimensionável de **early** passando por **scale** até **bigtech** (alias depreciado: `solo` → `early`).
+> Estruture qualquer projeto como uma empresa de produto digital: uma constelação de 71 agents (12 C-level + 59 operacionais), 16 skills e hooks de governança e TDD. Dimensionável de **early** passando por **scale** até **bigtech** (alias depreciado: `solo` → `early`).
 
 ### Bem-vindo, líder supremo
 
@@ -272,7 +273,7 @@ Decisões de altíssimo valor (arquitetura macro, escopo, stack, go/no-go, deplo
 `bigtech` empacota uma organização completa de produto e engenharia em forma de plugin para o Claude Code:
 
 - **71 agents.** 12 C-level (estratégia, produto, engenharia, marketing, operações, segurança, dados, IA, finanças, receita, jurídico, chief of staff) e 59 operacionais que executam o trabalho, incluindo o time de desenvolvimento de jogos e os agents médico-periciais.
-- **15 skills.** Skills de orquestração (`/bigtech:bigtech`, `/bigtech:proj_software`, `/bigtech:proj_jogo`, `/bigtech:tab_pendencias`), atalhos de agent (`/bigtech:dr-advogado`, `/bigtech:dr-medico-perito`, `/bigtech:dr-medico-psiquiatra`, `/bigtech:dr-medico-trabalho`, `/bigtech:learning-designer`, `/bigtech:suporte-linux`, `/bigtech:visual-design-director`), o orquestrador de caso `/bigtech:pericia-medica` e três skills novas: `/bigtech:watchcode`, `/bigtech:manter_ligado` e `/bigtech:olhe_agentes`. `github-gossips` saiu do plugin e continua disponível fora dele.
+- **16 skills.** Skills de orquestração (`/bigtech:bigtech`, `/bigtech:proj_software`, `/bigtech:proj_jogo`, `/bigtech:tab_pendencias`), atalhos de agent (`/bigtech:dr-advogado`, `/bigtech:dr-medico-perito`, `/bigtech:dr-medico-psiquiatra`, `/bigtech:dr-medico-trabalho`, `/bigtech:learning-designer`, `/bigtech:suporte-linux`, `/bigtech:visual-design-director`), o orquestrador de caso `/bigtech:pericia-medica` e quatro skills operacionais: `/bigtech:watchcode`, `/bigtech:manter_ligado`, `/bigtech:olhe_agentes` e `/bigtech:eficacia`. `github-gossips` saiu do plugin e continua disponível fora dele.
 - **Hooks de governança e TDD.** Guard-rail de testes (red, green, refactor), lembrete de classificar o porte do projeto, reforço do modo de operação e bootstrap dos manuais na sessão.
 
 O princípio central: **o processo se adapta ao porte do projeto, nunca o contrário.** Um CLI de 200 linhas não chama o time inteiro. O Chief of Staff classifica o porte e liga só o necessário, prevenindo over-engineering.
@@ -406,6 +407,7 @@ Cada skill é invocada com o prefixo do plugin, como `/bigtech:<skill>`.
 | `watchcode` | operacional | Vigia o journal e os coredumps durante o trabalho dos agents e captura crashes reais. |
 | `manter_ligado` | operacional | Mantém a conexão com a tampa fechada e salva as sessões com 5% de bateria (só Linux com systemd). |
 | `olhe_agentes` | operacional | Liga, desliga ou mostra o monitor de agents, com tick a cada 5 minutos. |
+| `eficacia` | operacional | Mais trabalho útil pelo menor gasto: um timer do sistema, sem modelo, vigia as sessões, e a sessão de gerência ou de projeto enfileira a pergunta ao líder em vez de bloquear (o timer exige systemd --user). |
 
 Atalhos como `/bigtech:dr-advogado` e `/bigtech:learning-designer` chamam o agent de mesmo nome, que também leva o prefixo `bigtech:` (por exemplo, o agent `bigtech:dr-advogado`).
 

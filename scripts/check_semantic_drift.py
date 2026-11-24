@@ -10,7 +10,7 @@ Checks (hard fail):
   2. skills/*/SKILL.md: `name:` presente no frontmatter.
   3. hooks/hooks.json: scripts referenciados em args existem no disco.
   4. Contagem de agents == EXPECTED_AGENT_COUNT (bump intencional se inventário mudar).
-  4b. Contagem de skills == EXPECTED_SKILL_COUNT (CONS-12, 2026-11-20; 15 desde CONS-R7).
+  4b. Contagem de skills == EXPECTED_SKILL_COUNT (CONS-12, 2026-11-20; 16 desde a eficacia, 2026-11-24).
   5. valor legado "solo" não é porte primário (peer de early/scale/bigtech) sem alias/deprec.
   6. Zero referências ao host legado Codeberg em paths de produto.
 
@@ -42,7 +42,8 @@ EXPECTED_AGENT_COUNT = 71
 # proj_jogo, proj_software, suporte-linux, tab_pendencias, visual-design-director).
 # 2026-11-20, CONS-12C: 12 -> 16 (+ watchcode, manter_ligado, olhe_agentes, github-gossips).
 # 2026-11-20, CONS-R7 (D4): 16 -> 15; github-gossips volta a ser skill só global (fora do plugin).
-EXPECTED_SKILL_COUNT = 15
+# 2026-11-24: 15 -> 16 (+ eficacia).
+EXPECTED_SKILL_COUNT = 16
 
 # stem -> name permitido se diferente do stem. Vazio = sem exceções.
 NAME_STEM_EXCEPTIONS: dict[str, str] = {}

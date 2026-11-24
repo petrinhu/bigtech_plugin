@@ -19,7 +19,7 @@ General rule: prefer the main path (remote marketplace). Use the local-clone alt
 `bigtech` is a plugin for Claude Code that packages a product-and-engineering organization:
 
 - **71 agents.** 12 C-level (CEO, CPO, CTO, CMO, COO, CISO, CDO, CAIO, CFO, CRO, CLO, and Chief of Staff) and 59 operational agents that do the work, including `visual-design-director`, the game-development squad, and the medical-expert agents.
-- **15 skills.** Orchestration skills (`/bigtech:bigtech`, `/bigtech:proj_software`, `/bigtech:proj_jogo`, `/bigtech:tab_pendencias`), agent shortcuts (`/bigtech:visual-design-director`, `/bigtech:dr-advogado`, `/bigtech:dr-medico-perito`, `/bigtech:dr-medico-psiquiatra`, `/bigtech:dr-medico-trabalho`, `/bigtech:learning-designer`, `/bigtech:suporte-linux`), the case orchestrator `/bigtech:pericia-medica`, and three new operational skills: `/bigtech:watchcode`, `/bigtech:manter_ligado` and `/bigtech:olhe_agentes`. `github-gossips` left the plugin and stays available outside it.
+- **16 skills.** Orchestration skills (`/bigtech:bigtech`, `/bigtech:proj_software`, `/bigtech:proj_jogo`, `/bigtech:tab_pendencias`), agent shortcuts (`/bigtech:visual-design-director`, `/bigtech:dr-advogado`, `/bigtech:dr-medico-perito`, `/bigtech:dr-medico-psiquiatra`, `/bigtech:dr-medico-trabalho`, `/bigtech:learning-designer`, `/bigtech:suporte-linux`), the case orchestrator `/bigtech:pericia-medica`, and four operational skills: `/bigtech:watchcode`, `/bigtech:manter_ligado`, `/bigtech:olhe_agentes` and `/bigtech:eficacia`. `github-gossips` left the plugin and stays available outside it.
 - **Governance and TDD hooks.** Bootstrap of the manuals into the session, a reminder to classify the size, operating-mode reinforcement, TDD guard-rail (red, green, refactor), and a test runner.
 
 Package identity (confirmed in `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`):
@@ -102,7 +102,7 @@ Replace `/absolute/path/to/bigtech_plugin` with the absolute path of the directo
 Confirm the three signals. If any of them fails, report it to the user before moving on.
 
 1. **The 71 agents show up.** List the available agents and check for the C-level ones (`celso-ceo`, `capitolino-cpo`, `caetano-cto`, `camilo-cmo`, `cosmo-coo`, `narciso-ciso`, `candido-cdo`, `caio-caio`, `confucio-cfo`, `cicero-cro`, `claudio-clo`, `cosimo-chief-of-staff`) and a sample of the operational ones (`software-architect`, `backend-engineer`, `qa-engineer`, `visual-design-director`, `technical-writer`).
-2. **The 15 skills exist.** `/bigtech:bigtech`, `/bigtech:proj_software`, `/bigtech:tab_pendencias` and `/bigtech:visual-design-director` must be listed and invokable.
+2. **The 16 skills exist.** `/bigtech:bigtech`, `/bigtech:proj_software`, `/bigtech:tab_pendencias` and `/bigtech:visual-design-director` must be listed and invokable.
 3. **The hooks run.** When starting a new session, `bigtech_session_init` should inject the path of the manuals into the context. On a code project without the `.bigtech-porte` marker, `bigtech_porte_reminder` reminds you to classify the size; with the marker, it anchors the operating mode and cites the recorded size. Use `/plugin` to confirm that the plugin is active and that the hooks are registered.
 
 ### ⚠️ Name conflicts (check BEFORE installing)
@@ -114,7 +114,7 @@ If the user's environment already has **global** agents, skills, or hooks (defin
 Run this check before installing:
 
 1. Inspect the `agents` folder of your global Claude Code configuration for files named like any of the 71 agents of this plugin. "What this plugin is" gives only their count and roles; the names are listed in the Agents section of the [README.md](README.md) and are the file names of the plugin's `agents/` folder, without `.md` (for example `celso-ceo`).
-2. Inspect `~/.claude/skills/` for folders, and `~/.claude/commands/` for `.md` files, named like the 15 skills listed in "What this plugin is", written without the slash and without the `bigtech:` prefix (for example `bigtech`, `proj_software`, `tab_pendencias`). Global skills have no plugin prefix, so search for the bare name: a global `tab_pendencias` folder is the homonym of the plugin's `/bigtech:tab_pendencias`.
+2. Inspect `~/.claude/skills/` for folders, and `~/.claude/commands/` for `.md` files, named like the 16 skills listed in "What this plugin is", written without the slash and without the `bigtech:` prefix (for example `bigtech`, `proj_software`, `tab_pendencias`). Global skills have no plugin prefix, so search for the bare name: a global `tab_pendencias` folder is the homonym of the plugin's `/bigtech:tab_pendencias`.
 3. Inspect `~/.claude/hooks/` for homonymous TDD or governance hooks (`tdd_guard`, `tdd_runner`, `bigtech_*`).
 
 If there is a collision, **do not install over it.** Present to the user, as a question, the two safe ways out (recommend the first):
@@ -165,7 +165,7 @@ Regra geral: prefira o caminho principal (marketplace remoto). Use a alternativa
 `bigtech` é um plugin para o Claude Code que empacota uma organização de produto e engenharia:
 
 - **71 agents.** 12 C-level (CEO, CPO, CTO, CMO, COO, CISO, CDO, CAIO, CFO, CRO, CLO e Chief of Staff) e 59 operacionais que executam o trabalho, incluindo `visual-design-director`, o diretor de design visual, o time de desenvolvimento de jogos e os agents médico-periciais.
-- **15 skills.** Skills de orquestração (`/bigtech:bigtech`, `/bigtech:proj_software`, `/bigtech:proj_jogo`, `/bigtech:tab_pendencias`), atalhos de agent (`/bigtech:visual-design-director`, `/bigtech:dr-advogado`, `/bigtech:dr-medico-perito`, `/bigtech:dr-medico-psiquiatra`, `/bigtech:dr-medico-trabalho`, `/bigtech:learning-designer`, `/bigtech:suporte-linux`), o orquestrador de caso `/bigtech:pericia-medica` e três skills operacionais novas: `/bigtech:watchcode`, `/bigtech:manter_ligado` e `/bigtech:olhe_agentes`. `github-gossips` saiu do plugin e continua disponível fora dele.
+- **16 skills.** Skills de orquestração (`/bigtech:bigtech`, `/bigtech:proj_software`, `/bigtech:proj_jogo`, `/bigtech:tab_pendencias`), atalhos de agent (`/bigtech:visual-design-director`, `/bigtech:dr-advogado`, `/bigtech:dr-medico-perito`, `/bigtech:dr-medico-psiquiatra`, `/bigtech:dr-medico-trabalho`, `/bigtech:learning-designer`, `/bigtech:suporte-linux`), o orquestrador de caso `/bigtech:pericia-medica` e quatro skills operacionais: `/bigtech:watchcode`, `/bigtech:manter_ligado`, `/bigtech:olhe_agentes` e `/bigtech:eficacia`. `github-gossips` saiu do plugin e continua disponível fora dele.
 - **Hooks de governança e TDD.** Bootstrap dos manuais na sessão, lembrete de classificar o porte, reforço do modo de operação, guard-rail de TDD (red, green, refactor) e runner de testes.
 
 Identidade do pacote (confirmada em `.claude-plugin/plugin.json` e `.claude-plugin/marketplace.json`):
@@ -248,7 +248,7 @@ Substitua `/caminho/absoluto/para/bigtech_plugin` pelo caminho absoluto do diret
 Confirme os três sinais. Se algum falhar, relate ao usuário antes de seguir.
 
 1. **Os 71 agents aparecem.** Liste os agents disponíveis e confira a presença dos C-level (`celso-ceo`, `capitolino-cpo`, `caetano-cto`, `camilo-cmo`, `cosmo-coo`, `narciso-ciso`, `candido-cdo`, `caio-caio`, `confucio-cfo`, `cicero-cro`, `claudio-clo`, `cosimo-chief-of-staff`) e de uma amostra dos operacionais (`software-architect`, `backend-engineer`, `qa-engineer`, `visual-design-director`, `technical-writer`).
-2. **As 15 skills existem.** `/bigtech:bigtech`, `/bigtech:proj_software`, `/bigtech:tab_pendencias` e `/bigtech:visual-design-director` devem estar listadas e invocáveis.
+2. **As 16 skills existem.** `/bigtech:bigtech`, `/bigtech:proj_software`, `/bigtech:tab_pendencias` e `/bigtech:visual-design-director` devem estar listadas e invocáveis.
 3. **Os hooks rodam.** Ao iniciar uma nova sessão, o `bigtech_session_init` deve injetar o caminho dos manuais no contexto. Em projeto de código sem o marcador `.bigtech-porte`, o `bigtech_porte_reminder` lembra de classificar o porte; com o marcador, ancora o modo de operação e cita o porte registrado. Use `/plugin` para confirmar que o plugin está ativo e que os hooks estão registrados.
 
 ### ⚠️ Conflito de nomes (verifique ANTES de instalar)
@@ -260,7 +260,7 @@ Se o ambiente do usuário já tiver agents, skills ou hooks **globais** (definid
 Faça esta checagem antes de instalar:
 
 1. Inspecione a pasta `agents` da sua configuração global do Claude Code em busca de arquivos com o nome de algum dos 71 agents deste plugin. A seção "O que é este plugin" dá só a contagem e os papéis; os nomes estão na seção Agents do [README.md](README.md) e são os nomes dos arquivos da pasta `agents/` do plugin, sem o `.md` (por exemplo `celso-ceo`).
-2. Inspecione `~/.claude/skills/` em busca de pastas, e `~/.claude/commands/` em busca de arquivos `.md`, com o nome das 15 skills listadas em "O que é este plugin", escrito sem a barra e sem o prefixo `bigtech:` (por exemplo `bigtech`, `proj_software`, `tab_pendencias`). Skill global não tem prefixo de plugin, então procure o nome puro: uma pasta global `tab_pendencias` é a homônima da `/bigtech:tab_pendencias` do plugin.
+2. Inspecione `~/.claude/skills/` em busca de pastas, e `~/.claude/commands/` em busca de arquivos `.md`, com o nome das 16 skills listadas em "O que é este plugin", escrito sem a barra e sem o prefixo `bigtech:` (por exemplo `bigtech`, `proj_software`, `tab_pendencias`). Skill global não tem prefixo de plugin, então procure o nome puro: uma pasta global `tab_pendencias` é a homônima da `/bigtech:tab_pendencias` do plugin.
 3. Inspecione `~/.claude/hooks/` em busca de hooks de TDD ou de governança homônimos (`tdd_guard`, `tdd_runner`, `bigtech_*`).
 
 Se houver colisão, **não instale por cima.** Apresente ao usuário, via pergunta, as duas saídas seguras (recomende a primeira):
