@@ -66,6 +66,17 @@
           }
         ],
         "matcher": "Write|Edit"
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/skills/eficacia/bin/hook_lider_dormindo.sh"],
+            "timeout": 5
+          }
+        ],
+        "matcher": "AskUserQuestion"
       }
     ],
     "PostToolUse": [
