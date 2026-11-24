@@ -29,7 +29,7 @@ High-stakes decisions (macro architecture, scope, stack, go/no-go, irreversible 
 
 - **71 agents.** 12 C-level (strategy, product, engineering, marketing, operations, security, data, AI, finance, revenue, legal, chief of staff) and 59 operational agents that do the work, including the game-development squad and the medical-expert agents.
 - **16 skills.** Orchestration skills (`/bigtech:bigtech`, `/bigtech:proj_software`, `/bigtech:proj_jogo`, `/bigtech:tab_pendencias`), agent shortcuts (`/bigtech:dr-advogado`, `/bigtech:dr-medico-perito`, `/bigtech:dr-medico-psiquiatra`, `/bigtech:dr-medico-trabalho`, `/bigtech:learning-designer`, `/bigtech:suporte-linux`, `/bigtech:visual-design-director`), the case orchestrator `/bigtech:pericia-medica`, and four operational skills: `/bigtech:watchcode`, `/bigtech:manter_ligado`, `/bigtech:olhe_agentes` and `/bigtech:eficacia`. `github-gossips` left the plugin and stays available outside it.
-- **Governance and TDD hooks.** Test guard-rail (red, green, refactor), a reminder to classify the project size, operating-mode reinforcement, and bootstrap of the manuals into the session.
+- **Governance and TDD hooks.** Test guard-rail (red, green, refactor), a reminder to classify the project size, operating-mode reinforcement, bootstrap of the manuals into the session, and the `eficacia` skill's "leader asleep" lock, which queues questions and permission requests instead of leaving a session waiting for you.
 
 The core principle: **the process adapts to the size of the project, never the other way around.** A 200-line CLI does not summon the whole team. The Chief of Staff classifies the size and turns on only what is needed, preventing over-engineering.
 
@@ -216,12 +216,15 @@ When invoked, 63 of the 71 agents run a pre-flight check on the backlog table (`
 | `tab_pendencias_reminder.py` | SessionStart, UserPromptSubmit | Session-length reminder for the backlog table. On SessionStart it records when the session started; on UserPromptSubmit, once per session, if the project has the `.bigtech-porte` marker and a `TODO.md` and the session has run for more than 2 hours, it reminds you to mark delivered items in the `Status` column and to reorder through `/bigtech:tab_pendencias --reorder` only when priorities change. The time limit, or turning the reminder off, goes in an optional `.tab-staleness.json` at the project root. It only reminds, never blocks or reorders. |
 | `skills/tab_pendencias/tools/hooks/tab_pendencias_reminder.py` | SessionStart, UserPromptSubmit | Freshness signals of the backlog table, from the `tab_pendencias` skill. On SessionStart: a `git` repository without `TODO.md` (suggests `/bigtech:tab_pendencias --create`), a table with pending or in-progress items that has not been touched for several commits or days (measured with read-only `git`), an INBOX that needs triage, items piling up while waiting for verification, decisions waiting for you that have aged, and unfinished intake-journal entries. On UserPromptSubmit: new notes in `inbox/` written by another session. Thresholds go in the `[signals]` section of an optional `.tab_pendencias.ini` next to `TODO.md`. It only reminds, never blocks or reorders. |
 | `bigtech_reinforce.py` | UserPromptSubmit | Reinforces bigtech mode and routes natural-language activation to `/bigtech:bigtech`. Marker-scoped, noise-resistant. |
+| `skills/eficacia/bin/hook_lider_dormindo.sh` | PreToolUse (AskUserQuestion) | From the `eficacia` skill. While the "leader asleep" flag exists, it denies the question, writes it with its options to a local queue, and tells the agent to take a technical doubt to the C-level of the domain or to switch to other work. Without the flag, it exits silently. |
+| `skills/eficacia/bin/hook_permissao.sh` | PermissionRequest | From the `eficacia` skill. While the flag exists, it denies the permission request, writes the tool and a summary (the command or the file path) to the same queue, and tells the agent to switch to other work. Without the flag, it exits silently and the request reaches you as usual. |
+| `skills/eficacia/bin/hook_fim_turno.sh` | Stop | From the `eficacia` skill. While the flag exists, it blocks the end of the turn once and points the agent to an item in `TODO.md` that does not depend on the pending answer or, when the choice is reversible, to the recommended option on a branch of its own, with no merge; if nothing is left, the agent may stop. The next attempt to stop goes through (`stop_hook_active`), so there is no loop. Without the flag, it exits silently. |
 
-The plugin declares 9 hook entries across 4 events (SessionStart, UserPromptSubmit, PreToolUse, and PostToolUse); the smoke test checks each one.
+The plugin declares 12 hook entries across 6 events (SessionStart, UserPromptSubmit, PreToolUse, PermissionRequest, Stop, and PostToolUse), served by 10 scripts (7 in Python and 3 in bash); the smoke test checks each one. The "leader asleep" flag belongs to your user, not to one project: while it exists, the three `eficacia` hooks act in every Claude Code session you run on the machine.
 
 ### Compatibility
 
-**Platform.** Works on Linux, macOS, and Windows (native or WSL). The hooks are pure Python and run cross-platform; the hard prerequisite on Claude Code is `python3` on the PATH (see [Claude Code (native plugin)](#claude-code-native-plugin), notably the Windows note). When the `tab_pendencias` skill plans tests or audits that need external tools, each tool is offered for installation with your confirmation, using the command that fits your OS (apt/dnf/brew/winget/choco/scoop) and preferring cross-platform managers (pip/uv, cargo, npm). Nothing is installed silently.
+**Platform.** Works on Linux, macOS, and Windows (native or WSL). The governance and TDD hooks are pure Python and run cross-platform; the hard prerequisite on Claude Code is `python3` on the PATH (see [Claude Code (native plugin)](#claude-code-native-plugin), notably the Windows note). The three hooks of the `eficacia` skill run with `bash` and also call `python3` and `flock`; the skill's timer and automatic flag need Linux with systemd (`systemctl --user` and `loginctl`). When the `tab_pendencias` skill plans tests or audits that need external tools, each tool is offered for installation with your confirmation, using the command that fits your OS (apt/dnf/brew/winget/choco/scoop) and preferring cross-platform managers (pip/uv, cargo, npm). Nothing is installed silently.
 
 **Built for Claude Code (Anthropic).** The official install path is the Claude Code plugin/marketplace format (life-cycle hooks, skills, subagent protocol). Other assistants or code CLIs (Gemini CLI, GitHub Copilot CLI, OpenAI Codex, Cursor, Aider, etc.) are not supported without their own adaptation.
 
@@ -235,7 +238,7 @@ To pin a model for one agent, edit the `model` field in the header of `agents/<s
 
 ### Documentation
 
-**Wiki (beginner-friendly, didactic):** the [project Wiki](https://github.com/petrinhu/bigtech_plugin/wiki) has one page per agent, hook, and skill, plus a glossary, an installation guide, and a step-by-step usage guide.
+**Wiki (beginner-friendly, didactic):** the [project Wiki](https://github.com/petrinhu/bigtech_plugin/wiki) has one page per agent, hook, and skill (the three `eficacia` hooks are explained on the skill's page), plus a glossary, an installation guide, and a step-by-step usage guide.
 
 The governance manuals ship with the plugin in `docs/house/` and are injected into the session context:
 
@@ -249,6 +252,8 @@ The governance manuals ship with the plugin in `docs/house/` and are injected in
 ### Security
 
 The hooks run code on your machine, and `tdd_runner` may run the test command declared by the project you open (trust parity with `make test`/`npm test`). Before using it with third-party repositories, read [SECURITY.md](./SECURITY.md): trust model, opt-in, and how to disable.
+
+The three hooks of the `eficacia` skill act only while the "leader asleep" flag exists, and then in every session of your user. The skill's timer is installed only with your yes and stays installed if you remove the plugin, so run the skill's `vigia.sh remover` first. [SECURITY.md](./SECURITY.md) has the details.
 
 > **TDD mode runs a project-defined command as a shell.** The PostToolUse hook `tdd_runner` is opt-in: it only activates when the project you open contains a `.claude/tdd-guard.json` file. When it is active, the `fast_command`/`test_command` declared in that file is executed as a shell command after each edit. Treat `.claude/tdd-guard.json` as trusted code (the same trust you give to a `make test`/`npm test` target), and do not turn on TDD mode in an untrusted third-party repository without first inspecting that command. Prefer pointing `test_command` at an isolated executor (container or sandbox) with a process limit; run it on the host only where your rules allow.
 
@@ -274,7 +279,7 @@ Decisões de altíssimo valor (arquitetura macro, escopo, stack, go/no-go, deplo
 
 - **71 agents.** 12 C-level (estratégia, produto, engenharia, marketing, operações, segurança, dados, IA, finanças, receita, jurídico, chief of staff) e 59 operacionais que executam o trabalho, incluindo o time de desenvolvimento de jogos e os agents médico-periciais.
 - **16 skills.** Skills de orquestração (`/bigtech:bigtech`, `/bigtech:proj_software`, `/bigtech:proj_jogo`, `/bigtech:tab_pendencias`), atalhos de agent (`/bigtech:dr-advogado`, `/bigtech:dr-medico-perito`, `/bigtech:dr-medico-psiquiatra`, `/bigtech:dr-medico-trabalho`, `/bigtech:learning-designer`, `/bigtech:suporte-linux`, `/bigtech:visual-design-director`), o orquestrador de caso `/bigtech:pericia-medica` e quatro skills operacionais: `/bigtech:watchcode`, `/bigtech:manter_ligado`, `/bigtech:olhe_agentes` e `/bigtech:eficacia`. `github-gossips` saiu do plugin e continua disponível fora dele.
-- **Hooks de governança e TDD.** Guard-rail de testes (red, green, refactor), lembrete de classificar o porte do projeto, reforço do modo de operação e bootstrap dos manuais na sessão.
+- **Hooks de governança e TDD.** Guard-rail de testes (red, green, refactor), lembrete de classificar o porte do projeto, reforço do modo de operação, bootstrap dos manuais na sessão e a trava "líder dormindo" da skill `eficacia`, que põe perguntas e pedidos de permissão numa fila em vez de deixar a sessão parada à sua espera.
 
 O princípio central: **o processo se adapta ao porte do projeto, nunca o contrário.** Um CLI de 200 linhas não chama o time inteiro. O Chief of Staff classifica o porte e liga só o necessário, prevenindo over-engineering.
 
@@ -461,12 +466,15 @@ Ao serem acionados, 63 dos 71 agents fazem um pre-flight da tabela de pendência
 | `tab_pendencias_reminder.py` | SessionStart, UserPromptSubmit | Lembrete de tempo de sessão da tabela de pendências. No SessionStart, registra a hora de início da sessão; no UserPromptSubmit, uma vez por sessão, se o projeto tem o marcador `.bigtech-porte` e um `TODO.md` e a sessão já passou de 2 horas, lembra de marcar no `Status` os itens entregues e de reordenar pelo `/bigtech:tab_pendencias --reorder` só quando a prioridade mudar. O limite de tempo, ou o desligamento do lembrete, fica num `.tab-staleness.json` opcional na raiz do projeto. Só lembra, nunca bloqueia nem reordena. |
 | `skills/tab_pendencias/tools/hooks/tab_pendencias_reminder.py` | SessionStart, UserPromptSubmit | Sinais de frescor da tabela de pendências, da skill `tab_pendencias`. No SessionStart: repositório `git` sem `TODO.md` (sugere `/bigtech:tab_pendencias --create`), tabela com itens pendentes ou em andamento sem toque há vários commits ou dias (medido com `git` só para leitura), INBOX que precisa de triagem, itens acumulados à espera de verificação, decisões à sua espera que envelheceram e entradas inacabadas no journal de intake. No UserPromptSubmit: notas novas em `inbox/`, escritas por outra sessão. Os limiares ficam na seção `[signals]` de um `.tab_pendencias.ini` opcional ao lado do `TODO.md`. Só lembra, nunca bloqueia nem reordena. |
 | `bigtech_reinforce.py` | UserPromptSubmit | Reforça o modo bigtech e roteia ativação por linguagem natural para `/bigtech:bigtech`. Escopado por marcador, anti-ruído. |
+| `skills/eficacia/bin/hook_lider_dormindo.sh` | PreToolUse (AskUserQuestion) | Da skill `eficacia`. Enquanto a bandeira "líder dormindo" existir, nega a pergunta, grava-a com as opções numa fila local e manda o agente levar a dúvida técnica ao C-level do domínio ou trocar de trabalho. Sem a bandeira, sai em silêncio. |
+| `skills/eficacia/bin/hook_permissao.sh` | PermissionRequest | Da skill `eficacia`. Enquanto a bandeira existir, nega o pedido de permissão, grava na mesma fila a ferramenta e um resumo (o comando ou o caminho do arquivo) e manda o agente trocar de trabalho. Sem a bandeira, sai em silêncio e o pedido chega a você como sempre. |
+| `skills/eficacia/bin/hook_fim_turno.sh` | Stop | Da skill `eficacia`. Enquanto a bandeira existir, bloqueia uma vez o fim do turno e aponta um item do `TODO.md` que não dependa da resposta pendente ou, se a escolha for reversível, a opção recomendada num ramo próprio, sem merge; se nada sobrar, o agente pode parar. A tentativa seguinte de parar passa (`stop_hook_active`), sem laço. Sem a bandeira, sai em silêncio. |
 
-O plugin declara 9 entradas de hook em 4 eventos (SessionStart, UserPromptSubmit, PreToolUse e PostToolUse); o smoke test confere cada uma.
+O plugin declara 12 entradas de hook em 6 eventos (SessionStart, UserPromptSubmit, PreToolUse, PermissionRequest, Stop e PostToolUse), servidas por 10 scripts (7 em Python e 3 em bash); o smoke test confere cada uma. A bandeira "líder dormindo" é do seu usuário, não de um projeto: enquanto ela existir, os três hooks da `eficacia` agem em todas as sessões do Claude Code que você roda na máquina.
 
 ### Compatibilidade
 
-**Plataforma.** Funciona em Linux, macOS e Windows (nativo ou WSL). Os hooks são Python puro e rodam de forma cross-platform; o pré-requisito rígido no Claude Code é `python3` no PATH (veja [Claude Code (plugin nativo)](#claude-code-plugin-nativo), em especial a nota de Windows). Quando a skill `tab_pendencias` planeja testes ou auditorias que precisam de ferramentas externas, cada ferramenta é oferecida para instalação com a sua confirmação, no comando adequado ao seu SO (apt/dnf/brew/winget/choco/scoop) e preferindo gerenciadores cross-platform (pip/uv, cargo, npm). Nada é instalado em silêncio.
+**Plataforma.** Funciona em Linux, macOS e Windows (nativo ou WSL). Os hooks de governança e TDD são Python puro e rodam de forma cross-platform; o pré-requisito rígido no Claude Code é `python3` no PATH (veja [Claude Code (plugin nativo)](#claude-code-plugin-nativo), em especial a nota de Windows). Os três hooks da skill `eficacia` rodam com `bash` e também chamam `python3` e `flock`; o timer e a bandeira automática da skill exigem Linux com systemd (`systemctl --user` e `loginctl`). Quando a skill `tab_pendencias` planeja testes ou auditorias que precisam de ferramentas externas, cada ferramenta é oferecida para instalação com a sua confirmação, no comando adequado ao seu SO (apt/dnf/brew/winget/choco/scoop) e preferindo gerenciadores cross-platform (pip/uv, cargo, npm). Nada é instalado em silêncio.
 
 **Feito para o Claude Code (Anthropic).** O caminho oficial de instalação é o formato de plugin/marketplace do Claude Code (hooks de ciclo de vida, skills, protocolo de subagents). Outros assistentes ou CLIs de código (Gemini CLI, GitHub Copilot CLI, OpenAI Codex, Cursor, Aider, etc.) não são suportados sem adaptação própria.
 
@@ -480,7 +488,7 @@ Para fixar um modelo em um agent, edite o campo `model` no cabeçalho de `agents
 
 ### Documentação
 
-**Wiki (didática, para iniciantes):** a [Wiki do projeto](https://github.com/petrinhu/bigtech_plugin/wiki) tem uma página por agente, hook e skill, além de glossário, guia de instalação e de uso passo a passo.
+**Wiki (didática, para iniciantes):** a [Wiki do projeto](https://github.com/petrinhu/bigtech_plugin/wiki) tem uma página por agente, hook e skill (os três hooks da `eficacia` estão explicados na página da skill), além de glossário, guia de instalação e de uso passo a passo.
 
 Os manuais de governança acompanham o plugin em `docs/house/` e são injetados no contexto da sessão:
 
@@ -494,6 +502,8 @@ Os manuais de governança acompanham o plugin em `docs/house/` e são injetados 
 ### Segurança
 
 Os hooks executam código na sua máquina e o `tdd_runner` pode rodar o comando de teste declarado pelo projeto que você abrir (paridade de confiança com `make test`/`npm test`). Antes de usar com repositórios de terceiros, leia [SECURITY.md](./SECURITY.md): modelo de confiança, opt-in e como desativar.
+
+Os três hooks da skill `eficacia` só agem enquanto a bandeira "líder dormindo" existir, e então em todas as sessões do seu usuário. O timer da skill só é instalado com o seu sim e continua instalado se você remover o plugin; por isso, rode antes o `vigia.sh remover` da skill. O [SECURITY.md](./SECURITY.md) traz o detalhe.
 
 > **O modo TDD roda como shell um comando definido pelo projeto.** O hook PostToolUse `tdd_runner` é opt-in: só liga quando o projeto que você abrir contém o arquivo `.claude/tdd-guard.json`. Quando está ligado, o `fast_command`/`test_command` declarado nesse arquivo é executado como comando de shell após cada edição. Trate o `.claude/tdd-guard.json` como código confiável (a mesma confiança que você dá a um alvo `make test`/`npm test`) e não ative o modo TDD em repositório de terceiro não-confiável sem antes inspecionar esse comando. Prefira apontar o `test_command` para um executor isolado (container ou sandbox) com limite de processos; rode no host só onde as suas regras permitirem.
 

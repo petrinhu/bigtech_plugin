@@ -1,12 +1,13 @@
 # Segurança
 
-Política de segurança e modelo de confiança do plugin **bigtech** (versão 2.0.0).
+Política de segurança e modelo de confiança do plugin **bigtech** (versão 2.1.0).
 
 Este documento existe para que você decida, com informação completa, se quer
 instalar e operar o plugin. O resumo em uma frase: **os hooks deste plugin
 executam código na sua máquina, um deles pode rodar o comando de teste
-definido pelo projeto que você abrir, e alguns skills são opt-in e sobem
-processos ou serviços locais.** Abaixo, o detalhe de cada ponto.
+definido pelo projeto que você abrir, três deles negam perguntas e pedidos de
+permissão enquanto a bandeira "líder dormindo" existir, e alguns skills são
+opt-in e sobem processos ou serviços locais.** Abaixo, o detalhe de cada ponto.
 
 ## Modelo de confiança em uma frase
 
@@ -19,8 +20,9 @@ antes de rodar a suíte de testes deles.
 
 ## Superfície do plugin
 
-O arquivo `hooks/hooks.json` registra **9 entradas** de hook, que usam **7
-scripts** distintos. Os hooks são executados localmente, com o seu usuário.
+O arquivo `hooks/hooks.json` registra **12 entradas** de hook, que usam **10
+scripts** distintos: 7 em Python e 3 em bash, da skill `eficacia`. Os hooks são
+executados localmente, com o seu usuário.
 
 | Script | Evento | O que faz |
 |---|---|---|
@@ -31,13 +33,17 @@ scripts** distintos. Os hooks são executados localmente, com o seu usuário.
 | `hooks/bigtech_reinforce.py` | UserPromptSubmit | Reforça o modo de operação e roteia pedidos em linguagem natural. |
 | `hooks/tdd_guard.py` | PreToolUse (`Write\|Edit`) | Gate opt-in de TDD; pode bloquear a escrita de código de produção. |
 | `hooks/tdd_runner.py` | PostToolUse (`Write\|Edit`) | Roda a suíte de testes do projeto após a edição e grava o resultado. |
+| `skills/eficacia/bin/hook_lider_dormindo.sh` | PreToolUse (`AskUserQuestion`) | Com a bandeira "líder dormindo", nega a pergunta, grava o texto dela e as opções na fila local e manda o agente seguir sem você. Sem a bandeira, sai em silêncio. |
+| `skills/eficacia/bin/hook_permissao.sh` | PermissionRequest | Com a bandeira, nega o pedido de permissão e grava na fila a ferramenta e um resumo: o comando inteiro, o caminho do arquivo ou os primeiros 200 caracteres da entrada. Sem a bandeira, sai em silêncio e o pedido chega a você como sempre. |
+| `skills/eficacia/bin/hook_fim_turno.sh` | Stop | Com a bandeira, bloqueia uma vez o fim do turno e manda pegar um item do `TODO.md` que não dependa da resposta pendente ou, se a escolha for reversível, seguir a opção recomendada num ramo próprio, sem merge; se nada sobrar, a sessão pode parar. Na tentativa seguinte (`stop_hook_active` verdadeiro), libera, sem laço. Sem a bandeira, sai em silêncio. |
 
-Os 9 registros se distribuem assim: quatro em SessionStart, três em
-UserPromptSubmit, um em PreToolUse e um em PostToolUse.
+Os 12 registros se distribuem assim: quatro em SessionStart, três em
+UserPromptSubmit, dois em PreToolUse, um em PermissionRequest, um em Stop e um
+em PostToolUse.
 
 ### Os hooks não usam a rede
 
-Nenhum dos 7 scripts abre conexão de rede, faz telemetria ou envia dados para
+Nenhum dos 10 scripts abre conexão de rede, faz telemetria ou envia dados para
 fora da máquina. A única exceção é o próprio comando de teste do projeto,
 executado pelo `tdd_runner`, que pode fazer o que o projeto já faz quando você
 roda a suíte à mão. Os caminhos de rede das skills estão em "Rede fora dos
@@ -56,6 +62,13 @@ hooks", mais abaixo.
   no diretório temporário compartilhado (`/tmp`). Recusa symlink no diretório
   e diretório de outro dono: nesse caso nada é gravado e a sessão segue
   (fail-open). Os arquivos são podados por idade.
+- **Hooks da `eficacia`:** só com a bandeira "líder dormindo", os hooks de
+  pergunta e de permissão acrescentam o que barraram a
+  `${XDG_STATE_HOME:-$HOME/.local/state}/bigtech-eficacia/fila.md`, com `flock`
+  na trava `.fila.lock`, dentro de uma pasta criada com permissão `0700`. A
+  fila guarda o texto da pergunta e das opções e o comando inteiro do pedido de
+  permissão barrado: trate-a como privada. Ela só sai dali quando o
+  `vigia.sh acordar` a move para `arquivo/<data-hora>/`, que não é podado.
 
 ## O `git` dentro do hook de pendências
 
@@ -116,11 +129,14 @@ fora da raiz do projeto não é avaliado.
 ## Comportamento dos hooks: silent-fail
 
 Os hooks são **silent-fail**: qualquer erro interno é capturado e o turno
-segue normalmente. Eles nunca interrompem o seu trabalho por falha própria. A
-única exceção intencional é o `tdd_guard`, que é o **gate de TDD** e pode
-recusar a escrita de código de produção quando não há um teste vermelho
+segue normalmente. Eles nunca interrompem o seu trabalho por falha própria. Há
+duas exceções intencionais. A primeira é o `tdd_guard`, que é o **gate de TDD**
+e pode recusar a escrita de código de produção quando não há um teste vermelho
 registrado. Esse gate também é opt-in (só atua com `.claude/tdd-guard.json`) e
-tem válvulas de escape descritas abaixo.
+tem válvulas de escape descritas abaixo. A segunda são os três hooks da
+`eficacia`: enquanto a bandeira "líder dormindo" existir, eles negam a
+pergunta e o pedido de permissão e bloqueiam uma vez o fim do turno, em todas
+as sessões do seu usuário. Sem a bandeira, saem em silêncio.
 
 Em particular:
 
@@ -143,6 +159,11 @@ depende de um recurso que você liga ou de um comando que você roda:
   Claude Code. Ela pede a skill `/memo_persistente`, que não vem no plugin e
   só funciona se existir na sua configuração; a saída e o erro dessa chamada
   são descartados.
+- **`eficacia`:** o vigia do timer manda cada desvio novo como aviso curto a
+  um celular já pareado pelo KDE Connect, se houver um, ou como notificação
+  local (`notify-send`). O aviso leva o nome da sessão e, quando cabe, o número
+  do processo e os minutos de espera. Enquanto a bandeira "líder dormindo"
+  existir, ele não manda nada e grava o desvio num arquivo local.
 - **`tab_pendencias`, comando `--audit`:** para conferir afirmações da tabela
   como "não pushado" ou "na branch X", consulta o remoto git do projeto com
   `git ls-remote`, que só lê o remoto e não altera nada, nem local nem remoto.
@@ -161,19 +182,23 @@ As skills não são hooks: gravam só quando rodam.
 - **`bigtech`:** depois que o porte é classificado, o marcador
   `.bigtech-porte` na raiz do projeto.
 - **`tab_pendencias`:** o `TODO.md` do projeto; o `TESTES.md` e o
-  `AUDITORIAS.md` do projeto, quando faltam; e, quando precisa, uma pasta
-  `inbox/` ao lado do `TODO.md` e, dentro da pasta `.git` do repositório, um
+  `AUDITORIAS.md` do projeto, só com o `--add_tests_audit` e quando faltam; e,
+  quando precisa, uma pasta `inbox/` ao lado do `TODO.md` e, dentro da pasta
+  `.git` do repositório, um
   journal de intake e uma trava de escrita (fora de repositório git, a trava
   fica ao lado do `TODO.md`).
 - **`olhe_agentes`:** o prazo do monitor, a parada que você ordenou (se
   houver) e o último trabalho anunciado como concluído, em
   `$HOME/.config/olhe_agentes/<pasta do projeto>/`.
-- **`watchcode` e `manter_ligado`:** na seção seguinte.
+- **`watchcode`, `manter_ligado` e `eficacia`:** na seção seguinte.
 
 ## Skills com processos ou serviços locais
 
-Estes skills não são hooks. Rodam só quando você os invoca, e só no Linux com
-systemd. Nenhum deles é instalado como serviço permanente pelo plugin.
+Estes skills não são hooks e dependem do systemd. O `watchcode` e o
+`manter_ligado` só rodam no Linux com systemd, quando você os invoca, e sobem
+apenas unidades transitórias. A `eficacia` precisa do systemd para o timer e
+para a bandeira automática, e é a exceção: o `vigia.sh instalar`, que a skill
+só roda com o seu sim, instala um timer permanente do `systemd --user`.
 
 ### `watchcode`
 
@@ -185,22 +210,65 @@ systemd. Nenhum deles é instalado como serviço permanente pelo plugin.
   `enable`.
 - Estado em `${XDG_RUNTIME_DIR:-$HOME/.cache}/watchcode`; baseline local em
   `$HOME/.config/bigtech/watchcode_baseline.txt`.
-- Para parar: a própria skill tem o comando `off`, que encerra a unidade.
+- Para parar: a própria skill tem o comando `--off`, que encerra a unidade.
 
 ### `manter_ligado`
 
 - Mantém a máquina acordada com a tampa fechada, por meio de
   `systemd-inhibit` na unidade transitória, e salva o estado das sessões
   quando a bateria chega a 5%.
-- Enquanto está ativo, a suspensão automática fica bloqueada. Use `off` para
+- Enquanto está ativo, a suspensão automática fica bloqueada. Use `--off` para
   devolver o comportamento normal de energia.
 - Estado em `${XDG_RUNTIME_DIR:-$HOME/.cache}/manter_ligado`.
 - Com 5% de bateria, copia os transcripts das sessões registradas, isto é, as
   conversas inteiras, para
   `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/manter_ligado_snapshots` e guarda só a
-  cópia mais recente. O comando `limpar` apaga essas cópias.
+  cópia mais recente. O comando `--limpar` apaga essas cópias.
 - Os avisos de bateria pelo KDE Connect e o `claude -p` opcional estão em
   "Rede fora dos hooks".
+
+### `eficacia`
+
+- **Timer permanente.** O `vigia.sh instalar` grava `bigtech-eficacia.service`
+  e `bigtech-eficacia.timer` em `${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user/`
+  e os liga com `enable --now`. O timer sobrevive a reinício e roda o
+  `vigia.sh check` a cada 5 minutos (ajustável com `--intervalo`), com
+  `Nice=19`. O `vigia.sh remover` desliga e apaga as duas unidades.
+- **O timer chama o script pelo caminho absoluto** dentro da pasta do plugin.
+  Antes de desinstalar o plugin, rode `vigia.sh remover`; depois de atualizar o
+  plugin, rode `vigia.sh instalar` de novo, para o timer apontar para a cópia
+  nova.
+- **Sem modelo e sem rede.** O vigia não usa modelo de IA, não abre conexão de
+  rede (fora o aviso ao celular, em "Rede fora dos hooks") e não lê o diário
+  do sistema nem coredumps. Ele lê os `.json` de `$HOME/.claude/sessions/`, a
+  hora da última mudança dos transcritos e, no `vigia.sh status`, a contagem
+  de tokens dos transcritos das últimas 24 horas.
+- **Estado** em `${XDG_STATE_HOME:-$HOME/.local/state}/bigtech-eficacia/`,
+  pasta criada com permissão `0700`: `log.tsv`, `desvios.txt`, a bandeira
+  `lider_dormindo`, `lock_desde`, `parada/<nome>`, `fila.md`,
+  `decisoes_clevel.md`, `desvios_noite.md` e `arquivo/<data-hora>/`. A skill
+  nunca poda o `log.tsv` nem o `arquivo/`: apague-os à mão quando não os
+  quiser mais.
+- **A bandeira é do usuário, não do projeto.** Enquanto ela existir, os três
+  hooks da `eficacia` agem em todas as sessões do Claude Code do seu usuário.
+  Ela também se liga sozinha com a tela bloqueada há mais de
+  `bandeira_auto_min` minutos (padrão 30, pelo `loginctl`); no desbloqueio, só
+  a bandeira automática se apaga.
+- **Sanitizador único.** Todo texto que vem de fora (a pergunta, as opções, o
+  comando, o nome da sessão, o texto do `vigia.sh registrar`) passa pelo
+  `bin/limpa_texto.py` antes de ser gravado ou mostrado. Ele descarta todo
+  caractere Unicode de categoria de controle ou de formato (Cc, Cf, Co e Cn),
+  menos a tabulação e a quebra de linha. Assim, escape de terminal (ESC, BEL e
+  o CSI de 8 bits U+009B) e override bidi (U+202E) não chegam à fila, às
+  decisões, aos desvios nem à tela do `vigia.sh acordar`. O nome e a pasta da
+  sessão têm os espaços normalizados, para tabulação e quebra de linha não
+  deslocarem colunas nem injetarem linha, e todo campo numérico é validado
+  antes da aritmética do bash.
+- **`git` endurecido.** Para contar as entregas, o `vigia.sh status` roda
+  `git log` só para leitura, sem fsmonitor, hooks, programa de assinatura nem
+  verificação de assinatura (`core.fsmonitor=`, `core.hooksPath=/dev/null`,
+  `gpg.program=true`, `--no-show-signature`), e só em `.git` do seu próprio
+  usuário, para que um repositório de terceiro não execute código pelo `git`.
 
 ## `github-gossips`: saiu do plugin
 
@@ -219,8 +287,10 @@ Esses são plugins de terceiros, com hooks, permissões e políticas próprios.
 Este plugin não os controla nem audita. O `bigtech_session_init.py` apenas
 avisa, no início da sessão, quais dependências recomendadas não estão
 habilitadas. O plugin também chama ferramentas do sistema: `python3` (hooks),
-`git` (pendências), `systemd` e `journalctl` (`watchcode` e `manter_ligado`),
-`kdeconnect-cli` e `notify-send` (avisos do `manter_ligado`) e `claude`
+`git` (pendências e `vigia.sh status`), `systemd` e `journalctl` (`watchcode` e
+`manter_ligado`), `bash` e `flock` (hooks da `eficacia`), `systemctl` e
+`loginctl` (timer e bandeira automática da `eficacia`), `kdeconnect-cli` e
+`notify-send` (avisos do `manter_ligado` e da `eficacia`) e `claude`
 (`manter_ligado` com `MEMO_HEADLESS=1`).
 
 ## Como desativar
@@ -249,12 +319,17 @@ Você tem três níveis de controle para o TDD, do mais amplo ao mais específic
    estão verdes (`has_red=false`), útil para reorganizar código sem adicionar
    funcionalidade nova.
 
-Para os skills de processo local, use o comando `off` de cada um. 
+Para os skills de processo local, use o comando `--off` de cada um. 
 
-Para desinstalar o plugin por completo, use o gerenciador de plugins do
-Claude Code (`/plugin`), o que remove o registro de todos os hooks. A
-desinstalação não apaga o estado local listado acima; remova esses diretórios
-à mão se quiser um estado limpo.
+Para a `eficacia`: o `vigia.sh acordar` apaga a bandeira, e os três hooks
+voltam ao silêncio; `"bandeira_auto_min": 0` no `eficacia.json` desliga a
+bandeira automática; e o `vigia.sh remover` desliga e apaga o timer.
+
+Para desinstalar o plugin por completo, rode antes o `vigia.sh remover`, se
+instalou o timer da `eficacia`, porque a desinstalação não o desliga. Depois,
+use o gerenciador de plugins do Claude Code (`/plugin`), o que remove o
+registro de todos os hooks. A desinstalação não apaga o estado local listado
+acima; remova esses diretórios à mão se quiser um estado limpo.
 
 ## Boas práticas ao abrir código de terceiros
 
