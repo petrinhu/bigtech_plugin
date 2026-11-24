@@ -67,6 +67,18 @@
         ]
       }
     ],
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/skills/eficacia/bin/hook_permissao.sh"],
+            "timeout": 5
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "hooks": [

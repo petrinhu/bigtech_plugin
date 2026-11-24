@@ -70,11 +70,11 @@ Onde medir: o `vigia.sh status` dá a disponibilidade (fração das passadas do 
 
 | Classe | Quem decide | Quando | O que a sessão faz |
 |---|---|---|---|
-| 1 | a própria sessão | decisão técnica, reversível, dentro do escopo da ordem | decide, registra e segue |
+| 1 | a própria sessão | decisão técnica, reversível, dentro do escopo da ordem; desempate barato e escolha reversível entram aqui | decide, registra e segue |
 | 2 | o C-level do domínio (por exemplo, `bigtech:caetano-cto` em engenharia) | dúvida técnica ou de produto, reversível, fora do escopo da sessão | com o líder dormindo, pergunta ao C-level, que decide e registra para ratificação do líder; com o líder acordado, pergunta ao líder |
 | 3 | só o líder | commit depois que o classificador de permissão barrou um agente; permissão; regra ou lei; gasto; ação irreversível; uso da GPU; merge no ramo principal; tag; deploy | grava a pergunta nas pendências, com a recomendação, ANTES de bloquear, e troca de trabalho |
 
-A presença vem da bandeira "líder dormindo", nunca de suposição. Leia a pergunta antes de classificá-la e ajuste a matriz a partir das paradas reais.
+O C-level é caro (opus): entra só na dúvida técnica de verdade, não em toda pergunta. A presença vem da bandeira "líder dormindo", nunca de suposição. Leia a pergunta antes de classificá-la e ajuste a matriz a partir das paradas reais.
 
 ## Pré-voo, enfileire e siga, resumo ao acordar
 

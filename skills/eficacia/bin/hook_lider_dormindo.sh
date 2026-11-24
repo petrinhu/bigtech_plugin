@@ -18,7 +18,9 @@ fi
 # Bloco de texto da fila, montado por python3 -I (uma chamada). Nome da sessao:
 # casa pelo session_id e, se nao achar, pelo cwd do JSON de entrada.
 PY_FILA='
-import glob, json, os, sys, time
+import glob, json, os, sys, time, unicodedata
+def clean(v):
+    return "".join(c for c in str(v) if c == "\n" or not unicodedata.category(c).startswith("C"))
 sess_dir = sys.argv[1]
 try:
     data = json.loads(sys.stdin.read() or "{}")
@@ -42,7 +44,7 @@ if achou is None and cwd:
 if achou is not None:
     nome = str(achou.get("name") or "desconhecida")
 def lim(v):
-    return " ".join(str(v).split())
+    return " ".join(clean(v).split())
 ti = data.get("tool_input") or {}
 perguntas = ti.get("questions") or []
 out = ["## %s - sessao: %s" % (time.strftime("%Y-%m-%d %H:%M"), lim(nome))]

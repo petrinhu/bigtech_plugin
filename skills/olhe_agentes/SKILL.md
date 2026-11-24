@@ -34,7 +34,7 @@ O monitor funciona sem nenhuma das duas. Cada uma é opcional e só conta se exi
 ## `on` (padrão)
 1. `mkdir -p ~/.config/olhe_agentes/$SLUG`.
 2. Se `prazo` não existir ou já tiver vencido, grave `$(( $(date +%s) + 7*86400 ))`.
-3. Arme o ciclo: `ScheduleWakeup` com `delaySeconds: 300` e `prompt: "/bigtech:olhe_agentes tick"`.
+3. Se o timer `bigtech-eficacia.timer` estiver ativo (`systemctl --user is-active --quiet bigtech-eficacia.timer`), NAO arme o ciclo: o vigia do timer ja cobre as sessoes. Diga isso ao usuario e sugira `/bigtech:eficacia gerente`. Sem o timer, arme o ciclo: `ScheduleWakeup` com `delaySeconds: 300` e `prompt: "/bigtech:olhe_agentes tick"`.
 4. Responda ao usuário em uma linha: monitor ligado, a hora do próximo tick, o prazo e se há parada do usuário ativa.
 **Limite que tem de ser declarado:** o monitor vive DENTRO da sessão. Se a janela fechar ou o Claude cair, os ticks param junto. Nada de fora retoma a sessão com segurança. Para sobreviver a reinício, ofereça ao usuário o gêmeo local: agendador local do sistema ou `/schedule`; a escolha é dele.
 

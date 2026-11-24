@@ -53,6 +53,7 @@ try:
         raise ValueError("raiz deve ser objeto")
     esp = int(cfg.get("limiar_espera_min", 10))
     trav = int(cfg.get("limiar_travada_min", 15))
+    auto = int(cfg.get("bandeira_auto_min", 30))
     nomes = cfg.get("esperadas", [])
     if not isinstance(nomes, list):
         raise ValueError("esperadas deve ser lista")
@@ -60,7 +61,7 @@ except (OSError, ValueError, TypeError) as e:
     sys.stderr.write("vigia: config invalida em %s (%s)\n" % (cfg_path, e))
     sys.exit(2)
 
-print("C\t%d\t%d" % (esp, trav))
+print("C\t%d\t%d\t%d" % (esp, trav, auto))
 for n in nomes:
     print("E\t%s" % clean(n))
 
@@ -96,6 +97,37 @@ vigia_read() {
     || die "falha ao ler config ou sessoes" 2
 }
 
+# bandeira_auto <dry> <minutos>: tela bloqueada ha mais de N min cria a bandeira marcada
+# "automatica"; desbloqueio apaga so ela e roda acordar. Manual (dormir) nunca e apagada aqui.
+# Le LockedHint de loginctl (sessao do usuario). 0 desliga.
+bandeira_auto() {
+  local dry="$1" auto_min="$2" sid locked since agora
+  [ "$auto_min" -gt 0 ] || return 0
+  sid="${XDG_SESSION_ID:-}"
+  if [ -z "$sid" ]; then
+    sid="$(loginctl list-sessions --no-legend 2>/dev/null | awk -v u="${USER:-$(id -un)}" '$3==u{print $1; exit}')" || true
+  fi
+  [ -n "$sid" ] || return 0
+  locked="$(loginctl show-session "$sid" -p LockedHint 2>/dev/null | sed -n 's/^LockedHint=//p')" || true
+  agora=$EPOCHSECONDS
+  if [ "$locked" = yes ]; then
+    if [ "$dry" = 1 ]; then printf 'bandeira auto: tela bloqueada (dry-run, nada gravado)\n'; return 0; fi
+    ( umask 077; mkdir -p "$STATE_DIR" )
+    [ -s "$STATE_DIR/lock_desde" ] || printf '%s\n' "$agora" > "$STATE_DIR/lock_desde"
+    since="$(cat "$STATE_DIR/lock_desde")"
+    if [ $(( agora - since )) -gt $(( auto_min * 60 )) ] && [ ! -e "$STATE_DIR/lider_dormindo" ]; then
+      printf 'automatica\n' > "$STATE_DIR/lider_dormindo"
+      printf 'bandeira automatica criada (tela bloqueada ha mais de %s min)\n' "$auto_min"
+    fi
+  else
+    [ "$dry" = 1 ] && return 0
+    rm -f "$STATE_DIR/lock_desde"
+    if [ "$(cat "$STATE_DIR/lider_dormindo" 2>/dev/null || true)" = automatica ]; then
+      cmd_acordar
+    fi
+  fi
+}
+
 cmd_check() {
   local dry=0
   while [ $# -gt 0 ]; do
@@ -107,14 +139,14 @@ cmd_check() {
   done
 
   vigia_read
-  local now=$EPOCHSECONDS esp=10 trav=15 kind a b c d e f
+  local now=$EPOCHSECONDS esp=10 trav=15 auto=30 kind a b c d e f
   local -a E_NAMES=() S_PID=() S_NAME=() S_STATUS=() S_SUA=() S_TM=() S_VIVO=()
   local -a R_NAME=() R_STATE=() R_DET=() D_KEY=() D_MSG=()
   declare -A alive=()
 
   while IFS=$'\t' read -r kind a b c d e f; do
     case "$kind" in
-      C) esp="$a"; trav="$b" ;;
+      C) esp="$a"; trav="$b"; auto="$c" ;;
       E) E_NAMES+=("$a") ;;
       S)
         S_PID+=("$a"); S_NAME+=("$b"); S_STATUS+=("$c")
@@ -123,6 +155,7 @@ cmd_check() {
     esac
   done <<< "$PYOUT"
 
+  bandeira_auto "$dry" "$auto"
   add_row() { R_NAME+=("$1"); R_STATE+=("$2"); R_DET+=("$3"); }
   add_des() { D_KEY+=("$1"); D_MSG+=("$2"); }
 
@@ -199,9 +232,16 @@ cmd_check() {
     printf '%s\t%s\t%s\n' "$now" "${R_NAME[i]}" "${R_STATE[i]}" >> "$STATE_DIR/log.tsv"
   done
 
-  for j in "${NOVOS[@]}"; do
-    vigia_notify "${D_MSG[j]}"
-  done
+  if [ -e "$STATE_DIR/lider_dormindo" ]; then
+    # Com a bandeira ligada, nao acorda o celular: os desvios novos vao para a pilha da noite.
+    for j in "${NOVOS[@]}"; do
+      printf -- '- %s %s\n' "$(date +%H:%M)" "${D_MSG[j]}" >> "$STATE_DIR/desvios_noite.md"
+    done
+  else
+    for j in "${NOVOS[@]}"; do
+      vigia_notify "${D_MSG[j]}"
+    done
+  fi
   return 0
 }
 
@@ -232,6 +272,69 @@ cmd_status() {
       if [ "$kind" = "T" ]; then printf '%-24s %14s %14s\n' "TOTAL" "$pct" "$w"
       else printf '%-24s %14s %14s\n' "$s" "$pct" "$w"; fi
     done
+}
+
+# Tokens (input, output, cache) dos transcritos das ultimas 24 h, uma passada de python3;
+# entregas = commits nas ultimas 24 h no repo do cwd da sessao (um git por sessao).
+PY_TOKENS='
+import glob, json, os, re, sys, time, unicodedata
+sess_dir, proj_dir = sys.argv[1], sys.argv[2]
+corte = time.time() - 86400
+def clean(v):
+    return "".join(c for c in str(v) if not unicodedata.category(c).startswith("C"))
+for p in sorted(glob.glob(os.path.join(sess_dir, "*.json"))):
+    try:
+        with open(p, encoding="utf-8") as f:
+            d = json.load(f)
+    except (OSError, ValueError):
+        continue
+    cwd = str(d.get("cwd") or "")
+    nome = clean(d.get("name") or "desconhecida")
+    tin = tout = tcache = 0
+    if cwd:
+        slug = re.sub(r"[^A-Za-z0-9]", "-", cwd)
+        for t in glob.glob(os.path.join(proj_dir, slug, "*.jsonl")):
+            try:
+                if os.path.getmtime(t) < corte:
+                    continue
+                with open(t, encoding="utf-8", errors="replace") as f:
+                    for linha in f:
+                        try:
+                            o = json.loads(linha)
+                        except ValueError:
+                            continue
+                        msg = o.get("message") if isinstance(o, dict) else None
+                        u = msg.get("usage") if isinstance(msg, dict) else None
+                        if not isinstance(u, dict):
+                            u = o.get("usage") if isinstance(o, dict) else None
+                        if not isinstance(u, dict):
+                            continue
+                        tin += int(u.get("input_tokens") or 0)
+                        tout += int(u.get("output_tokens") or 0)
+                        tcache += int(u.get("cache_creation_input_tokens") or 0) + int(u.get("cache_read_input_tokens") or 0)
+            except (OSError, ValueError, TypeError):
+                continue
+    cwd_limpo = clean(cwd).replace("\t", " ")
+    print("T\t%s\t%s\t%d\t%d\t%d" % (nome, cwd_limpo, tin, tout, tcache))
+'
+
+cmd_tokens() {
+  local out
+  out="$(python3 -I -c "$PY_TOKENS" "$SESS_DIR" "$PROJ_DIR" 2>/dev/null || true)"
+  [ -n "$out" ] || return 0
+  printf '\n%-24s %12s %12s %12s %12s %10s %18s\n' sessao tokens input output cache entregas tokens_por_entrega
+  local k nome cwd tin tout tcache entregas total per
+  while IFS=$'\t' read -r k nome cwd tin tout tcache; do
+    [ "$k" = T ] || continue
+    entregas=0
+    if [ -n "$cwd" ] && [ -d "$cwd" ]; then
+      entregas="$(git -C "$cwd" log --since="24 hours ago" --oneline 2>/dev/null | wc -l | tr -d ' ')" || entregas=0
+    fi
+    total=$(( tin + tout + tcache ))
+    per="-"
+    [ "$entregas" -gt 0 ] && per=$(( total / entregas ))
+    printf '%-24s %12s %12s %12s %12s %10s %18s\n' "$nome" "$total" "$tin" "$tout" "$tcache" "$entregas" "$per"
+  done <<< "$out"
 }
 
 cmd_instalar() {
@@ -294,8 +397,10 @@ cmd_dormir() {
 
 # Nome da sessao pelo cwd (PWD): casa com $HOME/.claude/sessions/*.json. Uma chamada de python3.
 PY_NOME='
-import glob, json, os, sys
+import glob, json, os, sys, unicodedata
 cwd, sess = sys.argv[1], sys.argv[2]
+def clean(v):
+    return "".join(c for c in str(v) if not unicodedata.category(c).startswith("C"))
 for p in sorted(glob.glob(os.path.join(sess, "*.json"))):
     try:
         with open(p, encoding="utf-8") as f:
@@ -303,7 +408,7 @@ for p in sorted(glob.glob(os.path.join(sess, "*.json"))):
     except (OSError, ValueError):
         continue
     if str(d.get("cwd") or "") == cwd:
-        print(str(d.get("name") or "desconhecida"))
+        print(clean(d.get("name") or "desconhecida"))
         break
 else:
     print("desconhecida")
@@ -313,7 +418,7 @@ cmd_registrar() {
   [ $# -ge 1 ] && [ -n "$1" ] || die "uso: vigia.sh registrar \"<texto da decisao>\"" 2
   local texto="$1" nome hora
   nome="$(python3 -I -c "$PY_NOME" "$PWD" "$SESS_DIR" 2>/dev/null || echo desconhecida)"
-  texto="$(printf '%s' "$texto" | tr '\n' ' ')"
+  texto="$(printf '%s' "$texto" | tr -d '\000-\011\013-\037\177' | tr '\n' ' ')"
   hora="$(date +%Y-%m-%d\ %H:%M)"
   ( umask 077; mkdir -p "$STATE_DIR" )
   (
@@ -323,26 +428,69 @@ cmd_registrar() {
   printf 'decisao registrada (%s)\n' "$nome"
 }
 
+# Agrupa fila, decisoes e desvios por sessao (uma chamada de python3, sem fork por item).
+PY_AGRUPA='
+import re, sys, os
+st = sys.argv[1]
+grupos, ordem = {}, []
+VIGIA = "vigia (desvios da noite)"
+def add(nome, linha):
+    if nome not in grupos:
+        grupos[nome] = []
+        ordem.append(nome)
+    grupos[nome].append(linha)
+fila = os.path.join(st, "fila.md")
+if os.path.isfile(fila):
+    sess = "desconhecida"
+    for linha in open(fila, encoding="utf-8", errors="replace"):
+        linha = linha.rstrip("\n")
+        m = re.match(r"^## .* - sessao: (.*)$", linha)
+        if m:
+            sess = m.group(1).strip()
+        if linha.strip():
+            add(sess, linha)
+dec = os.path.join(st, "decisoes_clevel.md")
+if os.path.isfile(dec):
+    for linha in open(dec, encoding="utf-8", errors="replace"):
+        linha = linha.rstrip("\n")
+        m = re.search(r"\[(.*?)\] (.*)$", linha)
+        if m:
+            add(m.group(1), "[decisao] " + m.group(2))
+vig = os.path.join(st, "desvios_noite.md")
+if os.path.isfile(vig):
+    for linha in open(vig, encoding="utf-8", errors="replace"):
+        if linha.strip():
+            add(VIGIA, linha.rstrip("\n"))
+for nome in ordem:
+    cab = "== vigia (desvios da noite) ==" if nome == VIGIA else "== sessao: %s ==" % nome
+    print(cab)
+    for linha in grupos[nome]:
+        print(linha)
+    print()
+'
+
 cmd_acordar() {
   rm -f "$STATE_DIR/lider_dormindo"
   printf 'bandeira lider_dormindo apagada\n'
   [ -d "$STATE_DIR" ] || { printf 'fila vazia\n'; return 0; }
   (
     flock 9
-    local dest="" f
-    for f in fila.md decisoes_clevel.md; do
-      [ -s "$STATE_DIR/$f" ] || continue
-      if [ -z "$dest" ]; then
-        dest="$STATE_DIR/arquivo/$(date +%Y%m%d-%H%M%S)"
-        ( umask 077; mkdir -p "$dest" )
-      fi
-      printf '\n--- %s ---\n' "$f"
-      cat "$STATE_DIR/$f"
-      mv -f "$STATE_DIR/$f" "$dest/$f"
+    local f dest="" tem=0
+    for f in fila.md decisoes_clevel.md desvios_noite.md; do
+      [ -s "$STATE_DIR/$f" ] && tem=1
     done
-    [ -n "$dest" ] || printf 'fila vazia\n'
-    [ -n "$dest" ] && printf '\nmovido para %s\n' "$dest"
-    true
+    if [ "$tem" = 0 ]; then
+      printf 'fila vazia\n'
+    else
+      # Saida filtrada: sem caracteres de controle (escape de terminal), so \t e \n.
+      python3 -I -c "$PY_AGRUPA" "$STATE_DIR" | LC_ALL=C tr -d '\000-\010\013-\037\177' || true
+      dest="$STATE_DIR/arquivo/$(date +%Y%m%d-%H%M%S)"
+      ( umask 077; mkdir -p "$dest" )
+      for f in fila.md decisoes_clevel.md desvios_noite.md; do
+        [ -e "$STATE_DIR/$f" ] && mv -f "$STATE_DIR/$f" "$dest/$f"
+      done
+      printf '\nmovido para %s\n' "$dest"
+    fi
   ) 9>"$STATE_DIR/.fila.lock"
 }
 
@@ -354,7 +502,7 @@ EOF
 
 case "${1:-help}" in
   check) shift; cmd_check "$@" ;;
-  status) cmd_status ;;
+  status) cmd_status; cmd_tokens ;;
   instalar) shift; cmd_instalar "$@" ;;
   remover) cmd_remover ;;
   dormir) cmd_dormir ;;

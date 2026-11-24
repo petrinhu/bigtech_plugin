@@ -157,7 +157,7 @@ for event, groups in (hj.get("hooks") or {}).items():
             declared.setdefault(script_path.name, expanded)
             declared_all.append((event, expanded))
 
-EXPECTED_HOOKS = 11
+EXPECTED_HOOKS = 12
 if exec_blocks != EXPECTED_HOOKS:
     fail(f"esperados {EXPECTED_HOOKS} hooks type=command, encontrados {exec_blocks}")
 print(f"  hooks type=command: {exec_blocks} (todos forma exec: command=python3|bash + args[])")
