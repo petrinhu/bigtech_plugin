@@ -292,14 +292,63 @@ cmd_dormir() {
   printf 'bandeira lider_dormindo criada\n'
 }
 
+# Nome da sessao pelo cwd (PWD): casa com $HOME/.claude/sessions/*.json. Uma chamada de python3.
+PY_NOME='
+import glob, json, os, sys
+cwd, sess = sys.argv[1], sys.argv[2]
+for p in sorted(glob.glob(os.path.join(sess, "*.json"))):
+    try:
+        with open(p, encoding="utf-8") as f:
+            d = json.load(f)
+    except (OSError, ValueError):
+        continue
+    if str(d.get("cwd") or "") == cwd:
+        print(str(d.get("name") or "desconhecida"))
+        break
+else:
+    print("desconhecida")
+'
+
+cmd_registrar() {
+  [ $# -ge 1 ] && [ -n "$1" ] || die "uso: vigia.sh registrar \"<texto da decisao>\"" 2
+  local texto="$1" nome hora
+  nome="$(python3 -I -c "$PY_NOME" "$PWD" "$SESS_DIR" 2>/dev/null || echo desconhecida)"
+  texto="$(printf '%s' "$texto" | tr '\n' ' ')"
+  hora="$(date +%Y-%m-%d\ %H:%M)"
+  ( umask 077; mkdir -p "$STATE_DIR" )
+  (
+    flock 9
+    printf -- '- %s [%s] %s\n' "$hora" "$nome" "$texto" >> "$STATE_DIR/decisoes_clevel.md"
+  ) 9>"$STATE_DIR/.fila.lock"
+  printf 'decisao registrada (%s)\n' "$nome"
+}
+
 cmd_acordar() {
   rm -f "$STATE_DIR/lider_dormindo"
   printf 'bandeira lider_dormindo apagada\n'
+  [ -d "$STATE_DIR" ] || { printf 'fila vazia\n'; return 0; }
+  (
+    flock 9
+    local dest="" f
+    for f in fila.md decisoes_clevel.md; do
+      [ -s "$STATE_DIR/$f" ] || continue
+      if [ -z "$dest" ]; then
+        dest="$STATE_DIR/arquivo/$(date +%Y%m%d-%H%M%S)"
+        ( umask 077; mkdir -p "$dest" )
+      fi
+      printf '\n--- %s ---\n' "$f"
+      cat "$STATE_DIR/$f"
+      mv -f "$STATE_DIR/$f" "$dest/$f"
+    done
+    [ -n "$dest" ] || printf 'fila vazia\n'
+    [ -n "$dest" ] && printf '\nmovido para %s\n' "$dest"
+    true
+  ) 9>"$STATE_DIR/.fila.lock"
 }
 
 usage() {
   cat <<'EOF'
-uso: vigia.sh {check [--dry-run] | status | instalar [--intervalo MIN] | remover | dormir | acordar}
+uso: vigia.sh {check [--dry-run] | status | instalar [--intervalo MIN] | remover | dormir | acordar | registrar "<texto>"}
 EOF
 }
 
@@ -309,6 +358,7 @@ case "${1:-help}" in
   instalar) shift; cmd_instalar "$@" ;;
   remover) cmd_remover ;;
   dormir) cmd_dormir ;;
+  registrar) shift; cmd_registrar "$@" ;;
   acordar) cmd_acordar ;;
   -h|--help|help) usage ;;
   *) usage >&2; die "subcomando desconhecido: $1" 2 ;;
