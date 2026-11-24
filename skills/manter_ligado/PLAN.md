@@ -593,7 +593,7 @@ Create `skills/manter_ligado/SKILL.md`:
 ```markdown
 ---
 name: manter_ligado
-description: Mantém a conexão de dados viva com a tampa fechada (laptop na mochila, tethering) e salva o estado de todas as sessões quando a bateria chega a ≤5%, sem desligar a máquina. Use quando o usuário disser "manter ligado", "vou pôr o laptop na mochila", "não deixa suspender com a tampa fechada", "salva a sessão se a bateria acabar", ou invocar /bigtech:manter_ligado {on|off|status|limpar}.
+description: Mantém a conexão de dados viva com a tampa fechada (laptop na mochila, tethering) e salva o estado de todas as sessões quando a bateria chega a ≤5%, sem desligar a máquina. Use quando o usuário disser "manter ligado", "vou pôr o laptop na mochila", "não deixa suspender com a tampa fechada", "salva a sessão se a bateria acabar", ou invocar /bigtech:manter_ligado {--on|--off|--status|--limpar}.
 ---
 
 # manter_ligado

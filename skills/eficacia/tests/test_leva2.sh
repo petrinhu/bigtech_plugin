@@ -136,7 +136,7 @@ assert_has "$(cat "$DIR/SKILL.md")" "desempate barato" "SKILL classe 1 tem desem
 assert_has "$(cat "$DIR/SKILL.md")" "SendMessage" "SKILL gerente manda resposta por SendMessage"
 assert_has "$(cat "$DIR/SKILL.md")" "itens do TODO.md" "SKILL projeto: pre-voo marca os proximos itens"
 assert_has "$(cat "$DIR/../olhe_agentes/SKILL.md")" "bigtech-eficacia.timer" "olhe_agentes checa o timer"
-assert_has "$(cat "$DIR/../olhe_agentes/SKILL.md")" "/bigtech:eficacia gerente" "olhe_agentes sugere eficacia gerente"
+assert_has "$(cat "$DIR/../olhe_agentes/SKILL.md")" "/bigtech:eficacia --gerente" "olhe_agentes sugere eficacia gerente"
 
 echo
 if [ "$FAILS" -eq 0 ]; then echo "TODOS OS TESTES PASSARAM"; exit 0; fi

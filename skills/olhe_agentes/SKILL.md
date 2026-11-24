@@ -1,9 +1,12 @@
 ---
 name: olhe_agentes
-description: 'Liga, desliga ou mostra o MONITOR de agentes da sessão. Tick a cada 5 minutos, prazo de 7 dias. Com o modo autônomo LIGADO, se o main e os agentes estiverem sem fazer nada, descobre o motivo, resolve dentro do que o modo autônomo autoriza, registra cada decisão e manda continuarem no projeto. Com o modo autônomo DESLIGADO, se o trabalho acabou escreve na tela "trabalho concluído"; se não acabou, descobre o motivo, apresenta a causa e as opções ao usuário e manda retornarem depois da escolha dele. Uma parada ordenada pelo usuário nunca é retomada sem ordem dele. Use IMEDIATAMENTE quando o usuário invocar /bigtech:olhe_agentes, ou disser "ligue o monitor dos agentes", "olhe os agentes", "vigie se os agentes pararam", "desligue o monitor dos agentes". Argumentos: on (padrão), off, status, tick (uso interno do próprio ciclo).'
+description: 'Liga, desliga ou mostra o MONITOR de agentes da sessão. Tick a cada 5 minutos, prazo de 7 dias. Com o modo autônomo LIGADO, se o main e os agentes estiverem sem fazer nada, descobre o motivo, resolve dentro do que o modo autônomo autoriza, registra cada decisão e manda continuarem no projeto. Com o modo autônomo DESLIGADO, se o trabalho acabou escreve na tela "trabalho concluído"; se não acabou, descobre o motivo, apresenta a causa e as opções ao usuário e manda retornarem depois da escolha dele. Uma parada ordenada pelo usuário nunca é retomada sem ordem dele. Use IMEDIATAMENTE quando o usuário invocar /bigtech:olhe_agentes, ou disser "ligue o monitor dos agentes", "olhe os agentes", "vigie se os agentes pararam", "desligue o monitor dos agentes". Argumentos: --on (padrão), --off, --status, --tick (uso interno do próprio ciclo); a forma antiga on, off, status e tick também vale.'
+argument-hint: "[--on|--off|--status|--tick]"
 ---
 
 # olhe_agentes
+
+Forma antiga aceita, sem o traço (`on`, `off`, `status`, `tick`), com o mesmo efeito.
 
 Monitor de agentes. Requisitos de origem, no texto do pedido do autor da skill (não do usuário desta sessão), condensados no procedimento abaixo:
 
@@ -28,23 +31,23 @@ e depois: "crie uma skill chamada olhe_agentes que ligue sempre esse monitor".
 ## Dependências opcionais
 
 O monitor funciona sem nenhuma das duas. Cada uma é opcional e só conta se existir na configuração do usuário; sem ela, vale o comportamento indicado.
-- **Arquivo de modo autônomo** `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/autonomo/$SLUG.json`: presente e dentro do prazo, liga o modo autônomo, e o que o monitor pode resolver sozinho é o escopo que esse arquivo registra. Sem ele, o modo autônomo conta como DESLIGADO e vale o passo 6 do `tick`.
+- **Arquivo de modo autônomo** `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/autonomo/$SLUG.json`: presente e dentro do prazo, liga o modo autônomo, e o que o monitor pode resolver sozinho é o escopo que esse arquivo registra. Sem ele, o modo autônomo conta como DESLIGADO e vale o passo 6 do `--tick`.
 - **Snapshot da sessão** (`project_session_atual.md` na memória do projeto): diz qual é o trabalho em curso. Sem ele, o trabalho em curso é o último pedido do usuário nesta conversa, conferido no `git status` e no `git log -3`. Se isso não bastar para afirmar que o trabalho acabou, o monitor não anuncia conclusão: mostra o que viu e pergunta.
 
-## `on` (padrão)
+## `--on` (padrão)
 1. `mkdir -p ~/.config/olhe_agentes/$SLUG`.
 2. Se `prazo` não existir ou já tiver vencido, grave `$(( $(date +%s) + 7*86400 ))`.
-3. Se o timer `bigtech-eficacia.timer` estiver ativo (`systemctl --user is-active --quiet bigtech-eficacia.timer`), NAO arme o ciclo: o vigia do timer ja cobre as sessoes. Diga isso ao usuario e sugira `/bigtech:eficacia gerente`. Sem o timer, arme o ciclo: `ScheduleWakeup` com `delaySeconds: 300` e `prompt: "/bigtech:olhe_agentes tick"`.
+3. Se o timer `bigtech-eficacia.timer` estiver ativo (`systemctl --user is-active --quiet bigtech-eficacia.timer`), NAO arme o ciclo: o vigia do timer ja cobre as sessoes. Diga isso ao usuario e sugira `/bigtech:eficacia --gerente`. Sem o timer, arme o ciclo: `ScheduleWakeup` com `delaySeconds: 300` e `prompt: "/bigtech:olhe_agentes --tick"`.
 4. Responda ao usuário em uma linha: monitor ligado, a hora do próximo tick, o prazo e se há parada do usuário ativa.
 **Limite que tem de ser declarado:** o monitor vive DENTRO da sessão. Se a janela fechar ou o Claude cair, os ticks param junto. Nada de fora retoma a sessão com segurança. Para sobreviver a reinício, ofereça ao usuário o gêmeo local: agendador local do sistema ou `/schedule`; a escolha é dele.
 
-## `off`
+## `--off`
 `ScheduleWakeup` com `stop: true`, depois uma linha confirmando. Os arquivos de estado ficam.
 
-## `status`
+## `--status`
 Mostra o prazo restante, a parada do usuário (sim/não e o texto), o modo autônomo, os agentes em voo e os comandos de trabalho em execução.
 
-## `tick` (o ciclo, a cada 5 minutos)
+## `--tick` (o ciclo, a cada 5 minutos)
 1. **Prazo:** se vencido, escreva "monitor de agentes encerrado (prazo de 7 dias)" e NÃO reagende. Fim.
 2. **Leitura do estado**, sempre por comando e nunca de memória:
    - modo autônomo: arquivo `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/autonomo/$SLUG.json` presente e dentro do prazo (opcional; sem ele, DESLIGADO);
@@ -63,7 +66,7 @@ Mostra o prazo restante, a parada do usuário (sim/não e o texto), o modo autô
    - o trabalho em curso acabou (tudo commitado e relatado, sem agente em voo e, se houver snapshot, sem pendência nele): escreva "trabalho concluído: <o quê>", uma vez por trabalho (`concluido_avisado`);
    - não acabou e parou SEM ordem do usuário: descubra o motivo, apresente a causa e as opções, e retome o trabalho só depois da escolha dele.
 7. Nada a fazer: uma linha curta ("tick hh:mm, tudo em ordem" ou "tick hh:mm, parada do líder ativa").
-8. Reagende na sessão enquanto ela viver: `ScheduleWakeup` 300 s com `prompt: "/bigtech:olhe_agentes tick"`; a morte por reinício está declarada no limite do `on`.
+8. Reagende na sessão enquanto ela viver: `ScheduleWakeup` 300 s com `prompt: "/bigtech:olhe_agentes --tick"`; a morte por reinício está declarada no limite do `--on`.
 
 Nunca fazer, em nenhum ramo:
 - push, merge, tag ou ação irreversível sem a autorização que o projeto exige;

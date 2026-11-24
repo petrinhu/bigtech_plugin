@@ -1,6 +1,7 @@
 ---
 name: watchcode
-description: Vigia o journal/coredumps enquanto agentes ou main estao codando e captura crashes reais (OOM, SIGSEGV, SIGABRT, coredump de produto fora do baseline). Crash desta sessao delega o Caetano/CTO pra diagnosticar e propor; crash de outra sessao Claude ou do sistema/apps do usuario vira relatorio. Use quando o usuario disser "vigia o codigo", "arma o watchcode", "monitora crashes enquanto coda", "avisa se algo quebrar", ou invocar /bigtech:watchcode {on|off|status}.
+description: Vigia o journal/coredumps enquanto agentes ou main estao codando e captura crashes reais (OOM, SIGSEGV, SIGABRT, coredump de produto fora do baseline). Crash desta sessao delega o Caetano/CTO pra diagnosticar e propor; crash de outra sessao Claude ou do sistema/apps do usuario vira relatorio. Use quando o usuario disser "vigia o codigo", "arma o watchcode", "monitora crashes enquanto coda", "avisa se algo quebrar", ou invocar /bigtech:watchcode {--on|--off|--status}. Comandos --on, --off ou --status (a forma antiga on, off e status tambem vale).
+argument-hint: "[--on|--off|--status]"
 ---
 
 # watchcode
@@ -9,22 +10,24 @@ Vigia crashes reais durante a codificacao. O daemon detecta; esta sessao (a tick
 
 ## Comandos (rode com a Bash tool)
 
-- `on`  -> `bash ${CLAUDE_SKILL_DIR}/bin/watchcode.sh on`
-- `off` -> `bash ${CLAUDE_SKILL_DIR}/bin/watchcode.sh off`
-- `status` -> `bash ${CLAUDE_SKILL_DIR}/bin/watchcode.sh status`
+Forma antiga aceita, sem o traço (`on`, `off`, `status`), com o mesmo efeito.
+
+- `--on`  -> `bash ${CLAUDE_SKILL_DIR}/bin/watchcode.sh on`
+- `--off` -> `bash ${CLAUDE_SKILL_DIR}/bin/watchcode.sh off`
+- `--status` -> `bash ${CLAUDE_SKILL_DIR}/bin/watchcode.sh status`
 - `pin` -> `bash ${CLAUDE_SKILL_DIR}/bin/watchcode.sh pin`
 - `unpin` -> `bash ${CLAUDE_SKILL_DIR}/bin/watchcode.sh unpin`
 
-Ao dar `on`, ALEM de rodar o comando, ARME o loop de tick: use ScheduleWakeup (~120s) para reacordar e processar achados. Ao dar `off` ou ao detectar que os agentes de codificacao pararam (thread ociosa), faca a LEITURA FINAL, emita o RESUMO e pare (o `off` ja derruba o daemon no ultimo).
+Ao dar `--on`, ALEM de rodar o comando, ARME o loop de tick: use ScheduleWakeup (~120s) para reacordar e processar achados. Ao dar `--off` ou ao detectar que os agentes de codificacao pararam (thread ociosa), faca a LEITURA FINAL, emita o RESUMO e pare (o `--off` ja derruba o daemon no ultimo).
 
 ## Pin (manter o daemon vivo alem do refcount)
 
 Por padrao o daemon cai sozinho quando ninguem mais o usa (refcount de sessoes registradas chega a 0) - o pin e a excecao a essa regra.
 
-- `pin` -> sobe o daemon se ainda nao estiver no ar e cria um flag `pinned` em `$XDG_RUNTIME_DIR/watchcode/`. Com o flag ativo, o daemon NAO cai por ociosidade nem por refcount 0; ele so cai com `off` explicito ou com `unpin` (se ninguem mais estiver usando).
+- `pin` -> sobe o daemon se ainda nao estiver no ar e cria um flag `pinned` em `$XDG_RUNTIME_DIR/watchcode/`. Com o flag ativo, o daemon NAO cai por ociosidade nem por refcount 0; ele so cai com `--off` explicito ou com `unpin` (se ninguem mais estiver usando).
 - `unpin` -> remove o flag. Se nesse momento nao houver nenhuma sessao registrada (refcount 0), o daemon cai NA HORA; se ainda houver sessoes usando, ele continua vigiando normalmente por elas.
-- `status` mostra `[PINADO]` quando o flag esta ativo.
-- O encerramento automatico por ociosidade e o `off` RESPEITAM o pin: um daemon pinado nao cai so porque o refcount zerou.
+- `--status` mostra `[PINADO]` quando o flag esta ativo.
+- O encerramento automatico por ociosidade e o `--off` RESPEITAM o pin: um daemon pinado nao cai so porque o refcount zerou.
 - Caso de uso: deixar o watchcode vigiando um trabalho que pausa e retoma (ex: build longo, espera de humano) sem nenhuma sessao registrada durante o intervalo.
 
 ## A cada tick (vigilancia; NAO delega ainda)
@@ -45,7 +48,7 @@ Por padrao o daemon cai sozinho quando ninguem mais o usa (refcount de sessoes r
 
 ## Resumo final (semaforo)
 
-Ao encerrar (agentes pararam OU `off`): faca a leitura final, **VERIFIQUE o daemon de verdade** (`systemctl --user is-active watchcode-daemon.service` - nunca assuma), e emita UMA das tres, sempre com o icone 👿 antes do status do daemon.
+Ao encerrar (agentes pararam OU `--off`): faca a leitura final, **VERIFIQUE o daemon de verdade** (`systemctl --user is-active watchcode-daemon.service` - nunca assuma), e emita UMA das tres, sempre com o icone 👿 antes do status do daemon.
 
 Precedencia (regra de produto: **vermelho quando bloqueia o build**, mesmo sem prova de que e "desta sessao"):
 

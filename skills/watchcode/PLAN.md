@@ -677,7 +677,7 @@ Create `skills/watchcode/SKILL.md`:
 ````markdown
 ---
 name: watchcode
-description: Vigia o journal/coredumps enquanto agentes ou main estao codando e captura crashes reais (OOM, SIGSEGV, SIGABRT, coredump de produto fora do baseline). Crash desta sessao delega o Caetano/CTO (fable) pra diagnosticar e propor; crash de outra sessao Claude ou do sistema/apps do usuario vira relatorio. Use quando o usuario disser "vigia o codigo", "arma o watchcode", "monitora crashes enquanto coda", "avisa se algo quebrar", ou invocar /bigtech:watchcode {on|off|status}.
+description: Vigia o journal/coredumps enquanto agentes ou main estao codando e captura crashes reais (OOM, SIGSEGV, SIGABRT, coredump de produto fora do baseline). Crash desta sessao delega o Caetano/CTO (fable) pra diagnosticar e propor; crash de outra sessao Claude ou do sistema/apps do usuario vira relatorio. Use quando o usuario disser "vigia o codigo", "arma o watchcode", "monitora crashes enquanto coda", "avisa se algo quebrar", ou invocar /bigtech:watchcode {--on|--off|--status}.
 ---
 
 # watchcode

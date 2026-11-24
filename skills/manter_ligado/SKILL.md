@@ -1,23 +1,24 @@
 ---
 name: manter_ligado
-description: Mantém a conexão de dados viva com a tampa fechada (laptop na mochila, tethering) e salva o estado de todas as sessões quando a bateria chega a ≤5%, sem desligar a máquina. Use quando o usuário disser "manter ligado", "vou pôr o laptop na mochila", "não deixa suspender com a tampa fechada", "salva a sessão se a bateria acabar", ou invocar /bigtech:manter_ligado {on|off|status|limpar}. Só serve para Linux com systemd --user (systemd-run e systemd-inhibit); em outro SO falha com mensagem clara.
+description: Mantém a conexão de dados viva com a tampa fechada (laptop na mochila, tethering) e salva o estado de todas as sessões quando a bateria chega a ≤5%, sem desligar a máquina. Use quando o usuário disser "manter ligado", "vou pôr o laptop na mochila", "não deixa suspender com a tampa fechada", "salva a sessão se a bateria acabar", ou invocar /bigtech:manter_ligado --on, --off, --status ou --limpar (a forma antiga on, off, status e limpar tambem vale). Só serve para Linux com systemd --user (systemd-run e systemd-inhibit); em outro SO falha com mensagem clara.
+argument-hint: "[--on|--off|--status|--limpar]"
 ---
 
 # manter_ligado
 
-Skill controladora. Executa o script conforme o argumento (default `status`):
+Skill controladora. Executa o script conforme o argumento (default `--status`). Forma antiga aceita, sem o traço (`on`, `off`, `status`, `limpar`), com o mesmo efeito.
 
-- `on` → `bash ${CLAUDE_SKILL_DIR}/bin/manter_ligado.sh on`
-- `off` → `bash ${CLAUDE_SKILL_DIR}/bin/manter_ligado.sh off`
-- `status` → `bash ${CLAUDE_SKILL_DIR}/bin/manter_ligado.sh status`
-- `limpar` → `bash ${CLAUDE_SKILL_DIR}/bin/manter_ligado.sh limpar`
+- `--on` → `bash ${CLAUDE_SKILL_DIR}/bin/manter_ligado.sh on`
+- `--off` → `bash ${CLAUDE_SKILL_DIR}/bin/manter_ligado.sh off`
+- `--status` → `bash ${CLAUDE_SKILL_DIR}/bin/manter_ligado.sh status`
+- `--limpar` → `bash ${CLAUDE_SKILL_DIR}/bin/manter_ligado.sh limpar`
 
 Ao invocar, rode o comando correspondente com a Bash tool e relate a saída ao usuário.
-Não peça confirmação para `on`/`off`/`status`. Para `limpar` (apaga snapshots), confirme antes.
+Não peça confirmação para `--on`/`--off`/`--status`. Para `--limpar` (apaga snapshots), confirme antes.
 
 ## O que faz
 
-- `on`: registra a sessão atual e sobe um guardião singleton (`systemd --user` transitório) que segura
+- `--on`: registra a sessão atual e sobe um guardião singleton (`systemd --user` transitório) que segura
   um inhibitor `sleep:handle-lid-switch` (tampa fechada não suspende; a tela apaga/acorda pelo KDE) e
   roda um loop de bateria.
 - A **20%**: push de aviso ao celular (KDE Connect; fallback notify-send). O texto sugere rodar `/memo` nas
@@ -30,7 +31,7 @@ Não peça confirmação para `on`/`off`/`status`. Para `limpar` (apaga snapshot
   funciona se existir na configuração do usuário. O código não falha sem ela (a saída e o erro do
   `claude -p` são descartados), mas cada chamada pode levar até 90 s e atrasa a cópia das sessões
   seguintes. Sem a skill, deixe `MEMO_HEADLESS` desligado.
-- `off`: desregistra; guardião cai só no último `off`. `status`: mostra se está armado. `limpar`: faxina.
+- `--off`: desregistra; guardião cai só no último `--off`. `--status`: mostra se está armado. `--limpar`: faxina.
 
 Detalhes: ver `DESIGN.md` e `PLAN.md` nesta pasta.
 

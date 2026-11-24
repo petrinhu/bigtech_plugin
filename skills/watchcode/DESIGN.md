@@ -8,9 +8,9 @@ Enquanto agentes/main estão codando (compilando e RODANDO binários de produto)
 
 ## Comandos
 
-- `/bigtech:watchcode on` - arma (scoped ao cwd), registra a sessão, sobe o daemon (ou adota um órfão).
-- `/bigtech:watchcode off` - encerra na hora: desregistra a sessão, scan final, resumo, derruba o daemon se for a última.
-- `/bigtech:watchcode status` - mostra se está armado, por quantas sessões, e achados acumulados.
+- `/bigtech:watchcode --on` - arma (scoped ao cwd), registra a sessão, sobe o daemon (ou adota um órfão).
+- `/bigtech:watchcode --off` - encerra na hora: desregistra a sessão, scan final, resumo, derruba o daemon se for a última.
+- `/bigtech:watchcode --status` - mostra se está armado, por quantas sessões, e achados acumulados.
 
 ## Arquitetura - daemon "burro" + leitor "inteligente" (Claude)
 
@@ -66,7 +66,7 @@ Só a classe **(1)** diagnostica/propõe. **(2)** e **(3)** são relato puro.
 
 - **`on`**: reap de sids mortos; registra a sessão atual (com seu `scope`=cwd e um `cursor` iniciando em 0 para consumir backlog de um órfão). Se o daemon não está no ar -> sobe. Se está no ar com registro vazio (**órfão**) -> **adota** (só registra; deixa ele coletando). Se está no ar já registrado -> no-op.
 - **Enquanto armado**: a tick (~120s) lê `findings.jsonl` do cursor da sessão, classifica e roteia (delega Caetano em `this`; relatório em `other`/`system`). Avança o cursor.
-- **Fim do loop (Opção 1 aprovada)**: **automático** quando a thread principal fica ociosa (sem agentes de codificação pendentes por um tick) **OU** `/bigtech:watchcode off` manual. No fim: desregistra a sessão; **scan final**; emite o **resumo** (achados classificados desta sessão + o que um órfão adotado já havia coletado; inclui erros de sistema/apps do usuário na janela ativa; ou "nada anormal"); se o registro ficou vazio -> **derruba o daemon** (sem órfão).
+- **Fim do loop (Opção 1 aprovada)**: **automático** quando a thread principal fica ociosa (sem agentes de codificação pendentes por um tick) **OU** `/bigtech:watchcode --off` manual. No fim: desregistra a sessão; **scan final**; emite o **resumo** (achados classificados desta sessão + o que um órfão adotado já havia coletado; inclui erros de sistema/apps do usuário na janela ativa; ou "nada anormal"); se o registro ficou vazio -> **derruba o daemon** (sem órfão).
 
 ## Higiene
 

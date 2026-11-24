@@ -10,10 +10,10 @@ Alvo: Linux com systemd e KDE Plasma (o aviso ao celular usa o KDE Connect). Hib
 
 ## Comandos
 
-- `/bigtech:manter_ligado on` — arma o keep-alive + guardião de bateria; registra a sessão atual.
-- `/bigtech:manter_ligado off` — desregistra a sessão atual; derruba o guardião só se for a última.
-- `/bigtech:manter_ligado status` — mostra se está armado e por quantas sessões; reconcilia o registro.
-- `/bigtech:manter_ligado limpar` — faxina geral sob demanda (apaga snapshots, zera registro).
+- `/bigtech:manter_ligado --on` — arma o keep-alive + guardião de bateria; registra a sessão atual.
+- `/bigtech:manter_ligado --off` — desregistra a sessão atual; derruba o guardião só se for a última.
+- `/bigtech:manter_ligado --status` — mostra se está armado e por quantas sessões; reconcilia o registro.
+- `/bigtech:manter_ligado --limpar` — faxina geral sob demanda (apaga snapshots, zera registro).
 
 ## Arquitetura — controlador fino + guardião singleton
 
