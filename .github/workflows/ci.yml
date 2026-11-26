@@ -26,11 +26,16 @@ jobs:
   # .md de evals/, docs/campanha, docs/auditoria, docs/submission e
   # docs/superpowers). docs/house e os .md da raiz que o drift e o sync
   # leem rodam o CI normal, como agents/ e skills/.
-  # Tag, workflow_dispatch, ramo novo ou base ilegivel: roda tudo.
+  # Base (L-35, "O seletivo"): o ultimo commit verde do proprio ramo; sem verde,
+  # o ramo principal (push de outro ramo, ou PR); no principal sem verde, roda tudo.
+  # Tag, workflow_dispatch ou base ilegivel: roda tudo.
   # ---------------------------------------------------------------------
   mudanca:
     name: mudanca so de docs?
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
     outputs:
       testes: ${{ steps.diff.outputs.testes }}
     steps:
@@ -45,21 +50,44 @@ jobs:
         env:
           EVENTO: ${{ github.event_name }}
           REF: ${{ github.ref }}
-          ANTES: ${{ github.event.before }}
+          RAMO: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
           PR_BASE: ${{ github.event.pull_request.base.sha }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         run: |
           DOCS='^(TODO\.md|\.claude/.*|evals/.+\.md|docs/(campanha|auditoria|submission|superpowers)/.*)$'
           testes=true
           base=""
-          if [ "$EVENTO" = "push" ] && [ "${REF#refs/tags/}" = "$REF" ]; then base="$ANTES"; fi
-          if [ "$EVENTO" = "pull_request" ]; then base="$PR_BASE"; fi
+          origem="roda tudo"
+          # Ultimo SHA com run deste workflow fechado em success no ramo. Sem API ou
+          # sem verde, sai vazio, e o pior caso e rodar tudo (nunca pular teste por falha).
+          ultimo_verde() {
+            local sha
+            if sha="$(gh run list --workflow ci.yml --branch "$1" --status success --limit 1 --json headSha --jq '.[0].headSha // ""' 2>/dev/null)" \
+               && [[ "$sha" =~ ^[0-9a-f]{40}$ ]] && git cat-file -e "$sha^{commit}" 2>/dev/null; then
+              printf '%s' "$sha"
+            fi
+          }
+          if [ "$EVENTO" = "pull_request" ]; then
+            base="$(ultimo_verde "$RAMO")"; origem="verde do proprio ramo"
+            if [ -z "$base" ]; then base="$PR_BASE"; origem="ramo principal (PR)"; fi
+          elif [ "$EVENTO" = "push" ] && [ "${REF#refs/tags/}" = "$REF" ]; then
+            base="$(ultimo_verde "$RAMO")"; origem="verde do proprio ramo"
+            if [ -z "$base" ] && [ "$RAMO" != "main" ]; then
+              base="$(git rev-parse --verify -q origin/main)" || base=""
+              origem="ramo principal"
+            fi
+          fi
           arquivos=""
           if [ -n "$base" ] && [ "$base" != "0000000000000000000000000000000000000000" ] \
              && arquivos="$(git diff --name-only "$base" HEAD)"; then
             if [ -n "$arquivos" ] && ! printf '%s\n' "$arquivos" | grep -vE "$DOCS" >/dev/null; then
               testes=false
             fi
+          else
+            base=""
           fi
+          printf 'base: %s (%s)\n' "${base:-nenhuma}" "$origem"
           printf 'arquivos mudados:\n%s\n' "$arquivos"
           echo "roda os testes: $testes"
           echo "testes=$testes" >> "$GITHUB_OUTPUT"
@@ -73,6 +101,8 @@ jobs:
     if: needs.mudanca.outputs.testes == 'true'
     runs-on: ${{ matrix.os }}
     strategy:
+      # fail-fast: false de proposito: a matriz e de SO (ubuntu x windows) e roda
+      # listas de passos diferentes; falha so num dos dois e a informacao que a matriz da.
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
