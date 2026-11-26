@@ -101,9 +101,8 @@ jobs:
     if: needs.mudanca.outputs.testes == 'true'
     runs-on: ${{ matrix.os }}
     strategy:
-      # fail-fast: false de proposito: a matriz e de SO (ubuntu x windows) e roda
-      # listas de passos diferentes; falha so num dos dois e a informacao que a matriz da.
-      fail-fast: false
+      # fail-fast: true (L-35, parar no primeiro erro): a primeira falha cancela o resto da matriz.
+      fail-fast: true
       matrix:
         os: [ubuntu-latest, windows-latest]
         python-version: ["3.11", "3.12"]
@@ -204,7 +203,7 @@ jobs:
     container:
       image: ${{ matrix.image }}
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         include:
           - distro: debian
